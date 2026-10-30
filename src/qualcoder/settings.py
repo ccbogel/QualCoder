@@ -26,10 +26,11 @@ import logging
 import os
 import re
 import unicodedata  # <- L normalize localized numerals when reading numeric combos
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
-from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .ai_llm import (
     add_new_ai_model,
@@ -41,9 +42,10 @@ from .ai_llm import (
 )
 from .ai_runtime import ai_runtime_ready, show_ai_runtime_not_ready
 from .coder_names import DialogCoderNames
-from .confirm_delete import DialogConfirmDelete
+
+#from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
-from .helpers import get_default_user_directory, Message
+from .helpers import Message, get_default_user_directory
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
@@ -81,7 +83,7 @@ Notes
 FONT_SIZES = [8, 10, 12, 14, 16, 18]        # comboBox_fontsize / codetree / docfontsize  
 BACKUP_COUNTS = [0, 1, 2, 3, 4, 5]          # comboBox_backups  
 CONTEXT_CHARS = [100, 200, 300]             # comboBox_surrounding_chars  
-STYLE_OPTIONS = ["native", "original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow"]
+STYLE_OPTIONS = ["native", "original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow", "custom"]
 HIGHLIGHT_STYLE_OPTIONS = ["marker", "underline"]
 MAIN_TABS_OPTIONS = ["top", "left"]
 
@@ -185,11 +187,11 @@ class StrictDoubleRangeValidator(QtGui.QDoubleValidator):
 class DialogSettings(QtWidgets.QDialog):
     """ Settings for the coder name, coder table and to display ids. """
 
-    settings = {}
+    #settings={}
 
     def __init__(self, app, parent=None, section=None, enable_ai=False,
-                 ai_runtime_loader: Optional[Callable[..., bool]] = None):
-
+                 ai_runtime_loader: Callable[..., bool] | None = None):
+        self.settings = {}
         self.app = app
         self.ai_runtime_loader = ai_runtime_loader
         if self.app.conn is not None:
@@ -442,8 +444,8 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.comboBox_language.setItemData(index, 'language', QtCore.Qt.ItemDataRole.UserRole + 1)
 
         current_language = preferred_language if preferred_language is not None else self.settings['language']
-        if not self.set_language_combo_selection(current_language):
-            if not self.set_language_combo_selection('en'):
+        if not self.set_language_combo_selection(current_language)\
+            and not self.set_language_combo_selection('en'):
                 for index in range(self.ui.comboBox_language.count()):
                     item_type = self.ui.comboBox_language.itemData(index, QtCore.Qt.ItemDataRole.UserRole + 1)
                     if item_type == 'language':
@@ -475,8 +477,8 @@ class DialogSettings(QtWidgets.QDialog):
         if obj == self.ui.comboBox_language:
             if event.type() == QtCore.QEvent.Type.MouseButtonPress:
                 self.refresh_language_combo()
-            if event.type() == QtCore.QEvent.Type.KeyPress:
-                if event.key() in (QtCore.Qt.Key.Key_F4, QtCore.Qt.Key.Key_Down):
+            if event.type() == QtCore.QEvent.Type.KeyPress\
+                and event.key() in (QtCore.Qt.Key.Key_F4, QtCore.Qt.Key.Key_Down):
                     self.refresh_language_combo()
         return super().eventFilter(obj, event)
 
@@ -557,7 +559,7 @@ class DialogSettings(QtWidgets.QDialog):
         if not ai_runtime_ready(self.app):
             self.ui.label_auth_result.setText(_("AI components are still loading."))
             return
-        is_authenticated, status_text = get_chatgpt_oauth_status()
+        is_authenticated, status_text = get_chatgpt_oauth_status() # flagged as unused
         self.ui.label_auth_result.setText(status_text)
 
     def update_ai_auth_widgets(self):

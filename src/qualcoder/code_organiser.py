@@ -20,23 +20,24 @@ https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
 https://qualcoder.org/
 """
+import datetime
 import logging  # was missing; apply/transaction paths log debug and errors
 import math  # perimeter line geometry
-import sqlite3
-from copy import deepcopy
-import datetime
 import os
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-from random import randint
+import sqlite3
 import xml.etree.ElementTree as etree  # QDC codebook import
+from copy import deepcopy
+from random import randint
 
-from PyQt6 import QtCore, QtWidgets, QtGui
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
 
 from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
 from .codebook import parse_codebook_path, read_codebook_rows
-from .color_selector import TextColor, colors as valid_colors
+from .color_selector import TextColor
+from .color_selector import colors as valid_colors
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_organiser import Ui_DialogOrganiser
 from .helpers import ExportDirectoryPathDialog, Message
@@ -123,7 +124,7 @@ class CodeOrganiser(QDialog):
         self.scene.selectionChanged.connect(self._sync_connection_handles)
         global update_graphics_item_models  # noqa: F824
         update_graphics_item_models = False
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         model = []
         text_ = _("BACK UP PROJECT before applying changes to the codes tree.\n"
                   "The Code organiser is used mainly with grounded theory to help you develop and organise"
@@ -207,7 +208,7 @@ class CodeOrganiser(QDialog):
         # Keyed by stable original ids; immune to actions that overwrite original_*
         # fields (e.g. link_code_under_code rewrites original_supercid).
         self._initial_model = {}
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         for item in model:
             key = ('code', item['original_cid']) if item['original_cid'] is not None \
                 else ('cat', item['original_catid'])
@@ -258,7 +259,7 @@ class CodeOrganiser(QDialog):
             category['supercid'] = None
             category['color'] = '#FFFFFF'
             category['delete'] = False  # True if merged
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         model = categories + codes
 
     def get_refined_model(self, root_key):
@@ -275,7 +276,7 @@ class CodeOrganiser(QDialog):
         param: root_key : None | "All" | tuple(kind, id)
         """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         if root_key is None or root_key == "All":
             return
         # Backwards tolerance: a bare name still selects a top-level category.
@@ -315,7 +316,7 @@ class CodeOrganiser(QDialog):
             while frontier and guard < 100000:
                 guard += 1
                 nxt = set()
-                for cid_ in list(frontier):
+                for cid_ in frontier:
                     if cid_ in keep_catids:
                         continue
                     keep_catids.add(cid_)
@@ -403,7 +404,7 @@ class CodeOrganiser(QDialog):
         param: global model : List of Dictionaries of categories and codes
         """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         # Order the model by supercatid, subcats, codes
         ordered_model = []
         # a node is "top level" for layout when its PARENT is not present
@@ -463,10 +464,10 @@ class CodeOrganiser(QDialog):
             code_or_cat['child_names'] = self.named_children_of_node(code_or_cat)
             add_to_scene = True
             for scene_item in self.scene.items():
-                if isinstance(scene_item, TextGraphicsItem):
-                    if scene_item.code_or_cat['name'] == code_or_cat['name'] and \
-                            scene_item.code_or_cat['catid'] == code_or_cat['catid'] and \
-                            scene_item.code_or_cat['cid'] == code_or_cat['cid']:
+                if isinstance(scene_item, TextGraphicsItem) and\
+                    scene_item.code_or_cat['name'] == code_or_cat['name'] and\
+                    scene_item.code_or_cat['catid'] == code_or_cat['catid'] and\
+                    scene_item.code_or_cat['cid'] == code_or_cat['cid']:
                         add_to_scene = False
             if add_to_scene:
                 self.scene.addItem(TextGraphicsItem(self.app, code_or_cat))
@@ -509,7 +510,7 @@ class CodeOrganiser(QDialog):
                 print(i.__class__, i.pos())
         if key == QtCore.Qt.Key.Key_M:  # and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
             # Display model
-            global model  # noqa: F824
+            global model  # noqa: F824, PLW0602
             print("^^^^ MODEL ^^^^")
             for m in model:
                 print(m)
@@ -561,11 +562,11 @@ class CodeOrganiser(QDialog):
 
     def reject(self):
 
-        super(CodeOrganiser, self).reject()
+        super().reject()
 
     def accept(self):
 
-        super(CodeOrganiser, self).accept()
+        super().accept()
 
     def eventFilter(self, obj, event):
         """ Forwards context menu events to graphics view items, and implements
@@ -625,11 +626,10 @@ class CodeOrganiser(QDialog):
                         if self._connect_state == 'dragging_preview':
                             self._handle_connect_click(scene_pos)
                             return True
-                elif event.type() == QtCore.QEvent.Type.MouseMove:
-                    if self._connect_state == 'dragging_preview':
-                        scene_pos = self.ui.graphicsView.mapToScene(event.position().toPoint())
-                        self.scene.set_connection_preview(self._connect_source, scene_pos)
-                        return True
+                elif event.type() == QtCore.QEvent.Type.MouseMove and self._connect_state == 'dragging_preview':
+                    scene_pos = self.ui.graphicsView.mapToScene(event.position().toPoint())
+                    self.scene.set_connection_preview(self._connect_source, scene_pos)
+                    return True
 
             # PAN with the middle mouse button, or left button while the
             # spacebar is held. Ported from view_graph (identical mechanism).
@@ -704,7 +704,7 @@ class CodeOrganiser(QDialog):
                           f" catid:{i.code_or_cat['catid']} ocatid:{i.code_or_cat['original_catid']} "
                           f"supercatid:{i.code_or_cat['supercatid']} child names{i.code_or_cat['child_names']}")'''
         if action == action_add_category:
-            global model  # noqa: F824
+            global model  # noqa: F824, PLW0602
             cat_ids_list = []
             categories_ = []
             for item in model:
@@ -800,7 +800,7 @@ class CodeOrganiser(QDialog):
         'file SOURCE under TARGET' (SOURCE becomes the child). Reuses the exact model
         mutations of the right-click link operations, so the outcome is identical and
         the same circular-nesting guards apply. Model only; Apply writes to the DB. """
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         global update_graphics_item_models  # noqa: F824
         s = source.code_or_cat
         t = target.code_or_cat
@@ -885,21 +885,21 @@ class CodeOrganiser(QDialog):
 
     def _next_temp_cid(self):
         """ Deterministic unique temporary negative cid. """
-        global model  # noqa: F824
+        global model  # noqa: PLW0602
         negatives = [it['cid'] for it in model if it.get('cid') is not None and it['cid'] < 0]
         return (min(negatives) - 1) if negatives else -1
 
     def _next_temp_catid(self):
         """ Deterministic unique temporary negative catid. """
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         negatives = [it['catid'] for it in model if it.get('catid') is not None and it['catid'] < 0]
         return (min(negatives) - 1) if negatives else -1
 
     def _collect_existing_item_names(self):
         """ Names from the model AND the whole database (codes and categories), so a
         new code cannot collide with anything, in or out of the selected branch. """
-        global model  # noqa: F824
-        names = set(it.get('name', '') for it in model)
+        global model  # noqa: F824, PLW0602
+        names = {it.get('name', '') for it in model}
         cur = self.app.conn.cursor()
         cur.execute("select name from code_name")
         names.update(row[0] for row in cur.fetchall())
@@ -950,7 +950,7 @@ class CodeOrganiser(QDialog):
     def create_code(self):
         """ Create a new unlinked (free) code via push button. Model only. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         ui = DialogAddItemName(self.app, self._collect_existing_item_names(),
                                _("Code"), _("Code name"))
         ui.exec()
@@ -970,7 +970,7 @@ class CodeOrganiser(QDialog):
         model. Imported items get temporary negative ids; the database is only
         written on Apply, inside its transaction. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         file_filter = "Codebook files (*.qdc *.txt *.csv)"
         filepath, _filter = QtWidgets.QFileDialog.getOpenFileName(
             self, _("Import codebook"), self.app.settings.get('directory', ''), file_filter)
@@ -1074,7 +1074,7 @@ class CodeOrganiser(QDialog):
         Mirrors refi.py: existing names are REUSED so children still nest, never
         duplicated. Returns None if absent. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         for it in model:
             if it.get('cid') is None and it.get('name', '').strip() == name.strip() \
                     and not it.get('delete'):
@@ -1089,7 +1089,7 @@ class CodeOrganiser(QDialog):
         trailing-space variant of the code/category name workaround), then database.
         Returns None if absent. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         for it in model:
             if it.get('cid') is not None and it.get('name') in (name, name + " ") \
                     and it.get('name', '') != "":
@@ -1102,7 +1102,7 @@ class CodeOrganiser(QDialog):
     def _code_display_name(self, name):
         """  """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         for it in model:
             if it.get('cid') is None and it.get('name', '').strip() == name \
                     and not it.get('delete'):
@@ -1142,7 +1142,7 @@ class CodeOrganiser(QDialog):
         Existing names are reused (their real id anchors the children), never
         duplicated. Model only; nothing is written to the database here. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         tree = etree.parse(filepath)
         root = tree.getroot()
         codes_element = None
@@ -1217,7 +1217,7 @@ class CodeOrganiser(QDialog):
         means a free code. Existing category and code names anchor nesting via their
         real id; an existing final code is skipped (reused), never duplicated. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         for path_part, memo in rows:
             segments = parse_codebook_path(path_part)
             if not segments:
@@ -1287,7 +1287,7 @@ class CodeOrganiser(QDialog):
         code_or_cat['name'] is never modified (Apply writes names to the database);
         only the displayed text carries the suffix. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         cur = self.app.conn.cursor()
         own = {}
         for table in ('code_text', 'code_image', 'code_av'):
@@ -1409,7 +1409,7 @@ class CodeOrganiser(QDialog):
         model against the snapshot taken when the branch was selected. Returns a list
         of human-readable strings (also written to the project journal on Apply). """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         snapshot = getattr(self, '_initial_model', {})
 
         def cat_name(catid):
@@ -1530,7 +1530,7 @@ class CodeOrganiser(QDialog):
         operations to the project journal; emits the project event bus so open
         dialogs (graph, reports) resynchronise. SQL logic itself is unchanged. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         changes = self.build_pending_changes()
         if not changes:
             Message(self.app, _("Code organiser"), _("No changes to apply.")).exec()
@@ -1853,7 +1853,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         return: child_names : List
         """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         if node['cid'] is not None:
             # A code may have sub-codes (supercid); return descendant sub-code names so
             # they move together with the parent code when it is dragged.
@@ -1924,7 +1924,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                     (item.code_or_cat['name'] == "" or item.code_or_cat.get('delete')):
                 self.removeItem(item)
         # Update code.catid or category.supercatid if a category has been merged into another category
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         global update_graphics_item_models  # noqa: F824
         if update_graphics_item_models:
             for m_item in model:
@@ -2367,7 +2367,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Link every selected code to one chosen category. Batch version of
         link_code_to_category (same model mutation, same exclusivity rule). """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         if not code_items:
             return
         categories_ = [item for item in model
@@ -2400,7 +2400,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         link_code_under_code. The parent cannot be one of the selected codes nor a
         descendant of any of them (circular-nesting guard). """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         if not code_items:
             return
         selected_cids = {it.code_or_cat['cid'] for it in code_items}
@@ -2440,7 +2440,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         version of link_category_under_category. The parent cannot be one of the
         selected categories nor a descendant of any of them. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         if not cat_items:
             return
         selected_catids = {it.code_or_cat['catid'] for it in cat_items}
@@ -2475,7 +2475,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         a surviving parent code, otherwise moved into the deleted code's category or
         to top level). Model only; the database is written on Apply. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         if not code_items:
             return
         names = ", ".join(sorted(it.code_or_cat['name'].strip() for it in code_items))
@@ -2519,7 +2519,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         a deleted category become top level, unless they are themselves being
         deleted. Model only; the database is written on Apply. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         if not cat_items:
             return
         names = ", ".join(sorted(it.code_or_cat['name'].strip() for it in cat_items))
@@ -2553,7 +2553,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          sub_categories, sub_codes of a node. """
 
         existing_names = []
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         for item in model:
             existing_names.append({'name': item['name']})
 
@@ -2595,7 +2595,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Link selected code to selected category. """
 
         categories_ = []
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         for item in model:
             if item['cid'] is None and item['name'] != "" and not item.get('delete'):
                 categories_.append(item)
@@ -2624,7 +2624,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          Uses child_names to prevent circular nesting. """
 
         codes_ = []
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         # circular-nesting check by ids, not names
         blocked_cids = descendant_cids(model, self.code_or_cat['cid'])
         for item in model:
@@ -2658,7 +2658,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
         self.code_or_cat['supercid'] = None
         self.code_or_cat['original_supercid'] = None
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         for item in model:
             if item['cid'] == self.code_or_cat['cid']:
                 item['supercid'] = None
@@ -2672,7 +2672,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          Keep nameless code in model. """
 
         unsorted_codes = []
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         for item in model:
             if item['cid'] is not None and item['cid'] != self.code_or_cat['cid'] and item['name'] != "" \
                     and not item.get('delete'):
@@ -2721,7 +2721,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Remove code from category as top level item. """
 
         self.code_or_cat['catid'] = None
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         for item in model:
             if item['cid'] == self.code_or_cat['cid']:
                 item['catid'] = None
@@ -2738,7 +2738,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         dialog = self.scene().parent  # CodeOrganiser; GraphicsScene(self) in __init__
         if dialog is None:
             return
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         ui = DialogAddItemName(dialog.app, dialog._collect_existing_item_names(),
                                _("Code"), _("Code name"))
         ui.exec()
@@ -2763,7 +2763,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         dialog = self.scene().parent
         if dialog is None:
             return
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         ui = DialogAddItemName(dialog.app, dialog._collect_existing_item_names(),
                                _("Sub-code"), _("Sub-code name"))
         ui.exec()
@@ -2798,7 +2798,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          Use child_names list to prevent circular linkages. """
 
         categories_ = []
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         # circular-nesting check by ids, not names
         blocked_catids = descendant_catids(model, self.code_or_cat['catid'])
         for item in model:
@@ -2825,7 +2825,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          Use child_names list to prevent circular linkages. """
 
         categories = []
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         # circular-nesting check by ids, not names
         blocked_catids = descendant_catids(model, self.code_or_cat['catid'])
         for item in model:
@@ -2885,7 +2885,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         delete: lifted to the grandparent code, or moved into this code's category
         (or top level) when there is no parent code. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         msg = _("Code: ") + self.code_or_cat['name'].strip() + "\n" \
             + _("All codings of this code will also be deleted when changes are applied.")
         ui = DialogConfirmDelete(self.app, msg)
@@ -2926,7 +2926,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         deleted from the database on Apply, inside the single transaction. Its codes
         and sub-categories become top level, mirroring code_text.delete_category. """
 
-        global model  # noqa: F824
+        global model  # noqa: F824, PLW0602
         ui = DialogConfirmDelete(self.app, _("Category: ") + self.code_or_cat['name'].strip())
         if not ui.exec():
             return

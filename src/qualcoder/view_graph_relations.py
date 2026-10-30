@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -20,20 +18,21 @@ https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
-
 import json
 import logging
 import os
 
-from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtCore import Qt
 import qtawesome as qta
+from PyQt6 import QtGui, QtWidgets
+from PyQt6.QtCore import Qt
+
 from .GUI.ui_dialog_node_relations import Ui_Dialog_node_relations
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 import builtins
+
 if not hasattr(builtins, '_'):
     def _(txt):
         return txt
@@ -557,7 +556,7 @@ def load_relations(settings):
                         "comments": ""
                     })
                 data["User"]["relations"] = user_relations
-        except (json.JSONDecodeError, IOError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             logger.warning("Could not read node_relations.json: %s. Using defaults.", e)
 
     return data
@@ -574,7 +573,7 @@ def save_relations(settings, data):
         user_only = {"User": data.get("User", DEFAULT_FRAMEWORKS["User"])}
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(user_only, f, ensure_ascii=False, indent=2)
-    except IOError as e:
+    except OSError as e:
         logger.error("Could not write node_relations.json: %s", e)
 
 
@@ -845,9 +844,9 @@ class DialogNodeRelations(QtWidgets.QDialog):
         for rel in relations:
             raw_name = rel.get("name", "")
             translated_name = _(raw_name)
-            if search and search not in translated_name.lower():
-                # Also match against definition for broader discoverability
-                if search not in _(rel.get("definition", "")).lower():
+            # Also match against definition for broader discoverability
+            if search and search not in translated_name.lower()\
+                and search not in _(rel.get("definition", "")).lower():
                     continue
             item = QtWidgets.QListWidgetItem(translated_name)
             item.setData(Qt.ItemDataRole.UserRole, raw_name)
@@ -1061,7 +1060,7 @@ class DialogNodeRelations(QtWidgets.QDialog):
         try:
             with open(filepath, "r", encoding="utf-8") as f:
                 imported_data = json.load(f)
-        except (json.JSONDecodeError, IOError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             QtWidgets.QMessageBox.critical(
                 self, _("Import error"),
                 _("Could not read JSON file:\n") + str(e))

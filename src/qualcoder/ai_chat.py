@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -20,7 +18,6 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
-from datetime import datetime
 import html as html_lib
 import json
 import logging
@@ -33,28 +30,43 @@ import threading
 import time
 import traceback
 import unicodedata
-from typing import List, Dict, Any, Optional, Tuple
-from urllib.parse import urlencode, quote, unquote, urlparse, parse_qs, urlunparse
-import webbrowser
+from datetime import datetime
+from typing import Any
+from urllib.parse import parse_qs, quote, unquote, urlencode, urlparse, urlunparse
 
+import qtawesome as qta
 from langchain_core.documents.base import Document
 from langchain_core.messages.ai import AIMessage
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.system import SystemMessage
 from markdown_it import MarkdownIt
-from PyQt6 import QtWidgets, QtCore, QtGui
-from PyQt6.QtCore import Qt, QEvent, pyqtSignal
-from PyQt6.QtGui import QCursor, QGuiApplication, QAction, QPalette, QShortcut, QKeySequence, QStandardItemModel, QStandardItem
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import QEvent, Qt, pyqtSignal
+from PyQt6.QtGui import (
+    QAction,
+    QCursor,
+    QGuiApplication,
+    QKeySequence,
+    QPalette,
+    QShortcut,
+    QStandardItem,
+    QStandardItemModel,
+)
 from PyQt6.QtWidgets import QTextEdit
-import qtawesome as qta
 
 from .ai_agent_prompts import (
-    AiAgentPromptsCatalog,
     AgentPromptRecord,
+    AiAgentPromptsCatalog,
     prompt_name_and_scope,
     prompt_name_key,
 )
-from .ai_llm import extract_ai_memo, ai_quote_search, llm_content_to_text, strip_think_blocks, AICancelled
+from .ai_llm import (
+    AICancelled,
+    ai_quote_search,
+    extract_ai_memo,
+    llm_content_to_text,
+    strip_think_blocks,
+)
 from .ai_runtime import (
     ensure_ai_ready,
     runtime_status_bar_text,
@@ -99,7 +111,7 @@ MARKDOWN_RENDERER = MarkdownIt(
         "typographer": True,
     },
 ).enable(["table", "strikethrough"])
-MARKDOWN_HR_IMAGE_CACHE: Dict[str, str] = {}
+MARKDOWN_HR_IMAGE_CACHE: dict[str, str] = {}
 PROMPT_SLASH_REF_PATTERN = re.compile(r"(?:(?<=^)|(?<=[\s`(\[{]))/(?!/)[^\s`<>\[\]{}\"']+")
 
 
@@ -176,7 +188,7 @@ def render_markdown_to_html(text: str, hr_color: str = "#e6e6e6", hr_width_px: i
 class PrefixedComboBox(QtWidgets.QComboBox):
     """Draw a prefix in the closed combobox without changing the popup item texts."""
 
-    def __init__(self, prefix: str = "", parent: Optional[QtWidgets.QWidget] = None):
+    def __init__(self, prefix: str = "", parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
         self._display_prefix = prefix
 
@@ -200,7 +212,7 @@ class TreePopupComboBox(QtWidgets.QWidget):
     currentIndexChanged = pyqtSignal(int)
     currentModelIndexChanged = pyqtSignal(QtCore.QModelIndex)
 
-    def __init__(self, parent: Optional[QtWidgets.QWidget] = None):
+    def __init__(self, parent: QtWidgets.QWidget | None = None):
         super().__init__(parent)
         self._model = None
         self._model_column = 0
@@ -402,8 +414,7 @@ class TreePopupComboBox(QtWidgets.QWidget):
         y_pos = anchor.y()
         if y_pos + height > available.bottom() + 1:
             y_pos = self.mapToGlobal(QtCore.QPoint(0, 0)).y() - height
-        if y_pos < available.top():
-            y_pos = available.top()
+        y_pos = max(y_pos, available.top())
         self._popup.setGeometry(x_pos, y_pos, width, height)
 
     def _has_hierarchical_rows(self) -> bool:
@@ -518,7 +529,7 @@ class TreePopupComboBox(QtWidgets.QWidget):
         painter.drawControl(QtWidgets.QStyle.ControlElement.CE_ComboBoxLabel, option)
 
 
-class PromptCompletionListWidget(QtWidgets.QListWidget):
+class PromptCompletionlistWidget(QtWidgets.QListWidget):
     """Popup list for inline `/prompt` completion in the AI chat input."""
 
     popupHidden = pyqtSignal()
@@ -683,7 +694,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_text_doc_name = ''
         self.ai_text_text = ''
         self.ai_text_start_pos = -1
-        self._chat_ai_profile_snapshots: Dict[int, str] = {}
+        self._chat_ai_profile_snapshots: dict[int, str] = {}
         self.ai_output_autoscroll = True
         self._chat_window_refresh_pending = False
         self._chat_window_refresh_timer = QtCore.QTimer(self)
@@ -715,7 +726,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def _setup_prompt_completion(self) -> None:
         """Create the prompt completion popup and initialize transient state."""
 
-        self._prompt_completion_popup = PromptCompletionListWidget(self)
+        self._prompt_completion_popup = PromptCompletionlistWidget(self)
         self._prompt_completion_popup.setWindowFlags(
             Qt.WindowType.FramelessWindowHint | Qt.WindowType.SubWindow
         )
@@ -735,12 +746,12 @@ class DialogAIChat(QtWidgets.QDialog):
         self._prompt_completion_popup.setHorizontalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
         )
-        self._prompt_completion_records: List[AgentPromptRecord] = []
-        self._prompt_inline_completion: Optional[Dict[str, Any]] = None
+        self._prompt_completion_records: list[AgentPromptRecord] = []
+        self._prompt_inline_completion: dict[str, Any] | None = None
         self._prompt_completion_guard = False
         self._prompt_completion_accepting = False
         self._prompt_completion_temporarily_disabled = False
-        self._prompt_reference_styles: Dict[str, Dict[str, Any]] = {}
+        self._prompt_reference_styles: dict[str, dict[str, Any]] = {}
         self._prompt_reference_highlighter = PromptSlashReferenceHighlighter(
             self.ui.plainTextEdit_question.document(),
             lambda: self._prompt_completion_records,
@@ -795,7 +806,7 @@ class DialogAIChat(QtWidgets.QDialog):
         analysis_type = str(self.chat_list[self.current_chat_idx][2] if self.chat_list[self.current_chat_idx][2] is not None else '')
         return self._is_agent_chat_type(analysis_type)
 
-    def _current_prompt_completion_context(self) -> Optional[Dict[str, Any]]:
+    def _current_prompt_completion_context(self) -> dict[str, Any] | None:
         """Describe the active `/prompt` token at the caret, if any."""
 
         if not self._prompt_completion_enabled():
@@ -831,12 +842,11 @@ class DialogAIChat(QtWidgets.QDialog):
             "typed": typed_token,
         }
 
-    def _split_prompt_completion_query(self, typed: str) -> Tuple[str, str]:
+    def _split_prompt_completion_query(self, typed: str) -> tuple[str, str]:
         """Split one `/prompt/path` token into parent path and typed leaf prefix."""
 
         query = str(typed if typed is not None else '')
-        if query.startswith('/'):
-            query = query[1:]
+        query = query.removeprefix('/')
         query = query.replace('\\', '/')
         if query.endswith('/'):
             return query.rstrip('/'), ''
@@ -845,7 +855,7 @@ class DialogAIChat(QtWidgets.QDialog):
         parent, leaf = query.rsplit('/', 1)
         return parent, leaf
 
-    def _iter_prompt_completion_categories(self) -> List[str]:
+    def _iter_prompt_completion_categories(self) -> list[str]:
         """Return all category paths derived from the currently resolved prompts."""
 
         categories: set[str] = set()
@@ -855,7 +865,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 categories.add('/'.join(parts[:idx]))
         return sorted(categories, key=lambda item: item.casefold())
 
-    def _is_direct_prompt_completion_child(self, full_name: str, parent: str) -> Optional[str]:
+    def _is_direct_prompt_completion_child(self, full_name: str, parent: str) -> str | None:
         """Return the direct child name relative to `parent`, if any."""
 
         normalized_full = str(full_name if full_name is not None else '').strip('/')
@@ -871,13 +881,13 @@ class DialogAIChat(QtWidgets.QDialog):
                 return None
         return full_parts[-1]
 
-    def _matching_prompt_completion_items(self, prefix: str) -> List[Dict[str, Any]]:
+    def _matching_prompt_completion_items(self, prefix: str) -> list[dict[str, Any]]:
         """Return direct matching categories and prompts for the current token."""
 
         self._refresh_prompt_completion_records()
         parent, leaf = self._split_prompt_completion_query(prefix)
         normalized_leaf = prompt_name_key(leaf)
-        items: List[Dict[str, Any]] = []
+        items: list[dict[str, Any]] = []
 
         for category in self._iter_prompt_completion_categories():
             child_name = self._is_direct_prompt_completion_child(category, parent)
@@ -934,7 +944,7 @@ class DialogAIChat(QtWidgets.QDialog):
             )
         return items
 
-    def _completion_item_data(self, item: Optional[QtWidgets.QListWidgetItem]) -> Dict[str, Any]:
+    def _completion_item_data(self, item: QtWidgets.QlistWidgetItem | None) -> dict[str, Any]:
         if item is None:
             return {}
         data = item.data(Qt.ItemDataRole.UserRole)
@@ -943,14 +953,14 @@ class DialogAIChat(QtWidgets.QDialog):
         text = str(item.text() if item.text() is not None else '')
         return {"display_text": text, "insert_text": text, "kind": "prompt"}
 
-    def _show_prompt_completion_popup(self, matches: List[Dict[str, Any]]) -> None:
+    def _show_prompt_completion_popup(self, matches: list[dict[str, Any]]) -> None:
         """Render the current match list below the input caret."""
 
         popup = self._prompt_completion_popup
         with QtCore.QSignalBlocker(popup):
             popup.clear()
             for match in matches:
-                item = QtWidgets.QListWidgetItem(str(match.get("display_text", "")))
+                item = QtWidgets.QlistWidgetItem(str(match.get("display_text", "")))
                 item.setData(Qt.ItemDataRole.UserRole, match)
                 item.setToolTip(str(match.get("tooltip", "")))
                 popup.addItem(item)
@@ -1040,7 +1050,7 @@ class DialogAIChat(QtWidgets.QDialog):
         editor.setTextCursor(cursor)
         return True
 
-    def _preview_prompt_completion(self, completion_text: str, context: Dict[str, Any]) -> None:
+    def _preview_prompt_completion(self, completion_text: str, context: dict[str, Any]) -> None:
         """Insert the suggested suffix as selected text so typing can overwrite it."""
 
         typed = str(context.get("typed", ""))
@@ -1126,8 +1136,7 @@ class DialogAIChat(QtWidgets.QDialog):
         if not popup.isVisible() or popup.count() == 0:
             return False
         current_row = popup.currentRow()
-        if current_row < 0:
-            current_row = 0
+        current_row = max(current_row, 0)
         new_row = max(0, min(popup.count() - 1, current_row + step))
         if new_row == current_row:
             return True
@@ -1239,7 +1248,7 @@ class DialogAIChat(QtWidgets.QDialog):
         if hasattr(self, "_prompt_reference_highlighter"):
             self._prompt_reference_highlighter.rehighlight()
 
-    def _prompt_reference_html_style(self, style_role: str = "user") -> Tuple[str, str]:
+    def _prompt_reference_html_style(self, style_role: str = "user") -> tuple[str, str]:
         """Return foreground/background HTML colors for a prompt reference in one UI context."""
 
         background_color = QtGui.QColor(getattr(self, "_prompt_reference_background_color", QtGui.QColor("#ffffff")))
@@ -1269,7 +1278,7 @@ class DialogAIChat(QtWidgets.QDialog):
             if str(prompt.name if prompt.name is not None else '').strip('/') != ''
         }
 
-    def _prompt_reference_records_by_name(self) -> Dict[str, AgentPromptRecord]:
+    def _prompt_reference_records_by_name(self) -> dict[str, AgentPromptRecord]:
         """Return prompt records keyed by normalized slash reference name."""
 
         return {
@@ -1278,7 +1287,7 @@ class DialogAIChat(QtWidgets.QDialog):
             if str(prompt.name if prompt.name is not None else '').strip('/') != ''
         }
 
-    def _resolve_prompt_reference_name(self, prompt_name: str) -> Optional[AgentPromptRecord]:
+    def _resolve_prompt_reference_name(self, prompt_name: str) -> AgentPromptRecord | None:
         """Resolve a slash prompt reference, with chat-type-local fallback for analysis prompts."""
 
         normalized = prompt_name_key(str(prompt_name if prompt_name is not None else '').strip('/'))
@@ -1315,7 +1324,7 @@ class DialogAIChat(QtWidgets.QDialog):
             tooltip_lines.append(description)
         return '\n'.join(tooltip_lines)
 
-    def _prompt_reference_record_at_position(self, pos: QtCore.QPoint) -> Optional[AgentPromptRecord]:
+    def _prompt_reference_record_at_position(self, pos: QtCore.QPoint) -> AgentPromptRecord | None:
         """Return the prompt record under a viewport position in the input editor."""
 
         if not self._prompt_completion_enabled():
@@ -1333,12 +1342,11 @@ class DialogAIChat(QtWidgets.QDialog):
                 return self._resolve_prompt_reference_name(prompt_name)
         return None
 
-    def _decode_prompt_reference_href(self, href: str) -> Tuple[str, str]:
+    def _decode_prompt_reference_href(self, href: str) -> tuple[str, str]:
         """Decode a promptref href into prompt name and optional scope."""
 
         payload = str(href if href is not None else '')
-        if payload.startswith('promptref:'):
-            payload = payload[len('promptref:'):]
+        payload = payload.removeprefix('promptref:')
         name_part, _, query_part = payload.partition('?')
         prompt_name = unquote(name_part).strip('/').rstrip('/.,;:!?')
         prompt_scope = ''
@@ -1356,7 +1364,7 @@ class DialogAIChat(QtWidgets.QDialog):
             href += '?scope=' + quote(scope, safe='')
         return href
 
-    def _prompt_reference_records_by_label(self) -> Dict[str, AgentPromptRecord]:
+    def _prompt_reference_records_by_label(self) -> dict[str, AgentPromptRecord]:
         """Return known prompts keyed by alternative labels.
 
         Only explicit slash-notation prompt references are linked to avoid
@@ -1365,7 +1373,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
         return {}
 
-    def _prompt_reference_html_span(self, display_text: str, prompt: Optional[AgentPromptRecord], style_role: str = "user") -> str:
+    def _prompt_reference_html_span(self, display_text: str, prompt: AgentPromptRecord | None, style_role: str = "user") -> str:
         """Render one prompt reference token or label as styled HTML."""
 
         escaped_text = html_lib.escape(str(display_text if display_text is not None else ''))
@@ -1389,14 +1397,14 @@ class DialogAIChat(QtWidgets.QDialog):
         include_prompt_labels: bool = False,
         require_enabled: bool = True,
         style_role: str = "user",
-    ) -> Tuple[str, Dict[str, str]]:
+    ) -> tuple[str, dict[str, str]]:
         """Replace known prompt references in plain text with placeholders."""
 
         if require_enabled and not self._prompt_completion_enabled():
             return str(text if text is not None else ''), {}
 
         source_text = str(text if text is not None else '')
-        replacements: Dict[str, str] = {}
+        replacements: dict[str, str] = {}
 
         def replace_prompt_ref(match: re.Match) -> str:
             token = match.group(0)
@@ -1413,7 +1421,7 @@ class DialogAIChat(QtWidgets.QDialog):
         if include_prompt_labels:
             records_by_label = self._prompt_reference_records_by_label()
             known_labels = sorted(
-                (label for label in records_by_label.keys() if label != ''),
+                (label for label in records_by_label if label != ''),
                 key=len,
                 reverse=True,
             )
@@ -2085,7 +2093,7 @@ class DialogAIChat(QtWidgets.QDialog):
             return
         QtCore.QTimer.singleShot(0, lambda t=target: self._trigger_new_chat_menu_target(t))
 
-    def _popup_new_chat_menu(self, highlight_target: Optional[str] = None) -> None:
+    def _popup_new_chat_menu(self, highlight_target: str | None = None) -> None:
         """Show the New-session menu below the button and optionally highlight one entry."""
 
         if not ensure_ai_ready(self.app, _("AI Agent")):
@@ -2217,7 +2225,7 @@ class DialogAIChat(QtWidgets.QDialog):
             author = ''
         return author or 'unknown'
 
-    def _normalize_ai_profile_author(self, author: str = '', chat_idx: Optional[int] = None,
+    def _normalize_ai_profile_author(self, author: str = '', chat_idx: int | None = None,
                                      fallback_to_current: bool = False) -> str:
         """Resolve display/storage author names for AI messages."""
 
@@ -2236,7 +2244,7 @@ class DialogAIChat(QtWidgets.QDialog):
             return self._current_ai_profile_name()
         return 'unknown'
 
-    def _capture_chat_ai_profile_snapshot(self, chat_idx: Optional[int] = None) -> str:
+    def _capture_chat_ai_profile_snapshot(self, chat_idx: int | None = None) -> str:
         """Freeze the currently selected AI profile for one chat run."""
 
         if chat_idx is None:
@@ -2246,7 +2254,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self._chat_ai_profile_snapshots[int(chat_idx)] = author
         return author
 
-    def _clear_chat_ai_profile_snapshot(self, chat_idx: Optional[int] = None) -> None:
+    def _clear_chat_ai_profile_snapshot(self, chat_idx: int | None = None) -> None:
         """Remove a previously frozen AI profile snapshot for one chat."""
 
         if chat_idx is None:
@@ -2260,7 +2268,7 @@ class DialogAIChat(QtWidgets.QDialog):
         heading_size = self.app.settings['fontsize'] + 1
         return f'<div style="margin-top: 6px; font-size: {heading_size}pt;">⦿ <b>{safe_heading}</b></div>'
 
-    def _ai_agent_heading_html(self, author: str = '', chat_idx: Optional[int] = None,
+    def _ai_agent_heading_html(self, author: str = '', chat_idx: int | None = None,
                                fallback_to_current: bool = False) -> str:
         display_author = self._normalize_ai_profile_author(
             author,
@@ -2277,7 +2285,7 @@ class DialogAIChat(QtWidgets.QDialog):
             id_, name, analysis_type, summary, date, analysis_prompt = chat
             tooltip_text = self._chat_tooltip_text(chat)
 
-            # Creating a new QListWidgetItem
+            # Creating a new QlistWidgetItem
             if str(analysis_type).strip().lower() == 'code_analysis':
                 icon = code_analysis_icon(self.app)
             elif str(analysis_type).strip().lower() == 'text_analysis':
@@ -2439,7 +2447,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.history_update_message_list()
         self.update_chat_window()
 
-    def _flush_user_message_before_ai_start(self, chat_idx: Optional[int] = None) -> None:
+    def _flush_user_message_before_ai_start(self, chat_idx: int | None = None) -> None:
         """Render a freshly added user message before starting AI work."""
 
         if chat_idx is None:
@@ -2541,7 +2549,7 @@ class DialogAIChat(QtWidgets.QDialog):
             return False
         return True
 
-    def _start_general_chat_session(self, name='', summary='') -> Optional[int]:
+    def _start_general_chat_session(self, name='', summary='') -> int | None:
         """Create one base AI agent session and return its chat index."""
 
         self.new_chat(str(name if name is not None else ''), 'agent chat', summary, '')
@@ -2654,10 +2662,7 @@ class DialogAIChat(QtWidgets.QDialog):
         new_label = self._ai_permissions_label_for_value(new_value)
         if old_label == new_label:
             return
-        content = 'System event: AI Permissions changed from "{old}" to "{new}".'.format(
-            old=old_label,
-            new=new_label,
-        )
+        content = f'System event: AI Permissions changed from "{old_label}" to "{new_label}".'
         self.process_message('env_update', content, self.current_chat_idx)
 
     def _log_agent_env_update(self, content: str, chat_idx=None) -> None:
@@ -2705,7 +2710,7 @@ class DialogAIChat(QtWidgets.QDialog):
             )
         self._log_agent_env_update(content, chat_idx)
 
-    def _render_agent_prompt_content(self, content: str, extra_context: Optional[Dict[str, Any]] = None) -> str:
+    def _render_agent_prompt_content(self, content: str, extra_context: dict[str, Any] | None = None) -> str:
         """Replace supported runtime placeholders in one internal agent prompt."""
 
         if content == "":
@@ -2729,7 +2734,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
         return re.sub(r"\{\{([A-Z0-9_]+)\}\}", replace_placeholder, content)
 
-    def _load_internal_prompt_text(self, name: str, extra_context: Optional[Dict[str, Any]] = None) -> str:
+    def _load_internal_prompt_text(self, name: str, extra_context: dict[str, Any] | None = None) -> str:
         """Load one required internal prompt file and render its placeholders."""
 
         prompt_name = str(name if name is not None else "").strip()
@@ -2751,10 +2756,10 @@ class DialogAIChat(QtWidgets.QDialog):
             return self._render_agent_prompt_content(content)
         return content
 
-    def _collect_agent_base_prompt_context(self) -> Tuple[str, set[str]]:
+    def _collect_agent_base_prompt_context(self) -> tuple[str, set[str]]:
         """Build the current agent base prompt and track which prompts it already includes."""
 
-        sections: List[str] = []
+        sections: list[str] = []
         included_prompt_keys: set[str] = set()
 
         base_prompt = self.agent_prompts_catalog.get_internal_prompt(self._agent_base_prompt_name())
@@ -2813,7 +2818,7 @@ class DialogAIChat(QtWidgets.QDialog):
             return ""
         return "# Current task contract\n\n" + phase_text
 
-    def _resolve_turn_agent_prompts(self, user_message: str) -> List[AgentPromptRecord]:
+    def _resolve_turn_agent_prompts(self, user_message: str) -> list[AgentPromptRecord]:
         """Resolve explicit `/name` prompt references from one user message."""
 
         return [
@@ -2847,7 +2852,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
         return self._build_persistent_agent_prompt_message(prompt, activation_source='user')
 
-    def _persist_explicit_agent_prompts(self, chat_idx: int, user_message: str) -> List[AgentPromptRecord]:
+    def _persist_explicit_agent_prompts(self, chat_idx: int, user_message: str) -> list[AgentPromptRecord]:
         """Persist newly activated explicit prompts so they remain active in later turns."""
 
         prompts = self._resolve_turn_agent_prompts(user_message)
@@ -2858,7 +2863,7 @@ class DialogAIChat(QtWidgets.QDialog):
         if 0 <= chat_idx < len(self.chat_list) and self._is_agent_chat_type(self.chat_list[chat_idx][2]):
             _, base_prompt_keys = self._collect_agent_base_prompt_context()
 
-        latest_prompt_content: Dict[str, str] = {}
+        latest_prompt_content: dict[str, str] = {}
         for msg in reversed(self.chat_msg_list):
             if len(msg) < 5 or str(msg[2]) != 'prompt':
                 continue
@@ -2867,7 +2872,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 continue
             latest_prompt_content[prompt_name] = str(msg[4] if msg[4] is not None else '')
 
-        loaded_prompts: List[AgentPromptRecord] = []
+        loaded_prompts: list[AgentPromptRecord] = []
         for prompt in prompts:
             prompt_key = prompt_name_key(prompt.name)
             if prompt_key == '' or prompt_key in base_prompt_keys:
@@ -2889,7 +2894,7 @@ class DialogAIChat(QtWidgets.QDialog):
         if prompt_name == '':
             return
         prompt_message = self._build_persistent_agent_prompt_message(prompt, activation_source=activation_source)
-        latest_prompt_content: Optional[str] = None
+        latest_prompt_content: str | None = None
         for msg in reversed(self.chat_msg_list):
             if len(msg) < 5 or str(msg[2]) != 'prompt':
                 continue
@@ -2901,10 +2906,10 @@ class DialogAIChat(QtWidgets.QDialog):
             return
         self.history_add_message('prompt', prompt_name, prompt_message, chat_idx)
 
-    def _selected_sources(self, file_ids: List[int]) -> List[Tuple[int, str]]:
+    def _selected_sources(self, file_ids: list[int]) -> list[tuple[int, str]]:
         """Return ordered `(source_id, source_name)` tuples for the selected file ids."""
 
-        normalized_ids: List[int] = []
+        normalized_ids: list[int] = []
         for raw in list(file_ids or []):
             try:
                 file_id = int(raw)
@@ -2931,7 +2936,7 @@ class DialogAIChat(QtWidgets.QDialog):
             return []
         finally:
             conn.close()
-        selected_sources: List[Tuple[int, str]] = []
+        selected_sources: list[tuple[int, str]] = []
         for row in rows:
             if row is None or len(row) < 2:
                 continue
@@ -2945,15 +2950,15 @@ class DialogAIChat(QtWidgets.QDialog):
             selected_sources.append((source_id, source_name))
         return selected_sources
 
-    def _selected_source_names(self, file_ids: List[int]) -> List[str]:
+    def _selected_source_names(self, file_ids: list[int]) -> list[str]:
         """Return ordered source names for the selected file ids."""
 
         return [source_name for _source_id, source_name in self._selected_sources(file_ids)]
 
-    def _selected_cases(self, case_ids: List[int]) -> List[Tuple[int, str]]:
+    def _selected_cases(self, case_ids: list[int]) -> list[tuple[int, str]]:
         """Return ordered `(case_id, case_name)` tuples for the selected case ids."""
 
-        normalized_ids: List[int] = []
+        normalized_ids: list[int] = []
         for raw in list(case_ids or []):
             try:
                 case_id = int(raw)
@@ -2980,7 +2985,7 @@ class DialogAIChat(QtWidgets.QDialog):
             return []
         finally:
             conn.close()
-        selected_cases: List[Tuple[int, str]] = []
+        selected_cases: list[tuple[int, str]] = []
         for row in rows:
             if row is None or len(row) < 2:
                 continue
@@ -2995,12 +3000,12 @@ class DialogAIChat(QtWidgets.QDialog):
         return selected_cases
 
     def _topic_exploration_scope_env_update(self, topic_name: str, topic_description: str,
-                                            file_ids: List[int], filter_info: Optional[Dict[str, Any]] = None) -> str:
+                                            file_ids: list[int], filter_info: dict[str, Any] | None = None) -> str:
         """Build one durable scope note for topic exploration agent chats."""
 
         topic_text = str(topic_name if topic_name is not None else '').strip()
         description_text = str(topic_description if topic_description is not None else '').strip()
-        normalized_file_ids: List[int] = []
+        normalized_file_ids: list[int] = []
         for raw in list(file_ids or []):
             try:
                 file_id = int(raw)
@@ -3028,7 +3033,7 @@ class DialogAIChat(QtWidgets.QDialog):
         if no_filters:
             lines.append('Selected material: The whole project text corpus is in scope. No file, case, or attribute filters were applied.')
         else:
-            material_parts: List[str] = []
+            material_parts: list[str] = []
             if no_file_filter:
                 material_parts.append('No explicit file filter.')
             else:
@@ -3067,11 +3072,11 @@ class DialogAIChat(QtWidgets.QDialog):
         lines.append('After that first turn, the scope may be expanded if this seems helpful and the user agrees.')
         return "\n".join(lines)
 
-    def _topic_exploration_filter_summary(self, file_ids: List[int],
-                                          filter_info: Optional[Dict[str, Any]] = None) -> str:
+    def _topic_exploration_filter_summary(self, file_ids: list[int],
+                                          filter_info: dict[str, Any] | None = None) -> str:
         """Build a compact material/filter summary for the chat header."""
 
-        normalized_file_ids: List[int] = []
+        normalized_file_ids: list[int] = []
         for raw in list(file_ids or []):
             try:
                 file_id = int(raw)
@@ -3090,7 +3095,7 @@ class DialogAIChat(QtWidgets.QDialog):
         if no_file_filter and no_case_filter and not has_attribute_filter:
             return _('Whole project corpus (no file, case, or attribute filters).')
 
-        parts: List[str] = []
+        parts: list[str] = []
         if not no_file_filter:
             parts.append(_('explicit file filter'))
         if len(case_names) > 0:
@@ -3134,12 +3139,12 @@ class DialogAIChat(QtWidgets.QDialog):
             },
         )
 
-    def _topic_exploration_vector_search_uri(self, topic_name: str, topic_description: str, file_ids: List[int],
-                                             case_ids: Optional[List[int]] = None) -> str:
+    def _topic_exploration_vector_search_uri(self, topic_name: str, topic_description: str, file_ids: list[int],
+                                             case_ids: list[int] | None = None) -> str:
         """Build the MCP vector-search URI used to bootstrap one topic exploration chat."""
 
         query_variants = self.app.ai.generate_code_descriptions(topic_name, topic_description)
-        normalized_queries: List[str] = []
+        normalized_queries: list[str] = []
         seen_queries: set[str] = set()
         for candidate in list(query_variants or []):
             text = str(candidate if candidate is not None else '').strip()
@@ -3155,7 +3160,7 @@ class DialogAIChat(QtWidgets.QDialog):
             if fallback_query != '':
                 normalized_queries.append(fallback_query)
 
-        params: List[Tuple[str, str]] = []
+        params: list[tuple[str, str]] = []
         for query_text in normalized_queries:
             params.append(("q", query_text))
         for raw_file_id in list(file_ids or []):
@@ -3177,11 +3182,11 @@ class DialogAIChat(QtWidgets.QDialog):
             return "qualcoder://vector/search"
         return "qualcoder://vector/search?" + query_string
 
-    def _constrain_search_uri_to_material_scope(self, uri: str, allowed_file_ids: List[int],
-                                                allowed_case_ids: Optional[List[int]] = None) -> str:
+    def _constrain_search_uri_to_material_scope(self, uri: str, allowed_file_ids: list[int],
+                                                allowed_case_ids: list[int] | None = None) -> str:
         """Restrict one MCP read URI to the allowed file/case scope for the initial turn."""
 
-        normalized_allowed_files: List[int] = []
+        normalized_allowed_files: list[int] = []
         seen_allowed_files: set[int] = set()
         for raw in list(allowed_file_ids or []):
             try:
@@ -3193,7 +3198,7 @@ class DialogAIChat(QtWidgets.QDialog):
             seen_allowed_files.add(file_id)
             normalized_allowed_files.append(file_id)
 
-        normalized_allowed_cases: List[int] = []
+        normalized_allowed_cases: list[int] = []
         seen_allowed_cases: set[int] = set()
         for raw in list(allowed_case_ids or []):
             try:
@@ -3226,10 +3231,10 @@ class DialogAIChat(QtWidgets.QDialog):
 
         query = parse_qs(parsed.query, keep_blank_values=True)
 
-        def _constrain_positive_int_query_values(key: str, allowed_values: List[int]) -> None:
+        def _constrain_positive_int_query_values(key: str, allowed_values: list[int]) -> None:
             if len(allowed_values) == 0:
                 return
-            existing_values: List[int] = []
+            existing_values: list[int] = []
             seen_existing: set[int] = set()
             for raw_value in list(query.get(key, []) or []):
                 try:
@@ -3256,7 +3261,7 @@ class DialogAIChat(QtWidgets.QDialog):
         new_query = urlencode(query, doseq=True)
         return urlunparse((parsed.scheme, parsed.netloc, parsed.path, parsed.params, new_query, parsed.fragment))
 
-    def _start_mcp_agent_worker(self, messages: List[Any], chat_idx: int, worker_func,
+    def _start_mcp_agent_worker(self, messages: list[Any], chat_idx: int, worker_func,
                                 *worker_args) -> None:
         """Start one MCP-backed agent worker with the standard callback wiring."""
 
@@ -3283,11 +3288,11 @@ class DialogAIChat(QtWidgets.QDialog):
             },
         )
 
-    def _mcp_topic_exploration_worker(self, messages: List[Any], chat_idx: int,
-                                      bootstrap_spec: Dict[str, Any], signals=None) -> Dict[str, Any]:
+    def _mcp_topic_exploration_worker(self, messages: list[Any], chat_idx: int,
+                                      bootstrap_spec: dict[str, Any], signals=None) -> dict[str, Any]:
         """Run the first topic exploration turn on top of the normal MCP agent flow."""
 
-        result: Dict[str, Any] = {
+        result: dict[str, Any] = {
             "chat_idx": chat_idx,
             "stream_messages": [],
             "tool_messages": [],
@@ -3319,14 +3324,14 @@ class DialogAIChat(QtWidgets.QDialog):
         if prompt_record is None:
             raise ValueError(_("The selected topic exploration prompt could not be loaded."))
 
-        history_messages: List[Any] = list(messages)
-        agent_messages: List[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
+        history_messages: list[Any] = list(messages)
+        agent_messages: list[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
         mcp_base_system_prompt = self._mcp_base_system_prompt()
         ai_change_set_id = self._begin_ai_change_set(history_messages, chat_idx)
         final_hint = ""
-        tool_messages: List[Dict[str, str]] = []
+        tool_messages: list[dict[str, str]] = []
         tool_messages_streamed = signals is not None and getattr(signals, "progress", None) is not None
-        bootstrap_calls: List[Tuple[str, Dict[str, Any]]] = [
+        bootstrap_calls: list[tuple[str, dict[str, Any]]] = [
             ("initialize", {}),
             ("resources/list", {}),
             ("resources/templates/list", {}),
@@ -3343,9 +3348,9 @@ class DialogAIChat(QtWidgets.QDialog):
         latest_reflection_summary = ""
         methodology_gate = self._empty_methodology_gate()
         pending_user_decision = None
-        deferred_calls_for_next_round: List[Dict[str, Any]] = []
+        deferred_calls_for_next_round: list[dict[str, Any]] = []
 
-        def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        def _prepare_mcp_request(method_name: str, raw_params: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
             prepared_request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
             prepared_display_params = dict(prepared_request_params)
             if method_name == "resources/read":
@@ -3362,7 +3367,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 prepared_request_params["_ai_change_set_id"] = ai_change_set_id
             return prepared_request_params, prepared_display_params
 
-        def append_tool_exchange(method_name: str, method_params: Dict[str, Any], rpc_response: Dict[str, Any]):
+        def append_tool_exchange(method_name: str, method_params: dict[str, Any], rpc_response: dict[str, Any]):
             call_content = json.dumps(
                 {"action": "mcp_call", "method": method_name, "params": method_params},
                 ensure_ascii=False,
@@ -3407,7 +3412,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 tool_messages.append({"msg_type": "single_instruct", "msg_author": "ai_agent", "msg_content": payload})
 
         def build_phase_request_message(phase_contract: str, trailing_instruction: str) -> HumanMessage:
-            parts: List[str] = []
+            parts: list[str] = []
             phase_text = str(phase_contract if phase_contract is not None else "").strip()
             trailing_text = str(trailing_instruction if trailing_instruction is not None else "").strip()
             if phase_text != "":
@@ -3416,8 +3421,8 @@ class DialogAIChat(QtWidgets.QDialog):
                 parts.append(trailing_text)
             return HumanMessage(content="\n\n".join(parts).strip())
 
-        def build_phase_messages(phase_contract: str, trailing_instruction: str) -> List[Any]:
-            phase_messages: List[Any] = []
+        def build_phase_messages(phase_contract: str, trailing_instruction: str) -> list[Any]:
+            phase_messages: list[Any] = []
             if mcp_base_system_prompt != "":
                 phase_messages.append(SystemMessage(content=mcp_base_system_prompt))
             phase_messages.extend(agent_messages)
@@ -3645,7 +3650,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
                 current_round_calls, deferred_calls = self._split_mcp_call_queue(planned_calls, max_calls_per_round)
                 executed_any_call = False
-                round_failures: List[Dict[str, Any]] = []
+                round_failures: list[dict[str, Any]] = []
                 for call in current_round_calls:
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
@@ -3899,10 +3904,10 @@ class DialogAIChat(QtWidgets.QDialog):
             if ai_change_set_id != "":
                 self._discard_empty_ai_change_set(ai_change_set_id)
 
-    def _selected_code_names(self, code_ids: List[int]) -> List[str]:
+    def _selected_code_names(self, code_ids: list[int]) -> list[str]:
         """Return ordered code names for the selected code ids."""
 
-        normalized_ids: List[int] = []
+        normalized_ids: list[int] = []
         for raw in list(code_ids or []):
             try:
                 code_id = int(raw)
@@ -3930,10 +3935,10 @@ class DialogAIChat(QtWidgets.QDialog):
             conn.close()
         return [str(row[0]).strip() for row in rows if row is not None and row[0] is not None]
 
-    def _count_code_segments_for_selection(self, code_ids: List[int], file_ids: List[int], coder_names: List[str]) -> int:
+    def _count_code_segments_for_selection(self, code_ids: list[int], file_ids: list[int], coder_names: list[str]) -> int:
         """Count matching coded text segments for a code analysis selection."""
 
-        normalized_code_ids: List[int] = []
+        normalized_code_ids: list[int] = []
         for raw in list(code_ids or []):
             try:
                 code_id = int(raw)
@@ -3944,7 +3949,7 @@ class DialogAIChat(QtWidgets.QDialog):
         if len(normalized_code_ids) == 0:
             return 0
 
-        normalized_file_ids: List[int] = []
+        normalized_file_ids: list[int] = []
         for raw in list(file_ids or []):
             try:
                 file_id = int(raw)
@@ -3953,7 +3958,7 @@ class DialogAIChat(QtWidgets.QDialog):
             if file_id > 0 and file_id not in normalized_file_ids:
                 normalized_file_ids.append(file_id)
 
-        normalized_coders: List[str] = []
+        normalized_coders: list[str] = []
         seen_coders: set[str] = set()
         for raw in list(coder_names or []):
             coder = str(raw if raw is not None else '').strip()
@@ -3970,7 +3975,7 @@ class DialogAIChat(QtWidgets.QDialog):
             return 0
 
         where_parts = [f"cid IN ({','.join(['?'] * len(normalized_code_ids))})"]
-        params: List[Any] = list(normalized_code_ids)
+        params: list[Any] = list(normalized_code_ids)
         if len(normalized_file_ids) > 0:
             where_parts.append(f"fid IN ({','.join(['?'] * len(normalized_file_ids))})")
             params.extend(normalized_file_ids)
@@ -3993,7 +3998,7 @@ class DialogAIChat(QtWidgets.QDialog):
         finally:
             conn.close()
 
-    def _distribute_integer_budget(self, total_budget: int, item_count: int) -> List[int]:
+    def _distribute_integer_budget(self, total_budget: int, item_count: int) -> list[int]:
         """Distribute a positive integer budget across items, preserving at least one per item."""
 
         if item_count <= 0:
@@ -4009,12 +4014,12 @@ class DialogAIChat(QtWidgets.QDialog):
             budgets[idx] += 1
         return [max(1, value) for value in budgets]
 
-    def _code_analysis_segments_uri(self, cid: int, file_ids: List[int], coder_names: List[str],
+    def _code_analysis_segments_uri(self, cid: int, file_ids: list[int], coder_names: list[str],
                                     max_segments: int, max_chars: int,
-                                    case_ids: Optional[List[int]] = None) -> str:
+                                    case_ids: list[int] | None = None) -> str:
         """Build the MCP coded-segments URI used to bootstrap one code analysis chat."""
 
-        params: List[Tuple[str, str]] = [
+        params: list[tuple[str, str]] = [
             ("strategy", "diverse_by_document"),
             ("max_segments", str(max(1, int(max_segments)))),
             ("max_chars", str(max(1, int(max_chars)))),
@@ -4045,8 +4050,8 @@ class DialogAIChat(QtWidgets.QDialog):
             params.append(("owner", coder))
         return f"qualcoder://codes/segments/{int(cid)}?" + urlencode(params, doseq=True)
 
-    def _code_analysis_filter_summary(self, file_ids: List[int], coder_names: List[str],
-                                      filter_info: Optional[Dict[str, Any]] = None) -> str:
+    def _code_analysis_filter_summary(self, file_ids: list[int], coder_names: list[str],
+                                      filter_info: dict[str, Any] | None = None) -> str:
         """Build a compact coder/material summary for the code analysis chat header."""
 
         material_summary = self._topic_exploration_filter_summary(file_ids, filter_info)
@@ -4054,7 +4059,7 @@ class DialogAIChat(QtWidgets.QDialog):
             isinstance(filter_info, dict)
             and bool(filter_info.get("custom_coder_filter", False))
         )
-        normalized_coders: List[str] = []
+        normalized_coders: list[str] = []
         seen_coders: set[str] = set()
         for raw in list(coder_names or []):
             coder = str(raw if raw is not None else '').strip()
@@ -4069,10 +4074,10 @@ class DialogAIChat(QtWidgets.QDialog):
             return _('Visible coders; ') + material_summary
         return _('Coders: {}; ').format(", ".join(normalized_coders)) + material_summary
 
-    def _code_analysis_scope_env_update(self, code_name: str, code_memo: str, code_ids: List[int],
-                                        coder_names: List[str], file_ids: List[int],
-                                        filter_info: Optional[Dict[str, Any]] = None,
-                                        code_scope: Optional[List[Dict[str, Any]]] = None) -> str:
+    def _code_analysis_scope_env_update(self, code_name: str, code_memo: str, code_ids: list[int],
+                                        coder_names: list[str], file_ids: list[int],
+                                        filter_info: dict[str, Any] | None = None,
+                                        code_scope: list[dict[str, Any]] | None = None) -> str:
         """Build one durable scope note for code analysis agent chats."""
 
         focus_name = str(code_name if code_name is not None else '').strip()
@@ -4122,12 +4127,12 @@ class DialogAIChat(QtWidgets.QDialog):
         lines.append('If a broader scope expansion would be helpful, ask the user for permission first.')
         return "\n".join(lines)
 
-    def _format_code_analysis_selection_scope(self, code_scope: Optional[List[Dict[str, Any]]]) -> str:
+    def _format_code_analysis_selection_scope(self, code_scope: list[dict[str, Any]] | None) -> str:
         """Format the user's structured code/category selection for the AI context."""
 
         if not isinstance(code_scope, list) or len(code_scope) == 0:
             return ''
-        lines: List[str] = []
+        lines: list[str] = []
         max_codes_per_scope = 60
         for idx, raw_scope in enumerate(code_scope, start=1):
             if not isinstance(raw_scope, dict):
@@ -4166,8 +4171,8 @@ class DialogAIChat(QtWidgets.QDialog):
         return "\n".join(lines).strip()
 
     def _code_analysis_bootstrap_contract(self, code_name: str, code_memo: str, prompt: AgentPromptRecord,
-                                          code_ids: List[int],
-                                          code_scope: Optional[List[Dict[str, Any]]] = None) -> str:
+                                          code_ids: list[int],
+                                          code_scope: list[dict[str, Any]] | None = None) -> str:
         """Build the task contract for the first code-analysis turn before normal agent finalization."""
 
         focus_name = str(code_name if code_name is not None else '').strip()
@@ -4198,11 +4203,11 @@ class DialogAIChat(QtWidgets.QDialog):
             },
         )
 
-    def _mcp_code_analysis_worker(self, messages: List[Any], chat_idx: int,
-                                  bootstrap_spec: Dict[str, Any], signals=None) -> Dict[str, Any]:
+    def _mcp_code_analysis_worker(self, messages: list[Any], chat_idx: int,
+                                  bootstrap_spec: dict[str, Any], signals=None) -> dict[str, Any]:
         """Run the first code analysis turn on top of the normal MCP agent flow."""
 
-        result: Dict[str, Any] = {
+        result: dict[str, Any] = {
             "chat_idx": chat_idx,
             "stream_messages": [],
             "tool_messages": [],
@@ -4238,7 +4243,7 @@ class DialogAIChat(QtWidgets.QDialog):
         if prompt_record is None:
             raise ValueError(_("The selected code analysis prompt could not be loaded."))
 
-        normalized_code_ids: List[int] = []
+        normalized_code_ids: list[int] = []
         for raw in code_ids:
             try:
                 code_id = int(raw)
@@ -4249,12 +4254,12 @@ class DialogAIChat(QtWidgets.QDialog):
         if len(normalized_code_ids) == 0:
             raise ValueError(_("No codes are available for this code analysis."))
 
-        history_messages: List[Any] = list(messages)
-        agent_messages: List[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
+        history_messages: list[Any] = list(messages)
+        agent_messages: list[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
         mcp_base_system_prompt = self._mcp_base_system_prompt()
         ai_change_set_id = self._begin_ai_change_set(history_messages, chat_idx)
         final_hint = ""
-        tool_messages: List[Dict[str, str]] = []
+        tool_messages: list[dict[str, str]] = []
         tool_messages_streamed = signals is not None and getattr(signals, "progress", None) is not None
         coverage_total_segments = 0
         coverage_loaded_segments = 0
@@ -4262,7 +4267,7 @@ class DialogAIChat(QtWidgets.QDialog):
         segment_budgets = self._distribute_integer_budget(code_analysis_max_segments_total, len(normalized_code_ids))
         max_chars_total = max(4000, round(0.5 * (self.app.ai.large_llm_context_window * 4)))
         char_budgets = self._distribute_integer_budget(max_chars_total, len(normalized_code_ids))
-        bootstrap_calls: List[Tuple[str, Dict[str, Any]]] = [
+        bootstrap_calls: list[tuple[str, dict[str, Any]]] = [
             ("initialize", {}),
             ("resources/list", {}),
             ("resources/templates/list", {}),
@@ -4294,10 +4299,10 @@ class DialogAIChat(QtWidgets.QDialog):
         latest_reflection_summary = ""
         methodology_gate = self._empty_methodology_gate()
         pending_user_decision = None
-        deferred_calls_for_next_round: List[Dict[str, Any]] = []
-        previous_round_failures: List[Dict[str, Any]] = []
+        deferred_calls_for_next_round: list[dict[str, Any]] = []
+        previous_round_failures: list[dict[str, Any]] = []
 
-        def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        def _prepare_mcp_request(method_name: str, raw_params: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
             prepared_request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
             prepared_display_params = dict(prepared_request_params)
             if method_name == "resources/read":
@@ -4314,7 +4319,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 prepared_request_params["_ai_change_set_id"] = ai_change_set_id
             return prepared_request_params, prepared_display_params
 
-        def append_tool_exchange(method_name: str, method_params: Dict[str, Any], rpc_response: Dict[str, Any]):
+        def append_tool_exchange(method_name: str, method_params: dict[str, Any], rpc_response: dict[str, Any]):
             call_content = json.dumps(
                 {"action": "mcp_call", "method": method_name, "params": method_params},
                 ensure_ascii=False,
@@ -4358,7 +4363,7 @@ class DialogAIChat(QtWidgets.QDialog):
             else:
                 tool_messages.append({"msg_type": "single_instruct", "msg_author": "ai_agent", "msg_content": payload})
 
-        def accumulate_code_segment_coverage(rpc_response: Dict[str, Any]) -> None:
+        def accumulate_code_segment_coverage(rpc_response: dict[str, Any]) -> None:
             nonlocal coverage_total_segments, coverage_loaded_segments, coverage_hit_max_char_limit
 
             if not isinstance(rpc_response, dict):
@@ -4375,7 +4380,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 uri = str(item.get("uri", "")).split("?", 1)[0].strip()
                 if re.fullmatch(r"qualcoder://codes/segments/\d+", uri) is None:
                     continue
-                payload: Optional[Dict[str, Any]] = None
+                payload: dict[str, Any] | None = None
                 text_blob = item.get("text", None)
                 if isinstance(text_blob, str) and text_blob.strip() != "":
                     try:
@@ -4449,7 +4454,7 @@ class DialogAIChat(QtWidgets.QDialog):
             )
 
             def build_phase_request_message(phase_contract: str, trailing_instruction: str) -> HumanMessage:
-                parts: List[str] = []
+                parts: list[str] = []
                 phase_text = str(phase_contract if phase_contract is not None else "").strip()
                 trailing_text = str(trailing_instruction if trailing_instruction is not None else "").strip()
                 if phase_text != "":
@@ -4458,8 +4463,8 @@ class DialogAIChat(QtWidgets.QDialog):
                     parts.append(trailing_text)
                 return HumanMessage(content="\n\n".join(parts).strip())
 
-            def build_phase_messages(phase_contract: str, trailing_instruction: str) -> List[Any]:
-                phase_messages: List[Any] = []
+            def build_phase_messages(phase_contract: str, trailing_instruction: str) -> list[Any]:
+                phase_messages: list[Any] = []
                 if mcp_base_system_prompt != "":
                     phase_messages.append(SystemMessage(content=mcp_base_system_prompt))
                 phase_messages.extend(agent_messages)
@@ -4571,7 +4576,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     stop_reason = "no_more_valid_calls"
                     break
 
-                current_round_failures: List[Dict[str, Any]] = []
+                current_round_failures: list[dict[str, Any]] = []
                 for call in current_round_calls:
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
@@ -4869,7 +4874,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         else:
             return ''
 
-    def new_topic_chat_callback(self, chunks: List[Document], chat_idx: Optional[int] = None):
+    def new_topic_chat_callback(self, chunks: list[Document], chat_idx: int | None = None):
         # Analyze the data found
         if chat_idx is None:
             chat_idx = self.current_chat_idx
@@ -4943,7 +4948,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         self.process_message('instruct', ai_instruction)
         self.update_chat_window()   
                 
-    def topic_chat_get_actions(self) -> List[str]:
+    def topic_chat_get_actions(self) -> list[str]:
         # Analyze more data found in the semantic search
         cursor = self.chat_history_conn.cursor()
         chat_id = int(self.chat_list[self.current_chat_idx][0])
@@ -5079,7 +5084,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             },
         )
 
-    def _resolve_text_analysis_prompt_payload(self, prompt_payload: Any) -> Optional[AgentPromptRecord]:
+    def _resolve_text_analysis_prompt_payload(self, prompt_payload: Any) -> AgentPromptRecord | None:
         """Resolve one text-analysis prompt from a menu payload or prompt record."""
 
         prompt_name = ""
@@ -5118,11 +5123,11 @@ data collected. This information will accompany every prompt sent to the AI, res
             return None
         return prompt_record
 
-    def _mcp_text_analysis_worker(self, messages: List[Any], chat_idx: int,
-                                  bootstrap_spec: Dict[str, Any], signals=None) -> Dict[str, Any]:
+    def _mcp_text_analysis_worker(self, messages: list[Any], chat_idx: int,
+                                  bootstrap_spec: dict[str, Any], signals=None) -> dict[str, Any]:
         """Run the first text analysis turn on top of the normal MCP agent flow."""
 
-        result: Dict[str, Any] = {
+        result: dict[str, Any] = {
             "chat_idx": chat_idx,
             "stream_messages": [],
             "tool_messages": [],
@@ -5157,14 +5162,14 @@ data collected. This information will accompany every prompt sent to the AI, res
         if doc_id <= 0 or text_length <= 0:
             raise ValueError(_("No text passage is available for this text analysis."))
 
-        history_messages: List[Any] = list(messages)
-        agent_messages: List[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
+        history_messages: list[Any] = list(messages)
+        agent_messages: list[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
         mcp_base_system_prompt = self._mcp_base_system_prompt()
         ai_change_set_id = self._begin_ai_change_set(history_messages, chat_idx)
         final_hint = ""
-        tool_messages: List[Dict[str, str]] = []
+        tool_messages: list[dict[str, str]] = []
         tool_messages_streamed = signals is not None and getattr(signals, "progress", None) is not None
-        bootstrap_calls: List[Tuple[str, Dict[str, Any]]] = [
+        bootstrap_calls: list[tuple[str, dict[str, Any]]] = [
             ("initialize", {}),
             ("resources/list", {}),
             ("resources/templates/list", {}),
@@ -5181,17 +5186,17 @@ data collected. This information will accompany every prompt sent to the AI, res
         latest_reflection_summary = ""
         methodology_gate = self._empty_methodology_gate()
         pending_user_decision = None
-        deferred_calls_for_next_round: List[Dict[str, Any]] = []
-        previous_round_failures: List[Dict[str, Any]] = []
+        deferred_calls_for_next_round: list[dict[str, Any]] = []
+        previous_round_failures: list[dict[str, Any]] = []
 
-        def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        def _prepare_mcp_request(method_name: str, raw_params: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
             prepared_request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
             prepared_display_params = dict(prepared_request_params)
             if method_name == "tools/call" and ai_change_set_id != "":
                 prepared_request_params["_ai_change_set_id"] = ai_change_set_id
             return prepared_request_params, prepared_display_params
 
-        def append_tool_exchange(method_name: str, method_params: Dict[str, Any], rpc_response: Dict[str, Any]):
+        def append_tool_exchange(method_name: str, method_params: dict[str, Any], rpc_response: dict[str, Any]):
             call_content = json.dumps(
                 {"action": "mcp_call", "method": method_name, "params": method_params},
                 ensure_ascii=False,
@@ -5259,7 +5264,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             )
 
             def build_phase_request_message(phase_contract: str, trailing_instruction: str) -> HumanMessage:
-                parts: List[str] = []
+                parts: list[str] = []
                 phase_text = str(phase_contract if phase_contract is not None else "").strip()
                 trailing_text = str(trailing_instruction if trailing_instruction is not None else "").strip()
                 if phase_text != "":
@@ -5268,8 +5273,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                     parts.append(trailing_text)
                 return HumanMessage(content="\n\n".join(parts).strip())
 
-            def build_phase_messages(phase_contract: str, trailing_instruction: str) -> List[Any]:
-                phase_messages: List[Any] = []
+            def build_phase_messages(phase_contract: str, trailing_instruction: str) -> list[Any]:
+                phase_messages: list[Any] = []
                 if mcp_base_system_prompt != "":
                     phase_messages.append(SystemMessage(content=mcp_base_system_prompt))
                 phase_messages.extend(agent_messages)
@@ -5381,7 +5386,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     stop_reason = "no_more_valid_calls"
                     break
 
-                current_round_failures: List[Dict[str, Any]] = []
+                current_round_failures: list[dict[str, Any]] = []
                 for call in current_round_calls:
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
@@ -5691,8 +5696,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             QtCore.QPointF(1.0, float(scroll_value) + 1.0),
             QtCore.Qt.HitTestAccuracy.FuzzyHit
         ))
-        if pos < 0:
-            pos = 0
+        pos = max(pos, 0)
         y_pos = self._document_y_for_char_position(doc, pos)
         offset = float(scroll_value) - y_pos
         return {'mode': 'char', 'char_pos': int(pos), 'offset': float(offset)}
@@ -5945,7 +5949,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             text = text[:-1].rstrip()
         return text
 
-    def _text_ref_candidates(self) -> List[Dict[str, Any]]:
+    def _text_ref_candidates(self) -> list[dict[str, Any]]:
         """Expose the active text-analysis excerpt as a single resolver candidate."""
 
         source_id = self._safe_int(self.ai_text_doc_id, -1)
@@ -5967,9 +5971,9 @@ data collected. This information will accompany every prompt sent to the AI, res
     def _replace_references_from_candidates(
             self,
             text: Any,
-            candidates: List[Dict[str, Any]],
+            candidates: list[dict[str, Any]],
             streaming: bool = False,
-            streaming_placeholder: Optional[str] = None) -> str:
+            streaming_placeholder: str | None = None) -> str:
         """Replace {REF: ...} tags using a prepared list of evidence candidates."""
 
         res = str(text)
@@ -6240,7 +6244,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.ui.scrollArea_ai_output.verticalScrollBar().setValue(self.ui.scrollArea_ai_output.verticalScrollBar().maximum())
             self.ai_output_autoscroll = True
                                 
-    def history_update_message_list(self, db_conn: Optional[sqlite3.Connection] = None) -> None:
+    def history_update_message_list(self, db_conn: sqlite3.Connection | None = None) -> None:
         """Update self.chat_msg_list from the database.
 
         Args:
@@ -6257,7 +6261,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         else:
             self.chat_msg_list.clear()
 
-    def _chat_analysis_type(self, chat_idx: Optional[int] = None) -> str:
+    def _chat_analysis_type(self, chat_idx: int | None = None) -> str:
         """Return the analysis type for one chat index."""
 
         if chat_idx is None:
@@ -6266,7 +6270,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             return ''
         return str(self.chat_list[chat_idx][2] if self.chat_list[chat_idx][2] is not None else '')
 
-    def _chat_id_for_index(self, chat_idx: Optional[int] = None) -> Optional[int]:
+    def _chat_id_for_index(self, chat_idx: int | None = None) -> int | None:
         """Return the persisted chat id for one chat index."""
 
         if chat_idx is None:
@@ -6289,7 +6293,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         except Exception:
             return -1
 
-    def _history_base_prompt_keys(self, chat_idx: Optional[int] = None) -> set[str]:
+    def _history_base_prompt_keys(self, chat_idx: int | None = None) -> set[str]:
         """Return prompt keys already covered by the rebuilt base agent prompt."""
 
         analysis_type = self._chat_analysis_type(chat_idx)
@@ -6298,16 +6302,15 @@ data collected. This information will accompany every prompt sent to the AI, res
         _, base_prompt_keys = self._collect_agent_base_prompt_context()
         return base_prompt_keys
 
-    def _history_replay_metadata(self, rows: List[Any], base_prompt_keys: set[str]) -> Tuple[int, Dict[str, int]]:
+    def _history_replay_metadata(self, rows: list[Any], base_prompt_keys: set[str]) -> tuple[int, dict[str, int]]:
         """Collect replay metadata for latest compact state snapshots and prompts."""
 
         latest_agent_state_id = -1
-        latest_prompt_ids: Dict[str, int] = {}
+        latest_prompt_ids: dict[str, int] = {}
         for msg in rows:
             if msg[2] == 'agent_state':
                 msg_id = self._safe_message_id(msg)
-                if msg_id > latest_agent_state_id:
-                    latest_agent_state_id = msg_id
+                latest_agent_state_id = max(latest_agent_state_id, msg_id)
             elif msg[2] == 'prompt':
                 prompt_name = str(msg[3] if msg[3] is not None else '').strip()
                 if prompt_name == '':
@@ -6320,7 +6323,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     latest_prompt_ids[prompt_name] = msg_id
         return latest_agent_state_id, latest_prompt_ids
 
-    def _parse_mcp_result_payload(self, msg_content: str) -> Optional[Dict[str, Any]]:
+    def _parse_mcp_result_payload(self, msg_content: str) -> dict[str, Any] | None:
         """Parse one persisted MCP tool_result payload."""
 
         raw_text = str(msg_content if msg_content is not None else "")
@@ -6353,18 +6356,13 @@ data collected. This information will accompany every prompt sent to the AI, res
             "qualcoder://search/regex",
         ):
             return True
-        if re.fullmatch(r"qualcoder://documents/text/\d+", base_uri):
-            return True
-        if re.fullmatch(r"qualcoder://codes/segments/\d+", base_uri):
-            return True
-        if re.fullmatch(r"qualcoder://annotations/\d+", base_uri):
-            return True
-        return False
 
-    def _summarize_compacted_mcp_result(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        return bool(re.fullmatch(r"(qualcoder://documents/text/\d+|qualcoder://codes/segments/\d+|qualcoder://annotations/\d+)", base_uri))
+
+    def _summarize_compacted_mcp_result(self, payload: dict[str, Any]) -> dict[str, Any]:
         """Return a short structured summary for one compacted MCP result."""
 
-        summary: Dict[str, Any] = {}
+        summary: dict[str, Any] = {}
         method = str(payload.get("method", "")).strip()
         if method == "resources/read":
             requested_uri = str(payload.get("requested_uri", "")).strip()
@@ -6416,7 +6414,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 summary["tools"] = len(result_payload.get("tools", []))
         return summary
 
-    def _compacted_tool_result_placeholder(self, msg_content: str) -> Optional[str]:
+    def _compacted_tool_result_placeholder(self, msg_content: str) -> str | None:
         """Return one short replacement message for older compactable MCP results."""
 
         payload = self._parse_mcp_result_payload(msg_content)
@@ -6427,7 +6425,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         if "error" in payload:
             return None
         method = str(payload.get("method", "")).strip()
-        compacted: Dict[str, Any] = {
+        compacted: dict[str, Any] = {
             "action": "mcp_result_compacted",
             "method": method,
             "note": (
@@ -6446,8 +6444,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             return "Compacted MCP result:\n" + json.dumps(compacted, ensure_ascii=False)
         return None
 
-    def _history_rows_to_ai_messages(self, rows: List[Any], chat_idx: Optional[int] = None,
-                                     compact_frontier_msg_id: int = 0) -> List[Any]:
+    def _history_rows_to_ai_messages(self, rows: list[Any], chat_idx: int | None = None,
+                                     compact_frontier_msg_id: int = 0) -> list[Any]:
         """Convert persisted chat rows into replayable LangChain message objects."""
 
         messages = []
@@ -6470,9 +6468,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 messages.append(HumanMessage(content=msg[4]))
             elif msg[2] == 'env_update':
                 messages.append(HumanMessage(content=msg[4]))
-            elif msg[2] == 'ai':
-                messages.append(AIMessage(content=msg[4]))
-            elif msg[2] == 'tool_call':
+            elif msg[2] == 'ai' or msg[2] == 'tool_call':
                 messages.append(AIMessage(content=msg[4]))
             elif msg[2] == 'tool_result':
                 msg_content = str(msg[4] if msg[4] is not None else '')
@@ -6495,7 +6491,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 continue
         return messages
 
-    def _message_char_count(self, messages: List[Any]) -> int:
+    def _message_char_count(self, messages: list[Any]) -> int:
         """Estimate total payload size in characters for one replayed message list."""
 
         total_chars = 0
@@ -6503,13 +6499,13 @@ data collected. This information will accompany every prompt sent to the AI, res
             total_chars += len(str(getattr(msg, "content", "")))
         return total_chars
 
-    def _estimate_token_count_for_messages(self, messages: List[Any]) -> int:
+    def _estimate_token_count_for_messages(self, messages: list[Any]) -> int:
         """Conservatively estimate token usage for one replayed message list."""
 
         total_chars = self._message_char_count(messages)
         base_tokens = (total_chars / AI_CONTEXT_ESTIMATE_CHARS_PER_TOKEN)
         base_tokens += len(messages) * AI_CONTEXT_ESTIMATE_MESSAGE_OVERHEAD_TOKENS
-        return int(math.ceil(base_tokens * AI_CONTEXT_ESTIMATE_SAFETY_RATIO))
+        return math.ceil(base_tokens * AI_CONTEXT_ESTIMATE_SAFETY_RATIO)
 
     def _target_char_budget_for_messages(self, message_count: int, target_tokens: int) -> int:
         """Convert a token target into a conservative character budget."""
@@ -6518,7 +6514,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         unscaled_token_budget -= (message_count * AI_CONTEXT_ESTIMATE_MESSAGE_OVERHEAD_TOKENS)
         if unscaled_token_budget <= 0:
             return 0
-        return max(0, int(math.floor(unscaled_token_budget * AI_CONTEXT_ESTIMATE_CHARS_PER_TOKEN)))
+        return max(0, math.floor(unscaled_token_budget * AI_CONTEXT_ESTIMATE_CHARS_PER_TOKEN))
 
     def _large_model_context_window(self) -> int:
         """Return the configured context window of the large model."""
@@ -6532,10 +6528,10 @@ data collected. This information will accompany every prompt sent to the AI, res
             return 128000
         return context_window
 
-    def _protected_turn_start_msg_id(self, rows: List[Any], keep_turns: int = AI_CONTEXT_COMPACTION_PROTECTED_TURNS) -> int:
+    def _protected_turn_start_msg_id(self, rows: list[Any], keep_turns: int = AI_CONTEXT_COMPACTION_PROTECTED_TURNS) -> int:
         """Return the first message id of the protected recent-turn window."""
 
-        turn_start_ids: List[int] = []
+        turn_start_ids: list[int] = []
         for msg in rows:
             if not isinstance(msg, tuple) or len(msg) < 3:
                 continue
@@ -6550,7 +6546,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             return turn_start_ids[0]
         return turn_start_ids[-keep_turns]
 
-    def _get_chat_compaction_frontier(self, chat_idx: Optional[int] = None, db_conn=None) -> int:
+    def _get_chat_compaction_frontier(self, chat_idx: int | None = None, db_conn=None) -> int:
         """Return the persisted compaction frontier for one chat."""
 
         chat_id = self._chat_id_for_index(chat_idx)
@@ -6565,10 +6561,10 @@ data collected. This information will accompany every prompt sent to the AI, res
             return 0
         try:
             return max(0, int(row[0]))
-        except Exception:
+        except BaseExceptionGroup:
             return 0
 
-    def _set_chat_compaction_frontier(self, frontier_msg_id: int, chat_idx: Optional[int] = None, db_conn=None) -> None:
+    def _set_chat_compaction_frontier(self, frontier_msg_id: int, chat_idx: int | None = None, db_conn=None) -> None:
         """Persist a monotonically increasing compaction frontier for one chat."""
 
         chat_id = self._chat_id_for_index(chat_idx)
@@ -6614,17 +6610,17 @@ data collected. This information will accompany every prompt sent to the AI, res
             compact_frontier_msg_id=effective_frontier,
         )
         context_window = self._large_model_context_window()
-        trigger_tokens = int(math.floor(context_window * AI_CONTEXT_COMPACTION_TRIGGER_RATIO))
+        trigger_tokens = math.floor(context_window * AI_CONTEXT_COMPACTION_TRIGGER_RATIO)
         if self._estimate_token_count_for_messages(messages) <= trigger_tokens:
             return messages
 
         current_char_total = self._message_char_count(messages)
-        target_tokens = int(math.floor(context_window * AI_CONTEXT_COMPACTION_TARGET_RATIO))
+        target_tokens = math.floor(context_window * AI_CONTEXT_COMPACTION_TARGET_RATIO)
         target_char_budget = self._target_char_budget_for_messages(len(messages), target_tokens)
         if current_char_total <= target_char_budget:
             return messages
 
-        candidate_rows: List[Tuple[int, int]] = []
+        candidate_rows: list[tuple[int, int]] = []
         for msg in rows:
             if not isinstance(msg, tuple) or len(msg) < 5 or msg[2] != 'tool_result':
                 continue
@@ -6669,7 +6665,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.app.project_events.emit_table_changes(tables, source=self)
 
     def history_add_message(self, msg_type: str, msg_author: str, msg_content: str,
-                            chat_idx: Optional[int] = None, db_conn: Optional[sqlite3.Connection] = None,
+                            chat_idx: int | None = None, db_conn: sqlite3.Connection | None = None,
                             refresh: bool = True, commit: bool = True) -> None:
         """Save a timestamped message and optionally commit and refresh the history.
 
@@ -6699,7 +6695,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             if refresh:
                 self.history_update_message_list(db_conn)
 
-    def history_add_or_append_agent_status(self, status_text: str, chat_idx: Optional[int] = None,
+    def history_add_or_append_agent_status(self, status_text: str, chat_idx: int | None = None,
                                           msg_author: str = 'ai_agent') -> None:
         """Save a timestamped agent status, skipping immediate duplicates.
 
@@ -6755,7 +6751,7 @@ data collected. This information will accompany every prompt sent to the AI, res
     def _agent_chat_metadata_system_prompt(self) -> str:
         return self._load_internal_prompt_text("_chat-metadata")
 
-    def _agent_chat_metadata_json_schema(self) -> Dict[str, Any]:
+    def _agent_chat_metadata_json_schema(self) -> dict[str, Any]:
         return {
             "type": "object",
             "properties": {
@@ -6807,7 +6803,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             cancel_result={"chat_id": chat_id, "canceled": True},
         )
 
-    def _generate_agent_chat_metadata_worker(self, chat_id: int, user_message: str, signals=None) -> Dict[str, Any]:
+    def _generate_agent_chat_metadata_worker(self, chat_id: int, user_message: str, signals=None) -> dict[str, Any]:
         """Background worker for agent-chat metadata generation."""
 
         del signals
@@ -6827,7 +6823,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             "summary": self._sanitize_generated_chat_summary(response.get("summary", "")),
         }
 
-    def agent_chat_metadata_callback(self, result: Dict[str, Any]) -> None:
+    def agent_chat_metadata_callback(self, result: dict[str, Any]) -> None:
         """Persist generated chat metadata if the chat is still unnamed."""
 
         if not isinstance(result, dict) or result.get("canceled", False):
@@ -6890,10 +6886,9 @@ data collected. This information will accompany every prompt sent to the AI, res
         self.ai_output_autoscroll = True
         self._dismiss_prompt_completion(accept=False)
         q = self.ui.plainTextEdit_question.toPlainText()
-        if q != '':
-            if self.process_message('user', q):
-                self.ui.plainTextEdit_question.clear()
-                QtWidgets.QApplication.processEvents()
+        if q != '' and self.process_message('user', q):
+            self.ui.plainTextEdit_question.clear()
+            QtWidgets.QApplication.processEvents()
                         
     def process_message(self, msg_type, msg_content, chat_idx=None, db_conn=None, refresh_history=True, commit_history=True) -> bool:
         #if not self.app.ai.is_ready():
@@ -7054,7 +7049,7 @@ data collected. This information will accompany every prompt sent to the AI, res
     def _mcp_final_answer_system_prompt(self) -> str:
         return self._load_internal_prompt_text("_final-answer")
 
-    def _empty_methodology_gate(self) -> Dict[str, Any]:
+    def _empty_methodology_gate(self) -> dict[str, Any]:
         """Return the default methodological gate state."""
 
         return {
@@ -7070,7 +7065,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             return normalized
         return "allow"
 
-    def _extract_methodology_gate(self, payload: Any) -> Dict[str, Any]:
+    def _extract_methodology_gate(self, payload: Any) -> dict[str, Any]:
         """Extract a normalized methodological gate payload from planner/reflection JSON."""
 
         if not isinstance(payload, dict):
@@ -7080,7 +7075,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             "note": self._normalize_progress_note(payload.get("methodology_note", ""), max_length=1000),
         }
 
-    def _merge_methodology_gate(self, current: Any, new_gate: Any) -> Dict[str, Any]:
+    def _merge_methodology_gate(self, current: Any, new_gate: Any) -> dict[str, Any]:
         """Keep the stronger methodological gate while preserving useful detail."""
 
         severity = {
@@ -7114,7 +7109,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         if decision == "allow":
             return ""
 
-        lines: List[str] = [f"Methodology gate result: {decision}."]
+        lines: list[str] = [f"Methodology gate result: {decision}."]
         if decision == "allow_with_caveat":
             lines.append(
                 "Proceed only if you foreground the methodological caveat before the substantive answer."
@@ -7133,7 +7128,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             lines.append("Methodology note: " + note)
         return "\n".join(lines)
 
-    def _snapshot_methodology_gate(self, methodology_gate: Any) -> Dict[str, str]:
+    def _snapshot_methodology_gate(self, methodology_gate: Any) -> dict[str, str]:
         """Return the compact methodological gate state for agent-state snapshots."""
 
         gate = self._extract_methodology_gate(methodology_gate)
@@ -7143,7 +7138,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         }
 
     def _mcp_final_answer_phase_prompts(self, final_hint: str, stop_reason: str,
-                                        methodology_gate: Optional[Dict[str, Any]] = None) -> Tuple[str, str]:
+                                        methodology_gate: dict[str, Any] | None = None) -> tuple[str, str]:
         """Build the stable system prompt and dynamic user prompt for the final answer phase."""
 
         final_hint_text = str(final_hint if final_hint is not None else "").strip()
@@ -7162,7 +7157,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         final_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_final_answer_system_prompt())
         return final_system_prompt, "\n\n".join(prompt_parts)
 
-    def _run_mcp_request(self, method: str, params: Dict[str, Any]) -> tuple[Dict[str, Any], Dict[str, Any]]:
+    def _run_mcp_request(self, method: str, params: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
         request = {
             "jsonrpc": "2.0",
             "id": self.ai_mcp_server.new_request_id(),
@@ -7172,10 +7167,10 @@ data collected. This information will accompany every prompt sent to the AI, res
         response = self.ai_mcp_server.handle_request(request)
         return request, response
 
-    def _mcp_local_error_response(self, code: int, message: str, data: Any = None) -> Dict[str, Any]:
+    def _mcp_local_error_response(self, code: int, message: str, data: Any = None) -> dict[str, Any]:
         """Build one local MCP-shaped error response."""
 
-        error_payload: Dict[str, Any] = {
+        error_payload: dict[str, Any] = {
             "code": int(code),
             "message": str(message if message is not None else "").strip(),
         }
@@ -7211,8 +7206,8 @@ data collected. This information will accompany every prompt sent to the AI, res
 
         return ""
 
-    def _summarize_mcp_failure(self, method_name: str, method_params: Dict[str, Any],
-                               rpc_response: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    def _summarize_mcp_failure(self, method_name: str, method_params: dict[str, Any],
+                               rpc_response: dict[str, Any]) -> dict[str, Any] | None:
         """Return one compact failure summary for model feedback, or None on success."""
 
         if not isinstance(rpc_response, dict):
@@ -7245,7 +7240,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             elif code == -32000:
                 error_class = "runtime_error"
                 retry_advice = "retry_only_if_state_changed"
-            summary: Dict[str, Any] = {
+            summary: dict[str, Any] = {
                 "method": method,
                 "error_class": error_class,
                 "message": message,
@@ -7286,14 +7281,14 @@ data collected. This information will accompany every prompt sent to the AI, res
 
         return None
 
-    def _mcp_failure_feedback_block(self, failures: List[Dict[str, Any]]) -> str:
+    def _mcp_failure_feedback_block(self, failures: list[dict[str, Any]]) -> str:
         """Build an explicit reflection prompt block for recent MCP failures."""
 
-        compact_failures: List[Dict[str, Any]] = []
+        compact_failures: list[dict[str, Any]] = []
         for item in failures:
             if not isinstance(item, dict) or len(item) == 0:
                 continue
-            compact_item: Dict[str, Any] = {}
+            compact_item: dict[str, Any] = {}
             for key in ("method", "tool", "error_class", "message", "retry_advice", "details"):
                 if key in item and item.get(key) not in (None, "", []):
                     compact_item[key] = item.get(key)
@@ -7312,8 +7307,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             + "- If you cannot correct the failure inside the allowed MCP methods, choose ask_user or final_answer."
         )
 
-    def _execute_validated_mcp_call(self, method_name: str, raw_params: Dict[str, Any], allowed_methods: set[str],
-                                    prepare_request, signals, chat_idx: int) -> Tuple[Dict[str, Any], Dict[str, Any], bool]:
+    def _execute_validated_mcp_call(self, method_name: str, raw_params: dict[str, Any], allowed_methods: set[str],
+                                    prepare_request, signals, chat_idx: int) -> tuple[dict[str, Any], dict[str, Any], bool]:
         """Validate one MCP call locally, then dispatch it or return a structured local error."""
 
         method = str(method_name if method_name is not None else "").strip()
@@ -7331,11 +7326,11 @@ data collected. This information will accompany every prompt sent to the AI, res
         _request, response = self._run_mcp_request(method, request_params)
         return display_params, response, True
 
-    def _compact_mcp_result_content(self, method_name: str, method_params: Dict[str, Any],
-                                    rpc_response: Dict[str, Any]) -> str:
+    def _compact_mcp_result_content(self, method_name: str, method_params: dict[str, Any],
+                                    rpc_response: dict[str, Any]) -> str:
         """Return a compact MCP result payload for conversation history."""
 
-        compact: Dict[str, Any] = {
+        compact: dict[str, Any] = {
             "action": "mcp_result",
             "method": str(method_name).strip(),
         }
@@ -7355,13 +7350,13 @@ data collected. This information will accompany every prompt sent to the AI, res
 
         if method_name == "resources/read":
             compact["requested_uri"] = str(method_params.get("uri", "")).strip()
-            compact_contents: List[Dict[str, Any]] = []
+            compact_contents: list[dict[str, Any]] = []
             raw_contents = result_payload.get("contents", [])
             if isinstance(raw_contents, list):
                 for item in raw_contents:
                     if not isinstance(item, dict):
                         continue
-                    compact_item: Dict[str, Any] = {}
+                    compact_item: dict[str, Any] = {}
                     uri = str(item.get("uri", "")).strip()
                     if uri != "":
                         compact_item["uri"] = uri
@@ -7369,7 +7364,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     if isinstance(text_blob, str) and text_blob.strip() != "":
                         try:
                             parsed_payload = json.loads(text_blob)
-                        except Exception:
+                        except json.JSONDecodeError:
                             compact_item["text"] = text_blob
                         else:
                             compact_item["payload"] = parsed_payload
@@ -7395,7 +7390,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         compact["result"] = result_payload
         return "MCP result:\n" + json.dumps(compact, ensure_ascii=False)
 
-    def _begin_ai_change_set(self, messages: List[Any], chat_idx: int) -> str:
+    def _begin_ai_change_set(self, messages: list[Any], chat_idx: int) -> str:
         """Delegate AI change-set creation to the AI service."""
         ai = getattr(self.app, "ai", None)
         if ai is None:
@@ -7409,7 +7404,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             return
         ai.discard_empty_ai_change_set(set_id)
 
-    def _mcp_allowed_call_json_schema(self) -> Dict[str, Any]:
+    def _mcp_allowed_call_json_schema(self) -> dict[str, Any]:
         """JSON schema for allowed MCP calls in planner/reflection outputs."""
 
         list_params = {
@@ -7515,7 +7510,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             ],
         }
 
-    def _mcp_planner_json_schema(self) -> Dict[str, Any]:
+    def _mcp_planner_json_schema(self) -> dict[str, Any]:
         """JSON schema for the MCP planner control response."""
 
         call_schema = self._mcp_allowed_call_json_schema()
@@ -7595,7 +7590,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             "additionalProperties": False,
         }
 
-    def _mcp_reflection_json_schema(self) -> Dict[str, Any]:
+    def _mcp_reflection_json_schema(self) -> dict[str, Any]:
         """JSON schema for the MCP reflection control response."""
 
         call_schema = self._mcp_allowed_call_json_schema()
@@ -7684,11 +7679,11 @@ data collected. This information will accompany every prompt sent to the AI, res
             "additionalProperties": False,
         }
 
-    def _invoke_json_llm(self, messages: List[Any], schema_name: str = '',
-                         response_schema: Optional[Dict[str, Any]] = None,
+    def _invoke_json_llm(self, messages: list[Any], schema_name: str = '',
+                         response_schema: dict[str, Any] | None = None,
                          context: str = 'mcp_json_control',
                          model_kind: str = 'large',
-                         run_context=None) -> Dict[str, Any]:
+                         run_context=None) -> dict[str, Any]:
         """Invoke model and parse one JSON object response."""
 
         response_format = None
@@ -7711,13 +7706,13 @@ data collected. This information will accompany every prompt sent to the AI, res
             return {}
         try:
             data = json.loads(raw)
-        except Exception:
+        except json.JSONDecodeError:
             return {}
         if not isinstance(data, dict):
             return {}
         return data
 
-    def _internal_json_step_timeouts(self) -> Tuple[float, float]:
+    def _internal_json_step_timeouts(self) -> tuple[float, float]:
         """Return soft/hard wall-clock timeouts for planner-like JSON steps."""
 
         ai_service = getattr(self.app, 'ai', None)
@@ -7765,7 +7760,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             return True
 
         answered = threading.Event()
-        request: Dict[str, Any] = {
+        request: dict[str, Any] = {
             "chat_idx": chat_idx,
             "question": self._internal_step_timeout_question(step_name, status_kind),
             "abort": True,
@@ -7780,13 +7775,13 @@ data collected. This information will accompany every prompt sent to the AI, res
                 return True
         return bool(request.get("abort", True))
 
-    def _invoke_json_llm_with_step_timeout(self, messages: List[Any], schema_name: str = '',
-                                           response_schema: Optional[Dict[str, Any]] = None,
+    def _invoke_json_llm_with_step_timeout(self, messages: list[Any], schema_name: str = '',
+                                           response_schema: dict[str, Any] | None = None,
                                            context: str = 'mcp_json_control',
                                            model_kind: str = 'large',
                                            step_name: str = '',
                                            status_kind: str = '',
-                                           signals=None, chat_idx: int = -1) -> Dict[str, Any]:
+                                           signals=None, chat_idx: int = -1) -> dict[str, Any]:
         """Run one internal JSON LLM step with a visible soft timeout and a hard wall-clock timeout."""
 
         if status_kind == "reflection":
@@ -7818,8 +7813,8 @@ data collected. This information will accompany every prompt sent to the AI, res
         run_context.worker_type = 'internal_json_step'
         ai_service._register_run_context(run_context)
 
-        result_holder: Dict[str, Any] = {}
-        error_holder: Dict[str, Exception] = {}
+        result_holder: dict[str, Any] = {}
+        error_holder: dict[str, Exception] = {}
         finished = threading.Event()
 
         def _runner():
@@ -7946,7 +7941,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         if not isinstance(data, dict) or len(data) == 0:
             return False
 
-        normalized_keys = {str(key).strip() for key in data.keys()}
+        normalized_keys = {str(key).strip() for key in data}
         control_keys = {
             "action",
             "method",
@@ -7975,7 +7970,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         method = str(data.get("method", "")).strip().lower()
         if action == "mcp_call":
             return True
-        if method.startswith("tools/") or method.startswith("resources/"):
+        if method.startswith(("tools/", "resources/")):
             return True
         if "params" in data and "method" in data:
             return True
@@ -7992,7 +7987,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             return False
         try:
             data = json.loads(json_text)
-        except Exception:
+        except json.JSONDecodeError:
             return False
         return self._is_internal_control_json_payload(data)
 
@@ -8037,7 +8032,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             f'Invalid final output:\n{invalid_text}\n\n'
             'Rewrite this now as a normal user-facing answer only.'
         )
-        messages: List[Any] = [
+        messages: list[Any] = [
             SystemMessage(content=system_prompt),
             HumanMessage(content=repair_prompt),
         ]
@@ -8054,10 +8049,10 @@ data collected. This information will accompany every prompt sent to the AI, res
             return ''
 
     def _normalize_mcp_calls(self, raw_calls: Any, allowed_methods: set[str],
-                             max_calls: Optional[int] = None) -> List[Dict[str, Any]]:
+                             max_calls: int | None = None) -> list[dict[str, Any]]:
         """Validate and clamp model-proposed MCP calls."""
 
-        normalized: List[Dict[str, Any]] = []
+        normalized: list[dict[str, Any]] = []
         if not isinstance(raw_calls, list):
             return normalized
         for item in raw_calls:
@@ -8074,12 +8069,12 @@ data collected. This information will accompany every prompt sent to the AI, res
             normalized.append({"method": method, "params": params})
         return normalized
 
-    def _merge_mcp_call_lists(self, primary_calls: List[Dict[str, Any]],
-                              secondary_calls: List[Dict[str, Any]],
-                              max_calls: Optional[int] = None) -> List[Dict[str, Any]]:
+    def _merge_mcp_call_lists(self, primary_calls: list[dict[str, Any]],
+                              secondary_calls: list[dict[str, Any]],
+                              max_calls: int | None = None) -> list[dict[str, Any]]:
         """Merge two MCP call lists while preserving order and removing duplicates."""
 
-        merged: List[Dict[str, Any]] = []
+        merged: list[dict[str, Any]] = []
         seen: set[str] = set()
         for call_list in (primary_calls, secondary_calls):
             for call in call_list:
@@ -8098,7 +8093,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     return merged
         return merged
 
-    def _split_mcp_call_queue(self, calls: List[Dict[str, Any]], round_limit: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    def _split_mcp_call_queue(self, calls: list[dict[str, Any]], round_limit: int) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         """Split queued MCP calls into this round and deferred remainder."""
 
         if round_limit <= 0:
@@ -8123,7 +8118,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         return default
 
     def _parse_mcp_planner_response(self, plan_data: Any, allowed_methods: set[str],
-                                    max_queued_calls: int, max_calls_per_round: int) -> Dict[str, Any]:
+                                    max_queued_calls: int, max_calls_per_round: int) -> dict[str, Any]:
         """Normalize one planner/replanner JSON payload into controller state."""
 
         data = plan_data if isinstance(plan_data, dict) else {}
@@ -8159,7 +8154,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             "decision_context": self._normalize_progress_note(data.get("decision_context", ""), max_length=600),
         }
 
-    def _planner_output_missing_calls(self, planner_action: str, planned_calls: List[Dict[str, Any]],
+    def _planner_output_missing_calls(self, planner_action: str, planned_calls: list[dict[str, Any]],
                                       stop_reason: str) -> bool:
         """Return whether planner JSON requests MCP work but omitted executable calls."""
 
@@ -8170,7 +8165,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         return len(planned_calls) == 0
 
     def _parse_mcp_reflection_response(self, reflection_data: Any, allowed_methods: set[str],
-                                       max_queued_calls: int, max_calls_per_round: int) -> Dict[str, Any]:
+                                       max_queued_calls: int, max_calls_per_round: int) -> dict[str, Any]:
         """Normalize one reflection JSON payload into controller state."""
 
         data = reflection_data if isinstance(reflection_data, dict) else {}
@@ -8190,9 +8185,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         if action not in ("call_mcp", "final_answer", "ask_user"):
             if user_decision_required:
                 action = "ask_user"
-            elif self._is_methodology_gate_blocking(methodology_gate):
-                action = "final_answer"
-            elif self._json_bool(data.get("enough_information", False), False):
+            elif self._is_methodology_gate_blocking(methodology_gate) or self._json_bool(data.get("enough_information", False), False):
                 action = "final_answer"
             else:
                 action = "call_mcp"
@@ -8244,10 +8237,10 @@ data collected. This information will accompany every prompt sent to the AI, res
             "proposed_next_calls": proposed_next_calls,
         }
 
-    def _mcp_call_key(self, method: str, params: Dict[str, Any]) -> str:
+    def _mcp_call_key(self, method: str, params: dict[str, Any]) -> str:
         try:
             params_key = json.dumps(params, sort_keys=True, ensure_ascii=False)
-        except Exception:
+        except json.JSONDecodeError:
             params_key = str(params)
         return method + "|" + params_key
 
@@ -8312,7 +8305,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         except Exception:
             return default
 
-    def _tool_result_messages_for_chat(self, chat_idx: Optional[int]) -> List[str]:
+    def _tool_result_messages_for_chat(self, chat_idx: int | None) -> list[str]:
         """Return raw tool_result message contents for one chat."""
 
         if chat_idx is None:
@@ -8337,7 +8330,7 @@ data collected. This information will accompany every prompt sent to the AI, res
     @staticmethod
     def _build_ref_candidates_for_excerpt(source_id: int, source_name: str, start: int,
                                           excerpt: Any, context_before: Any = "",
-                                          context_after: Any = "") -> List[Dict[str, Any]]:
+                                          context_after: Any = "") -> list[dict[str, Any]]:
         """Build resolver candidates for one excerpt plus optional surrounding context."""
 
         excerpt_text = str(excerpt if excerpt is not None else "")
@@ -8349,7 +8342,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         before_start = start - len(before_text)
         after_start = start + len(excerpt_text)
 
-        candidates: List[Dict[str, Any]] = []
+        candidates: list[dict[str, Any]] = []
         seen: set[tuple[int, int, str]] = set()
 
         def append_candidate(candidate_start: int, candidate_text: str) -> None:
@@ -8378,7 +8371,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             append_candidate(before_start, before_text + excerpt_text + after_text)
         return candidates
 
-    def _extract_ref_candidates_from_tool_result(self, tool_result_raw: str) -> List[Dict[str, Any]]:
+    def _extract_ref_candidates_from_tool_result(self, tool_result_raw: str) -> list[dict[str, Any]]:
         """Extract evidence spans from one persisted MCP tool_result message."""
 
         if not isinstance(tool_result_raw, str):
@@ -8392,7 +8385,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             return []
         try:
             stored_payload = json.loads(raw_text)
-        except Exception:
+        except json.JSONDecodeError:
             return []
         if not isinstance(stored_payload, dict):
             return []
@@ -8407,7 +8400,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         if not isinstance(contents, list):
             return []
 
-        candidates: List[Dict[str, Any]] = []
+        candidates: list[dict[str, Any]] = []
         for content in contents:
             if not isinstance(content, dict):
                 continue
@@ -8582,11 +8575,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                     )
         return candidates
 
-    def _collect_ref_candidates(self, chat_idx: Optional[int]) -> List[Dict[str, Any]]:
+    def _collect_ref_candidates(self, chat_idx: int | None) -> list[dict[str, Any]]:
         """Collect deduplicated empirical evidence spans from MCP tool results."""
 
         tool_results = self._tool_result_messages_for_chat(chat_idx)
-        candidates: List[Dict[str, Any]] = []
+        candidates: list[dict[str, Any]] = []
         seen: set[str] = set()
         for raw in tool_results:
             for item in self._extract_ref_candidates_from_tool_result(raw):
@@ -8600,14 +8593,14 @@ data collected. This information will accompany every prompt sent to the AI, res
                 candidates.append(item)
         return candidates
 
-    def _resolve_ref_quote_to_anchor(self, quoted_text: str, candidates: List[Dict[str, Any]]) -> str:
+    def _resolve_ref_quote_to_anchor(self, quoted_text: str, candidates: list[dict[str, Any]]) -> str:
         """Resolve one exact/fuzzy quote to a quote: anchor."""
 
         quote_text = str(quoted_text if quoted_text is not None else "").strip()
         if quote_text == "":
             return _('(unknown reference)')
 
-        best_candidate: Optional[Dict[str, Any]] = None
+        best_candidate: dict[str, Any] | None = None
         best_local_start = -1
         best_local_end = -1
 
@@ -8649,14 +8642,12 @@ data collected. This information will accompany every prompt sent to the AI, res
         full_len = len(fulltext)
         if full_len <= 0:
             return _('(unknown reference)')
-        if abs_start < 0:
-            abs_start = 0
+        abs_start = max(abs_start, 0)
         if abs_start >= full_len:
             return _('(unknown reference)')
 
         abs_end = abs_start + max(1, best_local_end - best_local_start)
-        if abs_end > full_len:
-            abs_end = full_len
+        abs_end = min(abs_end, full_len)
         if abs_end <= abs_start:
             abs_end = min(full_len, abs_start + 1)
             if abs_end <= abs_start:
@@ -8673,12 +8664,12 @@ data collected. This information will accompany every prompt sent to the AI, res
             label = source_name if source_name != "" else str(source_id)
         return f'(<a href="quote:{source_id}_{abs_start}_{abs_len}">{label}</a>)'
 
-    def _mcp_general_chat_worker(self, messages: List[Any], chat_idx: int,
-                                 bootstrap_calls_extra: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
-                                 signals=None) -> Dict[str, Any]:
+    def _mcp_general_chat_worker(self, messages: list[Any], chat_idx: int,
+                                 bootstrap_calls_extra: list[tuple[str, dict[str, Any]]] | None = None,
+                                 signals=None) -> dict[str, Any]:
         """Background worker: staged agent flow with MCP resource access."""
 
-        result: Dict[str, Any] = {
+        result: dict[str, Any] = {
             "chat_idx": chat_idx,
             "stream_messages": [],
             "tool_messages": [],
@@ -8696,14 +8687,14 @@ data collected. This information will accompany every prompt sent to the AI, res
 
         ai_change_set_id = ""
         try:
-            history_messages: List[Any] = list(messages)
-            agent_messages: List[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
+            history_messages: list[Any] = list(messages)
+            agent_messages: list[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
             mcp_base_system_prompt = self._mcp_base_system_prompt()
             ai_change_set_id = self._begin_ai_change_set(history_messages, chat_idx)
             final_hint = ''
-            tool_messages: List[Dict[str, str]] = []
+            tool_messages: list[dict[str, str]] = []
             tool_messages_streamed = signals is not None and getattr(signals, "progress", None) is not None
-            bootstrap_calls: List[Tuple[str, Dict[str, Any]]] = [
+            bootstrap_calls: list[tuple[str, dict[str, Any]]] = [
                 ("initialize", {}),
                 ("resources/list", {}),
                 ("resources/templates/list", {}),
@@ -8722,14 +8713,14 @@ data collected. This information will accompany every prompt sent to the AI, res
             total_tool_calls = 0
             stop_reason = ""
             methodology_gate = self._empty_methodology_gate()
-            def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+            def _prepare_mcp_request(method_name: str, raw_params: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
                 prepared_request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
                 prepared_display_params = dict(prepared_request_params)
                 if method_name == "tools/call" and ai_change_set_id != "":
                     prepared_request_params["_ai_change_set_id"] = ai_change_set_id
                 return prepared_request_params, prepared_display_params
 
-            def append_tool_exchange(method_name: str, method_params: Dict[str, Any], rpc_response: Dict[str, Any]):
+            def append_tool_exchange(method_name: str, method_params: dict[str, Any], rpc_response: dict[str, Any]):
                 call_content = json.dumps(
                     {"action": "mcp_call", "method": method_name, "params": method_params},
                     ensure_ascii=False,
@@ -8773,7 +8764,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     tool_messages.append({"msg_type": "single_instruct", "msg_author": "ai_agent", "msg_content": payload})
 
             def build_phase_request_message(phase_contract: str, trailing_instruction: str) -> HumanMessage:
-                parts: List[str] = []
+                parts: list[str] = []
                 phase_text = str(phase_contract if phase_contract is not None else "").strip()
                 trailing_text = str(trailing_instruction if trailing_instruction is not None else "").strip()
                 if phase_text != "":
@@ -8782,8 +8773,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                     parts.append(trailing_text)
                 return HumanMessage(content="\n\n".join(parts).strip())
 
-            def build_phase_messages(phase_contract: str, trailing_instruction: str) -> List[Any]:
-                phase_messages: List[Any] = []
+            def build_phase_messages(phase_contract: str, trailing_instruction: str) -> list[Any]:
+                phase_messages: list[Any] = []
                 if mcp_base_system_prompt != "":
                     phase_messages.append(SystemMessage(content=mcp_base_system_prompt))
                 phase_messages.extend(agent_messages)
@@ -8999,7 +8990,7 @@ data collected. This information will accompany every prompt sent to the AI, res
 
                 current_round_calls, deferred_calls = self._split_mcp_call_queue(planned_calls, max_calls_per_round)
                 executed_any_call = False
-                round_failures: List[Dict[str, Any]] = []
+                round_failures: list[dict[str, Any]] = []
                 for call in current_round_calls:
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
@@ -9347,7 +9338,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         self.update_chat_window()
         self._update_undo_button_state()
 
-    def _ai_internal_timeout_confirmation_callback(self, request: Dict[str, Any]) -> None:
+    def _ai_internal_timeout_confirmation_callback(self, request: dict[str, Any]) -> None:
         """Show an internal-step timeout question on the GUI thread."""
 
         if not isinstance(request, dict):
@@ -9574,8 +9565,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 popup_menu.close()
                 return True
 
-        if source is question_widget and event.type() == QEvent.Type.MouseButtonPress:
-            if self.current_chat_idx < 0:
+        if source is question_widget and event.type() == QEvent.Type.MouseButtonPress and self.current_chat_idx < 0:
                 try:
                     click_pos = event.position().toPoint()
                 except Exception:
@@ -9666,22 +9656,20 @@ data collected. This information will accompany every prompt sent to the AI, res
                     if self._move_prompt_completion_selection(-1):
                         return True
                 elif event.key() in (Qt.Key.Key_Tab, Qt.Key.Key_Return, Qt.Key.Key_Enter):
-                    if not event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
-                        if self._accept_prompt_completion():
+                    if not event.modifiers() and Qt.KeyboardModifier.ShiftModifier and self._accept_prompt_completion():
                             return True
                 elif event.key() == Qt.Key.Key_Escape:
                     self._dismiss_prompt_completion(accept=False)
                     return True
 
             # Shift + Return/Enter creates a new line. Just pressing Return/Enter sends the question to the AI:
-            if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
-                if not event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
+            if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter) and not event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
                     self.send_user_question()
                     return True  # Event handled
         # For all other cases, return super's eventFilter result
         return super().eventFilter(source, event)
 
-    def _ai_link_tooltip_colors(self) -> Tuple[QtGui.QColor, QtGui.QColor, QtGui.QColor]:
+    def _ai_link_tooltip_colors(self) -> tuple[QtGui.QColor, QtGui.QColor, QtGui.QColor]:
         """Return readable colors matching the current Qt tooltip style where possible."""
 
         application = QtWidgets.QApplication.instance()
@@ -9696,7 +9684,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     name, value = declaration.split(":", 1)
                     properties[name.strip().lower()] = value.strip()
 
-                def color_from_value(value: str) -> Optional[QtGui.QColor]:
+                def color_from_value(value: str) -> QtGui.QColor | None:
                     tokens = re.findall(r"#[0-9a-fA-F]{3,8}|rgba?\([^)]+\)|[A-Za-z]+", value)
                     for token in reversed(tokens):
                         color = QtGui.QColor(token)
@@ -9969,9 +9957,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     source_id, start, length = quote_id.split('_')
                     end = int(start) + int(length)
                     self._open_text_reference(int(source_id), int(start), end)
-            elif self._dispatch_ai_agent_tab_link(link):
-                return
-            elif self._dispatch_qualcoder_link(link):
+            elif self._dispatch_ai_agent_tab_link(link) or self._dispatch_qualcoder_link(link):
                 return
             elif link.startswith('action:topic_chat_analyze_more'):
                 self.topic_chat_analyze_more()

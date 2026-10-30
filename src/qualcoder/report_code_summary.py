@@ -20,15 +20,15 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
-from copy import deepcopy
-import pymupdf
 import logging
 import os
-import PIL
-from PIL import Image
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
+from copy import deepcopy
 
+import PIL
+import pymupdf
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from PIL import Image
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 
@@ -216,8 +216,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = _("Memo")
                 cat_name = c['name']
-                if self.truncated_code_names:
-                    if len(c['name']) > 62:  # Keep category name short
+                if self.truncated_code_names and len(c['name']) > 62:  # Keep category name short
                         cat_name = f"{c['name'][:30]}..{c['name'][-30:]}"
                         self.contains_long_names = True
                 top_item = QtWidgets.QTreeWidgetItem([cat_name, f'catid:{c["catid"]}', memo])
@@ -246,8 +245,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = _("Memo")
                         cat_name = c['name']
-                        if self.truncated_code_names:
-                            if len(c['name']) > 62:  # Keep category name short
+                        if self.truncated_code_names and len(c['name']) > 62:  # Keep category name short
                                 cat_name = f"{c['name'][:30]}..{c['name'][-30:]}"
                                 self.contains_long_names = True
                         child = QtWidgets.QTreeWidgetItem([cat_name, f'catid:{c["catid"]}', memo])
@@ -274,8 +272,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = _("Memo")
                 code_name = c['name']
-                if self.truncated_code_names:
-                    if len(c['name']) > 62:  # Keep category name short
+                if self.truncated_code_names and len(c['name']) > 62:  # Keep category name short
                         code_name = f"{c['name'][:30]}..{c['name'][-30:]}"
                         self.contains_long_names = True
                 top_item = QtWidgets.QTreeWidgetItem([code_name, f'cid:{c["cid"]}', memo])
@@ -303,8 +300,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                     if c['memo'] != "":
                         memo = _("Memo")
                     code_name = c['name']
-                    if self.truncated_code_names:
-                        if len(c['name']) > 62:  # Keep category name short
+                    if self.truncated_code_names and len(c['name']) > 62:  # Keep category name short
                             code_name = f"{c['name'][:30]}..{c['name'][-30:]}"
                             self.contains_long_names = True
                     child = QtWidgets.QTreeWidgetItem([code_name, f'cid:{c["cid"]}', memo])
@@ -537,7 +533,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
 
         # Remove punctuation. Convert to lower case
         chars = ""
-        for c in range(0, len(fulltext)):
+        for c in range(len(fulltext)):
             if fulltext[c].isalpha() or fulltext[c] == "'":
                 chars += fulltext[c]
             else:
@@ -566,15 +562,14 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         text += _("Unique words: ") + f"{len(word_freq)}\n"
         # Top 100 or maximum of less than 100
         max_count = len(word_freq)
-        if max_count > 100:
-            max_count = 100
+        max_count = min(max_count, 100)
         text += _("Top 100 words") + ". "
         if self.ui.comboBox_stopwords.currentText() != "  " and not user_created_stopwords:
             text += _("Applying stopwords: ") + self.ui.comboBox_stopwords.currentText()
         if user_created_stopwords:
             text += _("Applying stopwords from: .qualcoder/stopwords.txt")
         text += "\n"
-        for i in range(0, max_count):
+        for i in range(max_count):
             text += f"{word_freq[i][1]}   {word_freq[i][0]} | "
         text += "\n"
         return text

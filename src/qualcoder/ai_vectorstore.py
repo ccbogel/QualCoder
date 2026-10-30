@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -34,9 +32,9 @@ import time
 import traceback
 import weakref
 from collections import defaultdict
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from datetime import datetime
-from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union
+from datetime import UTC, datetime
 
 os.environ['FAISS_NO_AVX2'] = '1'
 # Setting the env 'FAISS_OPT_LEVEL' to '' will create a 'generic' index. It is a poorly documented 
@@ -48,15 +46,17 @@ os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
 import faiss
+import numpy as np
+import sentence_transformers  # Keep a reference so it is not garbage collected in subthreads.
 from huggingface_hub import hf_hub_download
 from huggingface_hub.utils.tqdm import tqdm as HuggingFaceTqdm
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_community.vectorstores import FAISS as LegacyFAISS
-import numpy as np
 from PyQt6 import QtCore, QtWidgets
-import sentence_transformers  # Keep a reference so it is not garbage collected in subthreads.
 
-from qualcoder.ai_async_worker import AIException, GuiThreadRelay, Worker, WorkerSignals
+from qualcoder.ai_async_worker import GuiThreadRelay, Worker, WorkerSignals
+
+#from qualcoder.ai_async_worker import AIException, GuiThreadRelay, Worker, WorkerSignals
 from qualcoder.ai_runtime import (
     VECTORSTORE_FAILED,
     VECTORSTORE_INDEXING,
@@ -65,7 +65,8 @@ from qualcoder.ai_runtime import (
     VECTORSTORE_UNLOADED,
 )
 from qualcoder.error_dlg import show_error_dlg
-from qualcoder.helpers import Message
+
+#from qualcoder.helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -80,7 +81,7 @@ class _EmbeddingModelDownloadCancelled(Exception):
 
 
 def _create_huggingface_progress_class(
-        vectorstore: "AiVectorstore", signals: Optional[WorkerSignals], file_name: str
+        vectorstore: AiVectorstore, signals: WorkerSignals | None, file_name: str
 ) -> type[HuggingFaceTqdm]:
     """Create a Hugging Face progress bar that forwards updates to Qt.
 
@@ -102,7 +103,7 @@ def _create_huggingface_progress_class(
         def display(self, msg=None, pos=None) -> None:
             """Suppress terminal output because progress is shown in Qt."""
 
-        def update(self, size: float = 1) -> Optional[bool]:
+        def update(self, size: float = 1) -> bool | None:
             if vectorstore.download_model_cancel:
                 raise _EmbeddingModelDownloadCancelled
             self.qt_downloaded += size
@@ -133,27 +134,27 @@ class SearchChunkDocument:
     """Lightweight replacement for the LangChain Document used by the AI workflow."""
 
     page_content: str
-    metadata: Dict[str, Union[str, int, float]]
+    metadata: dict[str, str | int | float]
     id: str
 
 
 class E5SentenceTransformerEmbeddings(SentenceTransformerEmbeddings):
 
-    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
         emb_texts = []
         for text in texts:
             emb_texts.append('passage: ' + text)
         return super().embed_documents(texts=emb_texts)
 
-    def embed_query(self, text: str) -> List[float]:
+    def embed_query(self, text: str) -> list[float]:
         return super().embed_documents([f'query: {text}'])[0]
 
 
 class _RecursiveTextChunker:
     """Adapted from LangChain's RecursiveCharacterTextSplitter."""
 
-    def __init__(self, separators: Optional[List[str]] = None, chunk_size: int = 500,
-                 chunk_overlap: int = 100, keep_separator: Union[bool, str] = "end",
+    def __init__(self, separators: list[str] | None = None, chunk_size: int = 500,
+                 chunk_overlap: int = 100, keep_separator: bool | str = "end",
                  strip_whitespace: bool = True):
         if chunk_overlap > chunk_size:
             raise ValueError("chunk_overlap must be <= chunk_size")
@@ -163,7 +164,7 @@ class _RecursiveTextChunker:
         self._keep_separator = keep_separator
         self._strip_whitespace = strip_whitespace
 
-    def _split_text_with_regex(self, text: str, separator: str) -> List[str]:
+    def _split_text_with_regex(self, text: str, separator: str) -> list[str]:
         if separator:
             if self._keep_separator:
                 raw_splits = re.split(f"({re.escape(separator)})", text)
@@ -183,16 +184,16 @@ class _RecursiveTextChunker:
             splits = list(text)
         return [split for split in splits if split != ""]
 
-    def _join_docs(self, docs: List[str], separator: str) -> Optional[str]:
+    def _join_docs(self, docs: list[str], separator: str) -> str | None:
         text = separator.join(docs)
         if self._strip_whitespace:
             text = text.strip()
         return None if text == "" else text
 
-    def _merge_splits(self, splits: Iterable[str], separator: str) -> List[str]:
+    def _merge_splits(self, splits: Iterable[str], separator: str) -> list[str]:
         separator_len = len(separator)
-        docs: List[str] = []
-        current_doc: List[str] = []
+        docs: list[str] = []
+        current_doc: list[str] = []
         total = 0
         for item in splits:
             item_len = len(item)
@@ -220,10 +221,10 @@ class _RecursiveTextChunker:
             docs.append(merged)
         return docs
 
-    def _split_text(self, text: str, separators: List[str]) -> List[str]:
-        final_chunks: List[str] = []
+    def _split_text(self, text: str, separators: list[str]) -> list[str]:
+        final_chunks: list[str] = []
         separator = separators[-1]
-        new_separators: List[str] = []
+        new_separators: list[str] = []
         for idx, candidate in enumerate(separators):
             if candidate == "":
                 separator = candidate
@@ -234,7 +235,7 @@ class _RecursiveTextChunker:
                 break
 
         splits = self._split_text_with_regex(text, separator)
-        good_splits: List[str] = []
+        good_splits: list[str] = []
         merge_separator = "" if self._keep_separator else separator
         for split in splits:
             if len(split) < self._chunk_size:
@@ -252,11 +253,11 @@ class _RecursiveTextChunker:
             final_chunks.extend(self._merge_splits(good_splits, merge_separator))
         return final_chunks
 
-    def split_text(self, text: str) -> List[str]:
+    def split_text(self, text: str) -> list[str]:
         return self._split_text(text, self._separators)
 
-    def create_documents(self, text: str, metadata: Dict[str, Union[str, int]]) -> List[SearchChunkDocument]:
-        documents: List[SearchChunkDocument] = []
+    def create_documents(self, text: str, metadata: dict[str, str | int]) -> list[SearchChunkDocument]:
+        documents: list[SearchChunkDocument] = []
         index = 0
         previous_chunk_len = 0
         for chunk_idx, chunk in enumerate(self.split_text(text)):
@@ -273,7 +274,7 @@ class _RecursiveTextChunker:
 class _CompatFaissStore:
     """Compatibility shim for the old ai_llm lookup path."""
 
-    def __init__(self, vectorstore: "AiVectorstore"):
+    def __init__(self, vectorstore: AiVectorstore):
         self._vectorstore = vectorstore
 
     def similarity_search_with_relevance_scores(self, query: str, k: int = 4,
@@ -372,7 +373,7 @@ class AiVectorstore:
         self._search_db_path = ""
         self._legacy_faiss_path = ""
         self._faiss_index = None
-        self._chunk_ids_by_pos: List[int] = []
+        self._chunk_ids_by_pos: list[int] = []
         self._compat_store = _CompatFaissStore(self)
         self._chunker = _RecursiveTextChunker(
             separators=list(self.chunk_separators),
@@ -403,7 +404,7 @@ class AiVectorstore:
         with self._state_lock:
             return self._worker_generation
 
-    def cancelled(self, worker_generation: Optional[int] = None) -> bool:
+    def cancelled(self, worker_generation: int | None = None) -> bool:
         """Return whether work has been invalidated by shutdown or project closure."""
 
         with self._state_lock:
@@ -480,7 +481,7 @@ class AiVectorstore:
                 return False
         return True
 
-    def _download_model_file(self, file_name: str, signals: Optional[WorkerSignals]) -> str:
+    def _download_model_file(self, file_name: str, signals: WorkerSignals | None) -> str:
         """Download one model file while forwarding Hugging Face progress to Qt.
 
         Args:
@@ -508,7 +509,7 @@ class AiVectorstore:
             finally:
                 _HUGGINGFACE_TQDM_MODULE.tqdm = original_progress_class
 
-    def _download_embedding_model(self, signals: Optional[WorkerSignals] = None) -> None:
+    def _download_embedding_model(self, signals: WorkerSignals | None = None) -> None:
         """Download missing embedding-model files through Hugging Face Hub.
 
         Args:
@@ -591,7 +592,7 @@ class AiVectorstore:
     def _connect_project_db(self) -> sqlite3.Connection:
         return sqlite3.connect(self._project_db_path(), timeout=30)
 
-    def _fetch_project_text_sources(self) -> List[Dict[str, Union[str, int, None]]]:
+    def _fetch_project_text_sources(self) -> list[dict[str, str | int | None]]:
         conn = self._connect_project_db()
         try:
             rows = conn.execute(
@@ -709,7 +710,7 @@ class AiVectorstore:
                     self.chunk_overlap,
                     "l2",
                     "ready",
-                    datetime.utcnow().isoformat(timespec="seconds"),
+                    datetime.now(tz=UTC).isoformat(timespec="seconds"),
                 ),
             )
         conn.commit()
@@ -726,7 +727,7 @@ class AiVectorstore:
     def _set_meta_build_state(self, conn: sqlite3.Connection, state: str) -> None:
         conn.execute(
             "UPDATE search_meta SET build_state=?, last_build_at=?",
-            (str(state), datetime.utcnow().isoformat(timespec="seconds")),
+            (str(state),datetime.now(tz=UTC).isoformat(timespec="seconds")),
         )
         conn.commit()
 
@@ -747,27 +748,27 @@ class AiVectorstore:
     def _blob_to_vector(self, blob) -> np.ndarray:
         return np.frombuffer(blob, dtype=np.float32).copy()
 
-    def _compute_hash_ordinals(self, docs: List[SearchChunkDocument]) -> None:
-        seen: Dict[str, int] = defaultdict(int)
+    def _compute_hash_ordinals(self, docs: list[SearchChunkDocument]) -> None:
+        seen: dict[str, int] = defaultdict(int)
         for doc in docs:
             text_hash = self._hash_text(doc.page_content)
             doc.metadata["text_hash"] = text_hash
             doc.metadata["hash_ordinal"] = seen[text_hash]
             seen[text_hash] += 1
 
-    def _split_source_text(self, source_id: int, source_name: str, text: str) -> List[SearchChunkDocument]:
+    def _split_source_text(self, source_id: int, source_name: str, text: str) -> list[SearchChunkDocument]:
         docs = self._chunker.create_documents(text, {"id": int(source_id), "name": str(source_name)})
         self._compute_hash_ordinals(docs)
         return docs
 
-    def _load_existing_vectors_by_hash(self, conn: sqlite3.Connection, source_id: int) -> Dict[str, List[np.ndarray]]:
+    def _load_existing_vectors_by_hash(self, conn: sqlite3.Connection, source_id: int) -> dict[str, list[np.ndarray]]:
         rows = conn.execute(
             "SELECT c.text_hash, e.vector_blob "
             "FROM search_chunks c JOIN search_embeddings e ON e.chunk_id = c.chunk_id "
             "WHERE c.source_id=? ORDER BY c.chunk_index",
             (int(source_id),),
         ).fetchall()
-        result: Dict[str, List[np.ndarray]] = defaultdict(list)
+        result: dict[str, list[np.ndarray]] = defaultdict(list)
         for text_hash, vector_blob in rows:
             if text_hash is None or vector_blob is None:
                 continue
@@ -784,8 +785,8 @@ class AiVectorstore:
         conn.execute("DELETE FROM search_source_state WHERE source_id=?", (int(source_id),))
 
     def _index_source(self, conn: sqlite3.Connection, source_id: int, source_name: str, text: str,
-                      candidate_vectors_by_hash: Optional[Dict[str, List[np.ndarray]]] = None,
-                      signals=None, worker_generation: Optional[int] = None) -> Optional[int]:
+                      candidate_vectors_by_hash: dict[str, list[np.ndarray]] | None = None,
+                      signals=None, worker_generation: int | None = None) -> int | None:
         if self.cancelled(worker_generation):
             return None
 
@@ -793,7 +794,7 @@ class AiVectorstore:
         if candidate_vectors_by_hash is None:
             candidate_vectors_by_hash = self._load_existing_vectors_by_hash(conn, source_id)
         else:
-            normalized: Dict[str, List[np.ndarray]] = defaultdict(list)
+            normalized: dict[str, list[np.ndarray]] = defaultdict(list)
             for key, vectors in candidate_vectors_by_hash.items():
                 normalized[str(key)] = [np.asarray(vec, dtype=np.float32) for vec in vectors]
             candidate_vectors_by_hash = normalized
@@ -805,8 +806,8 @@ class AiVectorstore:
             self.reading_doc = source_name
             signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{source_name}"')
 
-        texts_to_embed: List[str] = []
-        chunk_vectors: List[Optional[np.ndarray]] = []
+        texts_to_embed: list[str] = []
+        chunk_vectors: list[np.ndarray | None] = []
         for doc in docs:
             text_hash = str(doc.metadata["text_hash"])
             vectors = candidate_vectors_by_hash.get(text_hash, [])
@@ -816,7 +817,7 @@ class AiVectorstore:
                 chunk_vectors.append(None)
                 texts_to_embed.append(doc.page_content)
 
-        new_vectors: List[np.ndarray] = []
+        new_vectors: list[np.ndarray] = []
         for batch_start in range(0, len(texts_to_embed), self.embedding_batch_size):
             if self.cancelled(worker_generation) or not self._project_source_exists(source_id):
                 self.reading_doc = ''
@@ -886,7 +887,7 @@ class AiVectorstore:
                     str(source_name),
                     self._hash_text(text),
                     len(text),
-                    datetime.utcnow().isoformat(timespec="seconds"),
+                     datetime.now(tz=UTC).isoformat(timespec="seconds"),
                 ),
             )
             conn.commit()
@@ -894,8 +895,8 @@ class AiVectorstore:
         return len(docs)
 
     def _build_candidate_vectors_from_legacy(self, source_id: int, source_name: str, text: str,
-                                             legacy_items: List[Tuple[int, str, np.ndarray]]) -> Dict[str, List[np.ndarray]]:
-        result: Dict[str, List[np.ndarray]] = defaultdict(list)
+                                             legacy_items: list[tuple[int, str, np.ndarray]]) -> dict[str, list[np.ndarray]]:
+        result: dict[str, list[np.ndarray]] = defaultdict(list)
         current_len = len(text)
         for start_index, chunk_text, vector in sorted(legacy_items, key=lambda item: item[0]):
             if start_index < 0 or chunk_text == "":
@@ -908,8 +909,8 @@ class AiVectorstore:
             result[self._hash_text(chunk_text)].append(np.asarray(vector, dtype=np.float32))
         return result
 
-    def _load_legacy_candidates(self) -> Dict[int, List[Tuple[int, str, np.ndarray]]]:
-        result: Dict[int, List[Tuple[int, str, np.ndarray]]] = defaultdict(list)
+    def _load_legacy_candidates(self) -> dict[int, list[tuple[int, str, np.ndarray]]]:
+        result: dict[int, list[tuple[int, str, np.ndarray]]] = defaultdict(list)
         if not os.path.exists(self._legacy_faiss_path):
             return result
         with open(self._legacy_faiss_path, 'rb') as handle:
@@ -974,8 +975,8 @@ class AiVectorstore:
         self.faiss_db = self._compat_store
 
     def _refresh_sources(self, conn: sqlite3.Connection, signals=None,
-                         legacy_candidates: Optional[Dict[int, List[Tuple[int, str, np.ndarray]]]] = None,
-                         worker_generation: Optional[int] = None) -> None:
+                         legacy_candidates: dict[int, list[tuple[int, str, np.ndarray]]] | None = None,
+                         worker_generation: int | None = None) -> None:
         docs = self._fetch_project_text_sources()
         current_source_ids = {int(doc['id']) for doc in docs}
         existing_ids = {int(row[0]) for row in conn.execute("SELECT source_id FROM search_source_state").fetchall()}
@@ -1029,7 +1030,7 @@ class AiVectorstore:
                 worker_generation=worker_generation,
             )
 
-    def _open_db(self, rebuild: bool = False, worker_generation: Optional[int] = None,
+    def _open_db(self, rebuild: bool = False, worker_generation: int | None = None,
                  signals=None) -> None:
         if self.cancelled(worker_generation):
             return
@@ -1144,7 +1145,7 @@ class AiVectorstore:
     def progress_import(self, msg: str) -> None:
         self._post_message(msg)
 
-    def finished_import(self, worker_generation: Optional[int] = None) -> None:
+    def finished_import(self, worker_generation: int | None = None) -> None:
         if self.cancelled(worker_generation):
             return
         self._finish_vectorstore_worker(worker_generation)
@@ -1155,7 +1156,7 @@ class AiVectorstore:
             self._post_message(msg)
             logger.debug(msg)
 
-    def _finish_vectorstore_worker(self, worker_generation: Optional[int] = None) -> None:
+    def _finish_vectorstore_worker(self, worker_generation: int | None = None) -> None:
         if self.cancelled(worker_generation):
             return
         if self.vectorstore_workers_count > 0:
@@ -1180,12 +1181,12 @@ class AiVectorstore:
 
     def retrieve_similar_documents(
             self,
-            search_strings: List[str],
-            doc_ids: Optional[List[int]] = None,
+            search_strings: list[str],
+            doc_ids: list[int] | None = None,
             score_threshold: float = 0.5,
             k: int = 50,
-            cancel_check: Optional[Callable[[], None]] = None,
-    ) -> List[SearchChunkDocument]:
+            cancel_check: Callable[[], None] | None = None,
+    ) -> list[SearchChunkDocument]:
         """Retrieve, consolidate, and rank matching project chunks.
 
         Args:
@@ -1223,8 +1224,8 @@ class AiVectorstore:
                 ]
             results_by_query.append(results)
 
-        chunk_scores: Dict[str, float] = {}
-        chunks: List[SearchChunkDocument] = []
+        chunk_scores: dict[str, float] = {}
+        chunks: list[SearchChunkDocument] = []
         for results in results_by_query:
             if cancel_check is not None:
                 cancel_check()
@@ -1249,8 +1250,8 @@ class AiVectorstore:
         logger.debug('First 10 chunks of retrieved data:\n%s', chunks[:10])
         return chunks
 
-    def _fetch_documents_by_chunk_ids(self, chunk_ids: List[int]) -> Dict[int, SearchChunkDocument]:
-        result: Dict[int, SearchChunkDocument] = {}
+    def _fetch_documents_by_chunk_ids(self, chunk_ids: list[int]) -> dict[int, SearchChunkDocument]:
+        result: dict[int, SearchChunkDocument] = {}
         if not chunk_ids:
             return result
         normalized_ids = []
@@ -1286,8 +1287,8 @@ class AiVectorstore:
             )
         return result
 
-    def faiss_db_retrieve_documents(self, docstore_ids: List[str], faiss_db=None):
-        chunk_ids: List[int] = []
+    def faiss_db_retrieve_documents(self, docstore_ids: list[str], faiss_db=None):
+        chunk_ids: list[int] = []
         for docstore_id in docstore_ids:
             try:
                 chunk_id = int(str(docstore_id).strip())
@@ -1296,7 +1297,7 @@ class AiVectorstore:
             if chunk_id > 0:
                 chunk_ids.append(chunk_id)
         docs_map = self._fetch_documents_by_chunk_ids(chunk_ids)
-        result: List[SearchChunkDocument] = []
+        result: list[SearchChunkDocument] = []
         for chunk_id in chunk_ids:
             doc = docs_map.get(chunk_id)
             if doc is not None:
@@ -1330,7 +1331,7 @@ class AiVectorstore:
         query_vec = self._query_embedding(query)
         top_k = max(1, min(int(fetch_k if metadata_filter is not None else k), max(k, fetch_k, 1)))
         distances, indices = self._faiss_index.search(np.ascontiguousarray(query_vec.reshape(1, -1)), top_k)
-        chunk_ids: List[int] = []
+        chunk_ids: list[int] = []
         for pos in indices[0]:
             pos_i = int(pos)
             if pos_i < 0 or pos_i >= len(self._chunk_ids_by_pos):
@@ -1367,8 +1368,8 @@ class AiVectorstore:
                 break
         return results
 
-    def _import_document(self, id_: int, name: str, text: Optional[str],
-                         worker_generation: Optional[int] = None, signals=None) -> None:
+    def _import_document(self, id_: int, name: str, text: str | None,
+                         worker_generation: int | None = None, signals=None) -> None:
         source_id = int(id_)
         if self.cancelled(worker_generation):
             return
@@ -1399,7 +1400,7 @@ class AiVectorstore:
             conn.close()
         self.reading_doc = ''
 
-    def import_document(self, id_: int, name: str, text: Optional[str]) -> None:
+    def import_document(self, id_: int, name: str, text: str | None) -> None:
         self._set_runtime_state(VECTORSTORE_INDEXING)
         worker_generation = self._worker_generation_snapshot()
         worker = Worker(
@@ -1418,7 +1419,7 @@ class AiVectorstore:
         self.vectorstore_workers_count += 1
         self.threadpool.start(worker)
 
-    def _update_vectorstore(self, worker_generation: Optional[int] = None,
+    def _update_vectorstore(self, worker_generation: int | None = None,
                             signals=None) -> None:
         if self.cancelled(worker_generation):
             return
@@ -1520,9 +1521,8 @@ class AiVectorstore:
         wait: the worker leaves on its own at its next checkpoint.
         """
 
-        with self._index_write_lock:
-            with self._state_lock:
-                self._worker_generation += 1
+        with self._index_write_lock, self._state_lock:
+            self._worker_generation += 1
         self.threadpool.clear()
 
     def close(self) -> None:

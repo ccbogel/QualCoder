@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -20,24 +18,25 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
+import logging
+import shutil
+import tempfile  # Create a temporary file
 from collections import Counter
 from copy import copy, deepcopy
-import logging
 from pathlib import Path
-import tempfile  # Create a temporary file
+
 import pandas as pd
 import plotly.express as px
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtWidgets import QDialog
 from PyQt6.QtGui import QIcon
-import shutil
+from PyQt6.QtWidgets import QDialog
 
+from . import stopwords
 from .GUI.ui_dialog_charts import Ui_DialogCharts
 from .helpers import ExportDirectoryPathDialog, Message
 from .report_attributes import DialogSelectAttributeParameters
 from .simple_wordcloud import Wordcloud
-from . import stopwords
 
 logger = logging.getLogger(__name__)
 
@@ -46,18 +45,18 @@ class ViewCharts(QDialog):
     """ Dialog to view various charts of codes and categories.
     """
 
-    app = None
-    conn = None
-    settings = None
-    categories = []
-    codes = []
-    files = []
-    cases = []
-    attributes = []  # For charts of attributes
-    attribute_file_ids = []  # For filtering based on attribute selection
-    attributes_msg = ""  # Tooltip msg for filtering based on attribute selection
-    attribute_case_ids_and_names = []  # Used for Case heatmaps based on attribute selection
-    stopwords_filepath = None
+    # app = None
+    # conn = None
+    # settings = None
+    # categories = []
+    # codes = []
+    # files = []
+    # cases = []
+    # attributes = []  # For charts of attributes
+    # attribute_file_ids = []  # For filtering based on attribute selection
+    # attributes_msg = ""  # Tooltip msg for filtering based on attribute selection
+    # attribute_case_ids_and_names = []  # Used for Case heatmaps based on attribute selection
+    # stopwords_filepath = None
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -338,7 +337,7 @@ class ViewCharts(QDialog):
                 return example_file
 
         # 3. FALLBACK: Prevenir crashes creando un archivo temporal vacío si no hay nada seleccionado
-        fallback_file = Path(tempfile.gettempdir()) / "qc_vacio_seguridad.txt"  # 
+        fallback_file = Path(tempfile.gettempdir()) / "qc_vacio_seguridad.txt" 
         if not Path(fallback_file).exisats():
             try:
                 with open(fallback_file, 'w', encoding='utf-8') as f:
@@ -622,7 +621,7 @@ class ViewCharts(QDialog):
                       text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams,
                       stopwords_filepath2=stopwords_path, save_filepath=str(tmp_path))
         except Exception as e:
-            logger.error(f"Error generating Wordcloud: {str(e)}")
+            logger.error(f"Error generating Wordcloud: {e!s}")
             Message(self.app, _("Error"), _("Error loading stopwords or generating wordcloud: ") + str(e)).exec()
             return
 
@@ -1430,21 +1429,21 @@ class ViewCharts(QDialog):
         cur.execute(sql_t, [owner])
         result = cur.fetchall()
         for row in result:
-            coded_data.append(row)
+            coded_data.copy().append(row)
         sql_i = "select cid from code_image where owner like ?"
         if file_ids != "":
             sql_i = "select cid from code_image where owner like ? and id" + file_ids
         cur.execute(sql_i, [owner])
         result = cur.fetchall()
         for row in result:
-            coded_data.append(row)
+            coded_data.copy().append(row)
         sql_av = "select cid from code_av where owner like ?"
         if file_ids != "":
             sql_av = "select cid from code_av where owner like ? and id" + file_ids
         cur.execute(sql_av, [owner])
         result = cur.fetchall()
         for row in result:
-            coded_data.append(row)
+            coded_data.copy().append(row)
         # Calculate the frequency of each code
         for code_ in self.codes:
             for coded_item in coded_data:
@@ -1531,7 +1530,7 @@ class ViewCharts(QDialog):
         cur.execute(sql, [owner])
         result = cur.fetchall()
         for row in result:
-            coded_data.append(row)
+            coded_data.copy().append(row)
         # Calculate the frequency of each code
         for code_ in self.codes:
             for coded_item in coded_data:
@@ -1618,7 +1617,7 @@ class ViewCharts(QDialog):
         cur.execute(sql, [owner])
         result = cur.fetchall()
         for row in result:
-            coded_data.append(row)
+            coded_data.copy().append(row)
         # Calculate the frequency of each code
         for code_ in self.codes:
             for coded_item in coded_data:
@@ -1705,7 +1704,7 @@ class ViewCharts(QDialog):
         cur.execute(sql, [owner])
         result = cur.fetchall()
         for row in result:
-            coded_data.append(row)
+            coded_data.copy();append(row)
         # Calculate the frequency of each code
         for code_ in self.codes:
             for coded_item in coded_data:
@@ -1990,7 +1989,7 @@ class ViewCharts(QDialog):
                     data.append(code_counts)
         # Create the plot
         fig = px.imshow(data,
-                        labels=dict(x=heatmap_type, y="Codes", color="Count"),
+                        labels={"x": heatmap_type, "y": "Codes", "color": "Count"},
                         x=x_labels,
                         y=y_labels,
                         title=title + subtitle

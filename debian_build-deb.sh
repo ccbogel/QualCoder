@@ -14,8 +14,8 @@ if [ -d "dist" ]; then
 else
     echo "Compile QualCoder"
     # Compile QualCoder
-    python3 -m venv ".env"
-    source .env/bin/activate
+    python3 -m venv ".venv" --prompt QualCoder-Dev
+    source .venv/bin/activate
     python3 -m pip install --upgrade pip
     pip install -r requirements.txt
     pyinstaller qualcoder_onefile.spec

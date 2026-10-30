@@ -21,9 +21,9 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-import pymupdf
 import logging
 
+import pymupdf
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 logger = logging.getLogger(__name__)

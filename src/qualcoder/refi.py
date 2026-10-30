@@ -21,25 +21,26 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from copy import copy
 import datetime
 import html
 import logging
-from operator import itemgetter
 import os
-from pathlib import Path
-from random import randint
 import re
 import shutil
 import sqlite3
-from typing import Any
 import uuid
 import xml.etree.ElementTree as etree
 import zipfile
+from copy import copy
+from operator import itemgetter
+from pathlib import Path
+from random import randint
+from typing import Any
 
-from PyQt6 import QtWidgets, QtCore
+from PyQt6 import QtCore, QtWidgets
 
-from .color_selector import colors, color_matcher
+from .color_selector import color_matcher, colors
+
 # from .xsd import xsd_codebook, xsd_project  # Not used
 from .GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
 from .helpers import Message

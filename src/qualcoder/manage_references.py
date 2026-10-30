@@ -22,25 +22,29 @@ https://qualcoder.org/
 """
 
 import datetime
-import os
-from pathlib import Path
-from rispy import TAG_KEY_MAPPING
 import logging
-from operator import itemgetter
-from PyQt6 import QtWidgets, QtCore, QtGui
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+import os
 import re
-from shutil import copyfile
 import webbrowser
+from operator import itemgetter
+from pathlib import Path
+from shutil import copyfile
 
-from .GUI.ui_reference_editor import Ui_DialogReferenceEditor
-from .GUI.ui_manage_references import Ui_Dialog_manage_references
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from PyQt6 import QtCore, QtGui, QtWidgets
+from rispy import TAG_KEY_MAPPING
+
 from .confirm_delete import DialogConfirmDelete
+from .GUI.ui_manage_references import Ui_Dialog_manage_references
+from .GUI.ui_reference_editor import Ui_DialogReferenceEditor
+from .helpers import ExportDirectoryPathDialog, Message, extract_epub_fulltext
 from .information import DialogInformation
-from .helpers import Message, extract_epub_fulltext, ExportDirectoryPathDialog
+from .manage_references_import import (
+    ATTACHMENT_EXTENSIONS,
+    existing_reference_signatures,
+    reference_signature,
+)
 from .pdf_preview import DialogPdfPreview
-from .manage_references_import import ATTACHMENT_EXTENSIONS, existing_reference_signatures, \
-    reference_signature
 from .ris import Ris, RisImport
 from .select_items import DialogSelectItems
 from .view_av import DialogViewAV
@@ -274,7 +278,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if action == action_url:
             print("fggdgd")
         if action == action_show_all_rows:
-            for r in range(0, self.ui.tableWidget_files.rowCount()):
+            for r in range(self.ui.tableWidget_files.rowCount()):
                 self.ui.tableWidget_files.setRowHidden(r, False)
             self.table_files_rows_hidden = False
             return
@@ -895,7 +899,9 @@ class DialogReferenceManager(QtWidgets.QDialog):
                     raw = head.strip()
         # Schemes: file:// (local path) and internal-pdf:// (EndNote and friends)
         if raw.lower().startswith("file:"):
-            from urllib.parse import urlparse, unquote
+            
+            from urllib.parse import unquote, urlparse
+
             raw = unquote(urlparse(raw).path)
             # On Windows file:///C:/x gives /C:/x, strip the leading slash
             if os.name == "nt" and re.match(r"^/[A-Za-z]:", raw):
@@ -998,7 +1004,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         except Exception as err:
             logger.warning(f"Attachment copy failed: {file_path} : {err}")
             return None
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
                     (filename, text_, "/docs/" + filename, "", self.app.settings['codername'], now))
         self.app.conn.commit()
@@ -1029,8 +1035,13 @@ class DialogReferenceManager(QtWidgets.QDialog):
         per session). Shared pdf_utils helpers: same result through either route.
         """
 
-        from .pdf_utils import extract_pdf_highlights, pdf_annotations_to_file_memo, \
-            code_pdf_highlights, pdf_markups_question_text
+        from .pdf_utils import (
+            code_pdf_highlights,
+            extract_pdf_highlights,
+            pdf_annotations_to_file_memo,
+            pdf_markups_question_text,
+        )
+
         pdf_annotations_to_file_memo(self.app, self.parent_text_edit, fid, file_path)
         try:
             highlights = extract_pdf_highlights(file_path)
@@ -1200,7 +1211,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             cur.execute("update source set risid=? where id=?", [ris_id, fid])
             self.app.conn.commit()
             sql = "update attribute set value=? where id=? and name=?"
-            for attribute in attr_values:
+            for attribute in attr_values.items:
                 cur.execute(sql, [attr_values[attribute], fid, attribute])
                 self.app.conn.commit()
         if notify:

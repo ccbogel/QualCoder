@@ -21,8 +21,9 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from PyQt6 import QtCore, QtWidgets, QtGui
 import logging
+
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .GUI.ui_move_resize_rectangle import Ui_Dialog_move_resize_rect
 
@@ -34,7 +35,7 @@ class DialogMoveResizeRectangle(QtWidgets.QDialog):
     """
 
     def __init__(self, app, parent=None):
-        super(DialogMoveResizeRectangle, self).__init__(parent)
+        super().__init__(parent)
 
         self.app = app
         self.move_x = 0

@@ -40,14 +40,12 @@
 """
 
 
-from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QBrush, QFont, QColor
 from PyQt6.QtCore import *
+from PyQt6.QtGui import QBrush, QColor, QFont, QSyntaxHighlighter, QTextCharFormat
 
 
 class Highlighter(QSyntaxHighlighter):
     """ SQL code highlighter. """
-
-    highlighting_rules = []
 
     def __init__(self, parent):
         QSyntaxHighlighter.__init__(self, parent)

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -27,9 +25,9 @@ import math
 from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtWidgets import QDialog
 
+from .GUI.ui_dialog_graph_models import Ui_DialogGraphModels
 from .helpers import Message
 from .select_items import DialogSelectItems
-from .GUI.ui_dialog_graph_models import Ui_DialogGraphModels
 
 logger = logging.getLogger(__name__)
 
@@ -497,8 +495,8 @@ class DialogGraphModels(QDialog):
         """
         from .view_graph import TextGraphicsItem
         for item in self.view_graph.scene.items():
-            if isinstance(item, TextGraphicsItem):
-                if item.code_or_cat.get('cid') == cid:
+            if isinstance(item, TextGraphicsItem)\
+                and item.code_or_cat.get('cid') == cid:
                     return item
         return None
 
@@ -508,8 +506,8 @@ class DialogGraphModels(QDialog):
         """
         from .view_graph import TextGraphicsItem
         for item in self.view_graph.scene.items():
-            if isinstance(item, TextGraphicsItem):
-                if item.code_or_cat.get('cid') is None and item.code_or_cat.get('catid') == catid:
+            if isinstance(item, TextGraphicsItem)\
+                and item.code_or_cat.get('cid') is None and item.code_or_cat.get('catid') == catid:
                     return item
         return None
 
@@ -519,8 +517,8 @@ class DialogGraphModels(QDialog):
         """
         from .view_graph import CaseTextGraphicsItem
         for item in self.view_graph.scene.items():
-            if isinstance(item, CaseTextGraphicsItem):
-                if item.case_id == case_id:
+            if isinstance(item, CaseTextGraphicsItem)\
+                and item.case_id == case_id:
                     return item
         return None
 
@@ -530,8 +528,8 @@ class DialogGraphModels(QDialog):
         """
         from .view_graph import FileTextGraphicsItem
         for item in self.view_graph.scene.items():
-            if isinstance(item, FileTextGraphicsItem):
-                if item.file_id == file_id:
+            if isinstance(item, FileTextGraphicsItem)\
+                and item.file_id == file_id:
                     return item
         return None
 
@@ -607,9 +605,9 @@ class DialogGraphModels(QDialog):
         """
         from .view_graph import LinkGraphicsItem
         for item in self.view_graph.scene.items():
-            if isinstance(item, LinkGraphicsItem):
-                if (item.from_widget == from_node and item.to_widget == to_node) or \
-                   (item.from_widget == to_node and item.to_widget == from_node):
+            if isinstance(item, LinkGraphicsItem)\
+                and ((item.from_widget == from_node and item.to_widget == to_node) or \
+                   (item.from_widget == to_node and item.to_widget == from_node)):
                     return item
         line = LinkGraphicsItem(from_node, to_node, line_width, line_type, color, True)
         self.view_graph.scene.addItem(line)
@@ -621,9 +619,9 @@ class DialogGraphModels(QDialog):
         """
         from .view_graph import FreeLineGraphicsItem
         for item in self.view_graph.scene.items():
-            if isinstance(item, FreeLineGraphicsItem):
-                if (item.from_widget == from_node and item.to_widget == to_node) or \
-                   (item.from_widget == to_node and item.to_widget == from_node):
+            if isinstance(item, FreeLineGraphicsItem)\
+                and ((item.from_widget == from_node and item.to_widget == to_node) or \
+                   (item.from_widget == to_node and item.to_widget == from_node)):
                     return item
         line = FreeLineGraphicsItem(from_node, to_node, color, line_width, line_type, label)
         self.view_graph.scene.addItem(line)
@@ -713,11 +711,11 @@ class DialogGraphModels(QDialog):
             else:
                 root_catids.append(catid)
         # Stable alphabetical ordering at every level
-        for k in code_children:
+        for k in code_children.items():
             code_children[k].sort(key=lambda c: codes[c]['name'].lower())
-        for k in top_codes_by_cat:
+        for k in top_codes_by_cat.items():
             top_codes_by_cat[k].sort(key=lambda c: codes[c]['name'].lower())
-        for k in cat_children:
+        for k in cat_children.items():
             cat_children[k].sort(key=lambda c: cats[c]['name'].lower())
         root_catids.sort(key=lambda c: cats[c]['name'].lower())
         uncategorized.sort(key=lambda c: codes[c]['name'].lower())
@@ -961,7 +959,11 @@ class DialogGraphModels(QDialog):
         """
         Add segment nodes (text/image/A/V) for a code within a case 
         """  # multi-modal support
-        from .view_graph import FreeTextGraphicsItem, PixmapGraphicsItem, AVGraphicsItem  # added PixmapGraphicsItem and AVGraphicsItem
+        from .view_graph import (  # added PixmapGraphicsItem and AVGraphicsItem
+            AVGraphicsItem,
+            FreeTextGraphicsItem,
+            PixmapGraphicsItem,
+        )
 
         cur = self.app.conn.cursor()
         seg_index = 0  # global ordering across modalities
@@ -1244,7 +1246,11 @@ class DialogGraphModels(QDialog):
         """
         Add segment nodes (text/image/A/V) for a code applied within a file.
         """  # multi-modal support
-        from .view_graph import FreeTextGraphicsItem, PixmapGraphicsItem, AVGraphicsItem  # added PixmapGraphicsItem and AVGraphicsItem
+        from .view_graph import (  # added PixmapGraphicsItem and AVGraphicsItem
+            AVGraphicsItem,
+            FreeTextGraphicsItem,
+            PixmapGraphicsItem,
+        )
 
         cur = self.app.conn.cursor()
         seg_index = 0  # global ordering across modalities
@@ -1716,8 +1722,8 @@ class DialogGraphModels(QDialog):
             seg_y = y + si * 40
             freetextid = 1
             for item in self.view_graph.scene.items():
-                if isinstance(item, FreeTextGraphicsItem):
-                    if item.freetextid >= freetextid:
+                if isinstance(item, FreeTextGraphicsItem)\
+                    and item.freetextid >= freetextid:
                         freetextid = item.freetextid + 1
 
             text = r[1]

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -23,8 +21,8 @@ https://qualcoder.org/
 
 import datetime
 import logging
-from random import randint
 import sqlite3
+from random import randint
 
 from PyQt6 import QtWidgets
 
@@ -37,7 +35,7 @@ class RqdaImport:
     """ Import an RQDA database into a new QualCoder database. """
 
     def __init__(self, app, parent_textedit):
-        super(RqdaImport, self).__init__()
+        super().__init__()
 
         self.app = app
         self.parent_textEdit = parent_textedit

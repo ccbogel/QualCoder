@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from PyQt6 import QtCore, QtGui
 import qtawesome as qta
+from PyQt6 import QtCore, QtGui
 
 
 class AIChatSignalEmitter(QtCore.QObject):

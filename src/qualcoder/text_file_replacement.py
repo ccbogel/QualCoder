@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -22,26 +20,29 @@ https://qualcoder.org/
 """
 
 import datetime
+import json
+import zipfile
+from collections.abc import Iterable
+from pathlib import Path
+from shutil import copyfile
+from typing import Any
+
 import ebooklib
 from ebooklib import epub
-import json
-from pathlib import Path
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTTextLine
+from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
+from pdfminer.pdfpage import PDFPage
 from PyQt6 import QtCore
-from shutil import copyfile
 from striprtf.striprtf import rtf_to_text
-from typing import Any, Iterable
-import zipfile
 
-from .docx import opendocx, getdocumenttext
+from .docx import getdocumenttext, opendocx
 from .helpers import Message
 from .html_parser import *
 from .latex_import import LatexImportError, tex_file_to_plain_text
-from .text_decoding import decode_text_with_best_encoding as decode_text_with_best_encoding_helper
-
+from .text_decoding import (
+    decode_text_with_best_encoding as decode_text_with_best_encoding_helper,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -297,22 +298,22 @@ class ReplaceTextFile:
                     Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Import PDF
         if suffix == '.pdf':
-            pdf_file = open(self.new_file_path, 'rb')
-            resource_manager = PDFResourceManager()
-            laparams = LAParams()
-            device = PDFPageAggregator(resource_manager, laparams=laparams)
-            interpreter = PDFPageInterpreter(resource_manager, device)
-            pages_generator = PDFPage.get_pages(pdf_file)  # Generator PDFpage objects
-            text = ""
-            # Can be very slow with large PDFs and older computers
-            for i, page in enumerate(pages_generator):
-                QtCore.QCoreApplication.processEvents()  # Trial this to see if it prevents 'App not responding'
-                self.pdf_page_text = ""
-                interpreter.process_page(page)
-                layout = device.get_result()
-                for lobj in layout:
-                    self.get_item_and_hierarchy(page, lobj)
-                text += self.pdf_page_text
+            with open(self.new_file_path, 'rb') as pdf_file:
+                resource_manager = PDFResourceManager()
+                laparams = LAParams()
+                device = PDFPageAggregator(resource_manager, laparams=laparams)
+                interpreter = PDFPageInterpreter(resource_manager, device)
+                pages_generator = PDFPage.get_pages(pdf_file)  # Generator PDFpage objects
+                text = ""
+                # Can be very slow with large PDFs and older computers
+                for i, page in enumerate(pages_generator):
+                    QtCore.QCoreApplication.processEvents()  # Trial this to see if it prevents 'App not responding'
+                    self.pdf_page_text = ""
+                    interpreter.process_page(page)
+                    layout = device.get_result()
+                    for lobj in layout:
+                        self.get_item_and_hierarchy(page, lobj)
+                    text += self.pdf_page_text
         if suffix == ".tex":
             try:
                 text = tex_file_to_plain_text(self.new_file_path)
@@ -372,7 +373,7 @@ class ReplaceTextFile:
         mediapath = None
         self.new_file = {'name': filename, 'id': self.old_file['id'], 'fulltext': text, 'mediapath': mediapath,
             'memo': self.old_file['memo'], 'owner': self.app.settings['codername'],
-            'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
         cur.execute("update source set name=?,fulltext=?,mediapath=?,owner=?,date=? where id=?",
             (self.new_file['name'],  self.new_file['fulltext'], self.new_file['mediapath'],
              self.new_file['owner'], self.new_file['date'],
@@ -391,8 +392,8 @@ class ReplaceTextFile:
         if isinstance(lobj, LTTextLine):  # Do not use LTTextBox
             obj_text = lobj.get_text()
             # Fix Pdfminer recognising invalid unicode characters.
-            obj_text = obj_text.replace(u"\uE002", "Th")
-            obj_text = obj_text.replace(u"\uFB01", "fi")
+            obj_text = obj_text.replace("\uE002", "Th")
+            obj_text = obj_text.replace("\uFB01", "fi")
             self.pdf_page_text += obj_text
         if isinstance(lobj, Iterable):
             for obj in lobj:
@@ -449,7 +450,7 @@ class ReplaceTextFile:
         data = data.replace('</draw:frame>', '\n')
         text = ""
         tagged = False
-        for i in range(0, len(data)):
+        for i in range(len(data)):
             if data[i: i + 6] == "<text:" or data[i: i + 7] == "<table:" or data[i: i + 6] == "<draw:":
                 tagged = True
             if not tagged:

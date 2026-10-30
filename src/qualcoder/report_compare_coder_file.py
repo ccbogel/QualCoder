@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,20 +19,25 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
-from copy import copy
 import logging
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from copy import copy
 from typing import Any
 
-from PyQt6 import QtGui, QtWidgets, QtCore
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
 from .color_selector import TextColor
 from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 from .GUI.ui_report_compare_coder_file import Ui_Dialog_reportCompareCoderFile
-from .helpers import Message, msecs_to_hours_mins_secs, ExportDirectoryPathDialog, init_persistent_tree_header, \
-    restore_persistent_tree_widths
+from .helpers import (
+    ExportDirectoryPathDialog,
+    Message,
+    init_persistent_tree_header,
+    msecs_to_hours_mins_secs,
+    restore_persistent_tree_widths,
+)
 from .information import DialogInformation
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
@@ -757,7 +760,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         cur.execute(sql, [self.file_['id']])
         fulltext = cur.fetchone()
         if fulltext[0] is None or fulltext[0] == "":
-            return None
+            return
         sql = "select pos0,pos1,fid from code_text where fid=? and cid=? and owner=?"
         cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[0]])
         res0 = cur.fetchall()
@@ -1091,8 +1094,7 @@ class DialogDualCodedImage(QtWidgets.QDialog):
         if self.pixmap.height() > self.height() - 30 - 80:
             self.scale = (self.height() - 30 - 80) / self.pixmap.height()
             slider_value = int(self.scale * 100)
-            if slider_value > 100:
-                slider_value = 100
+            slider_value = min(slider_value, 100)
             self.ui.horizontalSlider.setValue(slider_value)
         self.draw_coded_areas()
 

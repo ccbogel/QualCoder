@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -23,10 +21,9 @@ https://qualcoder.org/
 
 import logging
 
-from PyQt6 import QtGui, QtWidgets, QtCore
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .GUI.ui_dialog_colour_selector import Ui_Dialog_colour_selector
-
 
 logger = logging.getLogger(__name__)
 
@@ -34,15 +31,16 @@ logger = logging.getLogger(__name__)
 class TextColor:
     """ Returns light or dark depending on the code color. """
 
-    white_text = [
+
+
+    def __init__(self, color):
+        self.white_text = [
         "#EB7333", "#E65100", "#C54949", "#B71C1C", "#CB5E3C", "#BF360C",
         "#FA58F4", "B76E95", "#9F3E72", "#880E4F", "#7D26CD",  "#1B5E20",
         "#487E4B", "#1B5E20", "#5E9179", "#AC58FA", "#5E9179", "#9090E3",
         "#6B6BDA", "#4646D1", "#3498DB", "#6D91C6", "#3D6CB3", "#0D47A1",
         "#9090E3", "#5882FA", "#9651D7"]
-    recommendation = "#000000"
 
-    def __init__(self, color):
         if color in self.white_text:
             self.recommendation = "#eeeeee"
         else:
@@ -209,7 +207,7 @@ class DialogColorSelect(QtWidgets.QDialog):
 
     def __init__(self, app, code_, parent=None):
 
-        super(DialogColorSelect, self).__init__(parent)
+        super().__init__(parent)
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_colour_selector()
         self.ui.setupUi(self)
@@ -273,7 +271,7 @@ class DialogColorSelect(QtWidgets.QDialog):
     def accept(self):
         """ Override accept button. """
 
-        super(DialogColorSelect, self).accept()
+        super().accept()
 
     def fill_table(self, color_range="normal"):
         """ Twelve rows of ten columns of colours.
@@ -289,8 +287,8 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.ui.tableWidget.setRowCount(ROWS)
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.horizontalHeader().setVisible(False)
-        for row in range(0, ROWS):
-            for col in range(0, COLS):
+        for row in range(ROWS):
+            for col in range(COLS):
                 code_color = colors[row * COLS + col]
                 text = ""
                 ttip = ""

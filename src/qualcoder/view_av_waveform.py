@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -1287,7 +1285,7 @@ def generate_waveform_png(media_path, out_path, colour, timeout=30):
            '-frames:v', '1', '-update', '1', tmp_path]
     try:
         with _generation_lock:
-            subprocess.run(cmd, timeout=timeout,
+            subprocess.run(cmd, check=False, timeout=timeout,
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             if os.path.exists(tmp_path):
                 # Stamp the render version on the ffmpeg output too

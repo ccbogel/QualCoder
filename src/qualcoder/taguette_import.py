@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -38,7 +36,7 @@ class TaguetteImport:
     Thanks to Lorenzo Salomón for creating the intial code for this. """
 
     def __init__(self, app, parent_textedit):
-        super(TaguetteImport, self).__init__()
+        super().__init__()
 
         self.app = app
         self.parent_textEdit = parent_textedit
@@ -104,11 +102,7 @@ class TaguetteImport:
         for r in res:
             tables.append(r[0])
         # print(tables)
-        if 'project_members' in tables and 'projects' in tables and 'documents' in tables and 'tags' in tables and \
-            'highlights' in tables and 'highlight_tags' in tables and 'commands' in tables:
-            return True
-        else:
-            return False
+        return bool('project_members' in tables and 'projects' in tables and 'documents' in tables and 'tags' in tables and 'highlights' in tables and 'highlight_tags' in tables and 'commands' in tables)
 
     # Import functions
     def html_to_plain_text(self, raw_html:str) -> str:

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -54,7 +52,7 @@ class SonalImport:
     """
 
     def __init__(self, app, parent_textedit):
-        super(SonalImport, self).__init__()
+        super().__init__()
 
         self.app = app
         self.parent_textEdit = parent_textedit

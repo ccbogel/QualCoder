@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 """
 This file is part of QualCoder.
@@ -37,12 +36,12 @@ import webbrowser
 import zipfile
 from copy import copy
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_llm import get_default_ai_models, update_ai_models
+from qualcoder.ai_mcp_server import AiMcpServer
 from qualcoder.ai_runtime import (
     AI_DISABLED,
     AI_INITIALIZING,
@@ -52,7 +51,7 @@ from qualcoder.ai_runtime import (
     VECTORSTORE_UNLOADED,
     vectorstore_required,
 )
-from qualcoder.helpers import get_default_user_directory, Message
+from qualcoder.helpers import Message, get_default_user_directory
 from qualcoder.speakers import speaker_coder_name
 
 qc_config_folder = Path('~').expanduser() / '.qualcoder'
@@ -111,7 +110,7 @@ class ProjectEventBus(QtCore.QObject):
 
 
 
-class App(object):
+class App:
     """ General methods for loading settings and recent project stored in .qualcoder folder.
     Savable settings does not contain project name, project path or db connection.
     """
@@ -161,7 +160,7 @@ class App(object):
             return AI_INITIALIZING
         return self.ai.get_status()
 
-    def _active_vectorstore(self) -> Optional[Any]:
+    def _active_vectorstore(self) -> Any | None:
         """Return the shared vectorstore when a configured consumer needs it."""
 
         if not vectorstore_required(self):
@@ -169,7 +168,7 @@ class App(object):
         return self.vectorstore
 
     def vectorstore_import_document(
-            self, source_id: int, source_name: str, text: Optional[str]) -> None:
+            self, source_id: int, source_name: str, text: str | None) -> None:
         """Queue one changed source document for indexing when search is active.
 
         Args:
@@ -288,7 +287,7 @@ class App(object):
         for line in result:
             date_text = line.split("|", maxsplit=1)[0] if "|" in line else ""
             try:
-                latest = datetime.datetime.strptime(date_text, date_format)
+                latest = datetime.datetime.strptime(date_text, date_format).astimezone()
             except ValueError:
                 continue
             if latest >= now:
@@ -1106,7 +1105,7 @@ class App(object):
     def merge_settings_with_default_stylesheet(self, settings):
         """ Stylesheet is coded to avoid potential data file import errors with pyinstaller.
         Various options for colour schemes:
-        original, dark, blue, green, orange, purple, yellow, rainbow, native
+        original, dark, blue, green, orange, purple, yellow, rainbow, native, user (json import)
 
         Orange #f89407
 
@@ -1114,7 +1113,8 @@ class App(object):
         color: qlineargradient(spread:pad, x1:0 y1:0, x2:1 y2:0, stop:0 rgba(0, 0, 0, 255),
         stop:1 rgba(255, 255, 255, 255));
         """
-
+        
+        #Main dark colors
         style_dark = "* {font-size: 12px; background-color: #2a2a2a; color:#eeeeee;}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
         QDialog {border: 1px solid #707070;}\n\
@@ -1182,6 +1182,8 @@ class App(object):
                                         f"QFileDialog QAbstractItemView {{font-size: {settings.get('fontsize')}")
         style_dark = style_dark.replace("QTreeWidget {font-size: 12",
                                         f"QTreeWidget {{font-size: {settings.get('treefontsize')}")
+        
+        # Main Style
         style = "* {font-size: 12px; color: #000000;}\n\
         QWidget {background-color: #efefef; color: #000000; border: none;}\n\
         QWidget:focus {border: 1px solid #f89407;}\n\
@@ -1237,6 +1239,7 @@ class App(object):
                               f"QFileDialog QAbstractItemView {{font-size: {settings.get('fontsize')}")
         style = style.replace("QTreeWidget {font-size: 12",
                               f"QTreeWidget {{font-size: {settings.get('treefontsize')}")
+        
         # Keep the active application palette and only override link colors.
         palette = QtWidgets.QApplication.instance().palette()
         palette.setColor(QtGui.QPalette.ColorRole.Link, QtGui.QColor(self.highlight_color()))
@@ -1280,20 +1283,24 @@ class App(object):
                     palette.setColor(color_group, tooltip_text_role, tooltip_text)
                 QtWidgets.QToolTip.setPalette(palette)
         QtWidgets.QApplication.instance().setPalette(palette)
+        
         if self.settings['stylesheet'] == 'native':
             application = QtWidgets.QApplication.instance()
             if not getattr(self, '_native_stripe_palette_connected', False):
                 application.paletteChanged.connect(self._update_native_alternate_base)
                 self._native_stripe_palette_connected = True
             self._update_native_alternate_base(application.palette())
+        
         if self.settings['stylesheet'] == 'dark':
             return style_dark
         style_rainbow = style_dark
+        
         if self.settings['stylesheet'] == 'original':
             # Force dark button foregrounds so qtawesome icons remain readable on the light button background.
             style = style.replace("QPushButton {border-style: outset; ",
                                   "QPushButton {border-style: outset; background-color: #dddddd; color: #202020; ")
             style += "\nQToolButton {color: #202020;}"
+        
         if self.settings['stylesheet'] == 'rainbow':
             style_rainbow += "\nQDialog {background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0.2 black, " \
                              "stop:0.27 red, stop:0.31 yellow, stop:0.35 green, stop:0.39 #306eff, stop:0.42 blue, " \
@@ -1305,25 +1312,31 @@ class App(object):
             style_rainbow += "\nQSlider {background-color: none;}"
             style_rainbow += "\nQGroupBox {background-color: none;}"
             return style_rainbow
+        
         if self.settings['stylesheet'] == "orange":
             style = style.replace("#efefef", "#ffcba4")
             style = style.replace("#e3e3e3", "#f2c19c")
             style = style.replace("#f89407", "#306eff")
+        
         if self.settings['stylesheet'] == "yellow":
             style = style.replace("#efefef", "#f9e79f")
             style = style.replace("#e3e3e3", "#eddb97")
+        
         if self.settings['stylesheet'] == "green":
             style = style.replace("#efefef", "#c8e6c9")
             style = style.replace("#e3e3e3", "#bedabf")
             style = style.replace("#f89407", "#ea202c")
+        
         if self.settings['stylesheet'] == "blue":
             style = style.replace("#efefef", "#cbe9fa")
             style = style.replace("#e3e3e3", "#c1ddee")
             style = style.replace("#f89407", "#303f9f")
+        
         if self.settings['stylesheet'] == "purple":
             style = style.replace("#efefef", "#dfe2ff")
             style = style.replace("#e3e3e3", "#d4d7f2")
             style = style.replace("#f89407", "#ca1b9a")
+        
         if self.settings['stylesheet'] == "native":
             style = "* {font-size: 12px;}"
             style += "\nQGroupBox { border: none; background-color: transparent;}"
@@ -1375,6 +1388,7 @@ class App(object):
                 )
             return palette.color(color_role).name(QtGui.QColor.NameFormat.HexRgb)
         return '#f89407'  # Default
+        # Change here
 
     def qtawesome_icon_color(self):
         """Get the default qtawesome icon color for the current QualCoder style."""
@@ -1385,6 +1399,7 @@ class App(object):
             palette = QtWidgets.QApplication.instance().palette()
             return palette.color(QtGui.QPalette.ColorRole.Text)
         return QtGui.QColor('#202020')
+        #change here
 
     def qtawesome_icon_color_disabled(self):
         """Get the default disabled qtawesome icon color for the current QualCoder style."""
@@ -1395,12 +1410,13 @@ class App(object):
             palette = QtWidgets.QApplication.instance().palette()
             return palette.color(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Text)
         return QtGui.QColor('#7a7a7a')
+        #change here
 
     def load_settings(self):
         result, ai_models = self._load_config_ini()
         # Check keys
-        if (not len(result) or 'codername' not in result.keys() or 'stylesheet' not in result.keys() or
-                'speakernameformat' not in result.keys()):
+        if (not len(result) or 'codername' not in result or 'stylesheet' not in result or
+                'speakernameformat' not in result):
             # create default:
             ai_models = get_default_ai_models()
             self.write_config_ini(self.default_settings, ai_models)

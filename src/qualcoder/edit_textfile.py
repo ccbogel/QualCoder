@@ -21,15 +21,16 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from PyQt6 import QtWidgets, QtCore, QtGui
-from copy import copy
-# import difflib  # Use diff_match_patch as it is 20x faster. Keep this in case its needed later.
-import diff_match_patch
 import logging
-from pathlib import Path
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
 import unicodedata
+from copy import copy
+
+# from pathlib import Path
+# import difflib  # Use diff_match_patch as it is 20x faster. Keep this in case its needed later.
+import diff_match_patch
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .GUI.ui_edit_text import Ui_Dialog_edit_text
 from .helpers import MarkdownHighlighter
@@ -58,7 +59,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
 
     def __init__(self, app, fid, clear_button="show"):
 
-        super(DialogEditTextFile, self).__init__(parent=None)
+        super().__init__(parent=None)
         self.app = app
         self.fid = fid
         cur = self.app.conn.cursor()
@@ -609,7 +610,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         # update doc in vectorstore
         if self.has_changed:
             self.app.vectorstore_import_document(self.fid, self.name, self.text)
-        super(DialogEditTextFile, self).accept()
+        super().accept()
 
     def _emit_project_table_changes(self, tables):
         """Notify other open dialogs about changed project tables."""

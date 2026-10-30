@@ -27,11 +27,11 @@ import json
 import logging
 import os
 import re
-from shutil import copyfile
 import sqlite3
+from shutil import copyfile
+
 # import sys
 # import traceback
-
 from openpyxl import load_workbook
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
@@ -230,7 +230,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 for row in reader:
                     self.data.append(row)
             except csv.Error as err:
-                logger.error(('file %s, line %d: %s' % (self.filepath, reader.line_num, err)))
+                logger.error(f"file {self.filepath}, line {reader.line_num}: {err}")
                 self.parent_textEdit.append(f"Row error: {reader.line_num}  {err}")
                 return False
         # Get field names and replace blacks with a placeholder
@@ -266,7 +266,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
         # Clean field names
         removes = r"!@#$%^&*()-+=[]{}\\|;:,.<>/?~`"
-        for i in range(0, len(self.fields)):
+        for i in range(len(self.fields)):
             self.fields[i] = self.fields[i].replace('\t', '')
             self.fields[i] = self.fields[i].replace(r'\xa0', '')
             for r in removes:
@@ -276,9 +276,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
         # Default field type is character
         self.fields_type = ["character"] * len(self.fields)
         # Determine if field type is numeric
-        for field in range(0, len(self.fields)):
+        for field in range(len(self.fields)):
             numeric = True
-            for row in range(0, len(self.data)):
+            for row in range(len(self.data)):
                 if self.data[row][field] != "":  # Need ot be OK with 'Null' values
                     try:
                         float(self.data[row][field])
@@ -292,7 +292,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         for field in range(1, len(self.fields)):
             if self.fields_type[field] == 'character':
                 set_of_values = set()
-                for row in range(0, len(self.data)):
+                for row in range(len(self.data)):
                     value = ""
                     try:
                         value = self.data[row][field]
@@ -331,7 +331,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         append to an existing table. """
 
         if not self.success:
-            super(DialogImportSurvey, self).accept()
+            super().accept()
             return
         # Check for duplicate field names
         if len(self.fields) != len(set(self.fields)):
@@ -354,7 +354,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
             Message(self.app, _("Survey not loaded"), msg, "warning").exec()
             return
         self.insert_data()
-        super(DialogImportSurvey, self).accept()
+        super().accept()
 
     def _emit_project_table_changes(self, tables):
         """Notify other open dialogs about changed project tables."""
@@ -395,8 +395,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
         existing_attr_names = [r[0] for r in result]
         sql = "insert into attribute_type (name,date,owner,memo, valueType, caseOrFile) values(?,?,?,?,?,?)"
         for col, name in enumerate(self.fields):
-            if self.fields_type[col] != "qualitative" and col > 0:  # col==0 is the case identifier
-                if name not in existing_attr_names:
+            # col==0 is the case identifier
+            if self.fields_type[col] != "qualitative" and col > 0 and\
+                name not in existing_attr_names:
                     logger.debug(f"{name} is not in case attribute_types. Adding.")
                     cur.execute(sql, (name, now_date, self.app.settings['codername'], "",
                                       self.fields_type[col], 'case'))
@@ -459,7 +460,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
             # Create one text file combining each row, prefix [case identifier] to each row.
             if self.fields_type[field] == "qualitative" and self.ui.checkBox_collate.isChecked():
                 fulltext = ""
-                for row in range(0, len(self.data)):
+                for row in range(len(self.data)):
                     if self.data[row][field] != "":
                         fulltext += f"[{self.data[row][0]}] "
                         pos0 = len(fulltext) - 1
@@ -506,7 +507,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
             # Create one text file per row, prefix [case identifier] to each row.
             if self.fields_type[field] == "qualitative" and not self.ui.checkBox_collate.isChecked():
-                for row in range(0, len(self.data)):
+                for row in range(len(self.data)):
                     qual_file_name = f"{self.data[row][0]}_{self.fields[field]}"
                     fulltext = f"{self.data[row][field]}"
                     try:
@@ -572,7 +573,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
         num_fields_in_row_error = False
         num_rows = self.ui.tableWidget.rowCount()
-        for row in range(0, num_rows):
+        for row in range(num_rows):
             self.ui.tableWidget.removeRow(0)
         self.ui.tableWidget.setColumnCount(len(self.fields))
         for c, field in enumerate(self.fields):
@@ -581,8 +582,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
             item.setToolTip(_(msg))
             self.ui.tableWidget.setHorizontalHeaderItem(c, item)
         self.ui.tableWidget.setRowCount(len(self.data))
-        for row in range(0, len(self.data)):
-            for col in range(0, len(self.fields)):
+        for row in range(len(self.data)):
+            for col in range(len(self.fields)):
                 value = "MISSING VALUE"
                 try:
                     value = str(self.data[row][col])
@@ -592,7 +593,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)  # Not editable
                 self.ui.tableWidget.setItem(row, col, item)
         self.ui.tableWidget.resizeColumnsToContents()
-        for col in range(0, self.ui.tableWidget.columnCount()):
+        for col in range(self.ui.tableWidget.columnCount()):
             if self.ui.tableWidget.columnWidth(col) > 200:
                 self.ui.tableWidget.setColumnWidth(col, 200)
         if num_fields_in_row_error and self.filepath[-4:].lower() == ".csv":

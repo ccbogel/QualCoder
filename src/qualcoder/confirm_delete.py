@@ -21,8 +21,9 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from PyQt6 import QtWidgets, QtCore
 import logging
+
+from PyQt6 import QtCore, QtWidgets
 
 from .GUI.ui_dialog_confirm_delete import Ui_Dialog_confirmDelete
 

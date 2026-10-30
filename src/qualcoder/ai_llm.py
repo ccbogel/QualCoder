@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -22,25 +20,23 @@ https://qualcoder.org/
 
 from __future__ import annotations
 
-import asyncio
+#import asyncio
 import configparser
 import json
 import logging
-from dataclasses import dataclass, field
-from datetime import datetime
-from logging.handlers import RotatingFileHandler
 import os
 import re
 import threading
 import time
 import traceback
 import uuid
+from dataclasses import dataclass, field
+from datetime import datetime
+from logging.handlers import RotatingFileHandler
 
-from PyQt6 import QtCore
-from PyQt6 import QtGui
-from PyQt6 import QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
-from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord
+from .ai_agent_prompts import AgentPromptRecord, AiAgentPromptsCatalog
 from .ai_async_worker import Worker
 from .ai_memo import extract_ai_memo as extract_public_ai_memo
 from .ai_ui import (
@@ -104,24 +100,31 @@ def load_ai_runtime_dependencies() -> None:
         if _AI_DEPENDENCIES_LOADED:
             return
 
-        from Bio.Align import PairwiseAligner as pairwise_aligner
         import httpx as httpx_module
+        import json_repair as json_repair_module
+        from Bio.Align import PairwiseAligner as pairwise_aligner
         from langchain_core.messages.ai import AIMessage as ai_message
         from langchain_core.messages.human import HumanMessage as human_message
         from langchain_core.messages.system import SystemMessage as system_message
         from langchain_core.runnables.config import RunnableConfig as runnable_config
         from langchain_openai import AzureChatOpenAI as azure_chat_open_ai
         from langchain_openai import ChatOpenAI as chat_open_ai
-        from langchain_openai.chat_models.codex import _ChatOpenAICodex as chat_open_ai_codex
+        from langchain_openai.chat_models.codex import (
+            _ChatOpenAICodex as chat_open_ai_codex,
+        )
         from langchain_openai.chatgpt_oauth import (
             _ChatGPTOAuthRefreshError as chatgpt_oauth_refresh_error,
+        )
+        from langchain_openai.chatgpt_oauth import (
             _FileChatGPTOAuthTokenProvider as file_chatgpt_oauth_token_provider,
+        )
+        from langchain_openai.chatgpt_oauth import (
             login_chatgpt as login_chatgpt_function,
         )
-        import json_repair as json_repair_module
         from openai import BadRequestError as bad_request_error
         from openai import OpenAI as open_ai
         from pydantic import ValidationError as validation_error
+
         from .ai_vectorstore import AiVectorstore as ai_vectorstore
 
         PairwiseAligner = pairwise_aligner
@@ -1939,9 +1942,7 @@ class AiLLM():
         # Transport interruptions mean the stream ended before the provider signaled completion.
         # Returning accumulated text as a normal result would persist a truncated
         # answer without showing the user that generation failed.
-        if self._is_stream_interruption_exception(err):
-            return False
-        return True
+        return not self._is_stream_interruption_exception(err)
 
     def _next_run_id(self) -> str:
         return "ai-run-" + uuid.uuid4().hex
@@ -2852,13 +2853,12 @@ class AiLLM():
 
         try:
             now = datetime.now().astimezone()
-            created_dt = datetime.strptime(created_text, "%Y-%m-%d %H:%M:%S")
+            created_dt = datetime.strptime(created_text, "%Y-%m-%d %H:%M:%S").astimezone()
             created_dt = created_dt.replace(tzinfo=now.tzinfo)
         except Exception:
             return ""
 
-        if created_dt > now:
-            created_dt = now
+        created_dt = min(created_dt, now)
 
         day_diff = (now.date() - created_dt.date()).days
         if day_diff > 0:
@@ -2882,9 +2882,9 @@ class AiLLM():
         """Blend palette colors to create readable separators in light and dark themes."""
 
         factor = max(0.0, min(1.0, float(amount)))
-        red = int(round(base.red() * (1.0 - factor) + overlay.red() * factor))
-        green = int(round(base.green() * (1.0 - factor) + overlay.green() * factor))
-        blue = int(round(base.blue() * (1.0 - factor) + overlay.blue() * factor))
+        red = round(base.red() * (1.0 - factor) + overlay.red() * factor)
+        green = round(base.green() * (1.0 - factor) + overlay.green() * factor)
+        blue = round(base.blue() * (1.0 - factor) + overlay.blue() * factor)
         return QtGui.QColor(red, green, blue)
 
     def _ai_change_list_stylesheet(self, list_view: QtWidgets.QListView) -> str:
@@ -3008,7 +3008,7 @@ class AiLLM():
         lines = [first_line]
         shown_summaries = operation_summaries[:4]
         for summary in shown_summaries:
-            lines.append(summary)
+            lines.append(summary)  # noqa: PERF402
         remaining = len(operation_summaries) - len(shown_summaries)
         if remaining > 0:
             lines.append(_("Additional actions: ") + str(remaining))
@@ -3356,9 +3356,7 @@ class AiLLM():
         expected_owner = str(state.get("owner", ""))
         if str(row[3]) != expected_value:
             return False
-        if expected_owner != "" and str(row[5]) != expected_owner:
-            return False
-        return True
+        return not (expected_owner != "" and str(row[5]) != expected_owner)
 
     def _can_undo_create_attribute(self, cur, op):
         attr_name = str(op.get("name", "")).strip()

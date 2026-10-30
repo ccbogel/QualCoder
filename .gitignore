@@ -30,3 +30,6 @@ tools/mcpb/node_modules/
 AGENTS.md
 windows_run_from_conda_*.bat
 *.code-workspace
+
+uv.lock
+.pytest_cache/

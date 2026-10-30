@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,17 +19,18 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-import pymupdf
 import logging
+import re
 from pathlib import Path
+
+import pymupdf
+import qtawesome as qta
 from PIL import Image
 from PIL.ExifTags import TAGS
-import qtawesome as qta
-from PyQt6 import QtCore, QtWidgets, QtGui
-import re
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
-from .helpers import file_typer, msecs_to_hours_mins_secs, Message
+from .helpers import Message, file_typer, msecs_to_hours_mins_secs
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 from .stopwords import *
@@ -638,7 +637,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
 
         # Remove punctuation. Convert to lower case
         chars = ""
-        for c in range(0, len(fulltext)):
+        for c in range(len(fulltext)):
             if fulltext[c].isalpha() or fulltext[c] == "'":
                 chars += fulltext[c]
             else:
@@ -665,8 +664,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         text_ += _("Unique words: ") + f"{len(word_freq)}\n"
         # Top 100 or maximum of less than 100
         max_count = len(word_freq)
-        if max_count > 100:
-            max_count = 100
+        max_count = min(max_count, 100)
         text_ += _("Top 100 words") + ". "
         if self.ui.comboBox_stopwords.currentText() != "  " and not user_created_stopwords:
             text_ += _("Applying stopwords: ") + self.ui.comboBox_stopwords.currentText()

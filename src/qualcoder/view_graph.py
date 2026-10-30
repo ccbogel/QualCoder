@@ -21,36 +21,44 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from copy import deepcopy
 import datetime
-import pymupdf
 import logging
 import math
-from pathlib import Path
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import sqlite3
+from copy import deepcopy
+from pathlib import Path
 
-from PyQt6 import QtCore, QtWidgets, QtGui
+import pymupdf
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from odf.draw import Frame
+from odf.draw import Image as OdfImage
+
+# ODF imports for the analytical graph summary export (.odt)
+from odf.opendocument import OpenDocumentText
+from odf.style import ParagraphProperties, Style, TableCellProperties, TextProperties
+from odf.table import Table, TableCell, TableColumn, TableRow
+from odf.text import H, P, Span
+from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_graph import Ui_DialogGraph
-from .helpers import DialogCodeInAV, DialogCodeInImage, DialogCodeInText, \
-    ExportDirectoryPathDialog, Message
+from .helpers import (
+    DialogCodeInAV,
+    DialogCodeInImage,
+    DialogCodeInText,
+    ExportDirectoryPathDialog,
+    Message,
+)
 from .memo import DialogMemo
 from .save_sql_query import DialogSaveSql
 from .select_items import DialogSelectItems
+from .view_graph_models import DialogGraphModels
+
 # new modules 
 from .view_graph_relations import DialogNodeRelations
-from .view_graph_models import DialogGraphModels
-# ODF imports for the analytical graph summary export (.odt)
-from odf.opendocument import OpenDocumentText
-from odf.text import P, H, Span
-from odf.table import Table, TableColumn, TableRow, TableCell
-from odf.draw import Frame, Image as OdfImage
-from odf.style import Style, TextProperties, ParagraphProperties, TableCellProperties
 
 logger = logging.getLogger(__name__)
 
@@ -336,8 +344,7 @@ def link_memo_to_segment(app, segment_node, memo_source_type, memo_source_id, me
     if scene is None:
         return
     for item in scene.items():
-        if isinstance(item, MemoGraphicsItem):
-            if item.memo_source_type == memo_source_type and item.memo_source_id == memo_source_id:
+        if isinstance(item, MemoGraphicsItem) and item.memo_source_type == memo_source_type and item.memo_source_id == memo_source_id:
                 Message(app, _("Memo already imported"),
                         _("This memo is already displayed in the graph.")).exec()
                 return
@@ -857,8 +864,7 @@ class GraphSynchronizer:
             elif isinstance(item, FileTextGraphicsItem):
                 if not self._refresh_file_item(item, cur):
                     items_to_remove.append(item)
-            elif isinstance(item, CaseTextGraphicsItem):
-                if not self._refresh_case_item(item, cur):
+            elif isinstance(item, CaseTextGraphicsItem) and not self._refresh_case_item(item, cur):
                     items_to_remove.append(item)
         self._remove_orphaned_items(items_to_remove)
 
@@ -971,9 +977,9 @@ class GraphSynchronizer:
                 item.prepareGeometryChange()
                 item.update()
                 for ln in self.vg.scene.items():
-                    if isinstance(ln, (LinkGraphicsItem, FreeLineGraphicsItem)):
-                        if hasattr(ln, 'from_widget') and hasattr(ln, 'to_widget'):
-                            if ln.from_widget == item or ln.to_widget == item:
+                    if isinstance(ln, (LinkGraphicsItem, FreeLineGraphicsItem)) and\
+                        hasattr(ln, 'from_widget') and hasattr(ln, 'to_widget') and\
+                            ln.from_widget == item or ln.to_widget == item:
                                 ln.redraw()
             return True
         if memo_ctid is not None and memo_ctid > -1:
@@ -1076,8 +1082,8 @@ class GraphSynchronizer:
         """ Remove orphaned nodes and all their connected lines. """
         for item in items_to_remove:
             for line in list(self.vg.scene.items()):
-                if type(line).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                    if getattr(line, 'from_widget', None) == item or getattr(line, 'to_widget', None) == item:
+                if type(line).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem") and\
+                    getattr(line, 'from_widget', None) == item or getattr(line, 'to_widget', None) == item:
                         self.vg.scene.removeItem(line)
             if item.scene() == self.vg.scene:
                 self.vg.scene.removeItem(item)
@@ -1209,11 +1215,9 @@ class GraphSynchronizer:
         segment_nodes = [n for n in self.vg.scene.items() if type(n).__name__ in segment_types]
         for seg in segment_nodes:
             is_real_segment = False
-            if type(seg).__name__ == "FreeTextGraphicsItem" and getattr(seg, 'ctid', -1) > 0:
-                is_real_segment = True
-            elif type(seg).__name__ == "PixmapGraphicsItem" and getattr(seg, 'imid', -1) > 0:
-                is_real_segment = True
-            elif type(seg).__name__ == "AVGraphicsItem" and getattr(seg, 'avid', -1) > 0:
+            if type(seg).__name__ == "FreeTextGraphicsItem" and getattr(seg, 'ctid', -1) > 0 or\
+                type(seg).__name__ == "PixmapGraphicsItem" and getattr(seg, 'imid', -1) > 0 or\
+                type(seg).__name__ == "AVGraphicsItem" and getattr(seg, 'avid', -1) > 0:
                 is_real_segment = True
             if not is_real_segment:
                 continue
@@ -1384,8 +1388,8 @@ class GraphSynchronizer:
     def _sync_line_visibility(self):
         """ Update line visibility based on endpoint visibility, and redraw if coding changed. """
         for item in self.vg.scene.items():
-            if isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)):
-                if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
+            if isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)) and\
+                hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
                     if not item.from_widget.isVisible() or not item.to_widget.isVisible():
                         item.hide()
                     else:
@@ -1395,8 +1399,8 @@ class GraphSynchronizer:
                 item.check_coding()
         if self._coding_changed:
             for item in self.vg.scene.items():
-                if isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)):
-                    if hasattr(item, 'redraw'):
+                if isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)) and\
+                    hasattr(item, 'redraw'):
                         item.redraw()
 
 
@@ -1744,9 +1748,9 @@ class ViewGraph(QDialog):
             item.remove = True
             # remove connected lines first to avoid orphan references
             for line in list(self.scene.items()):
-                if type(line).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                    if getattr(line, 'from_widget', None) == item or getattr(line, 'to_widget', None) == item:
-                        if line.scene() == self.scene:
+                if type(line).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem") and\
+                    getattr(line, 'from_widget', None) == item or getattr(line, 'to_widget', None) == item and\
+                        line.scene() == self.scene:
                             self.scene.removeItem(line)
             if item.scene() == self.scene:
                 self.scene.removeItem(item)
@@ -2383,13 +2387,11 @@ class ViewGraph(QDialog):
                         continue
                     # category/code hanging from a category in the branch
                     if model_item['supercatid'] is not None and \
-                            model_item['supercatid'] == refined_item['catid']:
-                        append_list.append(model_item)
-                    # (sub-codes): code hanging from a code in the branch (supercid)
-                    elif refined_item['cid'] is not None and \
-                            model_item.get('supercid') is not None and \
-                            model_item['supercid'] == refined_item['cid']:
-                        append_list.append(model_item)
+                        model_item['supercatid'] == refined_item['catid'] or\
+                        refined_item['cid'] is not None and \
+                        model_item.get('supercid') is not None and \
+                        model_item['supercid'] == refined_item['cid']:
+                            append_list.append(model_item)
             for append_item in append_list:
                 refined_model.append(append_item)
                 model.remove(append_item)
@@ -2526,7 +2528,7 @@ class ViewGraph(QDialog):
                 ordered_model.append(code_or_category)
                 _attach_children(code_or_category, 1)
 
-        for item in range(0, len(ordered_model)):
+        for item in range(len(ordered_model)):
             ordered_model[item]['y'] = item * self.font_size * 3
         model = ordered_model
 
@@ -2535,10 +2537,10 @@ class ViewGraph(QDialog):
             code_or_category['child_names'] = self.named_children_of_node(code_or_category)
             add_to_scene = True
             for scene_item in self.scene.items():
-                if isinstance(scene_item, TextGraphicsItem):
-                    if scene_item.code_or_cat['name'] == code_or_category['name'] and \
-                            scene_item.code_or_cat['catid'] == code_or_category['catid'] and \
-                            scene_item.code_or_cat['cid'] == code_or_category['cid']:
+                if isinstance(scene_item, TextGraphicsItem)and\
+                    scene_item.code_or_cat['name'] == code_or_category['name'] and \
+                    scene_item.code_or_cat['catid'] == code_or_category['catid'] and \
+                    scene_item.code_or_cat['cid'] == code_or_category['cid']:
                         add_to_scene = False
             if add_to_scene:
                 self.scene.addItem(TextGraphicsItem(self.app, code_or_category))
@@ -2689,15 +2691,15 @@ class ViewGraph(QDialog):
 
     def closeEvent(self, event):  # covers closing via the window X
         self._disconnect_event_bus()
-        super(ViewGraph, self).closeEvent(event)
+        super().closeEvent(event)
 
     def reject(self):
         self._disconnect_event_bus()
-        super(ViewGraph, self).reject()
+        super().reject()
 
     def accept(self):
         self._disconnect_event_bus()
-        super(ViewGraph, self).accept()
+        super().accept()
 
     def eventFilter(self, obj, event):
         if obj == self.ui.graphicsView.viewport():
@@ -2747,8 +2749,8 @@ class ViewGraph(QDialog):
                             self._handle_connect_click(scene_pos)
                             return True
                     # right/middle clicks fall through to default Qt handling
-                elif event.type() == QtCore.QEvent.Type.MouseMove:
-                    if self._connect_state == 'dragging_preview':
+                elif event.type() == QtCore.QEvent.Type.MouseMove and\
+                    self._connect_state == 'dragging_preview':
                         scene_pos = self.ui.graphicsView.mapToScene(event.position().toPoint())
                         self._connect_preview_pos = scene_pos
                         self.scene.set_connection_preview(self._connect_source, scene_pos)
@@ -3027,9 +3029,9 @@ class ViewGraph(QDialog):
                 continue
             # replace any existing free line between the same pair
             for existing in list(self.scene.items()):
-                if isinstance(existing, FreeLineGraphicsItem):
-                    if (existing.from_widget is node and existing.to_widget is target) or \
-                            (existing.from_widget is target and existing.to_widget is node):
+                if isinstance(existing, FreeLineGraphicsItem) and\
+                    ((existing.from_widget is node and existing.to_widget is target) or \
+                    (existing.from_widget is target and existing.to_widget is node)):
                         self.scene.removeItem(existing)
             line_item = FreeLineGraphicsItem(node, target, color,
                                              line_type=line_type_str, label=label)
@@ -3336,11 +3338,9 @@ class ViewGraph(QDialog):
         links = []
         for item in self.scene.items():
             if not item.isVisible(): continue
-            if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
-                    isinstance(item, CaseTextGraphicsItem) or isinstance(item, FileTextGraphicsItem) or \
-                    isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
+            if isinstance(item, (TextGraphicsItem, FreeTextGraphicsItem, CaseTextGraphicsItem, FileTextGraphicsItem, PixmapGraphicsItem, AVGraphicsItem)):
                 nodes.append(item)
-            elif isinstance(item, LinkGraphicsItem) or isinstance(item, FreeLineGraphicsItem):
+            elif isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)):
                 links.append(item)
 
         if not nodes: return
@@ -3379,7 +3379,7 @@ class ViewGraph(QDialog):
             # > codes > sub-codes), ties broken by connection count
             root = min(comp, key=lambda x: self.organize_sort_key(x, adjacency))
             roots.append(root)
-            visited_tree = set([root])
+            visited_tree = {root}
             queue = [root]
             while queue:
                 curr = queue.pop(0)
@@ -3419,7 +3419,7 @@ class ViewGraph(QDialog):
             parent_y = sum(c_ys) / len(c_ys) if c_ys else current_y
             set_pos(node, node_x, parent_y)
             expected_bottom = parent_y + node_h + 20
-            if current_y < expected_bottom: current_y = expected_bottom
+            current_y = max(current_y, expected_bottom)
             return parent_y
 
         for r in roots:
@@ -3437,11 +3437,9 @@ class ViewGraph(QDialog):
         links = []
         for item in self.scene.items():
             if not item.isVisible(): continue
-            if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
-                    isinstance(item, CaseTextGraphicsItem) or isinstance(item, FileTextGraphicsItem) or \
-                    isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
+            if isinstance(item, (TextGraphicsItem, FreeTextGraphicsItem, CaseTextGraphicsItem, FileTextGraphicsItem, PixmapGraphicsItem, AVGraphicsItem)):
                 nodes.append(item)
-            elif isinstance(item, LinkGraphicsItem) or isinstance(item, FreeLineGraphicsItem):
+            elif isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)):
                 links.append(item)
 
         if not nodes: return
@@ -3473,7 +3471,7 @@ class ViewGraph(QDialog):
 
         # 3. Fan tree (BFS) from the main_root
         tree_children = {n: [] for n in nodes}
-        visited_tree = set([main_root])
+        visited_tree = {main_root}
         queue = [main_root]
         while queue:
             current = queue.pop(0)
@@ -3593,8 +3591,8 @@ class ViewGraph(QDialog):
             for r in res:
                 coding_displayed = False
                 for item in self.scene.items():
-                    if isinstance(item, AVGraphicsItem):
-                        if item.avid == r[5]:
+                    if isinstance(item, AVGraphicsItem) and\
+                        item.avid == r[5]:
                             coding_displayed = True
                 if not coding_displayed:
                     name = selected_file['name'] + ': ' + str(int(r[2])) + ' to ' + str(int(r[3])) + _(" msecs")
@@ -3666,8 +3664,8 @@ class ViewGraph(QDialog):
             for r in res:
                 coding_displayed = False
                 for item in self.scene.items():
-                    if isinstance(item, PixmapGraphicsItem):
-                        if item.imid == r[7]:
+                    if isinstance(item, PixmapGraphicsItem) and\
+                        item.imid == r[7]:
                             coding_displayed = True
                 if not coding_displayed:
                     name = f"{selected_file['name']} x:{int(r[2])} y:{int(r[3])}"
@@ -3733,8 +3731,8 @@ class ViewGraph(QDialog):
                 for r in res:
                     coding_displayed = False
                     for item in self.scene.items():
-                        if isinstance(item, FreeTextGraphicsItem):
-                            if item.ctid == r[4]:
+                        if isinstance(item, FreeTextGraphicsItem) and\
+                            item.ctid == r[4]:
                                 coding_displayed = True
                     if not coding_displayed:
                         codings.append({'cid': r[0], 'fid': r[1], 'name': r[2], 'memo': r[3], 'filename': file_['name'],
@@ -3755,8 +3753,8 @@ class ViewGraph(QDialog):
             y += 10
             freetextid = 1
             for item in self.scene.items():
-                if isinstance(item, FreeTextGraphicsItem):
-                    if item.freetextid > freetextid:
+                if isinstance(item, FreeTextGraphicsItem) and\
+                    item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
             item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, s['ctid'])
             item.ctid = s['ctid']
@@ -3798,8 +3796,8 @@ class ViewGraph(QDialog):
                 for r in res:
                     coding_memo_displayed = False
                     for item in self.scene.items():
-                        if isinstance(item, FreeTextGraphicsItem):
-                            if item.memo_ctid is not None and item.memo_ctid == r[4]:
+                        if isinstance(item, FreeTextGraphicsItem) and\
+                        item.memo_ctid is not None and item.memo_ctid == r[4]:
                                 coding_memo_displayed = True
                     if not coding_memo_displayed:
                         memos.append({'cid': r[0], 'fid': r[1], 'tooltip': r[2], 'name': r[3], 'filetype': 'text',
@@ -3811,8 +3809,8 @@ class ViewGraph(QDialog):
                 for r in res_img:
                     coding_memo_displayed = False
                     for item in self.scene.items():
-                        if isinstance(item, FreeTextGraphicsItem):
-                            if item.memo_imid == r[7]:
+                        if isinstance(item, FreeTextGraphicsItem) and\
+                            item.memo_imid == r[7]:
                                 coding_memo_displayed = True
                     if not coding_memo_displayed:
                         tt = _("Memo for area: ") + "x:" + f"{r[2]}" + " y:" + f"{r[3]}" + " " + _("width:") \
@@ -3827,8 +3825,8 @@ class ViewGraph(QDialog):
                 for r in res_av:
                     coding_memo_displayed = False
                     for item in self.scene.items():
-                        if isinstance(item, FreeTextGraphicsItem):
-                            if item.memo_avid == r[5]:
+                        if isinstance(item, FreeTextGraphicsItem) and\
+                            item.memo_avid == r[5]:
                                 coding_memo_displayed = True
                     if not coding_memo_displayed:
                         tt = _("Memo for duration: ") + f"{r[2]} - {r[3]} " + _("msecs")
@@ -3851,8 +3849,8 @@ class ViewGraph(QDialog):
             y += 10
             freetextid = 1
             for item in self.scene.items():
-                if isinstance(item, FreeTextGraphicsItem):
-                    if item.freetextid > freetextid:
+                if isinstance(item, FreeTextGraphicsItem) and\
+                    item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
             item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, -1,
                                         s['ctid'], s['imid'], s['avid'])
@@ -3879,10 +3877,8 @@ class ViewGraph(QDialog):
         text_from = selected['name']
         from_item = None
         for item in self.scene.items():
-            if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
-                    isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem) or \
-                    isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
-                if item.text == text_from:
+            if isinstance(item, (TextGraphicsItem, FreeTextGraphicsItem, FileTextGraphicsItem, CaseTextGraphicsItem, PixmapGraphicsItem, AVGraphicsItem)) and\
+                item.text == text_from:
                     from_item = item
         # To Items selection, remove the from item, and remove matching text items
         texts_and_groups.remove(selected)
@@ -3914,17 +3910,15 @@ class ViewGraph(QDialog):
             text_to = s['name']
             to_item = None
             for item in self.scene.items():
-                if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
-                        isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem) or \
-                        isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
+                if isinstance(item, (TextGraphicsItem, FreeTextGraphicsItem, FileTextGraphicsItem, CaseTextGraphicsItem, PixmapGraphicsItem, AVGraphicsItem))and\
+                    item.text == text_to:
                     # Cannot link same text items
-                    if item.text == text_to:
                         to_item = item
             if from_item != to_item and not (from_item is None or to_item is None):
                 for existing in list(self.scene.items()):
-                    if isinstance(existing, FreeLineGraphicsItem):
-                        if (existing.from_widget == from_item and existing.to_widget == to_item) or \
-                           (existing.from_widget == to_item and existing.to_widget == from_item):
+                    if isinstance(existing, FreeLineGraphicsItem)and\
+                        ((existing.from_widget == from_item and existing.to_widget == to_item) or \
+                        (existing.from_widget == to_item and existing.to_widget == from_item)):
                             self.scene.removeItem(existing)
                 line_item = FreeLineGraphicsItem(from_item, to_item, color,
                                                  line_type=line_type_str, label=label)
@@ -4078,8 +4072,7 @@ class ViewGraph(QDialog):
         total_span = end_pos - start_pos
         gap = (total_span - total_size) / float(len(selected) - 1)
         min_gap = 15.0
-        if gap < min_gap:
-            gap = min_gap
+        gap = max(gap, min_gap)
         current_pos = start_pos
         for it in selected:
             rect = it.boundingRect()
@@ -4140,8 +4133,8 @@ class ViewGraph(QDialog):
     def _restore_all_handles(self):
         """ Restore handles only if their parent node is still selected. """
         for item in self.scene.items():
-            if isinstance(item, (ConnectionHandleItem, ResizeHandleItem)):
-                if hasattr(item, 'parent_item') and item.parent_item.isSelected():
+            if isinstance(item, (ConnectionHandleItem, ResizeHandleItem)) and\
+                hasattr(item, 'parent_item') and item.parent_item.isSelected():
                     item.setVisible(True)
 
     def _find_handle_at(self, scene_pos):
@@ -4186,9 +4179,9 @@ class ViewGraph(QDialog):
             line_type_str, arrow_mode_str = self._resolve_line_type_key(ui.selected_line_type)
             self._save_undo_state()
             for existing in list(self.scene.items()):
-                if isinstance(existing, FreeLineGraphicsItem):
-                    if (existing.from_widget == source and existing.to_widget == target) or \
-                       (existing.from_widget == target and existing.to_widget == source):
+                if isinstance(existing, FreeLineGraphicsItem) and\
+                    ((existing.from_widget == source and existing.to_widget == target) or \
+                    (existing.from_widget == target and existing.to_widget == source)):
                         self.scene.removeItem(existing)
             line_item = FreeLineGraphicsItem(source, target, color,
                                              line_type=line_type_str, label=label)
@@ -4204,8 +4197,7 @@ class ViewGraph(QDialog):
 
         freetextid = 1
         for item in self.scene.items():
-            if isinstance(item, FreeTextGraphicsItem):
-                if item.freetextid > freetextid:
+            if isinstance(item, FreeTextGraphicsItem) and item.freetextid > freetextid:
                     freetextid = item.freetextid + 1
         text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
         if not ok:
@@ -4292,9 +4284,8 @@ class ViewGraph(QDialog):
         to_remove = []
         for f in files:
             for item in self.scene.items():
-                if isinstance(item, FileTextGraphicsItem):
-                    if item.file_id == f['id']:
-                        to_remove.append(f)
+                if isinstance(item, FileTextGraphicsItem) and item.file_id == f['id']:
+                    to_remove.append(f)
         for tr in to_remove:
             files.remove(tr)
 
@@ -4335,9 +4326,8 @@ class ViewGraph(QDialog):
         to_remove = []
         for c in cases:
             for item in self.scene.items():
-                if isinstance(item, CaseTextGraphicsItem):
-                    if item.case_id == c['id']:
-                        to_remove.append(c)
+                if isinstance(item, CaseTextGraphicsItem) and item.case_id == c['id']:
+                    to_remove.append(c)
         for tr in to_remove:
             cases.remove(tr)
         ui = DialogSelectItems(self.app, cases, _("Select cases"), "multi")
@@ -4799,8 +4789,8 @@ class ViewGraph(QDialog):
                 node_counts["Cases"] += 1
             elif cls_name == "FileTextGraphicsItem":
                 node_counts["Files"] += 1
-            elif cls_name in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
+            elif cls_name in ("LinkGraphicsItem", "FreeLineGraphicsItem") and\
+                hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
                     label = getattr(item, 'label', '') or ''
                     if label:
                         # Traducido al mostrar; el dato guardado sigue canonico.
@@ -5493,10 +5483,10 @@ class ViewGraph(QDialog):
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size: 9pt} ")
-        alphabet_asc_action = menu.addAction((_("Alphabet ascending")))
-        alphabet_desc_action = menu.addAction((_("Alphabet descending")))
-        date_asc_action = menu.addAction((_("Oldest to newest")))
-        date_desc_action = menu.addAction((_("Newest to oldest")))
+        alphabet_asc_action = menu.addAction(_("Alphabet ascending"))
+        alphabet_desc_action = menu.addAction(_("Alphabet descending"))
+        date_asc_action = menu.addAction(_("Oldest to newest"))
+        date_desc_action = menu.addAction(_("Newest to oldest"))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
@@ -5817,7 +5807,6 @@ class ViewGraph(QDialog):
             else:
                 cur.execute("delete from gr_cdct_line_item where glineid=?", [line['glineid']])
                 self.app.conn.commit()
-        return
 
     def load_free_line_graphics_items(self, grid):
         """ Find the to and from widgets.
@@ -5845,60 +5834,74 @@ class ViewGraph(QDialog):
             # regular freetextid values. gmemoid = stored value - offset.
             from_memo_gmemoid = None
             to_memo_gmemoid = None
+            
             if line['fromfreetextid'] is not None and line['fromfreetextid'] >= _MEMO_LINE_ID_OFFSET:
                 from_memo_gmemoid = line['fromfreetextid'] - _MEMO_LINE_ID_OFFSET
+            
             if line['tofreetextid'] is not None and line['tofreetextid'] >= _MEMO_LINE_ID_OFFSET:
                 to_memo_gmemoid = line['tofreetextid'] - _MEMO_LINE_ID_OFFSET
+            
             for i in self.scene.items():
-                if from_item is None and from_memo_gmemoid is not None and isinstance(i, MemoGraphicsItem):
-                    if getattr(i, 'gmemoid', None) == from_memo_gmemoid:
+                if from_item is None and from_memo_gmemoid is not None and isinstance(i, MemoGraphicsItem) and\
+                    getattr(i, 'gmemoid', None) == from_memo_gmemoid:
                         from_item = i
-                if from_item is None and line['fromcaseid'] is not None and isinstance(i, CaseTextGraphicsItem):
-                    if i.case_id == line['fromcaseid']:
+                if from_item is None and line['fromcaseid'] is not None and isinstance(i, CaseTextGraphicsItem) and\
+                    i.case_id == line['fromcaseid']:
                         from_item = i
-                if from_item is None and line['fromfileid'] is not None and isinstance(i, FileTextGraphicsItem):
-                    if i.file_id == line['fromfileid']:
+                if from_item is None and line['fromfileid'] is not None and isinstance(i, FileTextGraphicsItem)and\
+                    i.file_id == line['fromfileid']:
                         from_item = i
                 if from_item is None and (line['fromcatid'] is not None or line['fromcid'] is not None) \
-                        and isinstance(i, TextGraphicsItem):
-                    if i.code_or_cat['catid'] == line['fromcatid'] and i.code_or_cat['cid'] == line['fromcid']:
+                        and isinstance(i, TextGraphicsItem)\
+                        and i.code_or_cat['catid'] == line['fromcatid']\
+                        and i.code_or_cat['cid'] == line['fromcid']:
                         from_item = i
                 # skip freetextid match when value is in memo-sentinel range
                 if from_item is None and line['fromfreetextid'] is not None \
                         and line['fromfreetextid'] < _MEMO_LINE_ID_OFFSET \
-                        and isinstance(i, FreeTextGraphicsItem):
-                    if i.freetextid == line['fromfreetextid']:
+                        and isinstance(i, FreeTextGraphicsItem)\
+                        and i.freetextid == line['fromfreetextid']:
                         from_item = i
-                if from_item is None and line['fromimid'] is not None and isinstance(i, PixmapGraphicsItem):
-                    if i.imid == line['fromimid']:
+                if from_item is None and line['fromimid'] is not None\
+                    and isinstance(i, PixmapGraphicsItem)\
+                    and i.imid == line['fromimid']:
                         from_item = i
-                if from_item is None and line['fromavid'] is not None and isinstance(i, AVGraphicsItem):
-                    if i.avid == line['fromavid']:
+                if from_item is None and line['fromavid'] is not None\
+                    and isinstance(i, AVGraphicsItem)\
+                    and i.avid == line['fromavid']:
                         from_item = i
+            
             for i in self.scene.items():
-                if to_item is None and to_memo_gmemoid is not None and isinstance(i, MemoGraphicsItem):
-                    if getattr(i, 'gmemoid', None) == to_memo_gmemoid:
+                if to_item is None and to_memo_gmemoid is not None\
+                and isinstance(i, MemoGraphicsItem)\
+                and getattr(i, 'gmemoid', None) == to_memo_gmemoid:
                         to_item = i
-                if to_item is None and line['tocaseid'] is not None and isinstance(i, CaseTextGraphicsItem):
-                    if i.case_id == line['tocaseid']:
+                if to_item is None and line['tocaseid'] is not None\
+                and isinstance(i, CaseTextGraphicsItem)\
+                and i.case_id == line['tocaseid']:
+                    to_item = i
+                if to_item is None and line['tofileid'] is not None\
+                    and isinstance(i, FileTextGraphicsItem)\
+                    and i.file_id == line['tofileid']:
                         to_item = i
-                if to_item is None and line['tofileid'] is not None and isinstance(i, FileTextGraphicsItem):
-                    if i.file_id == line['tofileid']:
-                        to_item = i
-                if to_item is None and (line['tocatid'] is not None or line['tocid'] is not None) \
-                        and isinstance(i, TextGraphicsItem):
-                    if i.code_or_cat['catid'] == line['tocatid'] and i.code_or_cat['cid'] == line['tocid']:
+                if to_item is None\
+                    and (line['tocatid'] is not None or line['tocid'] is not None) \
+                    and isinstance(i, TextGraphicsItem)\
+                    and i.code_or_cat['catid'] == line['tocatid']\
+                    and i.code_or_cat['cid'] == line['tocid']:
                         to_item = i
                 if to_item is None and line['tofreetextid'] is not None \
                         and line['tofreetextid'] < _MEMO_LINE_ID_OFFSET \
-                        and isinstance(i, FreeTextGraphicsItem):
-                    if i.freetextid == line['tofreetextid']:
+                        and isinstance(i, FreeTextGraphicsItem)\
+                        and i.freetextid == line['tofreetextid']:
                         to_item = i
-                if to_item is None and line['toimid'] is not None and isinstance(i, PixmapGraphicsItem):
-                    if i.imid == line['toimid']:
+                if to_item is None and line['toimid'] is not None\
+                    and isinstance(i, PixmapGraphicsItem)\
+                    and i.imid == line['toimid']:
                         to_item = i
-                if to_item is None and line['toavid'] is not None and isinstance(i, AVGraphicsItem):
-                    if i.avid == line['toavid']:
+                if to_item is None and line['toavid'] is not None\
+                    and isinstance(i, AVGraphicsItem)\
+                    and i.avid == line['toavid']:
                         to_item = i
             if from_item is not None and to_item is not None:
                 # pass label kwarg + restore arrow_mode after construction
@@ -5911,7 +5914,6 @@ class ViewGraph(QDialog):
             else:
                 cur.execute("delete from gr_free_line_item where gflineid=?", [line['gflineid']])
                 self.app.conn.commit()
-        return
 
     def load_case_text_graphics_items(self, grid):
         """ Load the case graphics items.
@@ -6453,7 +6455,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
     parent = None
 
     def __init__(self, parent=None):
-        super(GraphicsScene, self).__init__(parent)
+        super().__init__(parent)
         self.parent = parent
         self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
 
@@ -6480,11 +6482,11 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         return self.scene_height
 
     def mouseMoveEvent(self, mouse_event):
-        super(GraphicsScene, self).mouseMoveEvent(mouse_event)
+        super().mouseMoveEvent(mouse_event)
         # Update positions for ALL moved items
         for item in self.items():
-            if item.isSelected() and hasattr(item, 'code_or_cat'):
-                if item.code_or_cat is not None:
+            if item.isSelected() and hasattr(item, 'code_or_cat') and\
+                item.code_or_cat is not None:
                     item.code_or_cat['x'] = item.pos().x()
                     item.code_or_cat['y'] = item.pos().y()
             if isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)):
@@ -6513,7 +6515,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         right_sel_snapshot = []
         if mouse_event.button() == QtCore.Qt.MouseButton.RightButton:
             right_sel_snapshot = [i for i in self.selectedItems() if isinstance(i, valid_classes)]
-        super(GraphicsScene, self).mousePressEvent(mouse_event)
+        super().mousePressEvent(mouse_event)
         if len(right_sel_snapshot) > 1:
             for it in right_sel_snapshot:
                 try:
@@ -6528,8 +6530,8 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         if hasattr(self, '_drag_start_positions') and self._drag_start_positions:
             for item, (sx, sy) in self._drag_start_positions.items():
                 try:
-                    if item.scene() is self:
-                        if abs(item.pos().x() - sx) > 0.5 or abs(item.pos().y() - sy) > 0.5:
+                    if item.scene() is self and\
+                        (abs(item.pos().x() - sx) > 0.5 or abs(item.pos().y() - sy) > 0.5):
                             moved = True
                             break
                 except RuntimeError:
@@ -6538,7 +6540,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
             self._save_drag_undo(self._drag_start_positions)
         if hasattr(self, '_drag_start_positions'):
             self._drag_start_positions = {}
-        super(GraphicsScene, self).mouseReleaseEvent(mouse_event)
+        super().mouseReleaseEvent(mouse_event)
         # Expand sceneRect after drop, clamped
         items_rect = self.itemsBoundingRect()
         if not items_rect.isEmpty():
@@ -6609,8 +6611,8 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                 continue
         for line in self.items():
             cls_name = type(line).__name__
-            if cls_name in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                if hasattr(line, 'from_widget') and hasattr(line, 'to_widget'):
+            if cls_name in ("LinkGraphicsItem", "FreeLineGraphicsItem") and\
+                hasattr(line, 'from_widget') and hasattr(line, 'to_widget'):
                     line_data = {
                         'class': cls_name, 'item_ref': line,
                         'from_widget': line.from_widget, 'to_widget': line.to_widget,
@@ -6640,10 +6642,8 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         min_adjust_x = 0
         min_adjust_y = 0
         for i in movable:
-            if i.pos().x() < min_adjust_x:
-                min_adjust_x = i.pos().x()
-            if i.pos().y() < min_adjust_y:
-                min_adjust_y = i.pos().y()
+            min_adjust_x = min(min_adjust_x, i.pos().x())
+            min_adjust_y = min(min_adjust_y, i.pos().y())
         if min_adjust_x < 0 or min_adjust_y < 0:
             for i in movable:
                 i.setPos(i.pos().x() - min_adjust_x, i.pos().y() - min_adjust_y)
@@ -7024,13 +7024,10 @@ class MemoGraphicsItem(QtWidgets.QGraphicsTextItem):
             scene = self.scene()
             if scene:
                 for item in scene.items():
-                    if type(item).__name__ == "TextGraphicsItem":
-                        if self.memo_source_type == 'code' and item.code_or_cat.get('cid') == self.memo_source_id:
-                            item.code_or_cat['memo'] = new_memo
-                            item.get_memo()
-                        elif self.memo_source_type == 'category' \
-                                and item.code_or_cat.get('catid') == self.memo_source_id \
-                                and item.code_or_cat.get('cid') is None:
+                    if type(item).__name__ == "TextGraphicsItem" and\
+                        ((self.memo_source_type == 'code' and item.code_or_cat.get('cid') == self.memo_source_id) or\
+                        (self.memo_source_type == 'category' and item.code_or_cat.get('catid') == self.memo_source_id)\
+                        and item.code_or_cat.get('cid') is None):
                             item.code_or_cat['memo'] = new_memo
                             item.get_memo()
             # Notify other views via the event bus AFTER commit
@@ -7063,18 +7060,18 @@ class MemoGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == refresh_action:
             self._refresh_memo()
         if action == remove_action:
-            ui = DialogConfirmDelete(self.app, _("Remove this item from the graph?"))
+            ui = DialogConfirmDelete(self.app, ("Remove this item from the graph?"))
             if not ui.exec():
                 return
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None and\
+                hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
             self.remove = True
             for item in scene.items():
-                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                    if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
-                        if item.from_widget == self or item.to_widget == self:
+                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem")\
+                    and (hasattr(item, 'from_widget') and hasattr(item, 'to_widget'))\
+                        and (item.from_widget == self or item.to_widget == self):
                             scene.removeItem(item)
             scene.removeItem(self)
             scene.update()
@@ -7114,7 +7111,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         param: displaytext : Integer
         """
 
-        super(CaseTextGraphicsItem, self).__init__(None)
+        super().__init__(None)
         self.setToolTip(_("Case"))
         self.app = app
         self.conn = app.conn
@@ -7241,8 +7238,8 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         _no_snapshot_actions = {remove_action, import_memo_action, add_categories_action}
         if action not in _no_snapshot_actions:
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None\
+                and hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
         # import-and-link case memo (delegates to module-level helper)
         if import_memo_action and action == import_memo_action:
@@ -7295,14 +7292,14 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 return
             # snapshot before removing
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None\
+                and hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
             self.remove = True
             for item in scene.items():
-                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                    if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
-                        if item.from_widget == self or item.to_widget == self:
+                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem")\
+                    and (hasattr(item, 'from_widget') and hasattr(item, 'to_widget'))\
+                        and (item.from_widget == self or item.to_widget == self):
                             scene.removeItem(item)
             scene.removeItem(self)
             scene.update()
@@ -7352,7 +7349,7 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             displaytext : String
         """
 
-        super(FileTextGraphicsItem, self).__init__(None)
+        super().__init__(None)
         self.setToolTip(_("File"))
         self.app = app
         self.conn = app.conn
@@ -7486,8 +7483,8 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         _no_snapshot_actions = {remove_action, import_memo_action, add_categories_action}
         if action not in _no_snapshot_actions:
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None\
+                and hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
         if import_memo_action and action == import_memo_action:
             link_memo_to_segment(self.app, self, 'file', self.file_id, file_memo_text)
@@ -7539,9 +7536,9 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.remove = True
             scene = self.scene()
             for item in scene.items():
-                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                    if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
-                        if item.from_widget == self or item.to_widget == self:
+                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem")\
+                    and (hasattr(item, 'from_widget') and hasattr(item, 'to_widget'))\
+                        and (item.from_widget == self or item.to_widget == self):
                             scene.removeItem(item)
             scene.removeItem(self)
             scene.update()
@@ -7598,7 +7595,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             gfreeid : Integer or None
          """
 
-        super(FreeTextGraphicsItem, self).__init__(None)
+        super().__init__(None)
         self.app = app
         self.freetextid = freetextid  # For graph item storage
         self.setPos(x, y)
@@ -7760,8 +7757,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
                                 text_context_action, image_context_action, av_context_action}
         if action not in _no_snapshot_actions:
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None\
+                and hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
         # import-and-link memo (delegates to module-level helper)
         if import_memo_action and action == import_memo_action:
@@ -7841,14 +7838,14 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 return
             # snapshot AFTER confirmation, so Cancel never pollutes the undo stack
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None\
+                and hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
             self.remove = True
             for item in scene.items():
-                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                    if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
-                        if item.from_widget == self or item.to_widget == self:
+                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem")\
+                    and (hasattr(item, 'from_widget') and hasattr(item, 'to_widget'))\
+                    and (item.from_widget == self or item.to_widget == self):
                             scene.removeItem(item)
             scene.removeItem(self)
             scene.update()
@@ -7929,7 +7926,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
             label : String  relation label shown at the line midpoint (v17, persisted)
         """
 
-        super(FreeLineGraphicsItem, self).__init__(None)
+        super().__init__(None)
 
         self.from_widget = from_widget
         self.to_widget = to_widget
@@ -8017,8 +8014,8 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
         # snapshot before style/label changes (drag-undo pattern)
         if action != remove_action:
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None\
+                and hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
         # label editing
         if action == edit_label_action:
@@ -8098,8 +8095,8 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
                 return
             # snapshot AFTER confirmation
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None\
+                and hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
             self.remove = True
             if scene:
@@ -8233,7 +8230,7 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             color : String
          """
 
-        super(AVGraphicsItem, self).__init__(None)
+        super().__init__(None)
         self.app = app
         self.avid = avid
         self.code_or_cat = {'cid': None, 'catid': None}
@@ -8309,8 +8306,8 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         # snapshot for color changes only; view/import/remove handle their own state
         if action not in (context_action, import_memo_action, remove_action):
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None\
+                and hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
         # import-and-link memo (delegates to module-level helper)
         if import_memo_action and action == import_memo_action:
@@ -8341,14 +8338,14 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
                 return
             # snapshot AFTER confirmation
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None\
+                and hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
             self.remove = True
             for item in scene.items():
-                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                    if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
-                        if item.from_widget == self or item.to_widget == self:
+                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem")\
+                    and (hasattr(item, 'from_widget') and hasattr(item, 'to_widget'))\
+                        and (item.from_widget == self or item.to_widget == self):
                             scene.removeItem(item)
             scene.removeItem(self)
             scene.update()
@@ -8409,7 +8406,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             pdf_page : For Pdf images
          """
 
-        super(PixmapGraphicsItem, self).__init__(None)
+        super().__init__(None)
         self.app = app
         self.imid = imid
         self.code_or_cat = {'cid': None, 'catid': None}
@@ -8486,8 +8483,8 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         if width is None or width <= 0:
             width = self.base_display_width()
         width = float(width)
-        target_w = int(round(min(hires.width(), width * self.OVERSAMPLE)))
-        target_h = int(round(target_w * hires.height() / hires.width()))
+        target_w = round(min(hires.width(), width * self.OVERSAMPLE))
+        target_h = round(target_w * hires.height() / hires.width())
         if target_w < 1 or target_h < 1:
             return
         if target_w == hires.width():
@@ -8567,14 +8564,14 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
                 return
             # snapshot AFTER confirmation
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None\
+                and hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
             self.remove = True
             for item in scene.items():
-                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                    if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
-                        if item.from_widget == self or item.to_widget == self:
+                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem")\
+                    and (hasattr(item, 'from_widget') and hasattr(item, 'to_widget'))\
+                        and (item.from_widget == self or item.to_widget == self):
                             scene.removeItem(item)
             scene.removeItem(self)
             scene.update()
@@ -8602,7 +8599,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          param: isvisible : boolean
          """
 
-        super(TextGraphicsItem, self).__init__(None)
+        super().__init__(None)
         self.app = app
         self.conn = app.conn
         self.settings = app.settings
@@ -8708,9 +8705,9 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         node.show()
         scene = self.scene()
         for item in scene.items():
-            if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
-                    if item.from_widget.isVisible() and item.to_widget.isVisible():
+            if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem")\
+                and (hasattr(item, 'from_widget') and hasattr(item, 'to_widget'))\
+                and (item.from_widget.isVisible() and item.to_widget.isVisible()):
                         item.show()
         scene.update()
 
@@ -8806,8 +8803,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                                   add_parent_cat_action, add_parent_code_action, import_memo_action}
         if action not in _self_snapshot_actions:
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None\
+                and hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
         # import-and-link memo (delegates to module-level helper)
         if import_memo_action and action == import_memo_action:
@@ -8868,14 +8865,14 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 return
             # snapshot AFTER confirmation
             scene = self.scene()
-            if scene is not None and getattr(scene, 'parent', None) is not None:
-                if hasattr(scene.parent, '_save_undo_state'):
+            if scene is not None and getattr(scene, 'parent', None) is not None\
+                and hasattr(scene.parent, '_save_undo_state'):
                     scene.parent._save_undo_state()
             self.hide()
             for item in self.scene().items():
-                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                    if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
-                        if not item.from_widget.isVisible() or not item.to_widget.isVisible():
+                if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem")\
+                    and (hasattr(item, 'from_widget') and hasattr(item, 'to_widget'))\
+                        and (not item.from_widget.isVisible() or not item.to_widget.isVisible):
                             item.hide()
             self.scene().update()
 
@@ -8899,8 +8896,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if res is None:
             return
         scene = self.scene()
-        if scene is not None and getattr(scene, 'parent', None) is not None:
-            if hasattr(scene.parent, '_save_undo_state'):
+        if scene is not None and getattr(scene, 'parent', None) is not None\
+            and hasattr(scene.parent, '_save_undo_state'):
                 scene.parent._save_undo_state()
         cat_data = {'name': res[0], 'supercatid': res[2], 'catid': parent_catid, 'cid': None,
                     'x': self.pos().x() - 180, 'y': self.pos().y(),
@@ -8935,8 +8932,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if res is None:
             return
         scene = self.scene()
-        if scene is not None and getattr(scene, 'parent', None) is not None:
-            if hasattr(scene.parent, '_save_undo_state'):
+        if scene is not None and getattr(scene, 'parent', None) is not None\
+            and hasattr(scene.parent, '_save_undo_state'):
                 scene.parent._save_undo_state()
         code_data = {'name': res[1], 'supercatid': None, 'catid': res[4], 'cid': res[0],
                      'supercid': res[5],
@@ -8977,8 +8974,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if not selected:
             return
         scene = self.scene()
-        if scene is not None and getattr(scene, 'parent', None) is not None:
-            if hasattr(scene.parent, '_save_undo_state'):
+        if scene is not None and getattr(scene, 'parent', None) is not None\
+            and hasattr(scene.parent, '_save_undo_state'):
                 scene.parent._save_undo_state()
         radius = 200
         angle_step = (2 * math.pi) / max(1, len(selected))
@@ -9148,8 +9145,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             return
         # snapshot AFTER confirmation, so Cancel never pollutes the undo stack
         scene = self.scene()
-        if scene is not None and getattr(scene, 'parent', None) is not None:
-            if hasattr(scene.parent, '_save_undo_state'):
+        if scene is not None and getattr(scene, 'parent', None) is not None\
+            and hasattr(scene.parent, '_save_undo_state'):
                 scene.parent._save_undo_state()
         self.import_segments(ui.selected_text, ui.selected_image, ui.selected_av)
 
@@ -9182,8 +9179,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             return
         # snapshot AFTER confirmation, so Cancel never pollutes the undo stack
         scene = self.scene()
-        if scene is not None and getattr(scene, 'parent', None) is not None:
-            if hasattr(scene.parent, '_save_undo_state'):
+        if scene is not None and getattr(scene, 'parent', None) is not None\
+            and hasattr(scene.parent, '_save_undo_state'):
                 scene.parent._save_undo_state()
         radius = 250
         angle_step = (2 * math.pi) / max(1, len(selected))
@@ -9247,8 +9244,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
         # 2. Ocultar/Mostrar nodos hijos en cascada y recolectar sus CIDs. Hide/Show child nodes in cascade and collect their CIDs
         for item in self.scene().items():
-            if type(item).__name__ == "TextGraphicsItem" and item != self:
-                if item.code_or_cat['name'] in self.code_or_cat.get('child_names', []):
+            if type(item).__name__ == "TextGraphicsItem" and item != self\
+                and item.code_or_cat['name'] in self.code_or_cat.get('child_names', []):
                     # Guardar el CID de los códigos hijos para ocultar sus segmentos. Save the CID of child codes to hide their segments.
                     if item.code_or_cat.get('cid') is not None:
                         child_cids.append(item.code_or_cat['cid'])
@@ -9261,9 +9258,9 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
         # 3. Ocultar/Mostrar los segmentos (texto, imagen, a/v) vinculados a los códigos colapsados. Hide/Show the segments (text, image, A/V) linked to the collapsed codes
         for item in self.scene().items():
-            if type(item).__name__ in ("FreeTextGraphicsItem", "PixmapGraphicsItem", "AVGraphicsItem"):
-                if hasattr(item, 'code_or_cat') and item.code_or_cat is not None:
-                    if item.code_or_cat.get('cid') in child_cids:
+            if type(item).__name__ in ("FreeTextGraphicsItem", "PixmapGraphicsItem", "AVGraphicsItem")\
+                and hasattr(item, 'code_or_cat') and item.code_or_cat is not None\
+                    and item.code_or_cat.get('cid') in child_cids:
                         if self.is_collapsed:
                             item.hide()
                         else:
@@ -9271,12 +9268,13 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
         # 4. Refrescar las líneas (Ocultar las que queden sueltas). Refresh lines (Hide any loose ones)
         for item in self.scene().items():
-            if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
-                if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
-                    if not item.from_widget.isVisible() or not item.to_widget.isVisible():
+            if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem")\
+                and hasattr(item, 'from_widget') and hasattr(item, 'to_widget')\
+                    and (not item.from_widget.isVisible() or not item.to_widget.isVisible()):
                         item.hide()
-                    else:
-                        item.show()
+            else:
+                item.show()
+        
         self.scene().update()
 
     def case_media(self, ):

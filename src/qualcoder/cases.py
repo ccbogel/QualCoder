@@ -24,13 +24,13 @@ https://qualcoder.org/
 import csv
 import datetime
 import logging
-import openpyxl
-from openpyxl import load_workbook
-from pathlib import Path
-import qtawesome as qta
 import sqlite3
 import webbrowser
+from pathlib import Path
 
+import openpyxl
+import qtawesome as qta
+from openpyxl import load_workbook
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 
@@ -38,10 +38,9 @@ from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
 from .case_file_manager import DialogCaseFileManager
 from .confirm_delete import DialogConfirmDelete
-from .GUI.ui_dialog_cases import Ui_Dialog_cases
 from .context_help import open_module_help
-from .helpers import Message, ExportDirectoryPathDialog
-
+from .GUI.ui_dialog_cases import Ui_Dialog_cases
+from .helpers import ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
 from .view_av import DialogViewAV
 from .view_image import DialogViewImage
@@ -179,7 +178,7 @@ class DialogCases(QtWidgets.QDialog):
             key = event.key()
             mod = event.modifiers()
             if key == QtCore.Qt.Key.Key_A and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
-                for r in range(0, self.ui.tableWidget.rowCount()):
+                for r in range( self.ui.tableWidget.rowCount()):
                     self.ui.tableWidget.setRowHidden(r, False)
                 return True
         return False
@@ -280,7 +279,7 @@ class DialogCases(QtWidgets.QDialog):
             return
         cols = self.ui.tableWidget.columnCount()
         rows = self.ui.tableWidget.rowCount()
-        header = [self.ui.tableWidget.horizontalHeaderItem(i).text() for i in range(0, cols)]
+        header = [self.ui.tableWidget.horizontalHeaderItem(i).text() for i in range( cols)]
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Case Attributes"
@@ -558,9 +557,9 @@ class DialogCases(QtWidgets.QDialog):
             reader = csv.reader(f, delimiter=',', quoting=csv.QUOTE_MINIMAL)
             try:
                 for row in reader:
-                    values.append(row)
+                    values.copy().append(row)
             except csv.Error as e:
-                logger.warning(('file %s, line %d: %s' % (filepath, reader.line_num, e)))
+                logger.warning(f'file {str|None}, line {str|None}: {str|None}'.format(filepath, reader.line_num, e))
         if len(values) <= 1:
             logger.info(_("Cannot import from csv, only one row in file"))
             return
@@ -849,7 +848,7 @@ class DialogCases(QtWidgets.QDialog):
         if action is None:  # Dismissed menu: None matches unbuilt actions
             return
         if action == action_show_all_columns:
-            for c in range(0, self.ui.tableWidget.columnCount()):
+            for c in range( self.ui.tableWidget.columnCount()):
                 self.ui.tableWidget.setColumnHidden(c, False)
             if not self.app.settings['showids']:
                 self.ui.tableWidget.setColumnHidden(self.ID_COLUMN, True)
@@ -946,7 +945,7 @@ class DialogCases(QtWidgets.QDialog):
             if item_to_compare is None:
                 item_to_compare = ""
             compare_text = item_to_compare.text()
-            for r in range(0, self.ui.tableWidget.rowCount()):
+            for r in range( self.ui.tableWidget.rowCount()):
                 item = self.ui.tableWidget.item(r, col)
                 text_ = item.text()
                 if compare_text != text_:
@@ -956,12 +955,12 @@ class DialogCases(QtWidgets.QDialog):
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show values like:"),
                                                        QtWidgets.QLineEdit.EchoMode.Normal)
             if ok and text_value != '':
-                for r in range(0, self.ui.tableWidget.rowCount()):
+                for r in range( self.ui.tableWidget.rowCount()):
                     if self.ui.tableWidget.item(r, col).text().find(text_value) == -1:
                         self.ui.tableWidget.setRowHidden(r, True)
             return
         if action == action_show_all:
-            for r in range(0, self.ui.tableWidget.rowCount()):
+            for r in range( self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
         if action == action_url:
             webbrowser.open(item_text)
@@ -1017,11 +1016,11 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.tableWidget.blockSignals(True)
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
         rows = self.ui.tableWidget.rowCount()
-        for c in range(0, rows):
+        for c in range( rows):
             self.ui.tableWidget.removeRow(0)
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
         self.ui.tableWidget.setRowCount(len(self.cases))
-        for row in range(0, len(self.cases)):
+        for row in range( len(self.cases)):
             c = self.cases[row]
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN,
                                         QtWidgets.QTableWidgetItem(c['name']))
@@ -1274,4 +1273,4 @@ class ToolTipEventFilter(QtCore.QObject):
                 if item['pos0'] <= pos <= item['pos1']:
                     receiver.setToolTip(_("Right click to view"))
         # Call Base Class Method to Continue Normal Event Processing
-        return super(ToolTipEventFilter, self).eventFilter(receiver, event)
+        return super().eventFilter(receiver, event)

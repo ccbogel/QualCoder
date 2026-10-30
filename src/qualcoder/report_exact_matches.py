@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,18 +19,25 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
-from copy import copy, deepcopy
 import logging
-import openpyxl
-from PyQt6 import QtGui, QtWidgets, QtCore
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QBrush
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from copy import copy, deepcopy
 
+import openpyxl
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
+
+#from PyQt6.QtGui import QBrush
 from .code_in_all_files import DialogCodeInAllFiles
-from .color_selector import TextColor
+
+#from .color_selector import TextColor
 from .GUI.ui_report_matching_segments import Ui_DialogMatchingTextSegments
-from .helpers import DialogCodeInText, Message, init_persistent_tree_header, restore_persistent_tree_widths
+from .helpers import (
+    DialogCodeInText,
+    Message,
+    init_persistent_tree_header,
+    restore_persistent_tree_widths,
+)
 from .report_attributes import DialogSelectAttributeParameters
 
 logger = logging.getLogger(__name__)
@@ -352,7 +357,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             cur.execute(sql, values)
             coded_results = cur.fetchall()
 
-            sql = f"select code_text.cid, pos0,pos1 from code_text where "
+            sql = "select code_text.cid, pos0,pos1 from code_text where "
             sql += f" code_text.cid in ({excluded_cids_string}) "
             sql += " and code_text.owner=? and code_text.fid=?"
             cur.execute(sql, [selected_coder, fid])
@@ -383,7 +388,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     one_line_results[0] = str(one_line_results[0])  # cid
                     # one_line_results[5] = ""  # coded memo
                     for row in range(1, len(matching_codes_list)):
-                        one_line_results[0] += f", {str(matching_codes_list[row][0])}"  # cid
+                        one_line_results[0] += f", {matching_codes_list[row][0]!s}"  # cid
                         one_line_results[1] += f"|{matching_codes_list[row][1]}"  # codename
                         one_line_results[5] += f"|{matching_codes_list[row][5]}"  # coded segment memo
                     if one_line_results[5] == "||":

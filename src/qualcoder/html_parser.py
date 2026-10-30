@@ -24,10 +24,10 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from html.parser import HTMLParser
-from html.entities import name2codepoint
-import re
 import logging
+import re
+from html.entities import name2codepoint
+from html.parser import HTMLParser
 
 logger = logging.getLogger(__name__)
 
@@ -99,5 +99,5 @@ def text_to_html(text):
         t = mo.group()
         if len(t) == 1:
             return {'&': '&amp;', "'": '&#39;', '"': '&quot;', '<': '&lt;', '>': '&gt;'}.get(t)
-        return '<a href="%s">%s</a>' % (t, t)
+        return f'<a href="{t}">{t}</a>'
     return re.sub(r'https?://[^] ()"\';]+|[&\'"<>]', f, text)

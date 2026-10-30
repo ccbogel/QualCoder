@@ -22,7 +22,8 @@ https://qualcoder.org/
 """
 
 import logging
-from PyQt6 import QtWidgets, QtCore
+
+from PyQt6 import QtCore, QtWidgets
 
 from .GUI.ui_save_query import Ui_DialogSaveQuery
 

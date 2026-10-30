@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 Using --update option: Updates translation placeholders in .po and Qt .ts files.
 Using --compile option: Compiles .po to .mo files, and .ts to .qm files.

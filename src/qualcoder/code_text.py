@@ -22,49 +22,69 @@ https://qualcoder.org/
 """
 
 
-from copy import copy, deepcopy
 import datetime
-# import difflib  # Slow, kept this in case need to revert to it. Now using diff_match_patch
-import diff_match_patch
-import emoji
 import html
 import logging
-from operator import itemgetter
-from pathlib import Path
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
 import sqlite3
 import unicodedata
 import webbrowser
+from copy import copy, deepcopy
+from operator import itemgetter
+from pathlib import Path
 
+# import difflib  # Slow, kept this in case need to revert to it. Now using diff_match_patch
+import diff_match_patch
+import emoji
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from odf import dc as odf_dc
+from odf import office as odf_office
+from odf import style as odf_style
+from odf import text as odf_text  # Need for _export_odt_clean
+from odf.namespaces import DRAWNS, OFFICENS  # Required for _export_odt_clean method
+
+# Required for the _export_odt_clean method which generates native ODF files with ranged annotations using odfpy
+from odf.opendocument import OpenDocumentText  # Required for _export_odt_clean method
 from PyQt6 import QtCore, QtGui, QtWidgets, sip
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
-# Required for the _export_odt_clean method which generates native ODF files with ranged annotations using odfpy
-from odf.opendocument import OpenDocumentText  # Required for _export_odt_clean method
-from odf import text as odf_text, office as odf_office, dc as odf_dc, style as odf_style  # Need for _export_odt_clean
-from odf.namespaces import OFFICENS, DRAWNS  # Required for _export_odt_clean method
 
 from .ai_agent_prompts import AiAgentPromptsCatalog, prompt_name_and_scope
 from .ai_runtime import AI_READY, ensure_ai_ready
 from .ai_ui import ai_chat_signal_emitter
 from .code_in_all_files import DialogCodeInAllFiles
-from .code_text_coding_margin import (CodingMargin, DEFAULT_CODING_MARGIN_WIDTH, MINIMUM_CODING_MARGIN_WIDTH,
-                                      MINIMUM_CODING_MARGIN_LABEL_WIDTH)
+from .code_text_coding_margin import (
+    DEFAULT_CODING_MARGIN_WIDTH,
+    MINIMUM_CODING_MARGIN_LABEL_WIDTH,
+    MINIMUM_CODING_MARGIN_WIDTH,
+    CodingMargin,
+)
 from .code_tree import CodeTreeController
 from .codebook import build_codebook_path
-from .color_selector import DialogColorSelect, colour_ranges, TextColor, show_codes_of_colour_range
+from .coder_names import DialogCoderNames
+from .color_selector import (
+    DialogColorSelect,
+    TextColor,
+    colour_ranges,
+    show_codes_of_colour_range,
+)
 from .confirm_delete import DialogConfirmDelete
 from .context_help import open_module_help
-from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, NumberBar, CodeResizeHandle, \
-    ToolTipEventFilter, init_persistent_tree_header
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
+from .helpers import (
+    CodeResizeHandle,
+    DialogGetStartAndEndMarks,
+    ExportDirectoryPathDialog,
+    Message,
+    NumberBar,
+    ToolTipEventFilter,
+    init_persistent_tree_header,
+)
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
 from .select_items import DialogSelectItems  # For isinstance()
 from .speakers import DialogSpeakers, speaker_coder_name
-from .coder_names import DialogCoderNames
 
 ai_search_analysis_max_count = 10  # How many chunks of data are analysed in the second stage
 
@@ -81,7 +101,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def __init__(self, app, parent_textedit, tab_reports):
 
-        super(DialogCodeText, self).__init__()
+        super().__init__()
         self.app = app
         self.tab_reports = tab_reports  # Tab widget reports, used for updates to codes in other tabs
         self.parent_textEdit = parent_textedit
@@ -122,9 +142,9 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
         self.code_resize_timer = 0
-        self.code_resize_timer = datetime.datetime.now()
+        self.code_resize_timer = datetime.datetime.now().astimezone()
         self.overlap_timer = 0
-        self.overlap_timer = datetime.datetime.now()
+        self.overlap_timer = datetime.datetime.now().astimezone()
 
         # Variables associated with right-hand side splitter, for project memo, code rule
         self.project_memo = False

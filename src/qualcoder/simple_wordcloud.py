@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -20,10 +18,11 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
+import logging
 import webbrowser
 from copy import deepcopy
-import logging
 from pathlib import Path
+
 from wordcloud import WordCloud
 
 logger = logging.getLogger(__name__)
@@ -126,7 +125,6 @@ class Wordcloud:
                     self.stopwords.append(stopword.strip())
         except FileNotFoundError as err:
             print(err)
-            pass
 
         # ---- TEXT PREPROCESSING + NGRAMS ----
         # 1) Clean text (letters + apostrophes, lowercased)
@@ -179,8 +177,8 @@ class Wordcloud:
             scale=3  # higher-quality PNG
         )
 
-        if self.reverse_colors:
-            if wc.colormap is not None and hasattr(wc.colormap, "reversed"):
+        if self.reverse_colors\
+            and wc.colormap is not None and hasattr(wc.colormap, "reversed"):
                 wc.colormap = wc.colormap.reversed()
 
         # Generate image from frequencies

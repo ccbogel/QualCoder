@@ -24,12 +24,13 @@ https://qualcoder.org/
 import html
 import json  # To get the latest GitHub release information
 import logging
-from markdown_it import MarkdownIt
-from pathlib import Path
-from PyQt6 import QtWidgets, QtCore, QtGui
-import qtawesome as qta
 import re
 import urllib.request
+from pathlib import Path
+
+import qtawesome as qta
+from markdown_it import MarkdownIt
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .GUI.ui_dialog_information import Ui_Dialog_information
 
