@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\Users\salom\Downloads\r6\_ui_backup_20260826_012531\ui_special_functions.ui'
+# Form implementation generated from reading ui file 'ui_special_functions.ui'
 #
 # Created by: PyQt6 UI code generator 6.10.2
 #
@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_Dialog_special_functions(object):
     def setupUi(self, Dialog_special_functions):
         Dialog_special_functions.setObjectName("Dialog_special_functions")
-        Dialog_special_functions.resize(753, 558)
+        Dialog_special_functions.resize(753, 600)
         Dialog_special_functions.setMaximumSize(QtCore.QSize(16777215, 600))
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog_special_functions)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -62,6 +62,19 @@ class Ui_Dialog_special_functions(object):
         self.label_merge_info.setGeometry(QtCore.QRect(50, 30, 621, 30))
         self.label_merge_info.setObjectName("label_merge_info")
         self.verticalLayout.addWidget(self.groupBox_merge)
+        self.groupBox = QtWidgets.QGroupBox(parent=Dialog_special_functions)
+        self.groupBox.setMinimumSize(QtCore.QSize(0, 60))
+        self.groupBox.setMaximumSize(QtCore.QSize(16777215, 60))
+        self.groupBox.setStyleSheet("QGroupBox{border: 1px solid #f89407;}")
+        self.groupBox.setObjectName("groupBox")
+        self.label_update_seltext = QtWidgets.QLabel(parent=self.groupBox)
+        self.label_update_seltext.setGeometry(QtCore.QRect(50, 20, 661, 30))
+        self.label_update_seltext.setObjectName("label_update_seltext")
+        self.pushButton_update_seltext = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_update_seltext.setGeometry(QtCore.QRect(10, 20, 30, 30))
+        self.pushButton_update_seltext.setText("")
+        self.pushButton_update_seltext.setObjectName("pushButton_update_seltext")
+        self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_text_positions = QtWidgets.QGroupBox(parent=Dialog_special_functions)
         self.groupBox_text_positions.setMinimumSize(QtCore.QSize(0, 120))
         self.groupBox_text_positions.setMaximumSize(QtCore.QSize(16777215, 120))
@@ -119,6 +132,10 @@ class Ui_Dialog_special_functions(object):
         self.pushButton_merge.setToolTip(_translate("Dialog_special_functions", "Run merge projects"))
         self.pushButton_select_project.setToolTip(_translate("Dialog_special_functions", "Select project to merge"))
         self.label_merge_info.setText(_translate("Dialog_special_functions", "Select project to merge into this project"))
+        self.groupBox.setTitle(_translate("Dialog_special_functions", "Update coded seltext in documents with emojis"))
+        self.label_update_seltext.setText(_translate("Dialog_special_functions", "Update coded text. Where text is out of sync due to emojis in document."))
+        self.pushButton_update_seltext.setToolTip(_translate("Dialog_special_functions", "Find text files with emoji.\n"
+"Update the stored coded text if there is a discrepancy."))
         self.groupBox_text_positions.setTitle(_translate("Dialog_special_functions", "Change text positions"))
         self.label_end_positions.setText(_translate("Dialog_special_functions", "Change text code end positions ALL codes ALL files for current owner."))
         self.label_start_positions.setText(_translate("Dialog_special_functions", "Change text code start positions ALL codes ALL files for current owner."))
@@ -128,3 +145,13 @@ class Ui_Dialog_special_functions(object):
 "or reduce (negative numbers)"))
         self.pushButton_text_ends.setToolTip(_translate("Dialog_special_functions", "Run"))
         self.pushButton_text_starts.setToolTip(_translate("Dialog_special_functions", "Run"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Dialog_special_functions = QtWidgets.QDialog()
+    ui = Ui_Dialog_special_functions()
+    ui.setupUi(Dialog_special_functions)
+    Dialog_special_functions.show()
+    sys.exit(app.exec())

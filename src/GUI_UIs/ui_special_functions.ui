@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>753</width>
-    <height>558</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -203,6 +203,58 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>60</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>60</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QGroupBox{border: 1px solid #f89407;}</string>
+     </property>
+     <property name="title">
+      <string>Update coded seltext in documents with emojis</string>
+     </property>
+     <widget class="QLabel" name="label_update_seltext">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>20</y>
+        <width>661</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Update coded text. Where text is out of sync due to emojis in document.</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_update_seltext">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Find text files with emoji.
+Update the stored coded text if there is a discrepancy.</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox_text_positions">
      <property name="minimumSize">
       <size>
@@ -331,10 +383,10 @@ or reduce (negative numbers)</string>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
+      <set>QDialogButtonBox::StandardButton::Close</set>
      </property>
     </widget>
    </item>

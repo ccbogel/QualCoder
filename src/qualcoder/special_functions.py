@@ -22,13 +22,12 @@ https://qualcoder.org/
 """
 
 from contextlib import closing
+import emoji
 import logging
 from pathlib import Path
-import sqlite3
-
+from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-
-from PyQt6 import QtWidgets, QtCore
+import sqlite3
 
 from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
@@ -85,6 +84,8 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.ui.pushButton_select_project.pressed.connect(self.select_project_folder)
         self.ui.pushButton_merge.setEnabled(False)
         self.ui.pushButton_merge.pressed.connect(self.merge_projects)
+        self.ui.pushButton_update_seltext.setIcon(qta.icon('mdi6.alert-circle-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_update_seltext.pressed.connect(self.update_emoji_seltext)
         # Text positions, is here in case it is needed, but hidden for users as dangerous, Key Tilde to activate
         self.ui.groupBox_text_positions.hide()
 
@@ -315,6 +316,53 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
                 if isinstance(c, DialogCodeText):
                     c.get_coded_text_update_eventfilter_tooltips()
                     break
+
+    def update_emoji_seltext(self):
+        """ Fix out of sync stored seltext. where emoji character positions
+        have changed the recorded seltext. """
+
+        file_dicts = self.app.get_file_texts()
+        emoji_files = []
+        for file_dict in file_dicts:
+            has_emoji = any(emoji.is_emoji(char) for char in file_dict['fulltext'])
+            if has_emoji:
+                emoji_files.append(file_dict)
+        counter = 0
+        fixes_text = ""
+        cur = self.app.conn.cursor()
+        sql_coded = "select ctid, pos0, pos1, seltext from code_text where fid=?"
+        sql_fix = "update code_text set seltext=? where ctid=?"
+        for text_file in emoji_files:
+            text_edit = QtWidgets.QPlainTextEdit(text_file['fulltext'])
+            cur.execute(sql_coded, [text_file['id']])
+            res = cur.fetchall()
+            for r in res:
+                cursor = text_edit.textCursor()
+                cursor.setPosition(r[1])
+                cursor.setPosition(r[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
+                seltext = cursor.selectedText()
+                if seltext != r[3]:
+                    line = f"{text_file['name']}, (ctid,pos0,pos1): {r[0:3]}\n- {r[3]}\n+ {seltext}\n\n"
+                    fixes_text += (line)
+                    counter += 1
+                    try:
+                        cur.execute(sql_fix, [seltext, r[0]])
+                        self.app.conn.commit()
+                    except Exception as e:
+                        logger.debug(e)
+                        print(e)
+
+        if fixes_text == "":
+            Message(self.app, _('No changes'), _("No inconsistencies found"), "information").exec()
+            return
+        filepath, ok = QtWidgets.QFileDialog.getSaveFileName(
+            self, _("Save changes for review"), self.app.settings['directory'],"Text Files (*.txt)")
+        if not filepath or not ok:
+            return
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(fixes_text)
+            msg = f"{counter} " + _("inconsistencies found and updated.")
+            Message(self.app, _('Changes exported'), msg, "information").exec()
 
     def accept(self):
         """ Override accept button. """
