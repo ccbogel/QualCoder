@@ -21,22 +21,22 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from PyQt6 import QtCore, QtGui
-from PyQt6 import QtWidgets
-from PyQt6.QtCore import Qt
-
 import csv
 from datetime import datetime
 import logging
-import openpyxl
 import re
-import qtawesome as qta  # https://pictogrammers.com/library/mdi/
 import sqlite3
 
+import openpyxl
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
+import qtawesome as qta
+
 from .GUI.ui_dialog_SQL import Ui_Dialog_sql
-from .save_sql_query import DialogSaveSql
 from .helpers import ExportDirectoryPathDialog, Message
 from .highlighter import Highlighter
+from .save_sql_query import DialogSaveSql
+from .themes import palette_is_dark
 
 logger = logging.getLogger(__name__)
 
@@ -74,8 +74,7 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.tableWidget_results.setStyleSheet(doc_font)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         highlighter = Highlighter(self.ui.textEdit_sql)
-        if self.app.settings['stylesheet'] in ("dark", "rainbow"):
-            highlighter.create_rules(dark=True)
+        highlighter.create_rules(dark=palette_is_dark(self.ui.textEdit_sql.palette()))
         self.ui.textEdit_sql.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit_sql.customContextMenuRequested.connect(self.sql_menu)
         self.ui.textEdit_sql.setTabChangesFocus(True)

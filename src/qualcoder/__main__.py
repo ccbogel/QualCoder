@@ -334,11 +334,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project_panel_colors = {}
         self.action_log_visible = True
 
-        if platform.system() in ("Windows", "Darwin") and self.app.settings['stylesheet'] == "native":
-            # Use Fusion on Windows and macOS for consistent custom navigation rendering.
-            # It also avoids rendering issues with the native Windows dark style.
-            QtWidgets.QApplication.instance().setStyle("Fusion")
-
         QtWidgets.QMainWindow.__init__(self)
         self.external_mcp = ExternalMcpController(self.app, self)
         self.external_mcp.status_changed.connect(self._external_mcp_status_changed)
@@ -349,13 +344,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ai_sidebar_splitter_is_restoring = False
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        # Blend every workspace page into the navigation background, without a tab frame.
+        self.ui.tabWidget.setDocumentMode(True)
         self.init_action_log()
         self.init_placeholder_tab_layouts()
-        # Test of macOS menu bar
-        if self.app.settings['stylesheet'] == "native":
-            self.ui.menubar.setNativeMenuBar(True)
-        else:
-            self.ui.menubar.setNativeMenuBar(False)
+        # Keep platform menu integration consistent across themes.
+        self.ui.menubar.setNativeMenuBar(True)
         self.ui.textEdit.append(
                     f'<p><b>{html.escape(self.app.version)}</b> &middot; '
                     f'<a href="qualcoder://action/about">{html.escape(_("About"))}</a></p>')
@@ -814,17 +808,16 @@ Click "Yes" to start now.')
     def update_placeholder_tab_styles(self):
         """Match placeholder browser colors and link styling to the application theme."""
 
-        action_log_background = self.ui.textEdit.viewport().palette().color(
-            QtGui.QPalette.ColorRole.Base
-        ).name()
-        text_color = self.ui.textEdit.viewport().palette().color(QtGui.QPalette.ColorRole.Text).name()
+        workspace_palette = self.ui.tabWidget.palette()
+        workspace_background = workspace_palette.color(QtGui.QPalette.ColorRole.Window).name()
+        text_color = workspace_palette.color(QtGui.QPalette.ColorRole.WindowText).name()
         browser_style = f"""
             QTextBrowser {{
-                background-color: {action_log_background};
+                background-color: {workspace_background};
                 border: none;
             }}
             QTextBrowser:focus {{
-                background-color: {action_log_background};
+                background-color: {workspace_background};
                 border: none;
             }}
         """
@@ -832,7 +825,7 @@ Click "Yes" to start now.')
             placeholder.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
             placeholder.setFrameShadow(QtWidgets.QFrame.Shadow.Plain)
             placeholder.viewport().setStyleSheet(
-                f"background-color: {action_log_background}; border: none;"
+                f"background-color: {workspace_background}; border: none;"
             )
             placeholder.setStyleSheet(browser_style)
             placeholder.document().setDefaultStyleSheet(
@@ -855,7 +848,7 @@ Click "Yes" to start now.')
         if placeholder is None:
             return
         highlight_color = self.app.highlight_color()
-        text_color = self.ui.textEdit.viewport().palette().color(QtGui.QPalette.ColorRole.Text).name()
+        text_color = self.ui.tabWidget.palette().color(QtGui.QPalette.ColorRole.WindowText).name()
         doc_font_size = self.app.settings["docfontsize"]
         doc_font_family = self.app.settings.get("docfont", self.app.settings["font"])
         placeholder_map = {
@@ -3288,15 +3281,16 @@ Click "Yes" to start now.')
         for tab_widget in (self.ui.tab_reports, self.ui.tab_coding, self.ui.tab_manage):
             self.clear_tab_widgets(tab_widget, show_placeholder=True)
 
-    def change_settings(self, section=None, enable_ai=False):
-        """ Change default settings - the coder name, font, font size.
-        Language, Backup options.
-        As this dialog affects all others if the coder name changes, on exit of the dialog,
-        all other opened dialogs are destroyed.
-        
-        section = 'AI' moves to the AI settings at the bottom of the dialog
-        enable_ai = if True, the AI will be enabled in settings
+    def change_settings(self, section: Optional[str] = None, enable_ai: bool = False) -> None:
+        """Change settings, closing other dialogs if coder names change.
+
+        Args:
+            section: 'AI' or 'advanced AI' scrolls to the requested AI settings.
+            enable_ai: Whether to enable AI in the settings dialog.
         """
+        if (enable_ai or self.app.settings['ai_enable'] == 'True') and not ai_runtime_ready(self.app):
+            if not self.load_ai_runtime_modal(_("AI Settings")):
+                return
         current_coder = self.app.settings['codername']
         ui = DialogSettings(
             self.app,
@@ -4246,13 +4240,13 @@ def gui():
     if sys.platform in ["linux", "bsd"]: 
         QtWidgets.QApplication.setDesktopFileName("QualCoder")
         
-    #if platform.system() in ("Windows", "Darwin") and settings.get('stylesheet') == "native":
-    #    # Select Fusion before QApplication initializes the platform's native style.
+    # Prefer Fusion during initialization, then enforce it before applying colors.
     os.environ.setdefault("QT_STYLE_OVERRIDE", "Fusion")
     # Native video frame must not force sibling widgets native
     QtWidgets.QApplication.setAttribute(
         QtCore.Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
     app = QtWidgets.QApplication(sys.argv)
+    app.setStyle("Fusion")
     app._qc_installed_translators = []
     # Mouse wheel must not change closed comboboxes by accident, in any dialog
     app._qc_combo_wheel_guard = ComboWheelGuard(app)
@@ -4262,8 +4256,7 @@ def gui():
     QtGui.QFontDatabase.addApplicationFont(str(qc_config_folder / "NotoSans-Regular.ttf"))
     # DroidSandMono - for wordcloud
     install_droid_sans_mono()
-    stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
-    app.setStyleSheet(stylesheet)
+    qual_app.apply_theme(settings)
     qta.reset_cache()
     qta.set_defaults(
         color=qual_app.qtawesome_icon_color,
