@@ -3030,7 +3030,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if code['cid'] == item['cid']:
                 color = code['color']
         fmt = QtGui.QTextCharFormat()
-        brush = QBrush(QColor(color))
+        brush = QBrush(QColor(color.replace("#", "#70")))
         fmt.setBackground(brush)
         if item['important']:
             fmt.setFontWeight(QtGui.QFont.Weight.Bold)
@@ -4073,7 +4073,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.plainTextEdit.setTextCursor(cursor)
         cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        brush = QBrush(QColor(color))
+        brush = QBrush(QColor(color.replace("#", "#70")))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
         foreground_color = TextColor(color).recommendation
@@ -4144,7 +4144,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.plainTextEdit.setTextCursor(cursor)
         cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        brush = QBrush(QColor(color))
+        brush = QBrush(QColor(color.replace("#," "#70")))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
         foreground_colour = TextColor(color).recommendation
@@ -4755,7 +4755,7 @@ class DialogCodeText(QtWidgets.QWidget):
             fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
             fmt.setUnderlineColor(self._code_label_contrast_color(color))
         else:
-            brush = QBrush(QColor(color))
+            brush = QBrush(QColor(color.replace("#", "#70")))
             fmt.setBackground(brush)
             text_brush = QBrush(QColor(TextColor(color).recommendation))
             fmt.setForeground(text_brush)
@@ -4878,7 +4878,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
                 fmt.setUnderlineColor(self._code_label_contrast_color(color))
             else:
-                brush = QBrush(QColor(color))
+                brush = QBrush(QColor(color.replace("#", "#70")))
                 fmt.setBackground(brush)
                 # Foreground depends on the defined need_white_text color in color_selector
                 text_brush = QBrush(QColor(TextColor(color).recommendation))
@@ -6883,11 +6883,11 @@ class DialogCodeText(QtWidgets.QWidget):
                 return
             code_item['pos1'] = new_pos
 
+        '''OLD CODE - ERROR WITH EMOJIs. 
         cur = self.app.conn.cursor()
         cur.execute("select substr(fulltext,?,?) from source where id=?",
                     [code_item['pos0'] + 1, code_item['pos1'] - code_item['pos0'], code_item['fid']])
         res = cur.fetchone()
-        
         if not res:
             # Revert on extraction error
             code_item['pos0'] = orig_pos0
@@ -6897,9 +6897,17 @@ class DialogCodeText(QtWidgets.QWidget):
             self.highlight()
             return
         seltext = res[0]
+        print("SELTEXT FROM SQL:", seltext)
+        '''
+        cursor = self.ui.plainTextEdit.textCursor()
+        cursor.setPosition(code_item['pos0'])
+        cursor.setPosition(code_item['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        seltext = cursor.selectedText()
+        #print("SELTEXT FROM CURSOR POS:", seltext)
 
         try:
             sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
+            cur = self.app.conn.cursor()
             cur.execute(sql, [code_item['pos0'], code_item['pos1'], seltext, code_item['ctid']])
             self.app.conn.commit()
             self.app.delete_backup = False
