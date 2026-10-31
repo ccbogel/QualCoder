@@ -808,17 +808,16 @@ Click "Yes" to start now.')
     def update_placeholder_tab_styles(self):
         """Match placeholder browser colors and link styling to the application theme."""
 
-        action_log_background = self.ui.textEdit.viewport().palette().color(
-            QtGui.QPalette.ColorRole.Base
-        ).name()
-        text_color = self.ui.textEdit.viewport().palette().color(QtGui.QPalette.ColorRole.Text).name()
+        workspace_palette = self.ui.tabWidget.palette()
+        workspace_background = workspace_palette.color(QtGui.QPalette.ColorRole.Window).name()
+        text_color = workspace_palette.color(QtGui.QPalette.ColorRole.WindowText).name()
         browser_style = f"""
             QTextBrowser {{
-                background-color: {action_log_background};
+                background-color: {workspace_background};
                 border: none;
             }}
             QTextBrowser:focus {{
-                background-color: {action_log_background};
+                background-color: {workspace_background};
                 border: none;
             }}
         """
@@ -826,7 +825,7 @@ Click "Yes" to start now.')
             placeholder.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
             placeholder.setFrameShadow(QtWidgets.QFrame.Shadow.Plain)
             placeholder.viewport().setStyleSheet(
-                f"background-color: {action_log_background}; border: none;"
+                f"background-color: {workspace_background}; border: none;"
             )
             placeholder.setStyleSheet(browser_style)
             placeholder.document().setDefaultStyleSheet(
@@ -849,7 +848,7 @@ Click "Yes" to start now.')
         if placeholder is None:
             return
         highlight_color = self.app.highlight_color()
-        text_color = self.ui.textEdit.viewport().palette().color(QtGui.QPalette.ColorRole.Text).name()
+        text_color = self.ui.tabWidget.palette().color(QtGui.QPalette.ColorRole.WindowText).name()
         doc_font_size = self.app.settings["docfontsize"]
         doc_font_family = self.app.settings.get("docfont", self.app.settings["font"])
         placeholder_map = {
