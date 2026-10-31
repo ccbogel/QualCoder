@@ -73,7 +73,7 @@ from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
 from .helpers import Message
 from .html_parser import html_to_text
 from .information import ai_agent_tab_info, render_tab_info_markdown
-from .themes import palette_is_dark
+from .themes import AI_RESPONSE_COLORS, palette_is_dark
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -1521,8 +1521,8 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.toolButton_edit_title.setIcon(qta.icon('mdi6.pencil-outline'))
         self.ui.toolButton_edit_title.setIconSize(QtCore.QSize(16, 16))
         doc_font = f'font: {self.app.settings["docfontsize"]}pt \'{self.app.settings["font"]}\';'
-        light_colors = ("#356399", "#287368", "#666666")
-        dark_colors = ("#A5D6FF", "#4EC9B0", "#B5B5B5")
+        light_colors = (AI_RESPONSE_COLORS[0], "#287368", "#666666")
+        dark_colors = (AI_RESPONSE_COLORS[1], "#4EC9B0", "#B5B5B5")
 
         use_dark_colors = palette_is_dark(self.ui.plainTextEdit_question.palette())
 

@@ -4,6 +4,8 @@ All three themes use Qt Fusion to draw standard controls. Their geometry, focus
 indicators, hover states and button shapes are shared; colors come from QPalette.
 
 - `native` uses Qt's system palette, including light/dark appearance and accent colors.
+  On macOS, icons and other application accents share the AI chat response blue:
+  `#356399` in light mode and `#A5D6FF` in dark mode.
 - `original` uses a fixed light palette with neutral gray surfaces and the original bright orange accent.
   Selections have a black background with white text, independently of the accent.
 - `dark` uses a fixed dark palette with neutral gray surfaces and a bright orange accent.

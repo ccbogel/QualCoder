@@ -5,6 +5,9 @@ import platform
 from PyQt6 import QtGui, QtWidgets
 
 
+# Shared AI response and native macOS accent colors (light, dark).
+AI_RESPONSE_COLORS = ("#356399", "#A5D6FF")
+
 STYLE_OPTIONS = ["native", "original", "dark"]
 LEGACY_THEMES = {
     "blue": "original",

@@ -27,7 +27,6 @@ import datetime
 import locale as py_locale
 import logging
 import os
-import platform
 import shutil
 import sqlite3
 import sys
@@ -54,7 +53,7 @@ from qualcoder.ai_runtime import (
 )
 from qualcoder.helpers import get_default_user_directory, Message
 from qualcoder.speakers import speaker_coder_name
-from .themes import normalize_theme, theme_palette
+from .themes import AI_RESPONSE_COLORS, normalize_theme, palette_is_dark, theme_palette
 
 qc_config_folder = Path('~').expanduser() / '.qualcoder'
 logger = logging.getLogger(__name__)
@@ -1128,14 +1127,13 @@ class App(object):
             self._native_palette_connected = True
 
     def highlight_color(self) -> str:
-        """Return the theme accent independently of text selection colors."""
+        """Return the application accent for the current theme and platform."""
         if self.settings['stylesheet'] in ('original', 'dark'):
             return '#f89407'
+        if self.settings['stylesheet'] == 'native' and sys.platform == 'darwin':
+            return AI_RESPONSE_COLORS[1 if palette_is_dark() else 0]
         palette = QtWidgets.QApplication.instance().palette()
-        color_role = QtGui.QPalette.ColorRole.Highlight
-        if self.settings['stylesheet'] == 'native' and platform.system() == 'Darwin':
-            color_role = getattr(QtGui.QPalette.ColorRole, 'Accent', color_role)
-        return palette.color(color_role).name(QtGui.QColor.NameFormat.HexRgb)
+        return palette.color(QtGui.QPalette.ColorRole.Highlight).name(QtGui.QColor.NameFormat.HexRgb)
 
     def qtawesome_icon_color(self) -> QtGui.QColor:
         """Return the foreground color for toolbar and button icons."""
