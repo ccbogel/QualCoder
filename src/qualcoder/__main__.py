@@ -334,11 +334,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project_panel_colors = {}
         self.action_log_visible = True
 
-        if platform.system() in ("Windows", "Darwin") and self.app.settings['stylesheet'] == "native":
-            # Use Fusion on Windows and macOS for consistent custom navigation rendering.
-            # It also avoids rendering issues with the native Windows dark style.
-            QtWidgets.QApplication.instance().setStyle("Fusion")
-
         QtWidgets.QMainWindow.__init__(self)
         self.external_mcp = ExternalMcpController(self.app, self)
         self.external_mcp.status_changed.connect(self._external_mcp_status_changed)
@@ -351,11 +346,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.init_action_log()
         self.init_placeholder_tab_layouts()
-        # Test of macOS menu bar
-        if self.app.settings['stylesheet'] == "native":
-            self.ui.menubar.setNativeMenuBar(True)
-        else:
-            self.ui.menubar.setNativeMenuBar(False)
+        # Keep platform menu integration consistent across themes.
+        self.ui.menubar.setNativeMenuBar(True)
         self.ui.textEdit.append(
                     f'<p><b>{html.escape(self.app.version)}</b> &middot; '
                     f'<a href="qualcoder://action/about">{html.escape(_("About"))}</a></p>')
@@ -4246,13 +4238,13 @@ def gui():
     if sys.platform in ["linux", "bsd"]: 
         QtWidgets.QApplication.setDesktopFileName("QualCoder")
         
-    #if platform.system() in ("Windows", "Darwin") and settings.get('stylesheet') == "native":
-    #    # Select Fusion before QApplication initializes the platform's native style.
+    # Prefer Fusion during initialization, then enforce it before applying colors.
     os.environ.setdefault("QT_STYLE_OVERRIDE", "Fusion")
     # Native video frame must not force sibling widgets native
     QtWidgets.QApplication.setAttribute(
         QtCore.Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
     app = QtWidgets.QApplication(sys.argv)
+    app.setStyle("Fusion")
     app._qc_installed_translators = []
     # Mouse wheel must not change closed comboboxes by accident, in any dialog
     app._qc_combo_wheel_guard = ComboWheelGuard(app)
@@ -4262,8 +4254,7 @@ def gui():
     QtGui.QFontDatabase.addApplicationFont(str(qc_config_folder / "NotoSans-Regular.ttf"))
     # DroidSandMono - for wordcloud
     install_droid_sans_mono()
-    stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
-    app.setStyleSheet(stylesheet)
+    qual_app.apply_theme(settings)
     qta.reset_cache()
     qta.set_defaults(
         color=qual_app.qtawesome_icon_color,

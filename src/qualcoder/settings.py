@@ -44,6 +44,7 @@ from .coder_names import DialogCoderNames
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
 from .helpers import get_default_user_directory, Message
+from .themes import STYLE_OPTIONS
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
@@ -81,7 +82,6 @@ Notes
 FONT_SIZES = [8, 10, 12, 14, 16, 18]        # comboBox_fontsize / codetree / docfontsize  
 BACKUP_COUNTS = [0, 1, 2, 3, 4, 5]          # comboBox_backups  
 CONTEXT_CHARS = [100, 200, 300]             # comboBox_surrounding_chars  
-STYLE_OPTIONS = ["native", "original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow"]
 HIGHLIGHT_STYLE_OPTIONS = ["marker", "underline"]
 MAIN_TABS_OPTIONS = ["top", "left"]
 

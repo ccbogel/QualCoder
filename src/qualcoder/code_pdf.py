@@ -458,7 +458,7 @@ class PdfView(QtWidgets.QGraphicsView):
         self.viewport().setMouseTracking(True)
         # Initial cursor for the default mode (text): the text-selection I-beam.
         self.viewport().setCursor(Qt.CursorShape.IBeamCursor)
-        if self.dialog.app.settings.get('stylesheet', '') in ('dark', 'rainbow'):
+        if self.palette().color(QtGui.QPalette.ColorRole.Base).lightness() < 128:
             self.setBackgroundBrush(QColor(45, 45, 48))
         else:
             self.setBackgroundBrush(QColor(208, 209, 212))

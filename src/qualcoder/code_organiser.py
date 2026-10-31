@@ -1801,25 +1801,10 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         painter.setPen(pen)
         painter.drawLine(p1, pos)
 
-    def _link_color(self):
-        """ theme-aware hierarchy line colour. The default gray is nearly
-        invisible on the dark themes, so use a light gray there (and on any native
-        theme whose base colour is dark). """
-        try:
-            sheet = self.parent.app.settings.get('stylesheet', 'original')
-        except Exception:
-            sheet = 'original'
-        if sheet in ('dark', 'rainbow'):
-            return '#b0b0b0'
-        if sheet == 'native':
-            try:
-                base = QtWidgets.QApplication.instance().palette().color(
-                    QtGui.QPalette.ColorRole.Base)
-                if base.lightness() < 128:
-                    return '#b0b0b0'
-            except Exception:
-                pass
-        return '#555555'
+    def _link_color(self) -> str:
+        """Return a hierarchy line color visible against the current background."""
+        base_color = QtWidgets.QApplication.instance().palette().color(QtGui.QPalette.ColorRole.Base)
+        return '#b0b0b0' if base_color.lightness() < 128 else '#555555'
 
     def set_width(self, width):
         """ Resize scene width. """

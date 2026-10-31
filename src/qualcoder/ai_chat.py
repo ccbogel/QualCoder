@@ -73,6 +73,7 @@ from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
 from .helpers import Message
 from .html_parser import html_to_text
 from .information import ai_agent_tab_info, render_tab_info_markdown
+from .themes import palette_is_dark
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -1520,22 +1521,10 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.toolButton_edit_title.setIcon(qta.icon('mdi6.pencil-outline'))
         self.ui.toolButton_edit_title.setIconSize(QtCore.QSize(16, 16))
         doc_font = f'font: {self.app.settings["docfontsize"]}pt \'{self.app.settings["font"]}\';'
-        light_colors = ("#356399", "#287368", "#808080")
+        light_colors = ("#356399", "#287368", "#666666")
         dark_colors = ("#A5D6FF", "#4EC9B0", "#B5B5B5")
 
-        stylesheet = self.app.settings["stylesheet"]
-        use_dark_colors = stylesheet in ("dark", "rainbow")
-        if stylesheet == "native":
-            try:
-                use_dark_colors = (
-                    QGuiApplication.styleHints().colorScheme()
-                    == QtCore.Qt.ColorScheme.Dark
-                )
-            except AttributeError as exception:
-                print(f"Using an older PyQt6 version? {exception}")
-                logger.debug(
-                    "Could not determine the native color scheme: %s", exception
-                )
+        use_dark_colors = palette_is_dark(self.ui.plainTextEdit_question.palette())
 
         (
             self.ai_response_color,
@@ -1578,26 +1567,8 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.scrollArea_ai_output.setStyleSheet(f"QScrollArea#scrollArea_ai_output {{ {output_background_style} }}")
         self.ui.scrollArea_ai_output.viewport().setStyleSheet(output_background_style)
         self.ui.scrollArea_ai_output_contents.setStyleSheet(output_background_style)
-        default_panel_color = self.ui.widget_chat.palette().color(self.ui.widget_chat.backgroundRole())
-        combo_background_color = default_panel_color.name()
-        combo_text_color = self.ui.widget_chat.palette().color(QPalette.ColorRole.WindowText).name()
-        if self.app.settings['stylesheet'] not in ('dark', 'rainbow', 'native'):
-            combo_background_color = "#fafafa"
-            combo_text_color = "#000000"
-        combo_style = f"""
-            QComboBox {{
-                background-color: {combo_background_color};
-                color: {combo_text_color};
-            }}
-            QComboBox QAbstractItemView {{
-                background-color: {combo_background_color};
-                color: {combo_text_color};
-            }}
-        """
-        self.ui.comboBox_ai_chats.setStyleSheet(combo_style)
         tree_font = QtGui.QFont(self.app.settings["font"], self.app.settings["treefontsize"], QtGui.QFont.Weight.Normal)
         self.ui.comboBox_ai_chats.view().setFont(tree_font)
-        self.ui.comboBox_ai_permissions.setStyleSheet(combo_style)
         self.update_chat_window()
 
     def refresh_placeholder_if_visible(self) -> None:
