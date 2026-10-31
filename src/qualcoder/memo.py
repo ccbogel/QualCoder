@@ -26,15 +26,21 @@ import logging
 import re
 
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-from PyQt6 import QtWidgets, QtCore
 from odf.opendocument import OpenDocumentText  # For ODT export
 from odf.style import Style, TextProperties  # For ODT export
-from odf.text import H as OdfHeading, P as OdfParagraph, Span as OdfSpan  # For ODT export
+from odf.text import H as OdfHeading  # For ODT export
+from odf.text import P as OdfParagraph
+from odf.text import Span as OdfSpan
+from PyQt6 import QtCore, QtWidgets
 
 from .GUI.ui_dialog_memo import Ui_Dialog_memo
 from .GUI.ui_dialog_select_quote import Ui_Dialog_select_quote
-from .helpers import ExportDirectoryPathDialog, MarkdownHighlighter, Message, msecs_to_hours_mins_secs
-
+from .helpers import (
+    ExportDirectoryPathDialog,
+    MarkdownHighlighter,
+    Message,
+    msecs_to_hours_mins_secs,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +86,7 @@ class DialogMemo(QtWidgets.QDialog):
 
     def __init__(self, app, title:str="", memo:str="", clear_button:str="show", tooltip:str="",
                  entity_type:str="", entity_id=None):
-        super(DialogMemo, self).__init__(parent=None)  # Overrride accept method
+        super().__init__(parent=None)  # Overrride accept method
 
         self.app = app
         self.memo = memo
@@ -210,7 +216,7 @@ class DialogMemo(QtWidgets.QDialog):
         """ Accepted button overridden method. """
 
         self.memo = self.ui.textEdit.toPlainText()
-        super(DialogMemo, self).accept()
+        super().accept()
 
 
 class DialogSelectQuote(QtWidgets.QDialog):
@@ -225,7 +231,7 @@ class DialogSelectQuote(QtWidgets.QDialog):
     TEXT_COL = 4
 
     def __init__(self, app, entity_type:str, entity_id=None):
-        super(DialogSelectQuote, self).__init__(parent=None)
+        super().__init__(parent=None)
 
         self.app = app
         self.entity_type = entity_type
@@ -467,7 +473,7 @@ class DialogSelectReference(QtWidgets.QDialog):
     FILES_COL = 2
 
     def __init__(self, app, entity_type:str, entity_id=None):
-        super(DialogSelectReference, self).__init__(parent=None)
+        super().__init__(parent=None)
 
         self.app = app
         self.entity_type = entity_type

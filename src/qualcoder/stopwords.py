@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Stopwords  for WordClouds.
 Each variable uses the 2-letter ISO language code.

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -304,10 +302,11 @@ class DialogSelectItems(QtWidgets.QDialog):
                     selected.append(d)
             return selected
 
+QtCore_QModelIndex=QtCore.QModelIndex()
 
 class ListModel(QtCore.QAbstractListModel):
     def __init__(self, data_list, parent=None, checkable=False, checked_keys=None, key_func=None):
-        super(ListModel, self).__init__(parent)
+        super().__init__(parent)
         self.list = data_list
         self.checkable = checkable
         # Conjunto compartido de identidades marcadas (lo mantiene el dialogo).
@@ -315,11 +314,11 @@ class ListModel(QtCore.QAbstractListModel):
         self.checked_keys = checked_keys if checked_keys is not None else set()
         self.key_func = key_func if key_func is not None else (lambda d: ('name', d.get('name')))
 
-    def rowCount(self, parent=QtCore.QModelIndex()):
+    def rowCount(self, parent=QtCore_QModelIndex):
         return len(self.list)
 
     def flags(self, index):
-        base_flags = super(ListModel, self).flags(index)
+        base_flags = super().flags(index)
         if self.checkable and index.isValid():
             return base_flags | QtCore.Qt.ItemFlag.ItemIsUserCheckable
         return base_flags
@@ -365,4 +364,4 @@ class ListModel(QtCore.QAbstractListModel):
                 self.checked_keys.discard(key)
             self.dataChanged.emit(index, index, [role])
             return True
-        return super(ListModel, self).setData(index, value, role)
+        return super().setData(index, value, role)

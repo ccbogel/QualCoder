@@ -21,10 +21,11 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
-from PyQt6 import QtCore, QtWidgets
-from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
-from PyQt6.QtMultimediaWidgets import QVideoWidget
 import logging
+
+from PyQt6 import QtCore, QtWidgets
+from PyQt6.QtMultimedia import QAudioOutput, QMediaPlayer
+from PyQt6.QtMultimediaWidgets import QVideoWidget
 
 logger = logging.getLogger(__name__)
 

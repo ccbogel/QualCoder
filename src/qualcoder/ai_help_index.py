@@ -1,6 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-
-"""
+﻿"""
 Local help index for QualCoder AI assistance.
 
 The English Markdown manual from the QualCoder website repository is treated as
@@ -37,8 +35,8 @@ import os
 import re
 import sqlite3
 import threading
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import requests
 import yaml
@@ -70,8 +68,8 @@ class AiHelpIndex:
         self.db_path = os.path.join(self.help_dir, "help_index.sqlite")
         self._lock = threading.Lock()
 
-    def search(self, queries: List[str], page_size: int = DEFAULT_SEARCH_PAGE_SIZE,
-               cursor: Optional[str] = None) -> Dict[str, Any]:
+    def search(self, queries: list[str], page_size: int = DEFAULT_SEARCH_PAGE_SIZE,
+               cursor: str | None = None) -> dict[str, Any]:
         """Search the indexed help chunks with one or more English queries."""
 
         normalized_queries = [q.strip() for q in queries if str(q).strip() != ""]
@@ -103,7 +101,7 @@ class AiHelpIndex:
 
         has_more = len(rows) > page_size
         result_rows = rows[:page_size]
-        results: List[Dict[str, Any]] = []
+        results: list[dict[str, Any]] = []
         for row in result_rows:
             slug = str(row["slug"])
             title = str(row["title"])
@@ -129,7 +127,7 @@ class AiHelpIndex:
             "index_info": sync_info,
         }
 
-    def read_page(self, slug: str, start: int = 0, length: int = PAGE_READ_DEFAULT_CHARS) -> Dict[str, Any]:
+    def read_page(self, slug: str, start: int = 0, length: int = PAGE_READ_DEFAULT_CHARS) -> dict[str, Any]:
         """Read one cached help page by slug."""
 
         normalized_slug = self._normalize_slug(slug)
@@ -171,7 +169,7 @@ class AiHelpIndex:
             "index_info": sync_info,
         }
 
-    def list_pages(self) -> Dict[str, Any]:
+    def list_pages(self) -> dict[str, Any]:
         """Return indexed help pages for overview/debugging purposes."""
 
         self._ensure_index_ready()
@@ -223,7 +221,7 @@ class AiHelpIndex:
                 elif local_page_count <= 0:
                     self._sync_from_remote(conn)
 
-    def _sync_required(self, meta: Dict[str, str]) -> bool:
+    def _sync_required(self, meta: dict[str, str]) -> bool:
         """Return True when the cached help index should be refreshed."""
 
         last_successful_sync = meta.get("last_successful_sync_at", "").strip()
@@ -234,9 +232,9 @@ class AiHelpIndex:
         except ValueError:
             return True
         if last_sync_dt.tzinfo is None:
-            last_sync_dt = last_sync_dt.replace(tzinfo=timezone.utc)
+            last_sync_dt = last_sync_dt.replace(tzinfo=UTC)
         sync_interval = timedelta(hours=DEFAULT_SYNC_INTERVAL_HOURS)
-        return datetime.now(timezone.utc) - last_sync_dt >= sync_interval
+        return datetime.now(UTC) - last_sync_dt >= sync_interval
 
     def _sync_from_remote(self, conn: sqlite3.Connection) -> None:
         """Fetch the current English docs tree and refresh changed pages."""
@@ -271,7 +269,7 @@ class AiHelpIndex:
         conn.commit()
         conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
 
-    def _fetch_remote_page_listing(self) -> List[Dict[str, str]]:
+    def _fetch_remote_page_listing(self) -> list[dict[str, str]]:
         """Return current English help pages from the GitHub repo tree."""
 
         headers = {
@@ -284,9 +282,9 @@ class AiHelpIndex:
         payload = response.json()
         tree = payload.get("tree", [])
         if not isinstance(tree, list):
-            raise ValueError("Unexpected GitHub tree response for help docs.")
+            raise TypeError("Unexpected GitHub tree response for help docs.")
 
-        pages: List[Dict[str, str]] = []
+        pages: list[dict[str, str]] = []
         active_root = self._detect_help_docs_root(tree)
         for item in tree:
             if not isinstance(item, dict):
@@ -312,7 +310,7 @@ class AiHelpIndex:
         pages.sort(key=lambda item: item["slug"].lower())
         return pages
 
-    def _detect_help_docs_root(self, tree: List[Dict[str, Any]]) -> str:
+    def _detect_help_docs_root(self, tree: list[dict[str, Any]]) -> str:
         """Return the active English docs root used by the remote repository."""
 
         for root in HELP_DOCS_ROOT_CANDIDATES:
@@ -337,7 +335,7 @@ class AiHelpIndex:
         response.encoding = response.encoding or "utf-8"
         return response.text
 
-    def _parse_markdown_page(self, slug: str, markdown: str) -> Tuple[str, str, List[Dict[str, Any]]]:
+    def _parse_markdown_page(self, slug: str, markdown: str) -> tuple[str, str, list[dict[str, Any]]]:
         """Extract title, plain text, and indexed chunks from one Markdown page."""
 
         _, body = self._split_frontmatter(markdown)
@@ -345,13 +343,13 @@ class AiHelpIndex:
         plain_text = self._markdown_to_text(body)
         sections = self._split_sections(body, fallback_heading=title)
 
-        chunks: List[Dict[str, Any]] = []
+        chunks: list[dict[str, Any]] = []
         chunk_index = 0
         for heading, section_text in sections:
             paragraphs = [p.strip() for p in re.split(r"\n\s*\n", section_text) if p.strip() != ""]
             if len(paragraphs) == 0:
                 paragraphs = [section_text.strip()]
-            current_parts: List[str] = []
+            current_parts: list[str] = []
             current_length = 0
             for paragraph in paragraphs:
                 paragraph_text = self._markdown_to_text(paragraph).strip()
@@ -390,8 +388,8 @@ class AiHelpIndex:
             chunks.append({"chunk_index": 0, "heading": title, "body": plain_text.strip()})
         return title, plain_text, chunks
 
-    def _replace_page(self, conn: sqlite3.Connection, page: Dict[str, str], title: str,
-                      markdown: str, plain_text: str, chunks: List[Dict[str, Any]]) -> None:
+    def _replace_page(self, conn: sqlite3.Connection, page: dict[str, str], title: str,
+                      markdown: str, plain_text: str, chunks: list[dict[str, Any]]) -> None:
         """Replace one cached page and all indexed chunks."""
 
         conn.execute("DELETE FROM help_chunks_fts WHERE slug = ?", (page["slug"],))
@@ -434,7 +432,7 @@ class AiHelpIndex:
         conn.execute("DELETE FROM help_chunks_fts WHERE slug = ?", (slug,))
         conn.execute("DELETE FROM help_pages WHERE slug = ?", (slug,))
 
-    def _split_frontmatter(self, text: str) -> Tuple[Dict[str, Any], str]:
+    def _split_frontmatter(self, text: str) -> tuple[dict[str, Any], str]:
         """Return YAML frontmatter metadata and body without the frontmatter block."""
 
         raw_text = str(text if text is not None else "")
@@ -461,7 +459,7 @@ class AiHelpIndex:
         title_from_slug = slug.replace("-", " ").replace(".", ". ").strip()
         return title_from_slug if title_from_slug != "" else slug
 
-    def _split_sections(self, body: str, fallback_heading: str) -> List[Tuple[str, str]]:
+    def _split_sections(self, body: str, fallback_heading: str) -> list[tuple[str, str]]:
         """Split one page into heading-based sections."""
 
         matches = list(HEADING_PATTERN.finditer(body))
@@ -469,7 +467,7 @@ class AiHelpIndex:
             cleaned = body.strip()
             return [(fallback_heading, cleaned)] if cleaned != "" else []
 
-        sections: List[Tuple[str, str]] = []
+        sections: list[tuple[str, str]] = []
         intro_text = body[:matches[0].start()].strip()
         if intro_text != "":
             sections.append((fallback_heading, intro_text))
@@ -509,10 +507,10 @@ class AiHelpIndex:
 
         return self._markdown_to_text(text).replace("\n", " ").strip()
 
-    def _build_fts_query(self, queries: List[str]) -> str:
+    def _build_fts_query(self, queries: list[str]) -> str:
         """Build one conservative FTS5 MATCH query from natural-language search prompts."""
 
-        clauses: List[str] = []
+        clauses: list[str] = []
         for query in queries:
             tokens = re.findall(r"[A-Za-z0-9][A-Za-z0-9._:/+-]*", query)
             if len(tokens) == 0:
@@ -531,12 +529,11 @@ class AiHelpIndex:
         """Normalize help page references."""
 
         value = str(slug if slug is not None else "").strip()
-        if value.endswith(".md"):
-            value = value[:-3]
+        value = value.removesuffix(".md")
         value = value.strip().strip("/")
         return value
 
-    def _cursor_to_offset(self, cursor: Optional[str]) -> int:
+    def _cursor_to_offset(self, cursor: str | None) -> int:
         """Parse one numeric cursor into an offset."""
 
         if cursor is None or str(cursor).strip() == "":
@@ -607,13 +604,13 @@ class AiHelpIndex:
         )
         conn.commit()
 
-    def _read_meta(self, conn: sqlite3.Connection) -> Dict[str, str]:
+    def _read_meta(self, conn: sqlite3.Connection) -> dict[str, str]:
         """Return all sync metadata as a simple dict."""
 
         rows = conn.execute("SELECT key, value FROM help_meta").fetchall()
         return {str(row["key"]): str(row["value"]) for row in rows}
 
-    def _write_meta(self, conn: sqlite3.Connection, values: Dict[str, str]) -> None:
+    def _write_meta(self, conn: sqlite3.Connection, values: dict[str, str]) -> None:
         """Upsert sync metadata values."""
 
         for key, value in values.items():
@@ -626,7 +623,7 @@ class AiHelpIndex:
                 (str(key), str(value)),
             )
 
-    def _read_sync_info(self, conn: sqlite3.Connection) -> Dict[str, Any]:
+    def _read_sync_info(self, conn: sqlite3.Connection) -> dict[str, Any]:
         """Build one small sync status payload for MCP responses."""
 
         meta = self._read_meta(conn)
@@ -643,4 +640,4 @@ class AiHelpIndex:
     def _utc_now_iso(self) -> str:
         """Return the current UTC timestamp in ISO format."""
 
-        return datetime.now(timezone.utc).isoformat()
+        return datetime.now(UTC).isoformat()

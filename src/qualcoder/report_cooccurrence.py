@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,16 +19,17 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from copy import deepcopy
-from datetime import datetime
 import html
 import logging
-import openpyxl
-from openpyxl.utils import get_column_letter
-from openpyxl.styles import PatternFill
-from PyQt6 import QtCore, QtWidgets, QtGui
 import sqlite3
+from copy import deepcopy
+from datetime import datetime
+
+import openpyxl
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from openpyxl.styles import PatternFill
+from openpyxl.utils import get_column_letter
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .GUI.ui_dialog_cooccurrence import Ui_Dialog_Coocurrence
 from .helpers import ExportDirectoryPathDialog, Message
@@ -41,11 +40,16 @@ logger = logging.getLogger(__name__)
 
 # --- Imports for static image export
 # try:
-import networkx as nx
-from networkx.algorithms.community import louvain_communities, greedy_modularity_communities
 import matplotlib
+import networkx as nx
+from networkx.algorithms.community import (
+    greedy_modularity_communities,
+    louvain_communities,
+)
+
 matplotlib.use('Agg')  # Static engine to generate PNGs without a graphical interface
 import matplotlib.pyplot as plt
+
 # import matplotlib.cm as cm  # Not used ?
     
 '''    HAS_NETWORK_LIBS = True
@@ -231,7 +235,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         selection_list = [{'id': -1, 'name': ''}]
         for file_name in self.app.get_text_filenames():
-            selection_list.append(file_name)
+            selection_list.copy().append(file_name)
         ui = DialogSelectItems(self.app, selection_list, _("Select files"), "multi")
         ok = ui.exec()
         if not ok:
@@ -329,7 +333,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         selection_list = [{'id': -1, 'name': ''}]
         for code_ in self.codes:
-            selection_list.append(code_)
+            selection_list.copy().append(code_)
         ui = DialogSelectItems(self.app, selection_list, _("Select codes"), "multi")
         ok = ui.exec()
         if not ok:
@@ -368,7 +372,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.selected_categories_string = ""
         selection_list = [{'id': -1, 'name': ''}]
         for category in self.categories:
-            selection_list.append(category)
+            selection_list.copy().append(category)
         ui = DialogSelectItems(self.app, selection_list, _("Select categories"), "multi")
         ok = ui.exec()
         if not ok:
@@ -501,8 +505,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             if row_pos is None or col_pos is None:
                 continue
             self.data_counts[row_pos][col_pos] += 1
-            if self.data_counts[row_pos][col_pos] > self.max_count:
-                self.max_count = self.data_counts[row_pos][col_pos]
+            self.max_count = max(self.max_count, self.data_counts[row_pos][col_pos])
             '''print(r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'],
                   r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'])'''
             res_list = [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'],
@@ -520,8 +523,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             for col, item_data in enumerate(row_data):
                 if self.data_counts[row][col] > 0:
                     color_range_index = int(self.data_counts[row][col] / self.max_count * 5) - 1
-                    if color_range_index < 0:
-                        color_range_index = 0
+                    color_range_index = max(color_range_index, 0)
                     self.data_colors[row][col] = colors[color_range_index]
         self.fill_table()
 
@@ -1333,7 +1335,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             relation = "O"
         inter_area = inter_w * inter_h
         smaller = min((ax1 - ax0) * (ay1 - ay0), (bx1 - bx0) * (by1 - by0))
-        pct = int(round(100 * inter_area / smaller)) if smaller > 0 else 0
+        pct = round(100 * inter_area / smaller) if smaller > 0 else 0
         union = (min(ax0, bx0), min(ay0, by0),
                  max(ax1, bx1) - min(ax0, bx0), max(ay1, by1) - min(ay0, by0))
         return {"cid0": c0[1], "cid1": c1[1], "relation": relation,

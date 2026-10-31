@@ -21,13 +21,14 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-import logging
 import json
-from pathlib import Path
+import logging
 import random
 import string
-from PyQt6 import QtCore, QtWidgets
+from pathlib import Path
+
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from PyQt6 import QtCore, QtWidgets
 
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_pseudonyms import Ui_Dialog_pseudonyms
@@ -128,7 +129,7 @@ class Pseudonyms(QtWidgets.QDialog):
 
         self.load_json()
         rows = self.ui.tableWidget.rowCount()
-        for r in range(0, rows):
+        for r in range(rows):
             self.ui.tableWidget.removeRow(0)
         for row, data in enumerate(self.data):
             self.ui.tableWidget.insertRow(row)

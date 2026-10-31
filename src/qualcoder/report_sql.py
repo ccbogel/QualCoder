@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,22 +19,21 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from PyQt6 import QtCore, QtGui
-from PyQt6 import QtWidgets
+import csv
+import logging
+import re
+import sqlite3
+from datetime import datetime
+
+import openpyxl
+import qtawesome as qta  # https://pictogrammers.com/library/mdi/
+from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 
-import csv
-from datetime import datetime
-import logging
-import openpyxl
-import re
-import qtawesome as qta  # https://pictogrammers.com/library/mdi/
-import sqlite3
-
 from .GUI.ui_dialog_SQL import Ui_Dialog_sql
-from .save_sql_query import DialogSaveSql
 from .helpers import ExportDirectoryPathDialog, Message
 from .highlighter import Highlighter
+from .save_sql_query import DialogSaveSql
 
 logger = logging.getLogger(__name__)
 
@@ -168,7 +165,7 @@ class DialogSQL(QtWidgets.QDialog):
         results = cur.fetchall()
         header = []
         if cur.description is not None:
-            header = list(map(lambda x: x[0], cur.description))  # Gets column names
+            header = [x[0] for x in cur.description]  # Gets column names
         filename = "sql_report.xlsx"
         export_dir = ExportDirectoryPathDialog(self.app, filename)
         filepath = export_dir.filepath
@@ -219,7 +216,7 @@ class DialogSQL(QtWidgets.QDialog):
         results = cur.fetchall()
         header = []
         if cur.description is not None:
-            header = list(map(lambda x: x[0], cur.description))  # Gets column names
+            header = [x[0] for x in cur.description]  # Gets column names
         filename = "sql_report.csv"
         export_dir = ExportDirectoryPathDialog(self.app, filename)
         filepath = export_dir.filepath
@@ -288,11 +285,11 @@ class DialogSQL(QtWidgets.QDialog):
         self.sql = str(self.sql)
         QtWidgets.QApplication.processEvents()  # Stops gui freeze
         try:
-            time0 = datetime.now()
+            time0 = datetime.now().astimezone()
             cur.execute(self.sql)
             self.ui.label.setToolTip("")
             self.results = cur.fetchall()
-            time1 = datetime.now()
+            time1 = datetime.now().astimezone()
             timediff = time1 - time0
             self.queryTime = f"Time:{timediff}"
             self.ui.label.setToolTip(self.queryTime)
@@ -320,7 +317,7 @@ class DialogSQL(QtWidgets.QDialog):
                 self.ui.label.setText(text)
             col_names = []
             if cur.description is not None:
-                col_names = list(map(lambda x: x[0], cur.description))  # Gets column names
+                col_names = [x[0] for x in cur.description]  # Gets column names
             self.ui.tableWidget_results.setColumnCount(len(col_names))
             self.ui.tableWidget_results.setHorizontalHeaderLabels(col_names)
             self.file_data.append(col_names)
@@ -368,7 +365,7 @@ class DialogSQL(QtWidgets.QDialog):
         self.schema = table_dict
 
         # Fill tree widget with tables and views
-        tables_and_views = [k for k in self.schema.keys()]
+        tables_and_views = [k for k in self.schema]
         tables_and_views.sort()
         self.ui.treeWidget.clear()
         for table_name in tables_and_views:
@@ -639,7 +636,7 @@ class NewTableWidget(QtWidgets.QTableWidget):
     cell_value = None
 
     def __init__(self, parent=None):
-        super(NewTableWidget, self).__init__(parent)
+        super().__init__(parent)
 
     def contextMenuEvent(self, event):
 
@@ -716,7 +713,7 @@ class TableWidgetItem(QtWidgets.QTableWidgetItem):
         With some modification for unicode and numerics """
 
     def __init__(self, value):
-        super(TableWidgetItem, self).__init__(value)
+        super().__init__(value)
 
     def __lt__(self, other):
         """ Not sure about the if isinstance statement. """

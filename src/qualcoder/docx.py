@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Open and modify Microsoft Word 2007 docx files (called 'OpenXML' and
 'Office OpenXML' by Microsoft)
@@ -35,7 +33,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 import logging
 import xml.etree.ElementTree as etree
 import zipfile
-
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +92,7 @@ def getdocumenttext(document):
     # Since a single sentence might be spread over multiple text elements, iterate through each
     # paragraph, appending all text (t) children to that paragraphs text.
     for para in paralist:
-        paratext = u''
+        paratext = ''
         # Loop through each paragraph
         for element in para.iter():
             # Find t (text) elements
@@ -105,7 +102,7 @@ def getdocumenttext(document):
             elif element.tag == '{'+nsprefixes['w']+'}tab':
                 paratext = paratext + '\t'
         # Add our completed paragraph text to the list of paragraph text
-        if not len(paratext) == 0:
+        if len(paratext) != 0:
             paratextlist.append(paratext)
     return paratextlist
 

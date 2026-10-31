@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -20,24 +18,29 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
-from copy import copy
 import datetime
 import logging
+from copy import copy
+
 import openpyxl
+import qtawesome as qta
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.properties import Outline
-import qtawesome as qta
-
-from PyQt6 import QtGui, QtWidgets, QtCore
+from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
-from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-from .helpers import Message, ExportDirectoryPathDialog, init_persistent_tree_header, restore_persistent_tree_widths
+from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
+from .helpers import (
+    ExportDirectoryPathDialog,
+    Message,
+    init_persistent_tree_header,
+    restore_persistent_tree_widths,
+)
 from .information import DialogInformation
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
@@ -274,9 +277,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         msg = ""
         filenames = self.app.get_filenames()
         for i, f in enumerate(filenames):
-            if f['id'] in ui.result_file_ids:
-                if i < 20:
-                    msg += f"\n{f['name']}"
+            if f['id'] in ui.result_file_ids and i < 20:
+                msg += f"\n{f['name']}"
         if len(ui.result_file_ids) > 20:
             msg += f"\nand more. Total files: {len(ui.result_file_ids)}"
         Message(self.app, _("Files selected by attributes"), msg).exec()
@@ -572,7 +574,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
 
         header = ["Code Tree", "Id"]
         for coder in self.coders:
-            header.append(coder)
+            header.copy().append(coder)
         header.append("Total")
 
     def export_option_selected(self):
@@ -909,7 +911,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.treeWidget.clear()
         header = [_("Code Tree"), "Id", _("Text"), _("Image"), "A/V"]
         for coder in self.coders:
-            header.append(coder)
+            header.copy().append(coder)
         header.append("Total")
         self.ui.treeWidget.setColumnCount(len(header))
         self.ui.treeWidget.setHeaderLabels(header)

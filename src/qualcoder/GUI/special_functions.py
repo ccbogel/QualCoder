@@ -32,13 +32,12 @@ import os
 import sys
 import traceback
 
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_special_functions import Ui_Dialog_special_functions
-
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -64,7 +63,8 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
 
     def __init__(self, app, parent_textEdit, tab_coding, parent=None):
 
-        super(DialogSpecialFunctions, self).__init__(parent)
+        #super(DialogSpecialFunctions, self).__init__(parent)
+        super().__init__(parent)
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_special_functions()
         self.ui.setupUi(self)
@@ -116,8 +116,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         for r in res:
             new_pos0 = r[2] - delta
             # cannot have start pos less than start of text
-            if new_pos0 < 0:
-                new_pos0 = 0
+            new_pos0 = max(new_pos0, 0)
             # cannot have start pos larger than end pos
             if new_pos0 > r[3]:
                 new_pos0 = r[3] - 1
@@ -189,7 +188,8 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
     def accept(self):
         """ Overrride accept button. """
 
-        super(DialogSpecialFunctions, self).accept()
+        #super(DialogSpecialFunctions, self).accept()
+        super().accept()
 
     '''def menelic(self):
         """ Convert MAXQDA REFI-QDA export from many files into one text file.

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,14 +19,13 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from contextlib import closing
 import logging
-from pathlib import Path
 import sqlite3
+from contextlib import closing
+from pathlib import Path
 
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-
-from PyQt6 import QtWidgets, QtCore
+from PyQt6 import QtCore, QtWidgets
 
 from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
@@ -49,7 +46,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
 
     def __init__(self, app, parent_text_edit, tab_coding, parent=None):
 
-        super(DialogSpecialFunctions, self).__init__(parent)
+        super().__init__(parent)
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_special_functions()
         self.ui.setupUi(self)
@@ -238,8 +235,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         for r in res:
             new_pos0 = r[2] - delta
             # cannot have start pos less than start of text
-            if new_pos0 < 0:
-                new_pos0 = 0
+            new_pos0 = max(new_pos0, 0)
             # cannot have start pos larger than end pos
             if new_pos0 > r[3]:
                 new_pos0 = r[3] - 1
@@ -319,4 +315,4 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
     def accept(self):
         """ Override accept button. """
 
-        super(DialogSpecialFunctions, self).accept()
+        super().accept()

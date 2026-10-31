@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Prompt library editor for QualCoder.
 
@@ -34,16 +32,15 @@ from __future__ import annotations
 import logging
 import os
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Set, Tuple
 
-from PyQt6 import QtCore, QtWidgets, QtGui
-from PyQt6.QtGui import QClipboard, QKeySequence, QShortcut, QAction, QFont
-from PyQt6.QtCore import Qt
 import qtawesome as qta
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QAction, QClipboard, QFont, QKeySequence, QShortcut
 
 from .ai_agent_prompts import (
-    AiAgentPromptsCatalog,
     PROMPT_NAME_QT_PATTERN,
+    AiAgentPromptsCatalog,
     is_valid_prompt_folder_name,
     is_valid_prompt_name,
     is_windows_reserved_prompt_name,
@@ -60,10 +57,9 @@ from .ai_ui import (
     text_analysis_icon,
     topic_exploration_icon,
 )
+from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_ai_edit_prompts import Ui_Dialog_AiPrompts
 from .helpers import Message
-from .confirm_delete import DialogConfirmDelete
-
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -136,7 +132,7 @@ class EditorPromptRecord:
 class EditorFolderRecord:
     prompt_type: str
     relative_dir: str
-    scopes_present: Set[str]
+    scopes_present: set[str]
 
     def name(self) -> str:
         if self.relative_dir == "":
@@ -166,9 +162,9 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self.prompt_type = self.catalog.normalize_prompt_type(prompt_type)
         self.initial_prompt_name = self.catalog._normalize_prompt_name(initial_prompt_name)
         self.initial_prompt_scope = str(initial_prompt_scope if initial_prompt_scope is not None else "").strip()
-        self.prompts: List[EditorPromptRecord] = []
-        self.folders: List[EditorFolderRecord] = []
-        self.selected_prompt: Optional[EditorPromptRecord] = None
+        self.prompts: list[EditorPromptRecord] = []
+        self.folders: list[EditorFolderRecord] = []
+        self.selected_prompt: EditorPromptRecord | None = None
         self.dirty = False
         self.form_updating = True
         self.catalog.migrate_legacy_prompts_once()
@@ -329,7 +325,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self.dirty = False
 
     def _reload_folders(self) -> None:
-        folders_by_key: Dict[Tuple[str, str], EditorFolderRecord] = {}
+        folders_by_key: dict[tuple[str, str], EditorFolderRecord] = {}
         for scope in prompt_scopes:
             for prompt_type in prompt_types:
                 if self.prompt_type is not None and prompt_type != self.prompt_type:
@@ -363,7 +359,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
     def _remove_folder_scope_recursive(self, prompt_type: str, relative_dir: str, scope: str) -> None:
         normalized_dir = self._normalize_relative_dir(relative_dir)
         normalized_key = prompt_name_key(normalized_dir)
-        kept: List[EditorFolderRecord] = []
+        kept: list[EditorFolderRecord] = []
         for folder in self.folders:
             if folder.prompt_type != prompt_type:
                 kept.append(folder)
@@ -415,11 +411,11 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self.folders.sort(key=self._folder_sort_key)
         self.fill_tree()
 
-    def _scan_scope_dirs(self, scope: str, prompt_type: str) -> List[str]:
+    def _scan_scope_dirs(self, scope: str, prompt_type: str) -> list[str]:
         type_root = self._type_root_dir(scope, prompt_type)
         if type_root == "" or not os.path.isdir(type_root):
             return []
-        excluded_root_dirs: Set[str] = set()
+        excluded_root_dirs: set[str] = set()
         if prompt_type == "general":
             excluded_root_dirs = {
                 folder for folder in (
@@ -429,7 +425,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 )
                 if folder != ""
             }
-        result: List[str] = []
+        result: list[str] = []
         for dirpath, dirnames, _ in os.walk(type_root):
             dirnames[:] = [
                 dirname for dirname in dirnames
@@ -479,7 +475,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         text = str(value if value is not None else "").strip()
         if text == "":
             return ""
-        parts: List[str] = []
+        parts: list[str] = []
         for part in text.replace("\\", "/").split("/"):
             normalized_part = normalize_prompt_name_component(part)
             if normalized_part != "":
@@ -487,7 +483,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         return "/".join(parts)
 
     @classmethod
-    def _relative_dir_suffix(cls, relative_dir: str, parent_dir: str) -> Optional[str]:
+    def _relative_dir_suffix(cls, relative_dir: str, parent_dir: str) -> str | None:
         """Return the suffix below a parent directory, or ``None`` when unrelated."""
 
         relative_parts = cls._normalize_relative_dir(relative_dir).split("/")
@@ -533,9 +529,9 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return root
         return os.path.join(root, folder)
 
-    def _folder_direct_children(self, prompt_type: str, parent_dir: str) -> List[EditorFolderRecord]:
+    def _folder_direct_children(self, prompt_type: str, parent_dir: str) -> list[EditorFolderRecord]:
         normalized_parent = self._normalize_relative_dir(parent_dir)
-        result: List[EditorFolderRecord] = []
+        result: list[EditorFolderRecord] = []
         for folder in self.folders:
             if folder.prompt_type != prompt_type:
                 continue
@@ -545,7 +541,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         result.sort(key=lambda item: item.name().casefold())
         return result
 
-    def _prompts_in_dir(self, prompt_type: str, relative_dir: str) -> List[EditorPromptRecord]:
+    def _prompts_in_dir(self, prompt_type: str, relative_dir: str) -> list[EditorPromptRecord]:
         normalized_dir = self._normalize_relative_dir(relative_dir)
         result = [
             prompt
@@ -642,7 +638,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         parent_item,
         parent_dir: str,
         selected_path: str,
-        target_item_holder: Dict[str, Optional[QtWidgets.QTreeWidgetItem]],
+        target_item_holder: dict[str, QtWidgets.QTreeWidgetItem | None],
     ) -> None:
         for prompt in self._prompts_in_dir(prompt_type, parent_dir):
             prompt_item = self._make_prompt_item(parent_item, prompt)
@@ -661,7 +657,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self.form_updating = True
         try:
             selected_path = ""
-            target_item_holder: Dict[str, Optional[QtWidgets.QTreeWidgetItem]] = {"item": None}
+            target_item_holder: dict[str, QtWidgets.QTreeWidgetItem | None] = {"item": None}
             if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
                 selected_path = "|".join(self.tree_get_item_path(self.ui.treeWidget_prompts.selectedItems()[0]))
 
@@ -776,7 +772,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         scope: str,
         prompt_type: str,
         directory: str = "",
-    ) -> Optional[EditorPromptRecord]:
+    ) -> EditorPromptRecord | None:
         normalized_dir = self._normalize_relative_dir(directory)
         for prompt in self.prompts:
             if (
@@ -864,7 +860,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return "project"
         return "user"
 
-    def _selected_folder_context(self) -> Tuple[str, str]:
+    def _selected_folder_context(self) -> tuple[str, str]:
         if len(self.ui.treeWidget_prompts.selectedItems()) == 0:
             return self.prompt_type or "general", ""
         selected_item = self.ui.treeWidget_prompts.selectedItems()[0]
@@ -930,7 +926,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             counter += 1
         return f"{candidate}-{counter}"
 
-    def new_prompt(self, clicked: bool = False, pasted_prompt: Optional[Dict[str, str]] = None):
+    def new_prompt(self, clicked: bool = False, pasted_prompt: dict[str, str] | None = None):
         del clicked
         new_type, new_scope, new_dir = self._selection_context_for_new_prompt()
         if new_scope == "system":
@@ -1086,10 +1082,10 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return type_root
         return os.path.join(type_root, *normalized_dir.split("/"))
 
-    def _folder_scopes_for_item(self, item: QtWidgets.QTreeWidgetItem) -> List[str]:
+    def _folder_scopes_for_item(self, item: QtWidgets.QTreeWidgetItem) -> list[str]:
         return [scope for scope in str(item.data(0, ITEM_FOLDER_SCOPES_ROLE) or "").split("|") if scope != ""]
 
-    def _choose_scope_for_folder_operation(self, item: QtWidgets.QTreeWidgetItem, action_label: str) -> Optional[str]:
+    def _choose_scope_for_folder_operation(self, item: QtWidgets.QTreeWidgetItem, action_label: str) -> str | None:
         scopes = self._folder_scopes_for_item(item)
         if len(scopes) <= 1:
             return scopes[0] if scopes else None
@@ -1105,7 +1101,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return None
         return str(chosen_scope)
 
-    def _validate_folder_name(self, name: str) -> Optional[str]:
+    def _validate_folder_name(self, name: str) -> str | None:
         normalized = normalize_prompt_name_component(name)
         if normalized == "":
             Message(self.app, _('Edit prompts'), _('The folder name cannot be empty.'), "warning").exec()
@@ -1183,7 +1179,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         ):
             Message(self.app, _('Edit prompts'), _('A folder with the target name already exists.'), "warning").exec()
             return
-        updated_folders: List[EditorFolderRecord] = []
+        updated_folders: list[EditorFolderRecord] = []
         for folder in self.folders:
             if folder.prompt_type != prompt_type or scope not in folder.scopes_present:
                 updated_folders.append(folder)
@@ -1245,8 +1241,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             )
         ]
         self._remove_folder_scope_recursive(prompt_type, relative_dir, scope)
-        if self.selected_prompt is not None and self.selected_prompt.scope == scope and self.selected_prompt.prompt_type == prompt_type:
-            if self._relative_dir_suffix(self.selected_prompt.directory, relative_dir) is not None:
+        if self.selected_prompt is not None and self.selected_prompt.scope == scope and self.selected_prompt.prompt_type == prompt_type and self._relative_dir_suffix(self.selected_prompt.directory, relative_dir) is not None:
                 self.selected_prompt = None
         self._mark_dirty()
         self._refresh_tree_from_memory()
@@ -1331,7 +1326,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         QtCore.QTimer.singleShot(0, self._refresh_tree_from_memory)
         return True
 
-    def _drop_target_context(self, item: Optional[QtWidgets.QTreeWidgetItem]) -> Tuple[Optional[str], Optional[str]]:
+    def _drop_target_context(self, item: QtWidgets.QTreeWidgetItem | None) -> tuple[str | None, str | None]:
         if item is None:
             return None, None
         kind = str(item.data(0, ITEM_KIND_ROLE) or "")
@@ -1347,10 +1342,10 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
 
     def eventFilter(self, source, event):
         if source in (self.ui.treeWidget_prompts, self.ui.treeWidget_prompts.viewport()):
-            if event.type() in (QtCore.QEvent.Type.DragEnter, QtCore.QEvent.Type.DragMove):
-                if self.selected_prompt is not None and not self.selected_prompt.is_system:
+            if event.type() in (QtCore.QEvent.Type.DragEnter, QtCore.QEvent.Type.DragMove) and self.selected_prompt is not None and not self.selected_prompt.is_system:
                     event.accept()
                     return True
+            
             if event.type() == QtCore.QEvent.Type.Drop:
                 if self.selected_prompt is None or self.selected_prompt.is_system:
                     event.ignore()
@@ -1385,9 +1380,9 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         name: str,
         prompt_type: str,
         scope: str,
-        current_prompt: Optional[EditorPromptRecord] = None,
+        current_prompt: EditorPromptRecord | None = None,
         directory: str = "",
-    ) -> Optional[str]:
+    ) -> str | None:
         """Validate a prompt name for one location.
 
         Args:
@@ -1609,7 +1604,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 return
             prompt.name = validated_name
 
-        final_targets: Dict[str, EditorPromptRecord] = {}
+        final_targets: dict[str, EditorPromptRecord] = {}
         for prompt in self.prompts:
             if prompt.is_system:
                 continue
@@ -1626,7 +1621,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             prompt.current_file_path = target_path
 
         try:
-            desired_targets_by_scope: Dict[str, Dict[str, EditorPromptRecord]] = {"user": {}, "project": {}}
+            desired_targets_by_scope: dict[str, dict[str, EditorPromptRecord]] = {"user": {}, "project": {}}
             for normalized_target, prompt in final_targets.items():
                 if prompt.scope in desired_targets_by_scope:
                     desired_targets_by_scope[prompt.scope][normalized_target] = prompt
@@ -1636,7 +1631,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 for scope in ("user", "project")
             }
 
-            temp_targets: List[Tuple[str, str]] = []
+            temp_targets: list[tuple[str, str]] = []
 
             for scope in ("user", "project"):
                 for desired_dir in sorted(desired_dirs_by_scope[scope], key=len):

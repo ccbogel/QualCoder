@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,20 +19,21 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-import logging
-import re
 import datetime
 import json
+import logging
 import os
-from typing import Any, Dict, List, Tuple, Optional
-from PyQt6 import QtCore, QtGui, QtWidgets
-import qtawesome as qta
-from random import randint
+import re
 import sqlite3
+from random import randint
+from typing import Any
 
-from .GUI.ui_dialog_speakers import Ui_Dialog_speakers
+import qtawesome as qta
+from PyQt6 import QtCore, QtGui, QtWidgets
+
 from .color_selector import colors, colour_ranges
 from .context_help import open_module_help
+from .GUI.ui_dialog_speakers import Ui_Dialog_speakers
 from .helpers import Message
 from .select_items import DialogSelectItems  # for the select-files button
 
@@ -65,7 +64,7 @@ _TS_DELIMITED = (r"\[[0-9]?[0-9]:[0-9][0-9](?::[0-9][0-9])?\]"
                  r"|\{[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\}"
                  r"|#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9]{1,3}#")
 _TS_BARE = r"(?<![0-9:.])[0-9]?[0-9]:[0-9][0-9](?::[0-9][0-9])?(?:[.,][0-9]{1,3})?(?![0-9:.])"
-timestamp_re = re.compile("|".join([_TS_SRT, _TS_DELIMITED, _TS_BARE]))
+timestamp_re = re.compile(f"{_TS_SRT}|{_TS_DELIMITED}|{_TS_BARE}")
 
 
 _subtitle_index_line_re = re.compile(r"(?m)^[ \t]*\d{1,5}[ \t]*$")
@@ -311,7 +310,7 @@ class DialogSpeakers(QtWidgets.QDialog):
         #   DialogSpeakers(app, [{'id','name'}, ...])   -> lista de archivos. list of files
         #   DialogSpeakers(app, {'id','name'})          -> un dict. a single dict
         if filename is None and isinstance(fid, (list, tuple)):
-            self.files: List[Dict[str, Any]] = [dict(f) for f in fid]
+            self.files: list[dict[str, Any]] = [dict(f) for f in fid]
         elif filename is None and isinstance(fid, dict):
             self.files = [dict(fid)]
         else:  # forma clasica (app, fid, filename). classic form
@@ -325,8 +324,8 @@ class DialogSpeakers(QtWidgets.QDialog):
         if not self.files:
             self.files = self._fetch_text_files()
         self._info_note = ""   # nota o error a mostrar en label_info. note or error for label_info
-        self._additional_vocab: List[str] = []  # <- L  vocabulario acumulado de codigos adicionales. shared additional-codes vocab
-        self._additional_combos: Dict[int, QtWidgets.QComboBox] = {}  # <- L  combo por fila. per-row combo
+        self._additional_vocab: list[str] = []  # <- L  vocabulario acumulado de codigos adicionales. shared additional-codes vocab
+        self._additional_combos: dict[int, QtWidgets.QComboBox] = {}  # <- L  combo por fila. per-row combo
         self.speakers_category_name = '📌 ' + _('Speakers')
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_speakers()
@@ -363,8 +362,8 @@ class DialogSpeakers(QtWidgets.QDialog):
         self.ui.pushButton_saved_regex.clicked.connect(self.manage_saved_regexes)
         self.ui.pushButton_saved_regex.setVisible(False)  # shown with the Custom checkbox
         self.ui.checkBox_filter_timestamps.stateChanged.connect(lambda _state: self._auto_rescan())
-        self.codings: List[Dict[str, Any]] = []
-        self.speaker_summary: List[Dict[str, Any]] = []
+        self.codings: list[dict[str, Any]] = []
+        self.speaker_summary: list[dict[str, Any]] = []
         self._update_title()
         self._update_files_label()
         if len(self.files) == 1:
@@ -402,7 +401,7 @@ class DialogSpeakers(QtWidgets.QDialog):
         
         # El orden pone Name: primero, luego los formatos con simbolo y al final Custom.
         # Order puts Name: first, then the symbol formats, and Custom last.
-        self._identifiers: List[Tuple[str, str]] = [
+        self._identifiers: list[tuple[str, str]] = [
             ('name',    'Name:'),
             ('hash',    '#Name:'),
             ('at',      '@Name:'),
@@ -579,7 +578,7 @@ class DialogSpeakers(QtWidgets.QDialog):
                 return item.checkState() == QtCore.Qt.CheckState.Checked
         return False
 
-    def _checked_keys(self) -> List[str]:
+    def _checked_keys(self) -> list[str]:
         """ Claves de los identificadores marcados, en orden. Checked identifier keys, in order. """
         keys = []
         model = self.ui.comboBox_identifier.model()
@@ -616,7 +615,7 @@ class DialogSpeakers(QtWidgets.QDialog):
         suffix = self.files[0]['name'] if n == 1 else f"{n} " + _("files")
         self.setWindowTitle(f"{base} - {suffix}")
 
-    def _fetch_text_files(self) -> List[Dict[str, Any]]:
+    def _fetch_text_files(self) -> list[dict[str, Any]]:
         """ 
         Archivos de texto del proyecto para el selector. 
         
@@ -808,8 +807,8 @@ class DialogSpeakers(QtWidgets.QDialog):
                 warn_invalid(pattern_text, err)
 
         def collect_and_store():
-            # List order is the store order; empties and duplicates drop, cap 20.
-            seen: List[str] = []
+            # list order is the store order; empties and duplicates drop, cap 20.
+            seen: list[str] = []
             for i in range(list_widget.count()):
                 pattern_text = list_widget.item(i).text().strip()
                 if pattern_text and pattern_text not in seen:
@@ -992,12 +991,12 @@ class DialogSpeakers(QtWidgets.QDialog):
         """
 
         self.codings = []
-        name_counts: Dict[str, int] = {}
-        name_example: Dict[str, str] = {}
-        name_files: Dict[str, set] = {}  # archivos por hablante. Ffiles per speaker
-        name_file_counts: Dict[str, Dict[str, int]] = {}  # turnos por (hablante, archivo). turns per (speaker, file)
+        name_counts: dict[str, int] = {}
+        name_example: dict[str, str] = {}
+        name_files: dict[str, set] = {}  # archivos por hablante. Ffiles per speaker
+        name_file_counts: dict[str, dict[str, int]] = {}  # turnos por (hablante, archivo). turns per (speaker, file)
         # Inline ';' codes per turn; union kept for the name tooltip.
-        name_extra_codes: Dict[str, List[str]] = {}
+        name_extra_codes: dict[str, list[str]] = {}
         # Conserva los codigos adicionales por nombre al reanalizar (no se pierden al cambiar  # <- L
         # identificadores o archivos). Carry over additional codes by name across re-scans.
         prev_additional = {sp['name']: list(sp.get('additional_codes', []))  # <- L
@@ -1065,14 +1064,14 @@ class DialogSpeakers(QtWidgets.QDialog):
             )
         self._rebuild_additional_vocab()  # <- L  recalcula el vocabulario compartido. recompute shared vocab
 
-    def _split_codes(self, text) -> List[str]:  # <- L
+    def _split_codes(self, text) -> list[str]:  # <- L
         """ 
         Divide una cadena por ';' en codigos limpios, sin vacios ni duplicados (preserva orden).
         
         Split a string on ';' into clean code names, no empties or duplicates (order preserved). 
         """
         
-        out: List[str] = []
+        out: list[str] = []
         for part in str(text).split(';'):
             clean = re.sub(r"\s+", " ", part).strip()
             if clean and clean not in out:
@@ -1116,12 +1115,12 @@ class DialogSpeakers(QtWidgets.QDialog):
         chain_patterns = self._chain_patterns()
 
         # State for the currently open speaker turn
-        current_name: Optional[str] = None
-        current_start: Optional[int] = None      # pos0
-        current_end: Optional[int] = None        # pos1 (exclusive)
-        current_content_start: Optional[int] = None  # start of the utterance (after marker)
-        current_extras: List[str] = []           # inline ';' codes of THIS turn
-        current_conames: List[Tuple[str, List[str]]] = []  # chained co-codes of THIS turn
+        current_name: str | None = None
+        current_start: int | None = None      # pos0
+        current_end: int | None = None        # pos1 (exclusive)
+        current_content_start: int | None = None  # start of the utterance (after marker)
+        current_extras: list[str] = []           # inline ';' codes of THIS turn
+        current_conames: list[tuple[str, list[str]]] = []  # chained co-codes of THIS turn
 
         def finalize_current_turn():
             """Store the active turn (one coding per chained co-code) and reset the state."""
@@ -1189,7 +1188,7 @@ class DialogSpeakers(QtWidgets.QDialog):
 
             if line.endswith("\r\n"):
                 eol_len = 2
-            elif line.endswith("\n") or line.endswith("\r"):
+            elif line.endswith(("\n", "\r")):
                 eol_len = 1
             else:
                 eol_len = 0
@@ -1226,7 +1225,7 @@ class DialogSpeakers(QtWidgets.QDialog):
                     code_as, marker_start, marker_end = turns[turn_i]
                     finalize_current_turn()
                     # ';': first token = speaker (row), rest = codes for THIS turn only.
-                    turn_extras: List[str] = []
+                    turn_extras: list[str] = []
                     if ';' in code_as:
                         tokens = self._split_codes(code_as)
                         if not tokens:
@@ -1323,13 +1322,13 @@ class DialogSpeakers(QtWidgets.QDialog):
         try:
             # clear
             rows = self.ui.tableWidget.rowCount()
-            for r in range(0, rows):
+            for r in range(rows):
                 self.ui.tableWidget.removeRow(0)
             self._additional_combos = {}  # <- L  se recrean los combos en cada refresco. combos are recreated each refresh
 
             # Per-inline-code counts for the name tooltip ('mujer (2/2); Alma (1/2)').
-            extras_counts: Dict[str, Dict[str, int]] = {}
-            turns_totals: Dict[str, int] = {}
+            extras_counts: dict[str, dict[str, int]] = {}
+            turns_totals: dict[str, int] = {}
             for coding_ in self.codings:
                 turns_totals[coding_['name']] = turns_totals.get(coding_['name'], 0) + 1
                 for extra_ in coding_.get('extra_codes', []):
@@ -1801,7 +1800,7 @@ class DialogSpeakers(QtWidgets.QDialog):
         # Collision pre-check before writing: in-category names reuse silently;
         # outside collisions ask (use existing / suffix / cancel).
         reuse_outside = False
-        planned: List[str] = []
+        planned: list[str] = []
         sel_names = set()
         for speaker in self.speaker_summary:
             if not speaker['selected']:
@@ -1875,7 +1874,7 @@ class DialogSpeakers(QtWidgets.QDialog):
             inserted_codings = 0  # para marcar delete_backup solo si hubo cambios. to flag delete_backup only on real changes
             # Progress over the apply; Cancel rolls everything back.
             seg_key = 'segments_full' if include_name else 'segments_response'
-            codings_per_name: Dict[str, int] = {}
+            codings_per_name: dict[str, int] = {}
             for coding in self.codings:
                 if coding.get('selected', True):
                     n_pieces = max(len(coding.get(seg_key) or ()), 1)
@@ -1909,14 +1908,14 @@ class DialogSpeakers(QtWidgets.QDialog):
                 # sin vacios ni duplicados. Codes applied to this speaker's turns: those in
                 # "code as" (';'-separated) plus those in "additional codes". The same turns are
                 # coded to each, no empties or duplicates.
-                code_names: List[str] = self._split_codes(speaker['code_as'])  # <- L
+                code_names: list[str] = self._split_codes(speaker['code_as'])  # <- L
                 for extra in speaker.get('additional_codes', []):  # <- L  codigos adicionales de la columna nueva
                     if extra not in code_names:  # <- L
                         code_names.append(extra)  # <- L
                 row_codings = [c for c in self.codings
                                if c['name'] == speaker['name'] and c.get('selected', True)]
                 # Row codes apply to every turn; inline ';' codes only to their own.
-                turn_specific: Dict[str, List[Dict[str, Any]]] = {}
+                turn_specific: dict[str, list[dict[str, Any]]] = {}
                 for coding in row_codings:
                     for extra in coding.get('extra_codes', []):
                         if extra and extra not in code_names:
@@ -1931,7 +1930,7 @@ class DialogSpeakers(QtWidgets.QDialog):
 
                     # Chunked bulk insert (executemany + INSERT OR IGNORE): per-row
                     # executes froze the GUI on huge runs; events/cancel per chunk.
-                    chunk: List[tuple] = []
+                    chunk: list[tuple] = []
                     for coding in target_codings:
                         # One row per piece (filter may split a turn around stamps).
                         if include_name:  # todo el turno, con el nombre. Whole turn, with label
@@ -2090,7 +2089,7 @@ class DialogSpeakers(QtWidgets.QDialog):
         """
         
         existing = existing_memo or ""
-        present = set(m.strip() for m in re.findall(r"^File:\s*(.+)$", existing, flags=re.MULTILINE))
+        present = {m.strip() for m in re.findall(r"^File:\s*(.+)$", existing, flags=re.MULTILINE)}
         to_add = {f: c for f, c in file_counts.items() if f not in present}
         if not to_add:
             return existing

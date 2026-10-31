@@ -23,14 +23,14 @@ https://qualcoder.org/
 
 import datetime
 import logging
-from pathlib import Path
 import re
+from pathlib import Path
 
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 
-from .GUI.ui_case_file_manager import Ui_Dialog_case_file_manager
 from .confirm_delete import DialogConfirmDelete
+from .GUI.ui_case_file_manager import Ui_Dialog_case_file_manager
 from .helpers import DialogGetStartAndEndMarks, Message
 from .view_av import DialogViewAV
 from .view_image import DialogViewImage
@@ -279,19 +279,19 @@ class DialogCaseFileManager(QtWidgets.QDialog):
 
         rows = self.ui.tableWidget.rowCount()
         if self.ui.checkBox_hide.isChecked():
-            for r in range(0, rows):
+            for r in range(rows):
                 # Text present so hide
                 if len(self.ui.tableWidget.item(r, 2).text()) > 0:
                     self.ui.tableWidget.hideRow(r)
             return
-        for r in range(0, rows):
+        for r in range(rows):
             self.ui.tableWidget.showRow(r)
 
     def fill_table(self):
         """ Fill list widget with file details. """
 
         rows = self.ui.tableWidget.rowCount()
-        for r in range(0, rows):
+        for r in range(rows):
             self.ui.tableWidget.removeRow(0)
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)

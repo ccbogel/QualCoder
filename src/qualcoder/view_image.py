@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,34 +19,33 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from copy import deepcopy, copy
 import datetime
-import pymupdf
 import html
-from io import BytesIO
 import logging
-from pathlib import Path
-import PIL.Image
-from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import sqlite3
+from copy import copy, deepcopy
+from io import BytesIO
+from pathlib import Path
 from typing import Any
 
+import PIL.Image
+import pymupdf
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtCore import Qt, QBuffer
+from PyQt6.QtCore import QBuffer, Qt
 from PyQt6.QtGui import QBrush
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .code_tree import CodeTreeController
 from .coder_names import DialogCoderNames
-from .color_selector import DialogColorSelect
-from .color_selector import colour_ranges, show_codes_of_colour_range
+from .color_selector import DialogColorSelect, colour_ranges, show_codes_of_colour_range
+from .context_help import open_module_help
 from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
-from .context_help import open_module_help
-from .move_resize_rectangle import DialogMoveResizeRectangle
 from .helpers import ExportDirectoryPathDialog, Message, init_persistent_tree_header
 from .memo import DialogMemo
+from .move_resize_rectangle import DialogMoveResizeRectangle
 from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
 from .select_items import DialogSelectItems
@@ -69,7 +66,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         The slider values range from 9 to 99 with intervals of 3.
         """
 
-        super(DialogCodeImage, self).__init__()
+        super().__init__()
         self.app = app
         self.tab_reports = tab_reports  # Tab widget reports, used for updates to codes
         self.parent_textEdit = parent_textedit
@@ -705,7 +702,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.ui.listWidget.setCurrentRow(0)
             self.load_file()
             return
-        for i in range(0, len(self.files) - 1):
+        for i in range(len(self.files) - 1):
             if self.file_ == self.files[i]:
                 found = self.files[i + 1]
                 self.file_ = found
@@ -875,8 +872,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.pdf_page = int(text) - 1
         if self.pdf_page < 1:
             self.pdf_page = 0
-        if self.pdf_page > self.pdf_total_pages - 1:
-            self.pdf_page = self.pdf_total_pages - 1
+        self.pdf_page = min(self.pdf_page, self.pdf_total_pages - 1)
         self.ui.label_pages.setText(f"{self.pdf_page + 1}/{self.pdf_total_pages}")
         self.load_file()
 
@@ -887,15 +883,13 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def next_page(self):
         self.pdf_page += 1
-        if self.pdf_page > self.pdf_total_pages - 1:
-            self.pdf_page = self.pdf_total_pages - 1
+        self.pdf_page = min(self.pdf_page, self.pdf_total_pages - 1)
         self.ui.label_pages.setText(f"{self.pdf_page + 1}/{self.pdf_total_pages}")
         self.load_file()
 
     def previous_page(self):
         self.pdf_page -= 1
-        if self.pdf_page < 0:
-            self.pdf_page = 0
+        self.pdf_page = max(self.pdf_page, 0)
         self.ui.label_pages.setText(f"{self.pdf_page + 1}/{self.pdf_total_pages}")
         self.load_file()
 
@@ -1003,8 +997,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if self.pixmap.height() > self.height() - 30 - 100:
             scale = (self.height() - 30 - 100) / self.pixmap.height()
             slider_value = int(scale * 100)
-            if slider_value > 100:
-                slider_value = 100
+            slider_value = min(slider_value, 100)
             self.ui.horizontalSlider.setValue(slider_value)
         self.get_coded_areas()
         self.draw_coded_areas()
@@ -1478,8 +1471,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
 
         # Tree widget menu item keys F2 - F6, handled by the shared controller.
-        if self.ui.treeWidget.hasFocus():
-            if self.code_tree.handle_key_press(event):
+        if self.ui.treeWidget.hasFocus() and self.code_tree.handle_key_press(event):
                 return
 
         # Ctrl 0 to 9, G
@@ -1645,8 +1637,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 return True
         if object_ is self.scene:
             # Detect mouse movement on the scene to update the dashed rectangle in real-time
-            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.type() == QtCore.QEvent.Type.GraphicsSceneMouseMove:
-                if hasattr(self, 'is_dragging_handle') and self.is_dragging_handle:
+            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.type() == QtCore.QEvent.Type.GraphicsSceneMouseMove and hasattr(self, 'is_dragging_handle') and self.is_dragging_handle:
                     # Call function to recalculate boundaries based on cursor movement
                     self.update_interactive_resize(event.scenePos())
                     return True
@@ -1712,8 +1703,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                         return True
                     self.create_code_area(p1)
                     return True
-            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == Qt.MouseButton.RightButton:
-                if event.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
+            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == Qt.MouseButton.RightButton and event.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
                     p = event.buttonDownScenePos(Qt.MouseButton.RightButton)
                     self.scene_context_menu(p)
                     return True
@@ -1724,8 +1714,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         # Outside image area, no context menu
         for item in self.scene.items():
-            if type(item) == QtWidgets.QGraphicsPixmapItem:
-                if pos.x() > item.boundingRect().width() or pos.y() > item.boundingRect().height():
+            if type(item) == QtWidgets.QGraphicsPixmapItem and pos.x() > item.boundingRect().width() or pos.y() > item.boundingRect().height():
                     self.selection = None
                     return
         global_pos = QtGui.QCursor.pos()
@@ -1875,28 +1864,24 @@ class DialogCodeImage(QtWidgets.QDialog):
         ui = DialogMoveResizeRectangle(self.app)
         ui.exec()
         item['x1'] += ui.move_x
-        if item['x1'] < 0:
-            item['x1'] = 0
+        item['x1'] = max(item['x1'], 0)
         # x is past the image size, so resize to 10 wide and 11 back from image x edge
         if item['x1'] + 11 > self.pixmap.width():
             item['x1'] = self.pixmap.width() - 11
             item['width'] = 10
         item['y1'] += ui.move_y
-        if item['y1'] < 0:
-            item['y1'] = 0
+        item['y1'] = max(item['y1'], 0)
         # y is past the image size, so resize to 10 wide and 11 back from image y edge
         if item['y1'] + 11 > self.pixmap.height():
             item['y1'] = self.pixmap.height() - 11
             item['height'] = 10
         item['width'] += ui.resize_x
-        if item['width'] < 10:
-            item['width'] = 10
+        item['width'] = max(item['width'], 10)
         if item['x1'] + item['width'] > self.pixmap.width():
             overreach = item['x1'] + item['width'] - self.pixmap.width()
             item['width'] -= overreach + 1
         item['height'] += ui.resize_y
-        if item['height'] < 10:
-            item['height'] = 10
+        item['height'] = max(item['height'], 10)
         if item['y1'] + item['height'] > self.pixmap.height():
             overreach = item['y1'] + item['height'] - self.pixmap.height()
             item['height'] -= overreach + 1
@@ -1936,8 +1921,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             pos = QtCore.QPointF(pix_w_scaled - pos.y(), pos.x())
         items = []
         for item in self.code_areas:
-            if item['id'] == self.file_['id']:
-                if item['x1'] * self.scale <= pos.x() <= (item['x1'] + item['width']) * self.scale \
+            if item['id'] == self.file_['id'] and\
+                item['x1'] * self.scale <= pos.x() <= (item['x1'] + item['width']) * self.scale \
                         and item['y1'] * self.scale <= pos.y() <= (
                         item['y1'] + item['height']) * self.scale:
                     items.append(item)
@@ -2163,14 +2148,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         # When rotated 90/270 the visible image swaps width/height on screen
         if self.degrees in (90, 270):
             scaled_w, scaled_h = scaled_h, scaled_w
-        if mouse_x < 0:
-            mouse_x = 0
-        if mouse_x > scaled_w:
-            mouse_x = scaled_w
-        if mouse_y < 0:
-            mouse_y = 0
-        if mouse_y > scaled_h:
-            mouse_y = scaled_h
+        mouse_x = max(mouse_x, 0)
+        mouse_x = min(mouse_x, scaled_w)
+        mouse_y = max(mouse_y, 0)
+        mouse_y = min(mouse_y, scaled_h)
 
         # Logic to push the rectangle walls depending on the dragged corner
         if self.active_handle == "TL":  # Top-Left: Modifies left X and top Y
@@ -2240,8 +2221,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         height_unscaled = round(height_unscaled)
         
         # Strict boundaries: Prevent the user from expanding the box beyond the real image dimensions
-        if x_unscaled < 0: x_unscaled = 0
-        if y_unscaled < 0: y_unscaled = 0
+        x_unscaled = max(x_unscaled, 0)
+        y_unscaled = max(y_unscaled, 0)
         if x_unscaled + width_unscaled > px_w:
             width_unscaled = px_w - x_unscaled
         if y_unscaled + height_unscaled > px_h:
@@ -2332,8 +2313,7 @@ class DialogViewImage(QtWidgets.QDialog):
         if self.pixmap.height() > self.height() - 30 - 80:
             scale = (self.height() - 30 - 80) / self.pixmap.height()
             slider_value = int(scale * 100)
-            if slider_value > 100:
-                slider_value = 100
+            slider_value = min(slider_value, 100)
             self.ui.horizontalSlider.setValue(slider_value)
 
     def redraw_scene(self):

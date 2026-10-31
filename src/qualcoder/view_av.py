@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,34 +19,46 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from copy import copy
 import datetime
-# import difflib  # Use diff_match_patch as it is 20x faster. Keep this in case its needed later.
-import diff_match_patch
 import json
 import logging
 import os
 import platform
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
 import threading
 import time
+from copy import copy
 
+# import difflib  # Use diff_match_patch as it is 20x faster. Keep this in case its needed later.
+import diff_match_patch
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor
 
-from .GUI.ui_dialog_view_av import Ui_Dialog_view_av
 from .context_help import open_module_help
-from .helpers import NumberBar, msecs_to_hours_mins_secs, Message, ExportDirectoryPathDialog
+from .GUI.ui_dialog_view_av import Ui_Dialog_view_av
+from .helpers import (
+    ExportDirectoryPathDialog,
+    Message,
+    NumberBar,
+    msecs_to_hours_mins_secs,
+)
 from .html_parser import html_to_text  # Homologate transcript formats with Manage files
 from .select_items import DialogSelectItems
-from .view_av_waveform import waveform_backend_available, waveform_png_is_current, generate_waveform_png_async, \
-    waveform_colour, keyframe_interval_seconds  # noqa: F401  (WaveformSeekBar used via the promoted .ui widget)
+from .view_av_waveform import (
+    generate_waveform_png_async,
+    keyframe_interval_seconds,
+    waveform_backend_available,
+    waveform_colour,  # (WaveformSeekBar used via the promoted .ui widget)
+    waveform_png_is_current,
+)
 
 # If VLC not installed, it will not crash
 vlc = None
-from .media_player_qt import MediaInstance as QtMediaInstance, make_vlc_instance
+from .media_player_qt import MediaInstance as QtMediaInstance
+from .media_player_qt import make_vlc_instance
+
 try:
     import vlc
 except Exception as e:  # python-vlc missing: Qt backend takes over, no console noise
@@ -217,7 +227,7 @@ class DialogViewAV(QtWidgets.QDialog):
             if res is None:
                 cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
                             (file_['name'] + ".txt", "", None, "", self.app.settings['codername'],
-                             datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                             datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 tr_id = cur.fetchone()[0]
@@ -735,7 +745,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.text = text
         self.prev_text = copy(text)
         self.text_has_changed = False  # already persisted below, nothing pending for autosave
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         cur.execute("update source set fulltext=?, date=? where id=?", [text, now, self.transcription[0]])
         self.app.conn.commit()
         self.app.delete_backup = False
@@ -1209,8 +1219,7 @@ class DialogViewAV(QtWidgets.QDialog):
         cursor = self.ui.textEdit.textCursor()
         cursor.setPosition(result[2])
         endpos = result[2] - 1
-        if endpos < 0:
-            endpos = 0
+        endpos = max(endpos, 0)
         cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
 
@@ -1229,8 +1238,7 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Rewind 30 seconds. Alt + R """
 
         time_msecs = self.mediaplayer.get_time() - 30000
-        if time_msecs < 0:
-            time_msecs = 0
+        time_msecs = max(time_msecs, 0)
         pos = time_msecs / self.mediaplayer.get_media().get_duration()
         self.mediaplayer.set_position(pos)
         # Update timer display
@@ -1242,8 +1250,7 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Rewind 5 seconds. Ctrl + R """
 
         time_msecs = self.mediaplayer.get_time() - 5000
-        if time_msecs < 0:
-            time_msecs = 0
+        time_msecs = max(time_msecs, 0)
         pos = time_msecs / self.mediaplayer.get_media().get_duration()
         self.mediaplayer.set_position(pos)
         # Update timer display
@@ -1282,8 +1289,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
         rate = self.mediaplayer.get_rate()
         rate += 0.1
-        if rate > 2:
-            rate = 2
+        rate = min(rate, 2)
         self.mediaplayer.set_rate(rate)
         self.ui.label_rate.setText(str(round(rate, 1)) + "x")
 
@@ -1292,8 +1298,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
         rate = self.mediaplayer.get_rate()
         rate -= 0.1
-        if rate < 0.1:
-            rate = 0.1
+        rate = max(rate, 0.1)
         self.mediaplayer.set_rate(rate)
         self.ui.label_rate.setText(str(round(rate, 1)) + "x")
 
@@ -1710,8 +1715,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
             # On play rewind slightly
             time_msecs = self.mediaplayer.get_time() - 100
-            if time_msecs < 0:
-                time_msecs = 0
+            time_msecs = max(time_msecs, 0)
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
             self.mediaplayer.set_position(pos)
             # Update timer display
@@ -1783,10 +1787,10 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Armoured tick: an exception is logged once, the bar keeps alive. """
         try:
             self.update_ui()
-        except Exception as err:
+        except Exception:
             if not getattr(self, '_update_ui_error_logged', False):
                 self._update_ui_error_logged = True
-                logger.exception(f"update_ui tick failed (bar kept alive): {err}")
+                logger.exception("update_ui tick failed (bar kept alive):")
 
     def _vlc_display_ms(self, msecs):
         """ vlc reports the previous position for a few ticks after a seek:
@@ -1979,7 +1983,7 @@ class DialogViewAV(QtWidgets.QDialog):
         try:
             cur = self.app.conn.cursor()
             # self.transcription[0] is file id, [1] is the original text
-            date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
             cur.execute("update source set fulltext=?, date=? where id=?", [current_text, date, self.transcription[0]])
             for item in self.code_deletions:
                 cur.execute(item)

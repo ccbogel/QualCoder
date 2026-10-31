@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -23,42 +21,57 @@ https://qualcoder.org/
 
 import atexit
 import bisect
-from collections import defaultdict
-from copy import copy, deepcopy
 import datetime
-import pymupdf
 import logging
 import os
-from pathlib import Path
-from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QBrush, QColor
-import qtawesome as qta  # https://pictogrammers.com/library/mdi/
 import re
 import sqlite3
 import weakref
-import webbrowser # For: Open original file
+import webbrowser  # For: Open original file
+from collections import defaultdict
+from copy import copy, deepcopy
+from pathlib import Path
 
+import pymupdf
+import qtawesome as qta  # https://pictogrammers.com/library/mdi/
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QBrush, QColor
+
+# AI
+from .ai_agent_prompts import (
+    AiAgentPromptsCatalog,  # PromptsList removed; new Markdown-based catalog
+)
+from .ai_runtime import ensure_ai_ready
+from .ai_ui import ai_chat_signal_emitter
 from .code_in_all_files import DialogCodeInAllFiles
 from .code_tree import CodeTreeController
-from .color_selector import DialogColorSelect
-from .color_selector import TextColor
 from .coder_names import DialogCoderNames  # Coder change as in code_text
-from .speakers import DialogSpeakers, speaker_coder_name  # Mark speakers
-from .helpers import Message, init_persistent_tree_header, \
-    DialogGetStartAndEndMarks  # tree width persistence and autocode marks
+from .color_selector import DialogColorSelect, TextColor
 from .GUI.ui_dialog_code_pdf import Ui_Dialog_code_pdf
+from .helpers import (
+    DialogGetStartAndEndMarks,  # tree width persistence and autocode marks
+    Message,
+    init_persistent_tree_header,
+)
 from .memo import DialogMemo
+
+# Shared PDF helpers live in pdf_utils, so lighter modules do not import this one.
+from .pdf_utils import (
+    W_LINE,
+    W_POS0,
+    W_POS1,
+    W_X0,
+    W_X1,
+    W_Y0,
+    W_Y1,
+    _build_page_text,
+    _page_words_raw,
+)
 from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
 from .select_items import DialogSelectItems
-# AI
-from .ai_agent_prompts import AiAgentPromptsCatalog  # PromptsList removed; new Markdown-based catalog
-from .ai_runtime import ensure_ai_ready
-from .ai_ui import ai_chat_signal_emitter
-# Shared PDF helpers live in pdf_utils, so lighter modules do not import this one.
-from .pdf_utils import W_X0, W_Y0, W_X1, W_Y1, W_POS0, W_POS1, W_LINE, \
-    _page_words_raw, _build_page_text
+from .speakers import DialogSpeakers, speaker_coder_name  # Mark speakers
 
 logger = logging.getLogger(__name__)
 

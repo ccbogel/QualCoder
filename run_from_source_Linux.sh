@@ -5,15 +5,15 @@
 
 echo "Starting"
 # Create venv
-if [ -d ".env" ]; then
+if [ -d ".venv" ]; then
     echo "Virtual environment exists."
 else
     echo "Creating virtual environment."
-    python3 -m venv ".env"
+    python3 -m venv ".venv" --prompt QualCoder-Dev
 fi
 
 # Activate environment
-source .env/bin/activate
+source .venv/bin/activate
 
 # Install required modules
 echo "Installing requirements. This may take 10 minutes."

@@ -21,22 +21,24 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from PyQt6 import QtCore, QtWidgets, QtGui
 import datetime
-from pathlib import Path
-import re
 import logging
+import re
+import webbrowser
+from pathlib import Path
+
 # from spellchecker import SpellChecker
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from odf.opendocument import OpenDocumentText  # For ODT export
 from odf.text import P as OdfParagraph  # For ODT export
-import webbrowser
-from .add_item_name import DialogAddItemName
+from PyQt6 import QtCore, QtGui, QtWidgets
+
 from .add_attribute import DialogAddAttribute
+from .add_item_name import DialogAddItemName
 from .confirm_delete import DialogConfirmDelete
-from .GUI.ui_dialog_journals import Ui_Dialog_journals
 from .context_help import open_module_help
-from .helpers import Message, ExportDirectoryPathDialog, MarkdownHighlighter
+from .GUI.ui_dialog_journals import Ui_Dialog_journals
+from .helpers import ExportDirectoryPathDialog, MarkdownHighlighter, Message
 from .memo import DialogMemo, DialogSelectQuote, DialogSelectReference
 
 logger = logging.getLogger(__name__)
@@ -54,14 +56,14 @@ class DialogJournals(QtWidgets.QDialog):
 
     def __init__(self, app, parent_text_edit, parent=None):
 
-        super(DialogJournals, self).__init__(parent)
+        super().__init__(parent)
         self.app = app
         self.parent_text_edit = parent_text_edit
         self.jid = None  # journal database jid
         self.timer_msecs = 1500
         self.qtimer = QtCore.QTimer()
         self.qtimer.timeout.connect(self.update_database_text)
-        self.keypress_timer = datetime.datetime.now()  # Timer to reduce overly sensitive key events
+        self.keypress_timer = datetime.datetime.now()  # Timer to reduce overly sensitive key events  # noqa: DTZ005
         self.text_changed_flag = False
         self.rows_hidden = False
         QtWidgets.QDialog.__init__(self)
@@ -240,7 +242,7 @@ class DialogJournals(QtWidgets.QDialog):
 
         self.attribute_names.append({'name': name})
         # Update attribute_type list and database
-        now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         cur = self.app.conn.cursor()
         cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
                     (name, now_date, self.app.settings['codername'], "", 'journal', value_type))
@@ -278,7 +280,7 @@ class DialogJournals(QtWidgets.QDialog):
                 cur.execute(sql, (jid[0], attribute[0]))
                 res = cur.fetchone()
                 if res is None:
-                    placeholders = [attribute[0], jid[0], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    placeholders = [attribute[0], jid[0], datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                                     self.app.settings['codername']]
                     cur.execute(insert_sql, placeholders)
                     changed = True
@@ -426,7 +428,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
         self.ui.tableWidget.horizontalHeader().setStretchLastSection(False)
         rows = self.ui.tableWidget.rowCount()
-        for r in range(0, rows):
+        for r in range(rows):
             self.ui.tableWidget.removeRow(0)
         for row, data in enumerate(self.journals):
             self.ui.tableWidget.insertRow(row)
@@ -580,7 +582,7 @@ class DialogJournals(QtWidgets.QDialog):
             self.load_journals(f"{attribute_name}|desc")
             return
         if action == action_show_all:
-            for r in range(0, self.ui.tableWidget.rowCount()):
+            for r in range(self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = False
             return
@@ -588,8 +590,7 @@ class DialogJournals(QtWidgets.QDialog):
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show names like:"),
                                                             QtWidgets.QLineEdit.EchoMode.Normal, item_text)
             if ok and text_value != '':
-                if ok and text_value != '':
-                    for r in range(0, self.ui.tableWidget.rowCount()):
+                    for r in range(self.ui.tableWidget.rowCount()):
                         if self.ui.tableWidget.item(r, NAME_COLUMN).text().find(text_value) == -1:
                             self.ui.tableWidget.setRowHidden(r, True)
                     self.rows_hidden = True
@@ -603,8 +604,7 @@ class DialogJournals(QtWidgets.QDialog):
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show values like:"),
                                                             QtWidgets.QLineEdit.EchoMode.Normal, item_text)
             if ok and text_value != '':
-                if ok and text_value != '':
-                    for r in range(0, self.ui.tableWidget.rowCount()):
+                    for r in range(self.ui.tableWidget.rowCount()):
                         if self.ui.tableWidget.item(r, col).text().find(text_value) == -1:
                             self.ui.tableWidget.setRowHidden(r, True)
                     self.rows_hidden = True
@@ -626,7 +626,7 @@ class DialogJournals(QtWidgets.QDialog):
             return
         if action == action_show_this_coder:
             coder_selected = self.ui.tableWidget.item(row, OWNER_COLUMN).text()
-            for r in range(0, self.ui.tableWidget.rowCount()):
+            for r in range(self.ui.tableWidget.rowCount()):
                 coder_name = self.ui.tableWidget.item(r, OWNER_COLUMN).text()
                 if coder_selected != coder_name:
                     self.ui.tableWidget.setRowHidden(r, True)
@@ -1096,7 +1096,7 @@ class DialogJournals(QtWidgets.QDialog):
         # {name, jid, jentry, owner, date} and char position and search string length
         if self.jid is None or self.jid != prev_result[0]['jid']:
             self.jid = prev_result[0]['jid']
-            for row in range(0, self.ui.tableWidget.rowCount()):
+            for row in range(self.ui.tableWidget.rowCount()):
                 if int(self.ui.tableWidget.item(row, JID_COLUMN).text()) == self.jid:
                     self.ui.tableWidget.setCurrentCell(row, NAME_COLUMN)
                     # This will also load the jentry into the textEdit
@@ -1121,7 +1121,7 @@ class DialogJournals(QtWidgets.QDialog):
         # {name, jid, jentry, owner, date} and char position and search string length
         if self.jid is None or self.jid != next_result[0]['jid']:
             self.jid = next_result[0]['jid']
-            for row in range(0, self.ui.tableWidget.rowCount()):
+            for row in range(self.ui.tableWidget.rowCount()):
                 if int(self.ui.tableWidget.item(row, JID_COLUMN).text()) == self.jid:
                     self.ui.tableWidget.setCurrentCell(row, NAME_COLUMN)
                     # This will also load the jentry into the textEdit

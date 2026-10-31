@@ -23,16 +23,16 @@ https://qualcoder.org/
 
 import logging
 import os
-from pathlib import Path
 import time
+from pathlib import Path
 
-from PyQt6 import QtCore, QtWidgets, QtGui
+from PyQt6 import QtCore, QtGui, QtWidgets
 
+from .code_av import DialogCodeAV  # for isinstance()
 from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_manage_links import Ui_Dialog_manage_links
 from .helpers import Message
-from .code_av import DialogCodeAV  # for isinstance()
 from .view_image import DialogCodeImage  # DialogCodeImage for isinstance()
 
 logger = logging.getLogger(__name__)

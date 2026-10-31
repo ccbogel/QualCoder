@@ -22,17 +22,23 @@ https://qualcoder.org/
 """
 
 import datetime
-import pymupdf
 import logging
-from pathlib import Path
 import sqlite3
+from pathlib import Path
 from typing import Any
 
+import pymupdf
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .color_selector import TextColor
-from .helpers import msecs_to_mins_and_secs, DialogCodeInAV, DialogCodeInImage, DialogCodeInText, \
-    ExportDirectoryPathDialog, Message
+from .helpers import (
+    DialogCodeInAV,
+    DialogCodeInImage,
+    DialogCodeInText,
+    ExportDirectoryPathDialog,
+    Message,
+    msecs_to_mins_and_secs,
+)
 from .memo import DialogMemo
 from .select_items import DialogSelectItems
 
@@ -264,7 +270,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             title += _(" File: ") + row['file_or_casename']
         else:
             title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['source_name']
-        if 'pos0' in row.keys():
+        if 'pos0' in row:
             title += f", [{row['pos0']} - {row['pos1']}]"
         title += "  " + _("Code:") + f" {row['codename']} ({row['owner']})"
         if row['important']:
@@ -409,7 +415,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 action_remove_important = menu.addAction(_("Remove important flag"))
             else:
                 action_add_important = menu.addAction(_("Add important flag"))
-        action_export_odt = menu.addAction((_("Export to ODT file")))
+        action_export_odt = menu.addAction(_("Export to ODT file"))
         action = menu.exec(self.te.mapToGlobal(position))
         if action is None:
             return
@@ -726,10 +732,10 @@ class DialogCodedIds(QtWidgets.QDialog):
         foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
         title = f'<span style="background-color:{row["color"]}; {foregroundcolor}\">'
         title += _(" File: ") + row['file_or_casename']
-        if 'pos0' in row.keys():
+        if 'pos0' in row:
             title += f", [{row['pos0']} - {row['pos1']}]"
         title += "  " + _("Code:") + f" {row['codename']} ({row['owner']})"
-        if 'important' in row and row['important']:
+        if row.get('important'):
             title += " [!]"
         title += "</span><br />"
         self.te.insertHtml(title)

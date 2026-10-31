@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,16 +19,15 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from copy import copy
 import csv
 import datetime
 import html
 import logging
-import os
-from pathlib import Path
-from random import randint
 import re
 import sqlite3
+from copy import copy
+from pathlib import Path
+from random import randint
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 

@@ -1,6 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -26,20 +23,22 @@ import base64
 import datetime
 import gettext
 import html
+
 #import json  # To get the latest GitHub release information
 import logging
-from logging.handlers import RotatingFileHandler
 import multiprocessing
 import os
-from pathlib import Path
 import platform
 import shutil
 import sqlite3
 import sys
 import traceback
-from typing import Any, Optional
+
 #import urllib.request
 import webbrowser
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
+from typing import Any, Optional
 
 if __name__ == "__main__":
     # Handle frozen child processes and stdio before importing the GUI.
@@ -52,20 +51,20 @@ if __name__ == "__main__":
 # outlive the Qt window in frozen macOS builds and crash during QApplication teardown.
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
-from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta
-from qualcoder.app import App
+from PyQt6 import QtCore, QtGui, QtWidgets
+
 from qualcoder.ai_runtime import (
     AI_DISABLED,
     AI_FAILED,
     AI_INITIALIZING,
     AI_LOADING,
     AI_READY,
-    AiImportThread,
     VECTORSTORE_DISABLED,
     VECTORSTORE_FAILED,
     VECTORSTORE_LOADING,
     VECTORSTORE_UNLOADED,
+    AiImportThread,
     VectorstoreImportThread,
     ai_runtime_ready,
     ensure_ai_loaded,
@@ -73,49 +72,68 @@ from qualcoder.ai_runtime import (
     show_ai_runtime_not_ready,
     vectorstore_required,
 )
-from qualcoder.error_dlg import qt_exception_hook
-from qualcoder.external_mcp import ExternalMcpController
+from qualcoder.app import App
 from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.code_av import DialogCodeAV
 from qualcoder.code_color_scheme import DialogCodeColorScheme
 from qualcoder.code_organiser import CodeOrganiser
-from qualcoder.code_text import DialogCodeText
 from qualcoder.code_pdf import DialogCodePdf
+from qualcoder.code_text import DialogCodeText
 from qualcoder.codebook import Codebook, ImportPlainTextCodes
-from qualcoder.coder_names import DialogCoderNames
+
+#from qualcoder.coder_names import DialogCoderNames
 from qualcoder.context_help import ContextHelp
+from qualcoder.error_dlg import qt_exception_hook
+from qualcoder.external_mcp import ExternalMcpController
 from qualcoder.GUI.base64_droidsansmono_helper import DroidSansMono
 from qualcoder.GUI.base64_notosans_helper import NotoSans
 from qualcoder.GUI.ui_main import Ui_MainWindow
-from qualcoder.helpers import ComboWheelGuard, ElidedLabel, get_default_user_directory, Message
+from qualcoder.helpers import (
+    ComboWheelGuard,
+    ElidedLabel,
+    Message,
+    get_default_user_directory,
+)
 from qualcoder.import_survey import DialogImportSurvey
-from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
-from qualcoder.information import project_tab_info, manage_tab_info, coding_tab_info, reports_tab_info, render_tab_info_markdown
-from qualcoder.journals import DialogJournals, JID_COLUMN
+from qualcoder.information import (
+    DialogInformation,
+    coding_shortcuts_display,
+    coding_tab_info,
+    manage_tab_info,
+    menu_shortcuts_display,
+    project_tab_info,
+    render_tab_info_markdown,
+    reports_tab_info,
+)
+from qualcoder.journals import JID_COLUMN, DialogJournals
 from qualcoder.main_tab_rail import MainTabRail
-from qualcoder.recent_projects_delegate import RecentProjectDelegate, DATE_ROLE, PATH_ROLE
 from qualcoder.manage_files import DialogManageFiles
 from qualcoder.manage_links import DialogManageLinks
 from qualcoder.manage_references import DialogReferenceManager
 from qualcoder.memo import DialogMemo
+from qualcoder.recent_projects_delegate import (
+    DATE_ROLE,
+    PATH_ROLE,
+    RecentProjectDelegate,
+)
 from qualcoder.refi import RefiExport, RefiImport
-from qualcoder.reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
 from qualcoder.report_code_summary import DialogReportCodeSummary
-from qualcoder.report_compare_coder_file import DialogCompareCoderByFile
-from qualcoder.report_comparison_table import DialogReportComparisonTable
 from qualcoder.report_codes import DialogReportCodes
 from qualcoder.report_codes_by_segments import DialogCodesBySegments
+from qualcoder.report_compare_coder_file import DialogCompareCoderByFile
+from qualcoder.report_comparison_table import DialogReportComparisonTable
 from qualcoder.report_cooccurrence import DialogReportCooccurrence
-from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_exact_matches import DialogReportExactTextMatches
+from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_relations import DialogReportRelations
 from qualcoder.report_sql import DialogSQL
+from qualcoder.reports import DialogReportCodeFrequencies, DialogReportCoderComparisons
 from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
+from qualcoder.sonal_import import SonalImport
 from qualcoder.special_functions import DialogSpecialFunctions
 from qualcoder.taguette_import import TaguetteImport
-from qualcoder.sonal_import import SonalImport
 from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
@@ -124,7 +142,7 @@ from qualcoder.view_image import DialogCodeImage
 vlc = None
 try:
     import vlc
-except Exception as e:  # python-vlc missing: Qt backend takes over, no console noise
+except Exception as e:  # python-vlc missing: Qt backend takes over, no console noise 
     logging.getLogger(__name__).debug(f"python-vlc unavailable: {e}")
 
 qc_config_folder = Path('~').expanduser() / '.qualcoder'
@@ -139,14 +157,14 @@ logfile = qc_config_folder / 'QualCoder.log'
 log_maxBytes = 500000  # 500 KB: max length of the logfile before old entries are discarded
 # Hack for Windows 10 PermissionError that stops the rotating file handler, will produce massive files.
 try:
-    log_file = open(logfile, "r")
-    data = log_file.read()
-    log_file.close()
+    with open(logfile, "r") as log_file:
+        data = log_file.read()
+        log_file.close()
     if len(data) > log_maxBytes:
         logfile.unlink()
-        log_file = open(logfile, "w")
-        log_file.write(data[len(data) - (log_maxBytes // 2):])  # frees up half of log_maxBytes
-        log_file.close()
+        with open(logfile, "w") as log_file:
+            log_file.write(data[len(data) - (log_maxBytes // 2):])  # frees up half of log_maxBytes
+            log_file.close()
 except Exception as e:
     print(e)
 logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s.%(funcName)s %(message)s',
@@ -514,7 +532,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(_("AI: Components could not be loaded. See the log for details."))
 
     def load_ai_runtime_modal(
-            self, title: str, parent: Optional[QtWidgets.QWidget] = None) -> bool:
+            self, title: str, parent: QtWidgets.QWidget | None = None) -> bool:
         """Load AI packages in the background while displaying a modal step."""
 
         if ai_runtime_ready(self.app):
@@ -1493,7 +1511,7 @@ Click "Yes" to start now.')
         coder = self.app.settings['codername']
         activity = {}
 
-        def source_name(file_id: int) -> Optional[str]:
+        def source_name(file_id: int) -> str | None:
             cur.execute("select name from source where id=?", [file_id])
             res = cur.fetchone()
             return res[0] if res else None
@@ -3708,7 +3726,7 @@ Click "Yes" to start now.')
         try:
             cur.execute("select pdf_page from code_image")
         except sqlite3.OperationalError:
-            cur.execute('ALTER TABLE code_image ADD pdf_page integer')  #
+            cur.execute('ALTER TABLE code_image ADD pdf_page integer') 
             cur.execute('update project set databaseversion="v10", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v10")
@@ -3716,7 +3734,7 @@ Click "Yes" to start now.')
         try:
             cur.execute("select pdf_page from gr_pix_item")
         except sqlite3.OperationalError:
-            cur.execute('ALTER TABLE gr_pix_item ADD pdf_page integer')  #
+            cur.execute('ALTER TABLE gr_pix_item ADD pdf_page integer') 
             cur.execute('update project set databaseversion="v11", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v11")

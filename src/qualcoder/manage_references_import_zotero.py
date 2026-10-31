@@ -34,8 +34,7 @@ import shutil
 import tempfile
 import urllib.request
 
-from PyQt6 import QtWidgets, QtCore
-
+from PyQt6 import QtCore, QtWidgets
 from rispy import TAG_KEY_MAPPING
 
 from .helpers import Message
@@ -270,11 +269,11 @@ class ZoteroImport:
         """
         Creates the Ref_* attribute types if missing (as ris.RisImport.create_file_attributes).
         """
-        now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         cur = self.app.conn.cursor()
         ref_vars = {'Ref_Authors': 'character', 'Ref_Title': 'character', 'Ref_Type': 'character',
                     'Ref_Year': 'numeric', 'Ref_Journal': 'character'}
-        for key in ref_vars:
+        for key in ref_vars.items():
             cur.execute("select name from attribute_type where name=?", [key])
             if not cur.fetchone():
                 cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile,valuetype) "

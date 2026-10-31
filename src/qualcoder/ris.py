@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -24,11 +22,16 @@ https://qualcoder.org/
 import datetime
 import logging
 from pathlib import Path
+
 import rispy
 from PyQt6 import QtWidgets
 
-from .manage_references_import import ATTACHMENT_TAGS, existing_reference_signatures, \
-    import_progress_dialog, reference_signature
+from .manage_references_import import (
+    ATTACHMENT_TAGS,
+    existing_reference_signatures,
+    import_progress_dialog,
+    reference_signature,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -356,12 +359,12 @@ class RisImport:
     def create_file_attributes(self):
         """ Creates the attributes for Ref_Authors, Ref_Title, Ref_Type, Ref_Year, Ref_Journal """
 
-        now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         cur = self.app.conn.cursor()
         ref_vars = {'Ref_Authors': 'character', 'Ref_Title': 'character', 'Ref_Type': 'character',
                     'Ref_Year': 'numeric', 'Ref_Journal': 'character'}
         created = False
-        for key in ref_vars:
+        for key in ref_vars.items():
             cur.execute("select name from attribute_type where name=?", [key])
             res = cur.fetchone()
             if not res:
@@ -393,7 +396,7 @@ class RisImport:
                 cur.execute(sql, [source[0], att])
                 res = cur.fetchone()
                 if res is None:
-                    placeholders = [att, source[0], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    placeholders = [att, source[0], datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                                     self.app.settings['codername']]
                     cur.execute(insert_sql, placeholders)
                     self.app.conn.commit()
@@ -419,7 +422,7 @@ class RisImport:
                                     ['A1', 'A2', 'A3', 'A4', 'AU', 'KW', 'N1', 'UR'])
         list_tags = list(default_list_tags) + list(ATTACHMENT_TAGS)
         tag_keys = rispy.TAG_KEY_MAPPING
-        longtag_to_tag = dict((v, k) for k, v in tag_keys.items())
+        longtag_to_tag = {v: k for k, v in tag_keys.items()}
         cur = self.app.conn.cursor()
         cur.execute("select max(risid) from ris")
         res = cur.fetchone()
@@ -434,7 +437,7 @@ class RisImport:
             else str(Path(filepath).parent)
         existing_sigs = self.project_signatures()
         cur.execute("select lower(name) from source")
-        existing_names = set(r[0] for r in cur.fetchall() if r[0] is not None)
+        existing_names = {r[0] for r in cur.fetchall() if r[0] is not None}
         seen_sigs = set()
         seen_attach = set()
         rows = []
@@ -605,7 +608,7 @@ class RisImport:
             Boolean
         """
 
-        longtag_to_tag = dict((v, k) for k, v in rispy.TAG_KEY_MAPPING.items())
+        longtag_to_tag = {v: k for k, v in rispy.TAG_KEY_MAPPING.items()}
         pairs = []
         for longtag, raw in entry.items():
             tag = longtag_to_tag.get(longtag)

@@ -38,14 +38,19 @@ Code resize handles for text coding
 """
 
 import datetime
-import pymupdf
-from io import BytesIO
 import logging
-from pathlib import Path
-from PIL import Image, ImageOps, ImageFilter
 import platform
+from io import BytesIO
+from pathlib import Path
 
-from PyQt6 import QtCore, QtGui, QtWidgets, sip  # sip: detect deleted C++ objects in deferred callbacks
+import pymupdf
+from PIL import Image, ImageFilter, ImageOps
+from PyQt6 import (  # sip: detect deleted C++ objects in deferred callbacks
+    QtCore,
+    QtGui,
+    QtWidgets,
+    sip,
+)
 
 from .color_selector import TextColor
 from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
@@ -53,7 +58,9 @@ from .GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
 
 # If VLC not installed, it will not crash
 vlc = None
-from .media_player_qt import MediaInstance as QtMediaInstance, make_vlc_instance
+from .media_player_qt import MediaInstance as QtMediaInstance
+from .media_player_qt import make_vlc_instance
+
 try:
     import vlc
 except Exception as e:
@@ -316,7 +323,7 @@ def _apply_default_tree_widths(tree_widget, minimum_widths=None, default_width_f
                     if position == len(factor_columns) - 1:
                         target_width = max(flexible_width - allocated_width, 1)
                     else:
-                        target_width = max(1, int(round(flexible_width * (factor / total_factor))))
+                        target_width = max(1, round(flexible_width * (factor / total_factor)))
                         allocated_width += target_width
                     minimum_width = minimum_widths.get(index)
                     if minimum_width is not None:
@@ -388,6 +395,7 @@ def extract_epub_fulltext(filepath):
 
     import ebooklib
     from ebooklib import epub
+
     from .html_parser import html_to_text
 
     book = epub.read_epub(filepath)
@@ -577,7 +585,7 @@ class DialogCodeInText(QtWidgets.QDialog):
 
         self.app = app
         self.data = data
-        self.code_resize_timer = datetime.datetime.now()
+        self.code_resize_timer = datetime.datetime.now().astimezone()
         self.event_filter_on = False
         QtWidgets.QDialog.__init__(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
@@ -675,12 +683,12 @@ class DialogCodeInText(QtWidgets.QDialog):
             key = event.key()
             mod = event.modifiers()
             # using timer for a lot of things
-            now = datetime.datetime.now()
+            now = datetime.datetime.now().astimezone()
             diff = now - self.code_resize_timer
             if diff.microseconds < 100000:
                 return False
             # Key event can be too sensitive, adjusted  for 150 millisecond gap
-            self.code_resize_timer = datetime.datetime.now()
+            self.code_resize_timer = datetime.datetime.now().astimezone()
             if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier:
                 self.shrink_to_left()
                 return True
@@ -916,7 +924,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         self.app = app
         self.data = data
         self.scale = 1
-        self.export_key_timer = datetime.datetime.now()
+        self.export_key_timer = datetime.datetime.now().astimezone()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_context_image()
         self.ui.setupUi(self)
@@ -979,8 +987,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         if self.pixmap.height() > self.height() - 30 - 80:  # slider 30 and textedit 80 heights
             self.scale = (self.height() - 30 - 80) / self.pixmap.height()
             slider_value = int(self.scale * 100)
-            if slider_value > 100:
-                slider_value = 100
+            slider_value = min(slider_value, 100)
             self.ui.horizontalSlider.setValue(slider_value)
         self.draw_scene()
 
@@ -1106,11 +1113,11 @@ class DialogCodeInImage(QtWidgets.QDialog):
                 return True
             if key == QtCore.Qt.Key.Key_E:
                 # Prevent E key event double-activating
-                now = datetime.datetime.now()
+                now = datetime.datetime.now().astimezone()
                 overlap_diff = now - self.export_key_timer
                 if overlap_diff.total_seconds() > 2:
                     self.export_image()
-                self.export_key_timer = datetime.datetime.now()
+                self.export_key_timer = datetime.datetime.now().astimezone()
                 return True
         return False
 
@@ -1297,8 +1304,8 @@ class NumberBar(QtWidgets.QFrame):
         # Install event filter
         class EventFilter(QtCore.QObject):
             def eventFilter(filter_self, source: QtCore.QObject, event: QtCore.QEvent):
-                if source == self.text_edit or source == self.text_edit.viewport():
-                    if event.type() in (QtCore.QEvent.Type.UpdateRequest, 
+                if source == self.text_edit or source == self.text_edit.viewport() and\
+                    event.type() in (QtCore.QEvent.Type.UpdateRequest, 
                                         QtCore.QEvent.Type.Paint, 
                                         QtCore.QEvent.Type.Resize, 
                                         QtCore.QEvent.Type.KeyPress, 
@@ -1331,8 +1338,7 @@ class NumberBar(QtWidgets.QFrame):
         if self.is_plain_text:
             total_lines = max(1, self.text_edit.blockCount())
             self.highest_line = max(self.highest_line, self.first_line + total_lines - 1)
-        if self.first_line > self.highest_line:
-            self.highest_line = self.first_line
+        self.highest_line = max(self.highest_line, self.first_line)
         if self.highest_line < 1000:
             digits = 3  # minimum width 3 digits
         else:
@@ -1406,8 +1412,7 @@ class NumberBar(QtWidgets.QFrame):
                         round(top) + text_edit_font_metrics.ascent(),
                         line_number
                     )
-                    if line_count > self.highest_line:
-                        self.highest_line = line_count
+                    self.highest_line = max(self.highest_line, line_count)
                 block = block.next()
                 top = bottom
                 bottom = top + self.text_edit.blockBoundingRect(block).height()
@@ -1432,8 +1437,7 @@ class NumberBar(QtWidgets.QFrame):
                 )
 
                 block = block.next()
-                if line_count > self.highest_line:
-                    self.highest_line = line_count
+                self.highest_line = max(self.highest_line, line_count)
 
         painter.end()
         QtWidgets.QWidget.paintEvent(self, event)
@@ -1593,7 +1597,7 @@ class ToolTipEventFilter(QtCore.QObject):
             # Occasional None type error
             if self.code_text is None:
                 # Call Base Class Method to Continue Normal Event Processing
-                return super(ToolTipEventFilter, self).eventFilter(receiver, event)
+                return super().eventFilter(receiver, event)
             for item in self.code_text:
                 if item['pos0'] - self.offset <= pos <= item['pos1'] - self.offset and \
                         item['seltext'] is not None:
@@ -1643,5 +1647,5 @@ class ToolTipEventFilter(QtCore.QObject):
             if text_ != "":
                 receiver.setToolTip(text_)
         # Call Base Class Method to Continue Normal Event Processing
-        return super(ToolTipEventFilter, self).eventFilter(receiver, event)
+        return super().eventFilter(receiver, event)
 

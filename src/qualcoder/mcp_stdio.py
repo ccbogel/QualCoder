@@ -34,7 +34,8 @@ locks and error classification stay in QualCoder.
 import argparse
 import asyncio
 import sys
-from typing import Any, Awaitable, Callable, Optional
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 import anyio
 import httpx2
@@ -129,7 +130,7 @@ class QualCoderStdioBridge:
         await self.ensure_server()
         await self.serve()
 
-    async def _list_tools(self, _ctx: ServerRequestContext[Any], params: Optional[types.PaginatedRequestParams]):
+    async def _list_tools(self, _ctx: ServerRequestContext[Any], params: types.PaginatedRequestParams | None):
         try:
             return await self._with_session(lambda s: s.list_tools(params=params))
         except QualCoderUnreachableError:
@@ -139,16 +140,16 @@ class QualCoderStdioBridge:
         try:
             return await self._with_session(lambda s: s.call_tool(params.name, params.arguments or {}))
         except QualCoderUnreachableError as err:
-            return types.CallToolResult(content=[types.TextContent(type="text", text=str(err))], isError=True)
+            return types.CallToolResult(content=[types.TextContent(type="text", text=str(err))])
 
-    async def _list_resources(self, _ctx: ServerRequestContext[Any], params: Optional[types.PaginatedRequestParams]):
+    async def _list_resources(self, _ctx: ServerRequestContext[Any], params: types.PaginatedRequestParams | None):
         try:
             return await self._with_session(lambda s: s.list_resources(params=params))
         except QualCoderUnreachableError:
             return types.ListResourcesResult(resources=[])
 
     async def _list_resource_templates(
-            self, _ctx: ServerRequestContext[Any], params: Optional[types.PaginatedRequestParams]
+            self, _ctx: ServerRequestContext[Any], params: types.PaginatedRequestParams | None
     ):
         try:
             return await self._with_session(
@@ -160,7 +161,7 @@ class QualCoderStdioBridge:
     async def _read_resource(self, _ctx: ServerRequestContext[Any], params: types.ReadResourceRequestParams):
         return await self._with_session(lambda s: s.read_resource(params.uri))
 
-    async def _list_prompts(self, _ctx: ServerRequestContext[Any], _params: Optional[types.PaginatedRequestParams]):
+    async def _list_prompts(self, _ctx: ServerRequestContext[Any], _params: types.PaginatedRequestParams | None):
         return types.ListPromptsResult(prompts=[])
 
     async def serve(self) -> None:
@@ -169,7 +170,7 @@ class QualCoderStdioBridge:
             await self.server.run(read_stream, write_stream, options)
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="stdio bridge that attaches to a running QualCoder instance")
     endpoint_args = parser.add_mutually_exclusive_group()
     endpoint_args.add_argument("--url", default=None, help=f"MCP endpoint (default {DEFAULT_URL})")

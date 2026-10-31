@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Helpers for AI-visible memo content.
 

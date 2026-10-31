@@ -206,9 +206,7 @@ def extract_pdf_highlights(filepath):
                     if kind is not None:
                         stroke = (annot.colors or {}).get('stroke')
                         if stroke and len(stroke) >= 3:
-                            color = "#{:02X}{:02X}{:02X}".format(
-                                int(round(stroke[0] * 255)), int(round(stroke[1] * 255)),
-                                int(round(stroke[2] * 255)))
+                            color = f"#{round(stroke[0] * 255):02X}{round(stroke[1] * 255):02X}{round(stroke[2] * 255):02X}"
                         else:
                             color = "#F7FE2E"  # PDF default highlight yellow
                         quads = []

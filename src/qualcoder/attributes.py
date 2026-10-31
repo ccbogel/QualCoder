@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -24,14 +22,14 @@ https://qualcoder.org/
 import datetime
 import logging
 
-from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .add_attribute import DialogAddAttribute
 from .confirm_delete import DialogConfirmDelete
-from .memo import DialogMemo
-from .GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
 from .GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
+from .GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
+from .memo import DialogMemo
 
 logger = logging.getLogger(__name__)
 
@@ -276,7 +274,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
 
         self.ui.label.setText(_("Attributes: ") + str(len(self.attributes)))
         rows = self.ui.tableWidget.rowCount()
-        for i in range(0, rows):
+        for i in range(rows):
             self.ui.tableWidget.removeRow(0)
         self.ui.tableWidget.setColumnCount(4)
         self.ui.tableWidget.setHorizontalHeaderLabels([_("Name"), _("Assigned to"), _("Type"), _("Memo")])

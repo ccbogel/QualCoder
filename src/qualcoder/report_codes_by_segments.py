@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,18 +19,24 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
-from copy import deepcopy
 import logging
-import openpyxl
-from PyQt6 import QtGui, QtWidgets, QtCore
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QBrush
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from copy import deepcopy
 
+import openpyxl
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
+
+#from PyQt6.QtGui import QBrush
 from .code_in_all_files import DialogCodeInAllFiles
-from .color_selector import TextColor
+
+#from .color_selector import TextColor
 from .GUI.ui_report_codes_by_segments import Ui_DialogSegmentCodings
-from .helpers import Message, init_persistent_tree_header, restore_persistent_tree_widths
+from .helpers import (
+    Message,
+    init_persistent_tree_header,
+    restore_persistent_tree_widths,
+)
 from .report_attributes import DialogSelectAttributeParameters
 
 logger = logging.getLogger(__name__)
@@ -50,7 +54,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
     """
 
     def __init__(self, app, parent_textedit):
-        super(DialogCodesBySegments, self).__init__()
+        super().__init__()
         self.app = app
         self.parent_textEdit = parent_textedit
         self.code_names, self.categories = [], []
@@ -446,8 +450,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = _("Memo")
                 cat_name = c['name']
-                if self.truncated_code_names:
-                    if len(c['name']) > 62:  # Keep category name short
+                if self.truncated_code_names and len(c['name']) > 62:  # Keep category name short
                         cat_name = f"{c['name'][:30]}..{c['name'][-30:]}"
                         self.contains_long_names = True
                 top_item = QtWidgets.QTreeWidgetItem([cat_name, f'catid:{c["catid"]}', memo])
@@ -477,8 +480,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = "Memo"
                         cat_name = c['name']
-                        if self.truncated_code_names:
-                            if len(c['name']) > 62:  # Keep category name short
+                        if self.truncated_code_names and len(c['name']) > 62:  # Keep category name short
                                 cat_name = f"{c['name'][:30]}..{c['name'][-30:]}"
                                 self.contains_long_names = True
                         child = QtWidgets.QTreeWidgetItem([cat_name, f'catid:{c["catid"]}', memo])
@@ -505,8 +507,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 code_name = c['name']
-                if self.truncated_code_names:
-                    if len(c['name']) > 62:  # Keep category name short
+                if self.truncated_code_names and len(c['name']) > 62:  # Keep category name short
                         code_name = f"{c['name'][:30]}..{c['name'][-30:]}"
                         self.contains_long_names = True
                 top_item = QtWidgets.QTreeWidgetItem([code_name, f'cid:{c["cid"]}', memo])
@@ -534,8 +535,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                     if c['memo'] != "":
                         memo = _("Memo")
                     code_name = c['name']
-                    if self.truncated_code_names:
-                        if len(c['name']) > 62:  # Keep category name short
+                    if self.truncated_code_names and len(c['name']) > 62:  # Keep category name short
                             code_name = f"{c['name'][:30]}..{c['name'][-30:]}"
                             self.contains_long_names = True
                     child = QtWidgets.QTreeWidgetItem([code_name, f"cid:{c['cid']}", memo])
@@ -831,7 +831,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         """ Fill table and prepare xlsx result set. """
 
         num_rows = self.ui.tableWidget.rowCount()
-        for row in range(0, num_rows):
+        for row in range(num_rows):
             self.ui.tableWidget.removeRow(0)
         self.horizontal_labels = ["caseid", "case name", "fileid", "file name", "pos0", "pos1", "text"] + self.code_columns
         self.ui.tableWidget.setColumnCount(len(self.horizontal_labels))

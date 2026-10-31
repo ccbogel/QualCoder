@@ -21,9 +21,10 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from PyQt6 import QtWidgets, QtCore
-from pathlib import Path
 import logging
+from pathlib import Path
+
+from PyQt6 import QtCore, QtWidgets
 
 from .GUI.ui_attribute import Ui_DialogAddAttribute
 from .helpers import Message
@@ -42,7 +43,7 @@ class DialogAddAttribute(QtWidgets.QDialog):
     """
 
     def __init__(self, app, parent=None):
-        super(DialogAddAttribute, self).__init__(parent)
+        super().__init__(parent)
 
         self.app = app
         self.new_name = ""

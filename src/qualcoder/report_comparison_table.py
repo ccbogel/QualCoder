@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,20 +19,27 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from datetime import datetime
 import logging
+from datetime import datetime
 from math import isclose
-import openpyxl
-from openpyxl.utils import get_column_letter
-from openpyxl.styles import Alignment, PatternFill
-from PyQt6 import QtCore, QtWidgets, QtGui
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from sqlite3 import IntegrityError
 
-from .GUI.ui_comparison_table import Ui_Dialog_Comparisons
-from .helpers import ExportDirectoryPathDialog, Message, DialogCodeInText, DialogCodeInImage, DialogCodeInAV, msecs_to_hours_mins_secs
-from .select_items import DialogSelectItems
+import openpyxl
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from openpyxl.styles import Alignment, PatternFill
+from openpyxl.utils import get_column_letter
+from PyQt6 import QtCore, QtGui, QtWidgets
 
+from .GUI.ui_comparison_table import Ui_Dialog_Comparisons
+from .helpers import (
+    DialogCodeInAV,
+    DialogCodeInImage,
+    DialogCodeInText,
+    ExportDirectoryPathDialog,
+    Message,
+    msecs_to_hours_mins_secs,
+)
+from .select_items import DialogSelectItems
 
 logger = logging.getLogger(__name__)
 
@@ -291,7 +296,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
 
         selection_list = [{'id': -1, 'name': ''}]
         for file_name in self.app.get_filenames():
-            selection_list.append(file_name)
+            selection_list.copy().append(file_name)
         ui = DialogSelectItems(self.app, selection_list, _("Select files"), "multi")
         ok = ui.exec()
         if not ok:
@@ -360,8 +365,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 for fid in column['ids']:
                     cell_data += self.get_codings(fid, code_['cid'])
                 result_length = len(cell_data)
-                if result_length > self.max_count:
-                    self.max_count = result_length
+                self.max_count = max(self.max_count, result_length)
                 self.data_counts[row][col] = result_length
                 self.data[row][col] = cell_data
 
@@ -371,8 +375,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             for col, item_data in enumerate(row_data):
                 if self.data_counts[row][col] > 0:
                     color_range_index = int(self.data_counts[row][col] / self.max_count * 5) - 1
-                    if color_range_index < 0:
-                        color_range_index = 0
+                    color_range_index = max(color_range_index, 0)
                     self.data_colors[row][col] = colors[color_range_index]
         self.fill_table()
 
@@ -460,7 +463,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         cases = self.app.get_casenames()
         selection_list = [{'id': -1, 'name': ''}]
         for case in cases:
-            selection_list.append(case)
+            selection_list.copy().append(case)
         ui = DialogSelectItems(self.app, selection_list, _("Select cases"), "multi")
         ok = ui.exec()
         if not ok:
@@ -492,7 +495,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         selection_list = [{'id': -1, 'name': ''}]
         codes, categories = self.app.get_codes_categories()
         for code_ in codes:
-            selection_list.append(code_)
+            selection_list.copy().append(code_)
         ui = DialogSelectItems(self.app, selection_list, _("Select codes"), "multi")
         ok = ui.exec()
         if not ok:
@@ -524,7 +527,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         selection_list = [{'id': -1, 'name': ''}]
         codes, categories = self.app.get_codes_categories()
         for category in categories:
-            selection_list.append(category)
+            selection_list.copy().append(category)
         ui = DialogSelectItems(self.app, selection_list, _("Select one category"), "single")
         ok = ui.exec()
         if not ok:
@@ -668,7 +671,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                     if data['result_type'] == "image":
                         details += f"X, Y: {data['x1']}, {data['y1']}. Width: {data['width']}. Height: {data['height']}\n"
                         details += f"Memo: {data['memo']}"
-                    details += f"\n========\n"
+                    details += "\n========\n"
                 d_cell = ws2.cell(row=row + 2, column=col + 2)
                 d_cell.value = details
                 d_cell.alignment = Alignment(wrap_text=True, vertical='top')
@@ -864,7 +867,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.splitter.setSizes([300, 200])
 
     def show_list_item(self):
-        """  """
+        #"""  """ Empty docstring
 
         row = self.ui.listWidget.currentIndex().row()
         data = self.data_list_widget[row]

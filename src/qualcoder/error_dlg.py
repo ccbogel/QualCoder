@@ -36,7 +36,7 @@ class ErrorDlg(QtWidgets.QDialog):
     """Shows error dialog with traceback."""
 
     def __init__(self, msg, tb):
-        super(ErrorDlg, self).__init__(parent=None)
+        super().__init__(parent=None)
         self.ui = Ui_ErrorDlg()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
@@ -77,7 +77,7 @@ class UncaughtHook(QtCore.QObject):
     _exception_caught = QtCore.pyqtSignal(object, object)
 
     def __init__(self, *args, **kwargs):
-        super(UncaughtHook, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # Register the exception_hook() function as hook with the Python interpreter
         sys.excepthook = self.exception_hook

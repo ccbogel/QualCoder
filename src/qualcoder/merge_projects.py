@@ -23,10 +23,10 @@ https://qualcoder.org/
 
 import datetime
 import logging
-from pathlib import Path
 import re
 import shutil
 import sqlite3
+from pathlib import Path
 
 from PyQt6 import QtCore, QtWidgets
 
@@ -121,7 +121,7 @@ class DialogMergePreview(QtWidgets.QDialog):
 
     def __init__(self, app, sections, path_s, parent=None):
 
-        super(DialogMergePreview, self).__init__(parent)
+        super().__init__(parent)
         self.app = app
         self.sections = sections
         self.setWindowTitle(_("Merge preview"))

@@ -21,20 +21,20 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from copy import deepcopy
 import datetime
 import logging
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-from random import randint
 import sqlite3
+from copy import deepcopy
+from random import randint
 
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
 
 #from .__main__ import App
 from .add_item_name import DialogAddItemName
-from .color_selector import DialogColorSelect, colors, TextColor
+from .color_selector import DialogColorSelect, colors
 from .confirm_delete import DialogConfirmDelete
 from .helpers import Message, restore_persistent_tree_widths
 from .memo import DialogMemo

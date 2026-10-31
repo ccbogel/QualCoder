@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 This file is part of QualCoder.
@@ -20,22 +19,29 @@ https://qualcoder-org.github.io
 https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
-
-from copy import deepcopy
 import logging
 import os
+from copy import deepcopy
 
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
-from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord, prompt_name_and_scope
+
+from .ai_agent_prompts import (
+    AgentPromptRecord,
+    AiAgentPromptsCatalog,
+    prompt_name_and_scope,
+)
 from .ai_prompt_library import DialogAiEditPrompts
 from .color_selector import TextColor
-from .report_attributes import DialogSelectAttributeParameters
 from .GUI.ui_ai_search import Ui_Dialog_AiSearch
-from .helpers import Message, init_persistent_tree_header, restore_persistent_tree_widths
+from .helpers import (
+    Message,
+    init_persistent_tree_header,
+    restore_persistent_tree_widths,
+)
+from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
-
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -48,19 +54,19 @@ class DialogAiSearch(QtWidgets.QDialog):
     Called from code_text.py
     """
     
-    attributes = []
-    attribute_file_ids = []
-    selected_code_name = ''
-    selected_code_ids = -1
-    selected_code_memo = ''
-    selected_code_scope = []
-    include_coded_segments = False
-    selected_file_ids = []
-    selected_case_ids = []
-    selected_case_names = []
-    selected_filter_info = {}
-    current_prompt = None
-    prompt_records = []
+    # attributes = []
+    # attribute_file_ids = []
+    # selected_code_name = ''
+    # selected_code_ids = -1
+    # selected_code_memo = ''
+    # selected_code_scope = []
+    # include_coded_segments = False
+    # selected_file_ids = []
+    # selected_case_ids = []
+    # selected_case_names = []
+    # selected_filter_info = {}
+    # current_prompt = None
+    # prompt_records = []
 
     def _default_prompt_record(self):
         """Return the legacy-default prompt for this dialog context when available."""
@@ -277,8 +283,8 @@ class DialogAiSearch(QtWidgets.QDialog):
             self.ui.tabWidget.setCurrentIndex(int(self._get_context_setting('last_tab_index', 0)))
         self.ui.lineEdit_free_topic.setText(self._get_context_setting('free_topic', ''))
         self.ui.textEdit_free_description.setText(self._get_context_setting('free_description', '').replace('\\n', '\n'))        
-        self.ui.checkBox_send_memos.setChecked((self._get_context_setting('send_memos', 'True') == 'True'))
-        self.ui.checkBox_coded_segments.setChecked((self._get_context_setting('coded_segments', 'False') == 'True'))
+        self.ui.checkBox_send_memos.setChecked(self._get_context_setting('send_memos', 'True') == 'True')
+        self.ui.checkBox_coded_segments.setChecked(self._get_context_setting('coded_segments', 'False') == 'True')
         # buttons
         self.ui.pushButton_change_prompt.clicked.connect(self.change_prompt)
         self.ui.buttonBox.accepted.connect(self.ok)
@@ -623,8 +629,8 @@ class DialogAiSearch(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         sql = "select length(fulltext), mediapath from source where id=?"
         sql_text_codings = "select count(cid) from code_text_visible where fid=?"
-        sql_av_codings = "select count(cid) from code_av_visible where id=?"  # Not used
-        sql_image_codings = "select count(cid) from code_image_visible where id=?"  # Not used
+        #sql_av_codings = "select count(cid) from code_av_visible where id=?"  # Not used
+        #sql_image_codings = "select count(cid) from code_image_visible where id=?"  # Not used
         item = QtWidgets.QListWidgetItem(_("<no file filter>"))
         item.setToolTip(_("Search in all textfiles"))
         item.setData(Qt.ItemDataRole.UserRole, -1)
@@ -958,7 +964,7 @@ class DialogAiSearch(QtWidgets.QDialog):
                     self.selected_case_names.append(item.text())
             if len(selected_cases) > 0:
                 selected_cases_str = "(" + ", ".join(map(str, selected_cases)) + ")"
-                files_cases_sql = str('select distinct case_text.fid from case_text '
+                files_cases_sql = ('select distinct case_text.fid from case_text '
                                     'join source on case_text.fid=source.id '
                                     'where caseid in ') + selected_cases_str
                 cur = self.app.conn.cursor()

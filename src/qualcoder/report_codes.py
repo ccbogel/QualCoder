@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,35 +19,44 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-import sqlite3
-from copy import deepcopy
 import csv
 import datetime
-import pymupdf
 import logging
-import openpyxl
-from PyQt6.QtWidgets import QTextEdit
-from openpyxl.styles import Font, Alignment
-from openpyxl.utils import get_column_letter
 import os
-import PIL
-from PIL import Image
-import qtawesome as qta  # See https://pictogrammers.com/library/mdi/
 import re
+import sqlite3
+from copy import deepcopy
 from shutil import copyfile
 from typing import Any
 
-from PyQt6 import QtGui, QtWidgets, QtCore
+import openpyxl
+import PIL
+import pymupdf
+import qtawesome as qta  # See https://pictogrammers.com/library/mdi/
+from openpyxl.styles import Alignment, Font
+from openpyxl.utils import get_column_letter
+from PIL import Image
+from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
+from PyQt6.QtWidgets import QTextEdit
 
 from .code_in_all_files import DialogCodedIds
 from .color_selector import TextColor
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
-from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
-    ExportDirectoryPathDialog, init_persistent_tree_header, restore_persistent_tree_widths, \
-    doc_end_position, doc_position_from_index
+from .helpers import (
+    DialogCodeInAV,
+    DialogCodeInImage,
+    DialogCodeInText,
+    ExportDirectoryPathDialog,
+    Message,
+    doc_end_position,
+    doc_position_from_index,
+    init_persistent_tree_header,
+    msecs_to_hours_mins_secs,
+    restore_persistent_tree_widths,
+)
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
@@ -77,7 +84,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     """
 
     def __init__(self, app, parent_textedit, tab_coding):
-        super(DialogReportCodes, self).__init__()
+        super().__init__()
         self.app = app
         self.parent_textEdit = parent_textedit
         self.tab_coding = tab_coding
@@ -179,14 +186,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             if s0 > 10 and s1 > 10:
                 self.ui.splitter.setSizes([s0, s1, 0])
             v0 = int(self.app.settings['dialogreportcodes_splitter_v0'])
-            if v0 < 10:
-                v0 = 10
+            v0 = max(v0, 10)
             v1 = int(self.app.settings['dialogreportcodes_splitter_v1'])
-            if v1 < 10:
-                v1 = 10
+            v1 = max(v1, 10)
             v2 = int(self.app.settings['dialogreportcodes_splitter_v2'])
-            if v2 < 10:
-                v2 = 10
+            v2 = max(v2, 10)
             self.ui.splitter_vert.setSizes([v0, v1, v2])
         except KeyError:
             pass
@@ -770,20 +774,20 @@ class DialogReportCodes(QtWidgets.QDialog):
         wb = openpyxl.Workbook()
         ws = wb.active
         # Column header
-        for col in range(0, col_count):
+        for col in range(col_count):
             cell = ws.cell(column=col + 2, row=1)
             cell.value = self.ui.tableWidget.horizontalHeaderItem(col).text()
             cell.font = Font(b=True)
             ws.column_dimensions[get_column_letter(col + 1)].width = 30
         # Row header
-        for row in range(0, row_count):
+        for row in range(row_count):
             cell = ws.cell(column=1, row=row + 2)
             cell.value = self.ui.tableWidget.verticalHeaderItem(row).text()
             cell.font = Font(b=True)
 
         # Data
-        for c in range(0, col_count):
-            for r in range(0, row_count):
+        for c in range(col_count):
+            for r in range(row_count):
                 te = self.te[r][c]
                 try:
                     data_text = te.toPlainText()
@@ -818,9 +822,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         Using a byte order mark so that other software recognises UTF-8
         '''
         data = self.ui.textEdit.toPlainText()
-        f = open(filepath, 'w', encoding='utf-8-sig')
-        f.write(data)
-        f.close()
+        with open(filepath, 'w', encoding='utf-8-sig') as f:
+            f.write(data)
+            f.close()
         msg = _('Report exported: ') + filepath
         Message(self.app, _('Report exported'), msg, "information").exec()
         self.parent_textEdit.append(msg)
@@ -935,8 +939,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Number of categories, for category column headings
         total_categories = 0
         for data in self.results:
-            if len(self.categories_of_code(data['cid'])) > total_categories:
-                total_categories = len(self.categories_of_code(data['cid']))
+            total_categories = max(total_categories, len(self.categories_of_code(data['cid'])))
         if total_categories > 0:
             col_headings += ["Category"] * total_categories
 
@@ -1049,8 +1052,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Number of categories, for category column headings
         total_categories = 0
         for data in self.results:
-            if len(self.categories_of_code(data['cid'])) > total_categories:
-                total_categories = len(self.categories_of_code(data['cid']))
+            total_categories = max(total_categories, len(self.categories_of_code(data['cid'])))
         if total_categories > 0:
             col_headings += ["Category"] * total_categories
 
@@ -1244,7 +1246,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     imgids.append(row[5])
             if imgids:
                 item['overlaps'] = imgids
-        cooccuring_code_names = sorted(list(set(cooccuring_code_names)))
+        cooccuring_code_names = sorted(set(cooccuring_code_names))
         return cooccuring_code_names
 
     def export_html_file(self):
@@ -1603,7 +1605,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Clear results output
         rows = self.ui.tableWidget.rowCount()
-        for r in range(0, rows):
+        for r in range(rows):
             self.ui.tableWidget.removeRow(0)
         self.ui.comboBox_export.setEnabled(True)
         self.ui.textEdit.clear()
@@ -2030,8 +2032,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             else:
                 pre_text_start = 1  # sqlite strings start at 1 not 0
                 pre_text_length = r['pos0']  # sqlite strings start at 1 not 0, so this length is OK
-            if pre_text_start < 1:
-                pre_text_start = 1
+            pre_text_start = max(pre_text_start, 1)
             sql = "select substr(fulltext,?,?) from source where id=?"
             cur.execute(sql, [pre_text_start, pre_text_length, r['fid']])
             res_pre = cur.fetchone()
@@ -2204,9 +2205,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             cur.execute(sql, [id_])
             res = cur.fetchone()
             abs_path = ""
-            if 'audio:' == res[2][0:6]:
-                abs_path = res[2][6:]
-            elif 'video:' == res[2][0:6]:
+            if 'audio:' == res[2][0:6] or 'video:' == res[2][0:6]:
                 abs_path = res[2][6:]
             else:
                 abs_path = self.app.project_path + res[2]
@@ -3446,9 +3445,9 @@ class ToolTipEventFilter(QtCore.QObject):
             pos = cursor.position()
             receiver.setToolTip("")
             if self.media_data is None:
-                return super(ToolTipEventFilter, self).eventFilter(receiver, event)
+                return super().eventFilter(receiver, event)
             for item in self.media_data:
                 if item['textedit_start'] <= pos <= item['textedit_end']:
                     receiver.setToolTip(_("Right click to view"))
         # Call Base Class Method to Continue Normal Event Processing
-        return super(ToolTipEventFilter, self).eventFilter(receiver, event)
+        return super().eventFilter(receiver, event)

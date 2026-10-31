@@ -21,55 +21,69 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 import datetime
-import pymupdf
 import json
+import platform
+import sqlite3
+import time
+import webbrowser
+import zipfile
+from pathlib import Path
+from random import randint
+from shutil import copyfile, move
+from typing import Any
+
 import openpyxl
 import pandas as pd
-import platform
-from pathlib import Path
-import PIL
+import pymupdf
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from PIL import Image
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QProgressDialog
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-from random import randint
-import sqlite3
-import time
-from typing import Any
-from shutil import copyfile, move
 from striprtf.striprtf import rtf_to_text
-import webbrowser
-import zipfile
 
 # from .__main__ import App
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
+from .code_av import DialogCodeAV  # for isinstance update files
 from .code_pdf import DialogCodePdf
-from .context_help import open_module_help
-from .pdf_utils import extract_pdf_fulltext, extract_pdf_highlights, \
-    pdf_annotations_to_file_memo, code_pdf_highlights, \
-    pdf_markups_question_text  # Same extractor and word map as the PDF viewer
 from .code_text import DialogCodeText  # for isinstance()
-from .color_selector import colour_ranges, colors
+from .color_selector import colors, colour_ranges
 from .confirm_delete import DialogConfirmDelete
-from .docx import opendocx, getdocumenttext
+from .context_help import open_module_help
+from .docx import getdocumenttext, opendocx
 from .edit_textfile import DialogEditTextFile
 from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
-from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_secs, \
-    extract_epub_fulltext
+from .helpers import (
+    ExportDirectoryPathDialog,
+    Message,
+    extract_epub_fulltext,
+    msecs_to_hours_mins_secs,
+)
 from .html_parser import *
 from .latex_import import LatexImportError, tex_file_to_plain_text
 from .memo import DialogMemo
 from .pdf_preview import DialogPdfPagesToImages, DialogPdfPreview
+from .pdf_utils import (
+    code_pdf_highlights,
+    extract_pdf_fulltext,
+    extract_pdf_highlights,
+    pdf_annotations_to_file_memo,
+    pdf_markups_question_text,  # Same extractor and word map as the PDF viewer
+)
 from .pseudonyms import Pseudonyms
 from .report_codes import DialogReportCodes  # for isInstance()
 from .ris import Ris
 from .select_items import DialogSelectItems
+from .text_decoding import (
+    decode_text_with_best_encoding as decode_text_with_best_encoding_helper,
+)
 from .view_av import DialogViewAV
-from .view_av_waveform import waveform_backend_available, generate_waveform_png_async, waveform_colour
-from .code_av import DialogCodeAV  # for isinstance update files
-from .view_image import DialogViewImage, DialogCodeImage  # for isinstance update files
-from .text_decoding import decode_text_with_best_encoding as decode_text_with_best_encoding_helper
+from .view_av_waveform import (
+    generate_waveform_png_async,
+    waveform_backend_available,
+    waveform_colour,
+)
+from .view_image import DialogCodeImage, DialogViewImage  # for isinstance update files
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -757,7 +771,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             row_msg = _("Rows: ") + row_msg.replace("\t", " ")
         col_txt = ""
         col_msg = ""
-        for c in range(0, self.ui.tableWidget.columnCount()):
+        for c in range(self.ui.tableWidget.columnCount()):
             header_text = self.ui.tableWidget.horizontalHeaderItem(c).text()
             col_txt += f'{header_text}\t{self.ui.tableWidget.columnWidth(c)}\t\t'
             if self.ui.tableWidget.isColumnHidden(c):
@@ -807,7 +821,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         msg = _("Load table display settings") + f"\nProfile: {selection['name']}\n"
 
         # Reset columns and rows
-        for col in range(0, self.ui.tableWidget.columnCount()):
+        for col in range(self.ui.tableWidget.columnCount()):
             self.ui.tableWidget.setColumnHidden(col, False)
             # Must check for each column name, as some columns might be renamed. Renamed columns will be ignored
             for col_name_width in column_name_width_list:
@@ -835,7 +849,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             colname, operator, value = rpl.split("\t")
             msg += f"{colname} {operator} {value}\n"
             found = False
-            for c in range(0, self.ui.tableWidget.columnCount()):
+            for c in range(self.ui.tableWidget.columnCount()):
                 if self.ui.tableWidget.horizontalHeaderItem(c).text() == colname:
                     found = True
                     break
@@ -959,7 +973,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if action is None:  # Dismissed menu: None matches unbuilt actions
             return
         if action == action_show_all_columns:
-            for c in range(0, self.ui.tableWidget.columnCount()):
+            for c in range(self.ui.tableWidget.columnCount()):
                 self.ui.tableWidget.setColumnHidden(c, False)
             if not self.app.settings['showids']:
                 self.ui.tableWidget.setColumnHidden(self.ID_COLUMN, True)
@@ -1123,7 +1137,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.import_transcription_from_file(id_)
             return
         if action == action_view_original_text:
-            bad_link = bad_link = self.app.check_bad_file_links(id_)  # List is returned
+            bad_link = self.app.check_bad_file_links(id_)  # List is returned
             if bad_link:
                 bad_link = bad_link[0]
                 bad_path = bad_link['mediapath'].split(':', 1)[1]
@@ -1546,7 +1560,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         for f in filenames:
             if f['name'] == selection['old_name']:
                 Message(self.app, _("Cannot undo"), _("Another file has this name"), "warning").exec()
-                self.files_renamed = [x for x in self.files_renamed if not (selection['fid'] == x.get('fid'))]
+                self.files_renamed = [x for x in self.files_renamed if selection['fid'] != x.get('fid')]
                 if len(self.files_renamed) == 0:
                     self.ui.pushButton_undo.setEnabled(False)
                 return
@@ -1557,7 +1571,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                                      f"{selection['name']} -> {selection['old_name']}")
         self.load_file_data()
         self.app.vectorstore_update()
-        self.files_renamed = [x for x in self.files_renamed if not (selection['fid'] == x.get('fid'))]
+        self.files_renamed = [x for x in self.files_renamed if selection['fid'] != x.get('fid')]
         self._emit_project_table_changes(['source'])
         if len(self.files_renamed) == 0:
             self.ui.pushButton_undo.setEnabled(False)
@@ -1567,7 +1581,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         rows = self.ui.tableWidget.rowCount()
         selected_rows = []
-        for row in range(0, rows):
+        for row in range(rows):
             if not self.ui.tableWidget.isRowHidden(row):
                 selected_rows.append([int(self.ui.tableWidget.item(row, self.ID_COLUMN).text()),
                                       self.ui.tableWidget.item(row, self.NAME_COLUMN).text()])
@@ -1820,7 +1834,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute(sql, (source[0], attribute[0]))
                 res = cur.fetchone()
                 if res is None:
-                    placeholders = [attribute[0], source[0], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    placeholders = [attribute[0], source[0], datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                                     self.app.settings['codername']]
                     cur.execute(insert_sql, placeholders)
         self.app.conn.commit()
@@ -1852,7 +1866,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         cols = self.ui.tableWidget.columnCount()
         rows = self.ui.tableWidget.rowCount()
-        header = [self.ui.tableWidget.horizontalHeaderItem(i).text() for i in range(0, cols)]
+        header = [self.ui.tableWidget.horizontalHeaderItem(i).text() for i in range(cols)]
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "File Attributes"
@@ -2041,14 +2055,14 @@ class DialogManageFiles(QtWidgets.QDialog):
             return icon, metadata, ""
 
         abs_path = ""
-        if 'audio:' == res[2][0:6]:
-            abs_path = res[2][6:]
-        elif 'video:' == res[2][0:6]:
+        if 'audio:' == res[2][0:6] or 'video:' == res[2][0:6]:
             abs_path = res[2][6:]
         elif 'images:' == res[2][0:7]:
             abs_path = res[2][7:]
         else:
             abs_path = self.app.project_path + res[2]
+
+        import PIL.Image
 
         if res[2][:8] == "/images/":
             icon = QtGui.QIcon(qta.icon('mdi6.image-outline', options=[{'scale_factor': 1.2}]))
@@ -2170,7 +2184,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         self.attribute_names.append({'name': name})
         # update attribute_type list and database
-        now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         try:
             cur = self.app.conn.cursor()
             cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
@@ -2402,7 +2416,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(self, _('Duplicate file'),
                                           _("Duplicate filename.\nFile not created"))
             return None, None
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         entry = {'name': tr_name, 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
                  'owner': self.app.settings['codername'], 'date': now, 'av_text_id': None}
         cur = self.app.conn.cursor()
@@ -2614,7 +2628,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         # Create entry details to add to self.source and to database
         item = {'name': name, 'id': -1, 'fulltext': '', 'memo': "",
-                'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'owner': self.app.settings['codername'], 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                 'mediapath': None, 'icon': None, 'metadata': '', 'case': ""}
         # Update database
         cur = self.app.conn.cursor()
@@ -2639,7 +2653,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         attr_types = cur.fetchall()
         insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
         for a in attr_types:
-            placeholders = [a[0], id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            placeholders = [a[0], id_, datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                             self.app.settings['codername']]
             cur.execute(insert_sql, placeholders)
             self.app.conn.commit()
@@ -2718,7 +2732,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg += _("\nNo columns assigned as qualitative.")
             #msg += _("\nEmpty files will be created with attributes assigned to them.")
         cur = self.app.conn.cursor()
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         new_attributes = {}  # Change from character to numeric attribute_type after checking when loading data
         for col in attr_cols:
             cur.execute("select name from attribute_type where name=?", [col])
@@ -3166,7 +3180,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(self, _('Duplicate file'), _("Duplicate filename.\nFile not imported"))
             return
         entry = {'name': filename, 'id': -1, 'fulltext': None, 'memo': "", 'mediapath': mediapath,
-                 'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                 'owner': self.app.settings['codername'], 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                  'av_text_id': None}
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
@@ -3193,7 +3207,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if mediapath[:6] in ("/audio", "audio:", "/video", "video:"):
             entry = {'name': filename + ".txt", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
                      'owner': self.app.settings['codername'],
-                     'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                     'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                      'av_text_id': None}
             cur = self.app.conn.cursor()
             cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
@@ -3218,7 +3232,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             attr_types = cur.fetchall()
             insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
             for a in attr_types:
-                placeholders = [a[0], tr_id, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                placeholders = [a[0], tr_id, datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                                 self.app.settings['codername']]
                 cur.execute(insert_sql, placeholders)
                 self.app.conn.commit()
@@ -3390,7 +3404,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if link_path != "":
             mediapath = link_path
         entry = {'name': filename, 'id': -1, 'fulltext': text_, 'mediapath': mediapath, 'memo': "",
-                 'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+                 'owner': self.app.settings['codername'], 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
                     (
@@ -3407,7 +3421,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         attr_types = cur.fetchall()
         insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
         for a in attr_types:
-            placeholders = [a[0], id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            placeholders = [a[0], id_, datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                             self.app.settings['codername']]
             cur.execute(insert_sql, placeholders)
             self.app.conn.commit()
@@ -3490,7 +3504,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         data = data.replace('</draw:frame>', '\n')
         text_ = ""
         tagged = False
-        for i in range(0, len(data)):
+        for i in range(len(data)):
             if data[i: i + 6] == "<text:" or data[i: i + 7] == "<table:" or data[i: i + 6] == "<draw:":
                 tagged = True
             if not tagged:
@@ -3745,7 +3759,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         for s in selection:
             msg += _("Deleted file: ") + s['name'] + "\n"
-            self.files_renamed = [x for x in self.files_renamed if not (s['id'] == x.get('fid'))]
+            self.files_renamed = [x for x in self.files_renamed if s['id'] != x.get('fid')]
             # Delete text source
             if s['mediapath'] is None or s['mediapath'][0:5] == 'docs:' or s['mediapath'][0:6] == '/docs/':
                 try:
@@ -3955,7 +3969,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     # Delete from vectorstore; the safe helper survives index locks
                     self.vectorstore_delete_document_safe(res[0])
 
-            self.files_renamed = [x for x in self.files_renamed if not (file_id == x.get('fid'))]
+            self.files_renamed = [x for x in self.files_renamed if file_id != x.get('fid')]
         self.update_files_in_dialogs()
         self.check_attribute_placeholders()
         self.parent_text_edit.append(_("Deleted: ") + filenames)
@@ -4018,7 +4032,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
         self.ui.tableWidget.horizontalHeader().setStretchLastSection(False)
         rows = self.ui.tableWidget.rowCount()
-        for r in range(0, rows):
+        for r in range(rows):
             self.ui.tableWidget.removeRow(0)
         for row, data in enumerate(self.source):
             self.ui.tableWidget.insertRow(row)
@@ -4034,7 +4048,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 name_tt += data['mediapath'].split(':', 1)[1]
                 badlink = self.app.check_bad_file_links(data['id'])
                 if badlink:
-                    name_tt += f"\nORIGINAL FILE NOT FOUND"
+                    name_tt += "\nORIGINAL FILE NOT FOUND"
             name_item.setToolTip(name_tt)
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN, name_item)
             trimmed_date = data['date'].split()[0]

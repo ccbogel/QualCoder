@@ -46,10 +46,9 @@ import os
 import re
 import unicodedata
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import yaml
-
 
 PROMPT_REFERENCE_PATTERN = re.compile(r"(?<!\S)/(\S+)")
 PROMPT_FRONTMATTER_PATTERN = re.compile(r"\A---[ \t]*\r?\n(.*?)\r?\n---[ \t]*(?:\r?\n|$)", re.DOTALL)
@@ -185,10 +184,10 @@ class AiAgentPromptsCatalog:
         self.app = app
         self._system_root = os.path.join(os.path.dirname(__file__), "ai_prompts")
 
-    def list_prompts(self, include_internal: bool = False) -> List[AgentPromptRecord]:
+    def list_prompts(self, include_internal: bool = False) -> list[AgentPromptRecord]:
         """Return resolved prompt files with scope override handling."""
 
-        selected: Dict[str, AgentPromptRecord] = {}
+        selected: dict[str, AgentPromptRecord] = {}
         for scope, root in self._prompt_roots():
             for prompt in self._discover_scope(scope, root):
                 conflict_key = self._conflict_key(prompt.name)
@@ -209,14 +208,14 @@ class AiAgentPromptsCatalog:
 
     def list_prompt_variants(
         self,
-        prompt_type: Optional[str] = None,
+        prompt_type: str | None = None,
         include_internal: bool = False,
         apply_init: bool = True,
-    ) -> List[AgentPromptRecord]:
+    ) -> list[AgentPromptRecord]:
         """Return all prompts across scopes without conflict deduplication."""
 
         prompt_type = self._normalize_prompt_type(prompt_type)
-        prompts: List[AgentPromptRecord] = []
+        prompts: list[AgentPromptRecord] = []
         for scope, root in self._prompt_roots():
             prompts.extend(
                 self._discover_scope(
@@ -231,11 +230,11 @@ class AiAgentPromptsCatalog:
             return prompts
         return [item for item in prompts if not item.is_internal]
 
-    def list_visible_prompt_variants(self, prompt_type: Optional[str] = None) -> List[AgentPromptRecord]:
+    def list_visible_prompt_variants(self, prompt_type: str | None = None) -> list[AgentPromptRecord]:
         """Return effective user-visible prompt variants for one prompt type."""
 
         normalized_type = self._normalize_prompt_type(prompt_type)
-        selected: Dict[str, AgentPromptRecord] = {}
+        selected: dict[str, AgentPromptRecord] = {}
         for prompt in self.list_prompt_variants(
             prompt_type=normalized_type,
             include_internal=True,
@@ -253,7 +252,7 @@ class AiAgentPromptsCatalog:
             if new_rank > prev_rank:
                 selected[conflict_key] = prompt
 
-        prompts: List[AgentPromptRecord] = []
+        prompts: list[AgentPromptRecord] = []
         for prompt in selected.values():
             relative_path = self.prompt_name_within_type(prompt.name)
             basename = relative_path.rsplit("/", 1)[-1]
@@ -269,10 +268,10 @@ class AiAgentPromptsCatalog:
         self,
         name: str,
         scope: str,
-        prompt_type: Optional[str] = None,
+        prompt_type: str | None = None,
         include_internal: bool = False,
         apply_init: bool = True,
-    ) -> Optional[AgentPromptRecord]:
+    ) -> AgentPromptRecord | None:
         """Find one prompt variant by case-insensitive name and exact scope."""
 
         query_name = self._normalize_prompt_name(name)
@@ -290,7 +289,7 @@ class AiAgentPromptsCatalog:
                 return prompt
         return None
 
-    def get_prompt(self, name: str, include_internal: bool = False) -> Optional[AgentPromptRecord]:
+    def get_prompt(self, name: str, include_internal: bool = False) -> AgentPromptRecord | None:
         """Resolve one explicit user-callable prompt by case-insensitive name."""
 
         query = self._normalize_prompt_name(name)
@@ -302,7 +301,7 @@ class AiAgentPromptsCatalog:
                 return prompt
         return None
 
-    def get_internal_prompt(self, name: str) -> Optional[AgentPromptRecord]:
+    def get_internal_prompt(self, name: str) -> AgentPromptRecord | None:
         """Resolve one internal prompt by case-insensitive name."""
 
         query = self._normalize_prompt_name(name)
@@ -314,10 +313,10 @@ class AiAgentPromptsCatalog:
                 return prompt
         return None
 
-    def extract_prompt_references(self, text: str, include_internal: bool = False) -> List[AgentPromptRecord]:
+    def extract_prompt_references(self, text: str, include_internal: bool = False) -> list[AgentPromptRecord]:
         """Return prompts referenced via exact `/name` tokens in one chat message."""
 
-        resolved: List[AgentPromptRecord] = []
+        resolved: list[AgentPromptRecord] = []
         for candidate in self._extract_prompt_names(text, include_internal=include_internal):
             prompt = self.get_prompt(candidate, include_internal=include_internal)
             if prompt is None:
@@ -325,7 +324,7 @@ class AiAgentPromptsCatalog:
             resolved.append(prompt)
         return resolved
 
-    def resolve_prompt_references(self, text: str, include_internal: bool = False) -> List[AgentPromptRecord]:
+    def resolve_prompt_references(self, text: str, include_internal: bool = False) -> list[AgentPromptRecord]:
         """Return direct and nested prompt references with stable de-duplicated ordering."""
 
         return self.expand_prompt_references(
@@ -335,12 +334,12 @@ class AiAgentPromptsCatalog:
 
     def expand_prompt_references(
         self,
-        prompts: List[AgentPromptRecord],
+        prompts: list[AgentPromptRecord],
         include_internal: bool = False,
-    ) -> List[AgentPromptRecord]:
+    ) -> list[AgentPromptRecord]:
         """Expand nested prompt references so each resolved prompt appears at most once."""
 
-        ordered: List[AgentPromptRecord] = []
+        ordered: list[AgentPromptRecord] = []
         resolved: set[str] = set()
         visiting: set[str] = set()
 
@@ -368,10 +367,10 @@ class AiAgentPromptsCatalog:
 
         return ordered
 
-    def migrate_legacy_prompts_once(self) -> Dict[str, Dict[str, int]]:
+    def migrate_legacy_prompts_once(self) -> dict[str, dict[str, int]]:
         """Import legacy YAML prompts for user and project scopes into Markdown files."""
 
-        results: Dict[str, Dict[str, int]] = {}
+        results: dict[str, dict[str, int]] = {}
 
         confighome = str(getattr(self.app, "confighome", "") if hasattr(self.app, "confighome") else "").strip()
         if confighome != "":
@@ -406,12 +405,12 @@ class AiAgentPromptsCatalog:
             return ""
         return PROMPT_TYPE_FOLDERS.get(normalized_type, "")
 
-    def normalize_prompt_type(self, prompt_type: Optional[str]) -> Optional[str]:
+    def normalize_prompt_type(self, prompt_type: str | None) -> str | None:
         """Public wrapper for logical prompt-type normalization."""
 
         return self._normalize_prompt_type(prompt_type)
 
-    def prompt_type_from_name(self, name: str) -> Optional[str]:
+    def prompt_type_from_name(self, name: str) -> str | None:
         """Public wrapper around top-level prompt type inference."""
 
         return self._prompt_type_from_name(name)
@@ -437,7 +436,7 @@ class AiAgentPromptsCatalog:
         text = str(value if value is not None else "").strip()
         if text == "":
             return ""
-        parts: List[str] = []
+        parts: list[str] = []
         for part in text.replace("\\", "/").split("/"):
             normalized_part = normalize_prompt_name_component(part)
             if normalized_part != "":
@@ -478,7 +477,7 @@ class AiAgentPromptsCatalog:
             include_name=True,
         )
 
-    def parse_prompt_markdown_document(self, text: str) -> Tuple[Dict[str, Any], str]:
+    def parse_prompt_markdown_document(self, text: str) -> tuple[dict[str, Any], str]:
         """Parse one Markdown prompt document into frontmatter metadata and body."""
 
         metadata, body = self._split_frontmatter(text)
@@ -489,7 +488,7 @@ class AiAgentPromptsCatalog:
 
         return self._infer_description(body)
 
-    def _migrate_legacy_prompt_scope(self, legacy_yaml_path: str, markdown_root: str) -> Dict[str, int]:
+    def _migrate_legacy_prompt_scope(self, legacy_yaml_path: str, markdown_root: str) -> dict[str, int]:
         """One-time import of legacy YAML prompts into the new Markdown folder layout."""
 
         result = {"migrated": 0, "skipped": 0}
@@ -525,8 +524,8 @@ class AiAgentPromptsCatalog:
 
         return result
 
-    def _prompt_roots(self) -> List[Tuple[str, str]]:
-        roots: List[Tuple[str, str]] = []
+    def _prompt_roots(self) -> list[tuple[str, str]]:
+        roots: list[tuple[str, str]] = []
         roots.append(("system", self._system_root))
 
         confighome = ""
@@ -547,12 +546,12 @@ class AiAgentPromptsCatalog:
         scope: str,
         root: str,
         apply_init: bool = True,
-        prompt_type: Optional[str] = None,
-    ) -> List[AgentPromptRecord]:
+        prompt_type: str | None = None,
+    ) -> list[AgentPromptRecord]:
         if root is None or str(root).strip() == "" or not os.path.isdir(root):
             return []
 
-        result: List[AgentPromptRecord] = []
+        result: list[AgentPromptRecord] = []
         try:
             entries = list(os.walk(root))
         except OSError:
@@ -626,7 +625,7 @@ class AiAgentPromptsCatalog:
             return folder_init
         return folder_init + "\n\n" + prompt_body
 
-    def _prompt_type_from_name(self, name: str) -> Optional[str]:
+    def _prompt_type_from_name(self, name: str) -> str | None:
         """Infer one prompt type from the top-level prompt directory."""
 
         normalized_name = self._normalize_prompt_name(name)
@@ -645,7 +644,7 @@ class AiAgentPromptsCatalog:
             return "text_analysis"
         return "general"
 
-    def _normalize_prompt_type(self, prompt_type: Optional[str]) -> Optional[str]:
+    def _normalize_prompt_type(self, prompt_type: str | None) -> str | None:
         value = str(prompt_type if prompt_type is not None else "").strip()
         if value == "":
             return None
@@ -665,7 +664,7 @@ class AiAgentPromptsCatalog:
         if text == "":
             return ""
         parts = re.split(r"[\\/]+", text)
-        normalized_parts: List[str] = []
+        normalized_parts: list[str] = []
         for part in parts:
             normalized_part = normalize_prompt_name_component(part)
             if normalized_part != "":
@@ -678,14 +677,14 @@ class AiAgentPromptsCatalog:
             return False
         return any(part.startswith("_") for part in normalized_name.split("/"))
 
-    def _read_text(self, path: str) -> Optional[str]:
+    def _read_text(self, path: str) -> str | None:
         try:
             with open(path, "r", encoding="utf-8-sig") as handle:
                 return handle.read()
         except OSError:
             return None
 
-    def _load_legacy_prompts_from_yaml(self, raw_text: str, source_path: str) -> Optional[List[Dict[str, Any]]]:
+    def _load_legacy_prompts_from_yaml(self, raw_text: str, source_path: str) -> list[dict[str, Any]] | None:
         """Parse one legacy ai_prompts.yaml payload and return prompt dictionaries."""
 
         try:
@@ -714,7 +713,7 @@ class AiAgentPromptsCatalog:
         """Convert one legacy prompt name into a portable Unicode filename."""
 
         source_name = normalize_prompt_name_component(name)
-        characters: List[str] = []
+        characters: list[str] = []
         for character in source_name:
             if len(characters) == 0:
                 if _is_prompt_name_start_character(character):
@@ -740,12 +739,12 @@ class AiAgentPromptsCatalog:
 
     def _plan_legacy_prompt_targets(
         self,
-        legacy_prompts: List[Dict[str, Any]],
+        legacy_prompts: list[dict[str, Any]],
         markdown_root: str,
-    ) -> List[Tuple[Dict[str, Any], str]]:
+    ) -> list[tuple[dict[str, Any], str]]:
         """Plan deterministic target paths for all migratable legacy prompts in one scope."""
 
-        planned: List[Tuple[Dict[str, Any], str]] = []
+        planned: list[tuple[dict[str, Any], str]] = []
         used_paths: set[str] = set()
 
         for prompt in legacy_prompts:
@@ -787,7 +786,7 @@ class AiAgentPromptsCatalog:
                                         include_name: bool = True) -> str:
         """Build one Markdown prompt file with YAML frontmatter."""
 
-        metadata: Dict[str, str] = {
+        metadata: dict[str, str] = {
             "description": str(description if description is not None else "").strip(),
         }
         prompt_name = str(slug if slug is not None else "").strip()
@@ -810,7 +809,7 @@ class AiAgentPromptsCatalog:
             return "---\n" + frontmatter + "\n---\n"
         return "---\n" + frontmatter + "\n---\n\n" + body + "\n"
 
-    def _split_frontmatter(self, text: str) -> Tuple[Dict[str, str], str]:
+    def _split_frontmatter(self, text: str) -> tuple[dict[str, str], str]:
         """Return frontmatter metadata and Markdown body without the frontmatter block."""
 
         raw_text = str(text if text is not None else "")
@@ -830,13 +829,13 @@ class AiAgentPromptsCatalog:
             metadata = {}
         return metadata, body
 
-    def _extract_prompt_names(self, text: str, include_internal: bool = False) -> List[str]:
+    def _extract_prompt_names(self, text: str, include_internal: bool = False) -> list[str]:
         source_text = str(text if text is not None else "")
         if source_text.strip() == "":
             return []
 
         seen: set[str] = set()
-        result: List[str] = []
+        result: list[str] = []
         for match in PROMPT_REFERENCE_PATTERN.finditer(source_text):
             candidate = self._normalize_prompt_name(match.group(1) if match is not None else "")
             if candidate == "":
@@ -853,7 +852,7 @@ class AiAgentPromptsCatalog:
     def _infer_description(self, body: str) -> str:
         text = str(body if body is not None else "")
         lines = [line.strip() for line in text.splitlines()]
-        paragraph: List[str] = []
+        paragraph: list[str] = []
         in_paragraph = False
         for line in lines:
             if line == "":

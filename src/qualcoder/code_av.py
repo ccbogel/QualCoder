@@ -21,47 +21,61 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-import sqlite3
-from copy import copy, deepcopy
 import datetime
-import emoji
 import logging
 import os
-from pathlib import Path
 import platform
-import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
+import sqlite3
 import subprocess
 import threading
 import time
+from copy import copy, deepcopy
+from pathlib import Path
 
+import emoji
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
 
+from .ai_agent_prompts import AiAgentPromptsCatalog
+from .ai_runtime import ensure_ai_ready
+from .ai_ui import ai_chat_signal_emitter
 from .code_in_all_files import DialogCodeInAllFiles
 from .code_tree import CodeTreeController
 from .coder_names import DialogCoderNames
 from .color_selector import TextColor, colour_ranges, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
-from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from .context_help import open_module_help
-from .helpers import NumberBar, msecs_to_hours_mins_secs, Message, ToolTipEventFilter, CodeResizeHandle, \
-    init_persistent_tree_header, ExportDirectoryPathDialog
+from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
+from .helpers import (
+    CodeResizeHandle,
+    ExportDirectoryPathDialog,
+    Message,
+    NumberBar,
+    ToolTipEventFilter,
+    init_persistent_tree_header,
+    msecs_to_hours_mins_secs,
+)
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
+from .ris import Ris
 from .select_items import DialogSelectItems
 from .speakers import DialogSpeakers, speaker_coder_name
-from .ris import Ris
-from .ai_agent_prompts import AiAgentPromptsCatalog
-from .ai_runtime import ensure_ai_ready
-from .ai_ui import ai_chat_signal_emitter
-from .view_av_waveform import waveform_backend_available, waveform_png_is_current, generate_waveform_png_async, \
-    waveform_colour, keyframe_interval_seconds  # noqa: F401  (WaveformSeekBar used via the promoted .ui widget)
+from .view_av_waveform import (
+    generate_waveform_png_async,
+    keyframe_interval_seconds,
+    waveform_backend_available,
+    waveform_colour,
+    waveform_png_is_current,
+)
 
 # If VLC not installed, it will not crash
 vlc = None
-from .media_player_qt import MediaInstance as QtMediaInstance, make_vlc_instance
+from .media_player_qt import MediaInstance as QtMediaInstance
+from .media_player_qt import make_vlc_instance
+
 try:
     import vlc
 except Exception as e:  # python-vlc missing: Qt backend takes over, no console noise
@@ -97,8 +111,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Transcribed time positions as list of [text_pos0, text_pos1, milliseconds]
         self.time_positions = []
         self.important = False  # Flag to show or hide important coded text and segments
-        self.code_resize_timer = datetime.datetime.now()
-        self.overlap_timer = datetime.datetime.now()
+        self.code_resize_timer = datetime.datetime.now().astimezone()
+        self.overlap_timer = datetime.datetime.now().astimezone()
         self.overlap_code_index = 0  # Overlapping codes in text index
 
         # Segment variables
@@ -2628,7 +2642,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             if os.path.exists(waveform_path):
                 pm = QtGui.QPixmap()
                 pm.load(waveform_path)
-                if pm.isNull():  #
+                if pm.isNull():
                     sb.set_waveform_pixmap(None)
                     sb.set_no_waveform_message(_("Waveform could not be generated"))
                     return
@@ -2658,8 +2672,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
             # On play rewind 100 msecs
             time_msecs = self.mediaplayer.get_time() - 100
-            if time_msecs < 0:
-                time_msecs = 0
+            time_msecs = max(time_msecs, 0)
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
             self.mediaplayer.set_position(pos)
             # Update timer display
@@ -2815,10 +2828,9 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.stop()
 
         # If only playing a segment, need to pause at end of segment
-        if self.play_segment_end is not None:
-            if self.play_segment_end < msecs:
-                self.play_segment_end = None
-                self.play_pause()
+        if self.play_segment_end is not None and self.play_segment_end < msecs:
+            self.play_segment_end = None
+            self.play_pause()
 
     def closeEvent(self, event):
         """ Stop the vlc player on close. """
@@ -3145,10 +3157,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         mods = QtGui.QGuiApplication.keyboardModifiers()
 
         # Esc hides any active resize handles
-        if key == QtCore.Qt.Key.Key_Escape:
-            if hasattr(self, 'active_handles') and self.active_handles:
-                self.hide_resize_handles()
-                return
+        if key == QtCore.Qt.Key.Key_Escape and hasattr(self, 'active_handles') and self.active_handles:
+            self.hide_resize_handles()
+            return
         # Go to bookmark
         if key == QtCore.Qt.Key.Key_B and mods & QtCore.Qt.KeyboardModifier.ShiftModifier:
             self.go_to_bookmark()
@@ -3203,9 +3214,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.rewind_30_seconds()
             return
         # Tree widget menu item keys F2 - F6, handled by the shared controller.
-        if self.ui.treeWidget.hasFocus():
-            if self.code_tree.handle_key_press(event):
-                return
+        if self.ui.treeWidget.hasFocus() and self.code_tree.handle_key_press(event):
+            return
         # Ctrl 0 to 9
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
             #  Ctrl + P pause/play toggle
@@ -3282,10 +3292,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.coded_text_memo(cursor_pos)
             return
         # Overlapping codes cycle
-        now = datetime.datetime.now()
+        now = datetime.datetime.now().astimezone()
         overlap_diff = now - self.overlap_timer
         if key == QtCore.Qt.Key.Key_O and overlap_diff.total_seconds() > 0.15:
-            self.overlap_timer = datetime.datetime.now()
+            self.overlap_timer = datetime.datetime.now().astimezone()
             self.cycle_overlap()
             return
         # Quick mark selected text
@@ -3365,8 +3375,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cursor = self.ui.plainTextEdit.textCursor()
         cursor.setPosition(result[2])
         endpos = result[2] - 1
-        if endpos < 0:
-            endpos = 0
+        endpos = max(endpos, 0)
         cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.plainTextEdit.setTextCursor(cursor)
 
@@ -3406,7 +3415,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         entry = {'name': image_name, 'id': -1, 'fulltext': None,
                  'memo': self.file_['memo'], 'mediapath': f"/images/{image_name}",
                  'owner': self.app.settings['codername'],
-                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                  'av_text_id': None}
         try:
             cur = self.app.conn.cursor()
@@ -3484,9 +3493,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             if len(codes_here) == 1:
                 # 100 ms key gap; total_seconds(), .microseconds fails past 1s
                 gap_seconds = 0.1
-                now = datetime.datetime.now()
+                now = datetime.datetime.now().astimezone()
                 diff = now - self.code_resize_timer
-                self.code_resize_timer = datetime.datetime.now()
+                self.code_resize_timer = datetime.datetime.now().astimezone()
                 if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier \
                         and diff.total_seconds() > gap_seconds:
                     self.shrink_to_left(codes_here[0])
@@ -3575,8 +3584,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.mediaplayer.get_media() is None:
             return
         time_msecs = self.mediaplayer.get_time() - 30000
-        if time_msecs < 0:
-            time_msecs = 0
+        time_msecs = max(time_msecs, 0)
         pos = time_msecs / self.mediaplayer.get_media().get_duration()
         self.mediaplayer.set_position(pos)
         # Update timer display
@@ -3590,8 +3598,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.mediaplayer.get_media() is None:
             return
         time_msecs = self.mediaplayer.get_time() - 5000
-        if time_msecs < 0:
-            time_msecs = 0
+        time_msecs = max(time_msecs, 0)
         pos = time_msecs / self.mediaplayer.get_media().get_duration()
         self.mediaplayer.set_position(pos)
         # Update timer display
@@ -3710,8 +3717,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         rate = self.mediaplayer.get_rate()
         rate += 0.1
-        if rate > 2:
-            rate = 2
+        rate = min(rate, 2)
         self.mediaplayer.set_rate(rate)
         self.ui.label_rate.setText(str(round(rate, 1)) + "x")
 
@@ -3720,8 +3726,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         rate = self.mediaplayer.get_rate()
         rate -= 0.1
-        if rate < 0.1:
-            rate = 0.1
+        rate = max(rate, 0.1)
         self.mediaplayer.set_rate(rate)
         self.ui.label_rate.setText(str(round(rate, 1)) + "x")
 
@@ -3885,8 +3890,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         overlaps = []
         for i in self.code_text:
             for j in self.code_text:
-                if j != i:
-                    if j['pos0'] <= i['pos0'] <= j['pos1']:
+                if j != i and j['pos0'] <= i['pos0'] <= j['pos1']:
                         if j['pos0'] >= i['pos0'] and j['pos1'] <= i['pos1']:
                             overlaps.append([j['pos0'], j['pos1']])
                         elif i['pos0'] >= j['pos0'] and i['pos1'] <= j['pos1']:
@@ -5115,7 +5119,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
     """ set the scene for the graphics objects and re-draw events. """
 
     def __init__(self, width, height, parent=None):
-        super(GraphicsScene, self).__init__(parent)
+        super().__init__(parent)
         self.scene_width = width
         self.scene_height = height
         self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
@@ -5126,7 +5130,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         So a mouse click on a segment will open the 'alternative_context_menu' within the SegmentGraphicsItem
         """
 
-        super(GraphicsScene, self).mousePressEvent(event)
+        super().mousePressEvent(event)
         position = QtCore.QPointF(event.scenePos())
         #print("pos:", position.x(), position.y())
         for item in self.items(): # item is QGraphicsProxyWidget
@@ -5162,7 +5166,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     code_av_dialog = None
 
     def __init__(self, app, segment, scaler, code_av_dialog):  # text_for_segment, code_av_dialog):
-        super(SegmentGraphicsItem, self).__init__(None)
+        super().__init__(None)
 
         # Using these for when packaged with pyinstaller, to find the item on mouse click in the scene
         self.scene_from_x = 0
@@ -5377,7 +5381,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
                           '-to', str(self.segment["pos1"] / 1000),
                           '-c', 'copy', filepath]
         try:
-            subprocess.run(ffmpeg_command, timeout=60,
+            subprocess.run(ffmpeg_command, check=False, timeout=60,
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             if not os.path.exists(filepath):
                 Message(self.app, _("Segment export"), _("Export failed"), "warning").exec()

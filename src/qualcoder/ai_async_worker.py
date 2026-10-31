@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -25,11 +23,18 @@ Adopted from https://www.pythonguis.com/tutorials/multithreading-pyqt-applicatio
 
 import logging
 import sys
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from PyQt6 import sip
-from PyQt6.QtCore import QCoreApplication, QObject, QRunnable, QThread, Qt, pyqtSignal, pyqtSlot
-
+from PyQt6.QtCore import (
+    QCoreApplication,
+    QObject,
+    QRunnable,
+    Qt,
+    QThread,
+    pyqtSignal,
+    pyqtSlot,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -81,8 +86,8 @@ class GuiThreadRelay(QObject):
     error = pyqtSignal(object, object, object)
 
     def __init__(self, message_handler: Callable[[str], None],
-                 error_handler: Optional[Callable[[object, object, object], None]] = None,
-                 parent: Optional[QObject] = None):
+                 error_handler: Callable[[object, object, object], None] | None = None,
+                 parent: QObject | None = None):
         """Create a queued relay for callbacks that may touch GUI objects.
 
         Args:
@@ -153,7 +158,7 @@ class Worker(QRunnable):
     """
 
     def __init__(self, fn, *args, **kwargs):
-        super(Worker, self).__init__()
+        super().__init__()
 
         # Store constructor arguments (re-used for processing)
         self.fn = fn

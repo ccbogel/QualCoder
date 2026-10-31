@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -21,20 +19,26 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from copy import copy, deepcopy
 import logging
+import statistics
+from copy import copy, deepcopy
+from typing import Any
+
 import openpyxl
 import pandas as pd
 import plotly.express as px
-from PyQt6 import QtGui, QtWidgets, QtCore
-from PyQt6.QtCore import Qt
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-import statistics
-from typing import Any
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
 
 from .GUI.ui_dialog_code_relations import Ui_Dialog_CodeRelations
-from .helpers import DialogCodeInText, ExportDirectoryPathDialog, Message, init_persistent_tree_header, \
-    restore_persistent_tree_widths
+from .helpers import (
+    DialogCodeInText,
+    ExportDirectoryPathDialog,
+    Message,
+    init_persistent_tree_header,
+    restore_persistent_tree_widths,
+)
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 
@@ -581,8 +585,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         cell_counter_pos = current_row * col_count + current_col
         found_row = -1
         found_col = -1
-        for row in range(0, row_count):
-            for col in range(0, col_count):
+        for row in range(row_count):
+            for col in range(col_count):
                 try:
                     cell = self.ui.tableWidget.item(row, col).text()
                     if cell_counter_pos < row * col_count + col and found_row == -1 and search_text in cell:
@@ -680,7 +684,6 @@ class DialogReportRelations(QtWidgets.QDialog):
         ui = DialogCodeInText(self.app, data0)
         ui.add_coded_text(data1)
         ui.exec()
-        return
 
     def fill_table(self):
         """ A table of:
@@ -714,7 +717,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.tableWidget.setColumnCount(len(col_names))
         self.ui.tableWidget.setHorizontalHeaderLabels(col_names)
         rows = self.ui.tableWidget.rowCount()
-        for r in range(0, rows):
+        for r in range(rows):
             self.ui.tableWidget.removeRow(0)
         for r, i in enumerate(self.result_relations):
             self.ui.tableWidget.insertRow(r)
@@ -979,7 +982,7 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         self.result_summary = []
         rows = self.ui.tableWidget_statistics.rowCount()
-        for r in range(0, rows):
+        for r in range(rows):
             self.ui.tableWidget_statistics.removeRow(0)
         # Setup list of dictionaries with cid0 and cid1 as identifiers
         for i in self.result_relations:
@@ -1102,10 +1105,10 @@ class DialogReportRelations(QtWidgets.QDialog):
         if action == action_sort_descending:
             self.ui.tableWidget_statistics.sortItems(col, QtCore.Qt.SortOrder.DescendingOrder)
         if action == action_clear_filter:
-            for r in range(0, self.ui.tableWidget_statistics.rowCount()):
+            for r in range(self.ui.tableWidget_statistics.rowCount()):
                 self.ui.tableWidget_statistics.setRowHidden(r, False)
         if action == action_filter_equals:
-            for r in range(0, self.ui.tableWidget_statistics.rowCount()):
+            for r in range(self.ui.tableWidget_statistics.rowCount()):
                 self.ui.tableWidget_statistics.setRowHidden(r, False)
                 if self.ui.tableWidget_statistics.item(r, col).text() != cell_value:
                     self.ui.tableWidget_statistics.setRowHidden(r, True)

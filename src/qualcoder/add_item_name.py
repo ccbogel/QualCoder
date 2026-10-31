@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This file is part of QualCoder.
 
@@ -24,7 +22,7 @@ https://qualcoder.org/
 import logging
 from pathlib import Path
 
-from PyQt6 import QtWidgets, QtCore
+from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtGui import QRegularExpressionValidator
 
 from .GUI.ui_dialog_add_item import Ui_Dialog_add_item
@@ -52,7 +50,8 @@ class DialogAddItemName(QtWidgets.QDialog):
             reg_expression: QRegularExpression object
             """
 
-        super(DialogAddItemName, self).__init__(parent)
+        #super(DialogAddItemName, self).__init__(parent)
+        super().__init__(parent)
         self.existing_items = []
         self.new_item = None
         for i in items:
@@ -79,7 +78,8 @@ class DialogAddItemName(QtWidgets.QDialog):
             return
         self.new_item = this_item
         self.close()
-        super(DialogAddItemName, self).accept()
+        #super(DialogAddItemName, self).accept()
+        super().accept()
 
     def get_new_name(self):
         """ Get the new name. """

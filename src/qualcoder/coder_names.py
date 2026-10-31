@@ -23,8 +23,9 @@ https://qualcoder.org/
 
 import logging
 import re
-from PyQt6 import QtCore, QtWidgets
 import sqlite3
+
+from PyQt6 import QtCore, QtWidgets
 
 from .GUI.ui_dialog_coder_names import Ui_Dialog_coders
 from .helpers import Message

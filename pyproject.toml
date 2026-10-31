@@ -1,0 +1,65 @@
+[project]
+name = "QualCoder"
+version = "4.0.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "ccbogel", email = "ccbogel@hotmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "bio>=1.8.4",
+    "charset-normalizer>=3.5.2",
+    "diff-match-patch>=20241021",
+    "ebooklib>=0.20",
+    "emoji>=2.16.0",
+    "faiss-cpu>=1.15.1",
+    "json-repair>=0.64.2",
+    "langchain>=0.2.8",
+    "langchain-community>=0.2.7",
+    "langchain-core>=0.2.19",
+    "langchain-openai>=1.3.1",
+    "langchain-text-splitters>=0.2.2",
+    "markdown-it-py>=4.2.0",
+    "matplotlib>=3.11.2",
+    "mcp>=2.2,<3",
+    "networkx>=3.7",
+    "odfpy>=1.4.1",
+    "openpyxl>=3.1.5",
+    "pandas>=3.1.0",
+    "pdfminer-six>=20260107",
+    "pefile<2024.8.26",
+    "pillow>=13.0.0",
+    "plotly>=7.1.0",
+    "ply>=3.11",
+    "pyinstaller<=6.15",
+    "pylatexenc>=2.10,<3",
+    "pymupdf>=2.0",
+    "pyqt6>=6.5",
+    "python-vlc>=3.0.21203",
+    "pyyaml>=6.0.3",
+    "qtawesome>=1.4.2",
+    "requests>=2.34.2",
+    "rispy>=0.10.0",
+    "sentence-transformers>=5.7.0",
+    "six>=1.17.0",
+    "striprtf>=0.0.35",
+    "transformers<=4.53.0",
+    "uvicorn>=0.30,<1",
+    "wordcloud>=1.9.6",
+]
+
+[project.scripts]
+qualcoder = "qualcoder:main"
+
+[build-system]
+requires = ["uv_build>=0.12.21,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "lxml>=6.1.3",
+    "polib>=1.2.0",
+    "pytest>=9.2.0",
+    "uv>=0.13.6",
+]

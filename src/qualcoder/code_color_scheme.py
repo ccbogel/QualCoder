@@ -20,19 +20,25 @@ https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
 https://qualcoder.org/
 """
-
-from copy import deepcopy, copy
 import logging
+from copy import copy, deepcopy
 from pathlib import Path
+
+import qtawesome as qta
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QBrush
-import qtawesome as qta
 
-from .color_selector import colors, colors_red_weak, colors_red_blind, colors_green_weak, colors_green_blind, TextColor
+#from PyQt6.QtGui import QBrush
+from .color_selector import (
+    TextColor,
+    colors,
+    colors_green_blind,
+    colors_green_weak,
+    colors_red_blind,
+    colors_red_weak,
+)
 from .GUI.ui_dialog_code_colours import Ui_Dialog_code_colors
 from .helpers import init_persistent_tree_header, restore_persistent_tree_widths
-
 
 path = Path(__file__).resolve().parent
 logger = logging.getLogger(__name__)
@@ -45,13 +51,13 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
 
     app = None
     parent_textEdit = None
-    original_code_colors = []
+    original_code_colors= []
     selected_colors = []
 
     def __init__(self, app, parent_textedit):
         """ Colour scheme editor and viewer for various colour impairments. """
 
-        super(DialogCodeColorScheme, self).__init__()
+        super().__init__()
         self.app = app
         self.parent_textEdit = parent_textedit
         self.codes = []
@@ -325,8 +331,8 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
     def update_selected_colors(self):
         """ Update colour list. Prior to applying colors. """
 
-        for row in range(0, ROWS):
-            for col in range(0, COLS):
+        for row in range(ROWS):
+            for col in range(COLS):
                 try:
                     self.ui.tableWidget.item(row, col).setText("")
                 except AttributeError:
@@ -380,8 +386,8 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.ui.tableWidget.setRowCount(ROWS)
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.horizontalHeader().setVisible(False)
-        for row in range(0, ROWS):
-            for col in range(0, COLS):
+        for row in range(ROWS):
+            for col in range(COLS):
                 code_color = colors[row * COLS + col]
                 text = ""
                 item = QtWidgets.QTableWidgetItem(text)

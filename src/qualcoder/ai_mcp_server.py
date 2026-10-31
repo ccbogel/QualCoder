@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Shared MCP server for QualCoder.
 
@@ -30,10 +28,6 @@ https://qualcoder.org/
 """
 
 import asyncio
-from concurrent.futures import ThreadPoolExecutor
-from contextvars import ContextVar, copy_context
-from dataclasses import dataclass
-from datetime import datetime
 import hashlib
 import json
 import os
@@ -41,8 +35,13 @@ import random
 import re
 import sqlite3
 import time
-from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple, TypeVar
 import unicodedata
+from collections.abc import Awaitable, Callable
+from concurrent.futures import ThreadPoolExecutor
+from contextvars import ContextVar, copy_context
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from typing import Any, TypeVar
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from mcp import types
@@ -67,7 +66,7 @@ class AiMcpExecutionContext:
 
     source: str
     owner: str
-    client_name: Optional[str] = None
+    client_name: str | None = None
 
 
 INTERNAL_AI_CONTEXT = AiMcpExecutionContext(source="ai_agent", owner="AI Agent")
@@ -175,11 +174,9 @@ class AiMcpServer:
 
     def __init__(self, app):
         self.app = app
-        self._external_executor: Optional[
-            Callable[[Callable[[], ResultT], AiMcpExecutionContext], Awaitable[ResultT]]
-        ] = None
+        self._external_executor: Callable[[Callable[[], ResultT], AiMcpExecutionContext], Awaitable[ResultT]] | None = None
         self._request_seq = 1
-        self._preview_tokens: Dict[str, Dict[str, Any]] = {}
+        self._preview_tokens: dict[str, dict[str, Any]] = {}
         self._sdk_server = Server(
             self.server_name,
             version=self.server_version,
@@ -197,7 +194,7 @@ class AiMcpServer:
 
     def set_external_executor(
             self,
-            executor: Optional[Callable[[Callable[[], ResultT], AiMcpExecutionContext], Awaitable[ResultT]]]
+            executor: Callable[[Callable[[], ResultT], AiMcpExecutionContext], Awaitable[ResultT]] | None
     ) -> None:
         """Set the adapter that marshals external work onto the application thread."""
 
@@ -218,7 +215,7 @@ class AiMcpServer:
         self._preview_tokens.clear()
 
     @staticmethod
-    def sanitize_external_client_name(client_name: Any, max_length: int = 72) -> Optional[str]:
+    def sanitize_external_client_name(client_name: Any, max_length: int = 72) -> str | None:
         """Return a safe, short client display name, or None when unusable."""
 
         raw_name = "" if client_name is None else str(client_name)
@@ -258,7 +255,7 @@ class AiMcpServer:
             _execution_context.reset(token)
 
     async def _run_sdk_operation(
-            self, request_context: Optional[ServerRequestContext[Any]], operation: Callable[[], ResultT]
+            self, request_context: ServerRequestContext[Any] | None, operation: Callable[[], ResultT]
     ) -> ResultT:
         """Run internal work directly and marshal external work through the configured adapter."""
 
@@ -334,7 +331,7 @@ class AiMcpServer:
         """Recursively strip private memo suffixes from payloads sent to the AI."""
 
         if isinstance(value, dict):
-            sanitized: Dict[str, Any] = {}
+            sanitized: dict[str, Any] = {}
             for key, item in value.items():
                 if key == "memo":
                     sanitized[key] = self._memo_public_text(item)
@@ -345,7 +342,7 @@ class AiMcpServer:
             return [self._sanitize_memo_payload(item) for item in value]
         return value
 
-    def _tool_result_payload(self, payload: Dict[str, Any], is_error: bool = False) -> Dict[str, Any]:
+    def _tool_result_payload(self, payload: dict[str, Any], is_error: bool = False) -> dict[str, Any]:
         """Wrap structured tool content in an MCP tool result."""
 
         sanitized_payload = self._sanitize_memo_payload(payload)
@@ -360,7 +357,7 @@ class AiMcpServer:
             ],
         }
 
-    def _tool_result_summary_text(self, payload: Dict[str, Any], is_error: bool = False) -> str:
+    def _tool_result_summary_text(self, payload: dict[str, Any], is_error: bool = False) -> str:
         """Return one short human-readable summary for MCP tool results."""
 
         if not isinstance(payload, dict):
@@ -387,7 +384,7 @@ class AiMcpServer:
             return f"{tool_name} prepared a preview."
         return f"{tool_name} completed."
 
-    def _emit_project_table_changes(self, tables: List[str], source: Optional[str] = None) -> None:
+    def _emit_project_table_changes(self, tables: list[str], source: str | None = None) -> None:
         """Emit one app-level project data change event if the event bus exists."""
 
         project_events = getattr(self.app, "project_events", None)
@@ -396,13 +393,13 @@ class AiMcpServer:
         event_source = _execution_context.get().source if source is None else source
         project_events.emit_table_changes(tables, source=event_source)
 
-    def _snapshot_changed_table_names(self, snapshot: Dict[str, Any]) -> List[str]:
+    def _snapshot_changed_table_names(self, snapshot: dict[str, Any]) -> list[str]:
         """Return non-empty table names from one snapshot payload."""
 
         tables = snapshot.get("tables", {}) if isinstance(snapshot, dict) else {}
         if not isinstance(tables, dict):
             return []
-        changed_tables: List[str] = []
+        changed_tables: list[str] = []
         for table_name, rows in tables.items():
             name = str(table_name if table_name is not None else "").strip()
             if name == "" or not isinstance(rows, list) or len(rows) == 0:
@@ -419,7 +416,7 @@ class AiMcpServer:
             return self.AI_PERMISSION_FULL_ACCESS
         return self.AI_PERMISSION_READ_ONLY
 
-    def _tool_permission_error(self, tool_name: str, required_permission: int) -> Dict[str, Any]:
+    def _tool_permission_error(self, tool_name: str, required_permission: int) -> dict[str, Any]:
         """Return a standardized permission error for tools with insufficient access."""
 
         if required_permission == self.AI_PERMISSION_FULL_ACCESS:
@@ -441,12 +438,12 @@ class AiMcpServer:
             is_error=True,
         )
 
-    def _issue_preview_token(self, execute_tool: str, signature_payload: Dict[str, Any]) -> str:
+    def _issue_preview_token(self, execute_tool: str, signature_payload: dict[str, Any]) -> str:
         """Create one transient preview token for a later execute call."""
 
         signature_text = json.dumps(signature_payload, sort_keys=True, ensure_ascii=False)
         now = datetime.now().astimezone().isoformat()
-        token = hashlib.sha1(f"{execute_tool}|{signature_text}|{now}|{random.random()}".encode("utf-8")).hexdigest()
+        token = hashlib.sha1(f"{execute_tool}|{signature_text}|{now}|{random.random()}".encode()).hexdigest()
         self._preview_tokens[token] = {
             "execute_tool": execute_tool,
             "signature": signature_text,
@@ -454,7 +451,7 @@ class AiMcpServer:
         }
         return token
 
-    def _consume_preview_token(self, execute_tool: str, signature_payload: Dict[str, Any], token: str) -> None:
+    def _consume_preview_token(self, execute_tool: str, signature_payload: dict[str, Any], token: str) -> None:
         """Validate and consume one preview token."""
 
         preview_token = str(token if token is not None else "").strip()
@@ -462,7 +459,7 @@ class AiMcpServer:
             raise ValueError(f'{execute_tool} requires a preview_token from the corresponding preview tool.')
         token_data = self._preview_tokens.get(preview_token)
         if not isinstance(token_data, dict):
-            raise ValueError("preview_token is invalid or expired.")
+            raise TypeError("preview_token is invalid or expired.")
         expected_signature = json.dumps(signature_payload, sort_keys=True, ensure_ascii=False)
         if str(token_data.get("execute_tool", "")) != execute_tool:
             raise ValueError("preview_token does not match this tool.")
@@ -475,7 +472,7 @@ class AiMcpServer:
         self._request_seq += 1
         return req_id
 
-    def handle_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    def handle_request(self, request: dict[str, Any]) -> dict[str, Any]:
         """Handle a JSON-RPC request and return a JSON-RPC response."""
 
         request_id = request.get("id")
@@ -531,7 +528,7 @@ class AiMcpServer:
         except Exception as err:
             return self._error_response(request_id, -32603, "Internal error", str(err))
 
-    def describe_status_event(self, method: str, params: Dict[str, Any]) -> str:
+    def describe_status_event(self, method: str, params: dict[str, Any]) -> str:
         """Describe one user-facing status line for a request, if applicable."""
 
         if method == "initialize":
@@ -723,7 +720,7 @@ class AiMcpServer:
 
         return _('Reviewing project material...')
 
-    def _initialize_result(self) -> Dict[str, Any]:
+    def _initialize_result(self) -> dict[str, Any]:
         result = types.InitializeResult(
             protocolVersion=self.protocol_version,
             capabilities=types.ServerCapabilities(
@@ -752,7 +749,7 @@ class AiMcpServer:
         with ThreadPoolExecutor(max_workers=1) as pool:
             return pool.submit(copy_context().run, asyncio.run, coroutine).result()
 
-    def _dispatch_sdk(self, method: str, params: Any) -> Dict[str, Any]:
+    def _dispatch_sdk(self, method: str, params: Any) -> dict[str, Any]:
         """Dispatch an internal bridge call through one SDK v2 handler."""
 
         handler_entry = self._sdk_server.get_request_handler(method)
@@ -768,7 +765,7 @@ class AiMcpServer:
             )
         return dict(server_result)
 
-    def _pagination_params(self, params: Dict[str, Any]) -> Optional[types.PaginatedRequestParams]:
+    def _pagination_params(self, params: dict[str, Any]) -> types.PaginatedRequestParams | None:
         cursor = params.get("cursor")
         if cursor is None:
             return None
@@ -804,7 +801,7 @@ class AiMcpServer:
             query.pop("length", None)
         return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query, doseq=True), parts.fragment))
 
-    def _parse_read_window(self, uri: str) -> Tuple[str, Dict[str, Any]]:
+    def _parse_read_window(self, uri: str) -> tuple[str, dict[str, Any]]:
         parts = urlsplit(uri)
         query = parse_qs(parts.query, keep_blank_values=True)
         has_char_window = "start" in query or "length" in query
@@ -843,7 +840,7 @@ class AiMcpServer:
         return base_uri, window
 
     async def _sdk_list_resources(
-            self, _context: ServerRequestContext[Any], _params: Optional[types.PaginatedRequestParams]
+            self, _context: ServerRequestContext[Any], _params: types.PaginatedRequestParams | None
     ) -> types.ListResourcesResult:
         """Return the static resources through the SDK v2 low-level API."""
 
@@ -852,7 +849,7 @@ class AiMcpServer:
         )
 
     async def _sdk_list_resource_templates(
-            self, _context: ServerRequestContext[Any], _params: Optional[types.PaginatedRequestParams]
+            self, _context: ServerRequestContext[Any], _params: types.PaginatedRequestParams | None
     ) -> types.ListResourceTemplatesResult:
         """Return resource templates through the SDK v2 low-level API."""
 
@@ -866,7 +863,7 @@ class AiMcpServer:
                         "and a text excerpt. Optional window params: start and length, or line_start "
                         "and line_end."
                     ),
-                    mimeType="application/json",
+                    #mimeType="application/json",
                 ),
                 types.ResourceTemplate(
                     uriTemplate="qualcoder://cases/{id}",
@@ -874,7 +871,7 @@ class AiMcpServer:
                     description=(
                         "Read one case by case id, including memo, attributes, and linked files."
                     ),
-                    mimeType="application/json",
+                    #mimeType="application/json",
                 ),
                 types.ResourceTemplate(
                     uriTemplate="qualcoder://cases/text/{id}{?cursor,max_segments,max_chars,file_ids}",
@@ -883,7 +880,7 @@ class AiMcpServer:
                         "Read text-backed case segments for a case id. Optional query params: "
                         "cursor, max_segments, max_chars, file_ids."
                     ),
-                    mimeType="application/json",
+                    #mimeType="application/json",
                 ),
                 types.ResourceTemplate(
                     uriTemplate="qualcoder://annotations/{anid}{?owner}",
@@ -892,7 +889,7 @@ class AiMcpServer:
                         "Read one text annotation by annotation id. By default, coder visibility is respected. "
                         "Supplying owner explicitly permits reading that owner's annotation even when hidden."
                     ),
-                    mimeType="application/json",
+                    #mimeType="application/json",
                 ),
                 types.ResourceTemplate(
                     uriTemplate=(
@@ -906,7 +903,7 @@ class AiMcpServer:
                         "file_ids, case_ids, owner. "
                         "If owner is set, the server reads from code_text instead of code_text_visible."
                     ),
-                    mimeType="application/json",
+                    #mimeType="application/json",
                 ),
                 types.ResourceTemplate(
                     uriTemplate="qualcoder://vector/search{?q,cursor,file_ids,case_ids,exclude_cids,score_threshold}",
@@ -916,7 +913,7 @@ class AiMcpServer:
                         "(for example ?q=work&q=employment). Optional params: cursor, "
                         "file_ids, case_ids, exclude_cids, score_threshold."
                     ),
-                    mimeType="application/json",
+                    #mimeType="application/json",
                 ),
                 types.ResourceTemplate(
                     uriTemplate="qualcoder://search/bm25{?q,cursor,page_size,file_ids,case_ids,exclude_cids}",
@@ -926,7 +923,7 @@ class AiMcpServer:
                         "Pass one or more q parameters. Optional params: cursor, page_size, "
                         "file_ids, case_ids, and exclude_cids."
                     ),
-                    mimeType="application/json",
+                    #mimeType="application/json",
                 ),
                 types.ResourceTemplate(
                     uriTemplate="qualcoder://search/regex{?pattern,flags,cursor,page_size,file_ids,case_ids,exclude_cids,context_chars}",
@@ -936,7 +933,7 @@ class AiMcpServer:
                         "Optional params: flags (imsx), cursor, page_size, file_ids, case_ids, "
                         "exclude_cids, context_chars."
                     ),
-                    mimeType="application/json",
+                    #mimeType="application/json",
                 ),
                 types.ResourceTemplate(
                     uriTemplate="qualcoder://help/search{?q,cursor,page_size}",
@@ -945,7 +942,7 @@ class AiMcpServer:
                         "Search the cached English QualCoder help pages. Pass one or more English q "
                         "parameters. Optional params: cursor and page_size."
                     ),
-                    mimeType="application/json",
+                    #mimeType="application/json",
                 ),
                 types.ResourceTemplate(
                     uriTemplate="qualcoder://help/page/{slug}",
@@ -954,7 +951,7 @@ class AiMcpServer:
                         "Read one cached English QualCoder help page by page slug. Optional window "
                         "params: start and length."
                     ),
-                    mimeType="application/json",
+                    #mimeType="application/json",
                 ),
             ])
 
@@ -976,7 +973,7 @@ class AiMcpServer:
                     types.TextResourceContents(
                         uri=uri,
                         text=json.dumps(sanitized_payload, ensure_ascii=False),
-                        mimeType="application/json",
+                        ##mimeType="application/json",
                     )
                 ]
             )
@@ -984,7 +981,7 @@ class AiMcpServer:
         return await self._run_sdk_operation(_context, read_resource)
 
     async def _sdk_list_tools(
-            self, _context: ServerRequestContext[Any], _params: Optional[types.PaginatedRequestParams]
+            self, _context: ServerRequestContext[Any], _params: types.PaginatedRequestParams | None
     ) -> types.ListToolsResult:
         """Return QualCoder tools through the SDK v2 low-level API."""
 
@@ -1012,7 +1009,7 @@ class AiMcpServer:
             )
 
     async def _sdk_list_prompts(
-            self, _context: ServerRequestContext[Any], _params: Optional[types.PaginatedRequestParams]
+            self, _context: ServerRequestContext[Any], _params: types.PaginatedRequestParams | None
     ) -> types.ListPromptsResult:
         """Return the intentionally empty MCP prompt catalog."""
 
@@ -1039,7 +1036,7 @@ class AiMcpServer:
                 "Instruct the user to open or create a project in QualCoder, then retry this operation."
             )
 
-    def _read_resource_payload(self, uri: str, window: Dict[str, Any]) -> Dict[str, Any]:
+    def _read_resource_payload(self, uri: str, window: dict[str, Any]) -> dict[str, Any]:
         parts = urlsplit(uri)
         uri_no_query = urlunsplit((parts.scheme, parts.netloc, parts.path, "", parts.fragment))
         query = parse_qs(parts.query, keep_blank_values=True)
@@ -1115,34 +1112,34 @@ class AiMcpServer:
 
         raise ValueError(f"Unknown resource uri: {uri}")
 
-    def _result_response(self, request_id: Any, result: Dict[str, Any]) -> Dict[str, Any]:
+    def _result_response(self, request_id: Any, result: dict[str, Any]) -> dict[str, Any]:
         return {"jsonrpc": "2.0", "id": request_id, "result": result}
 
-    def _error_response(self, request_id: Any, code: int, message: str, data: Optional[Any] = None) -> Dict[str, Any]:
+    def _error_response(self, request_id: Any, code: int, message: str, data: Any | None = None) -> dict[str, Any]:
         error = {"code": code, "message": message}
         if data is not None:
             error["data"] = data
         return {"jsonrpc": "2.0", "id": request_id, "error": error}
 
-    def _base_resources(self) -> List[types.Resource]:
+    def _base_resources(self) -> list[types.Resource]:
         return [
             types.Resource(
                 uri="qualcoder://codes/tree",
                 name="Codes and categories",
                 description="Code tree with categories and code metadata.",
-                mimeType="application/json",
+                #mimeType="application/json",
             ),
             types.Resource(
                 uri="qualcoder://documents",
                 name="Text documents",
-                description="List text documents in the project with memo, document attributes, and text length.",
-                mimeType="application/json",
+                description="list text documents in the project with memo, document attributes, and text length.",
+                #mimeType="application/json",
             ),
             types.Resource(
                 uri="qualcoder://cases",
                 name="Cases",
-                description="List cases in the project with memo, attributes, and linked-file counts.",
-                mimeType="application/json",
+                description="list cases in the project with memo, attributes, and linked-file counts.",
+                #mimeType="application/json",
             ),
             types.Resource(
                 uri="qualcoder://annotations",
@@ -1152,44 +1149,44 @@ class AiMcpServer:
                     "owner, cursor, and page_size. By default, coder visibility is respected; an explicit owner "
                     "filter reads that owner's annotations even when hidden."
                 ),
-                mimeType="application/json",
+                #mimeType="application/json",
             ),
             types.Resource(
                 uri="qualcoder://vector/search",
                 name="Semantic vector search",
                 description="Semantic retrieval over embedded text chunks. Requires query param q. "
                             "Optional filters: file_ids, case_ids, and exclude_cids.",
-                mimeType="application/json",
+                #mimeType="application/json",
             ),
             types.Resource(
                 uri="qualcoder://search/bm25",
                 name="BM25 search",
                 description="FTS5/BM25 lexical retrieval over text chunks. Requires query param q. "
                             "Optional filters: file_ids, case_ids, and exclude_cids.",
-                mimeType="application/json",
+                #mimeType="application/json",
             ),
             types.Resource(
                 uri="qualcoder://search/regex",
                 name="Regular-expression search",
                 description="Regex keyword search over text documents. Requires query param pattern. "
                             "Optional filters: file_ids, case_ids, and exclude_cids.",
-                mimeType="application/json",
+                #mimeType="application/json",
             ),
             types.Resource(
                 uri="qualcoder://help/pages",
                 name="QualCoder help pages",
-                description="List cached English QualCoder help pages available for AI assistance.",
-                mimeType="application/json",
+                description="list cached English QualCoder help pages available for AI assistance.",
+                #mimeType="application/json",
             ),
             types.Resource(
                 uri="qualcoder://help/search",
                 name="QualCoder help search",
                 description="Search cached English QualCoder help pages. Requires query param q.",
-                mimeType="application/json",
+                #mimeType="application/json",
             ),
         ]
 
-    def _list_tools_payload(self) -> Dict[str, Any]:
+    def _list_tools_payload(self) -> dict[str, Any]:
         payload = {
             "tools": [
                 {
@@ -1632,9 +1629,9 @@ class AiMcpServer:
                 },
                 {
                     "name": "qualcoder_list_resources",
-                    "title": "List QualCoder resources",
+                    "title": "list QualCoder resources",
                     "description": (
-                        "List the qualcoder:// URIs that expose the open project's data (documents, cases, codes, "
+                        "list the qualcoder:// URIs that expose the open project's data (documents, cases, codes, "
                         "coded segments, annotations, searches, help pages). Read them with qualcoder_read_resource. "
                         "Requires Read-only, Sandboxed, or Full access."
                     ),
@@ -1684,7 +1681,7 @@ class AiMcpServer:
 
     DATABASE_BUSY_WAIT_SECONDS = 8.0
 
-    def _call_tool_payload(self, name: str, arguments: Optional[Dict[str, Any]], change_set_id: str) -> Dict[str, Any]:
+    def _call_tool_payload(self, name: str, arguments: dict[str, Any] | None, change_set_id: str) -> dict[str, Any]:
         """Run one tool, backing off and retrying while the project database is busy.
 
         A write that waits inside SQLite keeps the write lock, and any GUI write during that wait fails at once
@@ -1725,12 +1722,12 @@ class AiMcpServer:
         )
 
     def _call_tool_payload_once(
-            self, name: str, arguments: Optional[Dict[str, Any]], change_set_id: str
-    ) -> Dict[str, Any]:
+            self, name: str, arguments: dict[str, Any] | None, change_set_id: str
+    ) -> dict[str, Any]:
         if arguments is None:
             arguments = {}
         if not isinstance(arguments, dict):
-            raise ValueError("Tool arguments must be an object.")
+            raise TypeError("Tool arguments must be an object.")
         # Clients configured before the rename may still send the slashed names
         tool_name = str(name).strip().replace("/", "_")
         if tool_name == "":
@@ -1808,7 +1805,7 @@ class AiMcpServer:
 
         return self._tool_result_payload(payload)
 
-    def _tool_list_resources(self) -> Dict[str, Any]:
+    def _tool_list_resources(self) -> dict[str, Any]:
         """Return the resource catalog for clients that only use tools."""
 
         resources = self._dispatch_sdk("resources/list", None)
@@ -1818,7 +1815,7 @@ class AiMcpServer:
             "resourceTemplates": templates.get("resourceTemplates", []),
         }
 
-    def _tool_read_resource(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
+    def _tool_read_resource(self, arguments: dict[str, Any]) -> dict[str, Any]:
         """Read one qualcoder:// resource as a tool result, text content only."""
 
         uri = arguments.get("uri")
@@ -1839,7 +1836,7 @@ class AiMcpServer:
             content.append({"type": "text", "text": "(empty)"})
         return {"isError": False, "content": content}
 
-    def _tool_project_get_status(self) -> Dict[str, Any]:
+    def _tool_project_get_status(self) -> dict[str, Any]:
         """Return current project context for an external MCP client."""
 
         project_row = self._fetchone(
@@ -1867,7 +1864,7 @@ class AiMcpServer:
             "mcp_server_version": self.server_version,
         }
 
-    def _tool_create_category(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_create_category(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         name = " ".join(str(arguments.get("name", "")).split()).strip()
         if name == "":
             raise ValueError("Category name must not be empty.")
@@ -1946,7 +1943,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_create_code(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_create_code(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         name = " ".join(str(arguments.get("name", "")).split()).strip()
         if name == "":
             raise ValueError("Code name must not be empty.")
@@ -2044,7 +2041,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_create_text_coding(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_create_text_coding(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         cid = self._to_int(arguments.get("cid"), -1)
         fid = self._to_int(arguments.get("fid"), -1)
         quote = str(arguments.get("quote", "") if arguments.get("quote", "") is not None else "").strip()
@@ -2146,7 +2143,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_create_annotation(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_create_annotation(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         """Create one annotation over an unambiguous text span."""
 
         fid = self._to_int(arguments.get("fid"), -1)
@@ -2269,7 +2266,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_update_annotation(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_update_annotation(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         """Update the public memo text of one annotation."""
 
         anid = self._to_int(arguments.get("anid"), -1)
@@ -2340,7 +2337,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_delete_annotation(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_delete_annotation(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         """Delete one annotation and record a restorable snapshot."""
 
         anid = self._to_int(arguments.get("anid"), -1)
@@ -2384,7 +2381,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_preview_delete_category(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
+    def _tool_preview_delete_category(self, arguments: dict[str, Any]) -> dict[str, Any]:
         catid = self._to_int(arguments.get("catid"), -1)
         conn = self._connect()
         try:
@@ -2417,7 +2414,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_preview_delete_code(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
+    def _tool_preview_delete_code(self, arguments: dict[str, Any]) -> dict[str, Any]:
         cid = self._to_int(arguments.get("cid"), -1)
         conn = self._connect()
         try:
@@ -2455,7 +2452,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_update_category(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_update_category(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         catid = self._to_int(arguments.get("catid"), -1)
         if catid <= 0:
             raise ValueError("catid must be a positive integer.")
@@ -2529,7 +2526,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_update_code(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_update_code(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         cid = self._to_int(arguments.get("cid"), -1)
         if cid <= 0:
             raise ValueError("cid must be a positive integer.")
@@ -2603,7 +2600,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_update_text_coding(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_update_text_coding(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         ctid = self._to_int(arguments.get("ctid"), -1)
         if ctid <= 0:
             raise ValueError("ctid must be a positive integer.")
@@ -2671,7 +2668,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_move_category(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_move_category(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         catid = self._to_int(arguments.get("catid"), -1)
         new_supercatid_raw = arguments.get("new_supercatid", None)
         new_supercatid = None
@@ -2730,7 +2727,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_move_code(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_move_code(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         cid = self._to_int(arguments.get("cid"), -1)
         new_catid_raw = arguments.get("new_catid", None)
         new_catid = None
@@ -2805,7 +2802,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_delete_category(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_delete_category(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         catid = self._to_int(arguments.get("catid"), -1)
         signature = {"tool": "codes_delete_category", "catid": catid}
         self._consume_preview_token("codes_delete_category", signature, arguments.get("preview_token", ""))
@@ -2858,7 +2855,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_delete_code(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_delete_code(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         cid = self._to_int(arguments.get("cid"), -1)
         signature = {"tool": "codes_delete_code", "cid": cid}
         self._consume_preview_token("codes_delete_code", signature, arguments.get("preview_token", ""))
@@ -2908,7 +2905,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_move_text_coding(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_move_text_coding(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         ctid = self._to_int(arguments.get("ctid"), -1)
         new_cid = self._to_int(arguments.get("new_cid"), -1)
         if ctid <= 0:
@@ -2958,7 +2955,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_delete_text_coding(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_delete_text_coding(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         ctid = self._to_int(arguments.get("ctid"), -1)
         if ctid <= 0:
             raise ValueError("ctid must be a positive integer.")
@@ -2998,7 +2995,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_create_case(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_create_case(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         name = " ".join(str(arguments.get("name", "")).split()).strip()
         memo = self._memo_update_text(arguments.get("memo", ""))
         if name == "":
@@ -3062,7 +3059,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_link_text_to_case(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_link_text_to_case(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         caseid = self._to_int(arguments.get("caseid"), -1)
         fid = self._to_int(arguments.get("fid"), -1)
         quote = str(arguments.get("quote", "") if arguments.get("quote", "") is not None else "").strip()
@@ -3175,7 +3172,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_update_case(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_update_case(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         caseid = self._to_int(arguments.get("caseid"), -1)
         if caseid <= 0:
             raise ValueError("caseid must be a positive integer.")
@@ -3261,7 +3258,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_update_document(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_update_document(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         fid = self._to_int(arguments.get("fid"), -1)
         if fid <= 0:
             raise ValueError("fid must be a positive integer.")
@@ -3329,7 +3326,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_unlink_text_from_case(self, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_unlink_text_from_case(self, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         link_id = self._to_int(arguments.get("id"), -1)
         if link_id <= 0:
             raise ValueError("id must be a positive integer.")
@@ -3369,7 +3366,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_create_attribute(self, target_type: str, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_create_attribute(self, target_type: str, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         normalized_target_type = self._normalize_attribute_target_type(target_type)
         tool_name = "cases_create_attribute" if normalized_target_type == "case" else "documents_create_attribute"
         attribute_name = self._normalize_attribute_name(arguments.get("name", ""))
@@ -3447,7 +3444,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _tool_update_attributes(self, target_type: str, arguments: Dict[str, Any], change_set_id: str) -> Dict[str, Any]:
+    def _tool_update_attributes(self, target_type: str, arguments: dict[str, Any], change_set_id: str) -> dict[str, Any]:
         normalized_target_type = self._normalize_attribute_target_type(target_type)
         if normalized_target_type == "file":
             self._validate_document_attribute_arguments(arguments)
@@ -3464,11 +3461,11 @@ class AiMcpServer:
         if not isinstance(raw_attributes, list) or len(raw_attributes) == 0:
             raise ValueError("attributes must be a non-empty list.")
 
-        requested_attributes: List[Dict[str, Any]] = []
+        requested_attributes: list[dict[str, Any]] = []
         seen_names = set()
         for idx, raw_item in enumerate(raw_attributes, start=1):
             if not isinstance(raw_item, dict):
-                raise ValueError(f"attributes[{idx}] must be an object.")
+                raise TypeError(f"attributes[{idx}] must be an object.")
             attribute_name = self._normalize_attribute_name(raw_item.get("name", ""))
             if attribute_name == "":
                 raise ValueError(f"attributes[{idx}].name must not be empty.")
@@ -3494,8 +3491,8 @@ class AiMcpServer:
                 cur,
                 [item["name"] for item in requested_attributes],
             )
-            changes: List[Dict[str, Any]] = []
-            result_changes: List[Dict[str, Any]] = []
+            changes: list[dict[str, Any]] = []
+            result_changes: list[dict[str, Any]] = []
             now = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
 
             for item in requested_attributes:
@@ -3613,7 +3610,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _category_ref(self, category: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    def _category_ref(self, category: dict[str, Any] | None) -> dict[str, Any] | None:
         if not isinstance(category, dict):
             return None
         return {
@@ -3622,7 +3619,7 @@ class AiMcpServer:
             "owner": str(category.get("owner", "")),
         }
 
-    def _code_ref(self, code: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    def _code_ref(self, code: dict[str, Any] | None) -> dict[str, Any] | None:
         if not isinstance(code, dict):
             return None
         return {
@@ -3633,7 +3630,7 @@ class AiMcpServer:
             "supercid": code.get("supercid", None),
         }
 
-    def _case_ref(self, case: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    def _case_ref(self, case: dict[str, Any] | None) -> dict[str, Any] | None:
         if not isinstance(case, dict):
             return None
         return {
@@ -3647,7 +3644,7 @@ class AiMcpServer:
         return cur.fetchone() is not None
 
     def _fetchone_dict_cur(self, cur: sqlite3.Cursor, sql: str,
-                           params: Tuple[Any, ...] = ()) -> Optional[Dict[str, Any]]:
+                           params: tuple[Any, ...] = ()) -> dict[str, Any] | None:
         cur.execute(sql, params)
         row = cur.fetchone()
         if row is None:
@@ -3656,16 +3653,16 @@ class AiMcpServer:
         return {columns[i]: row[i] for i in range(min(len(columns), len(row)))}
 
     def _fetchall_dict_cur(self, cur: sqlite3.Cursor, sql: str,
-                           params: Tuple[Any, ...] = ()) -> List[Dict[str, Any]]:
+                           params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
         cur.execute(sql, params)
         rows = cur.fetchall()
         columns = [str(item[0]) for item in (cur.description or [])]
-        result: List[Dict[str, Any]] = []
+        result: list[dict[str, Any]] = []
         for row in rows:
             result.append({columns[i]: row[i] for i in range(min(len(columns), len(row)))})
         return result
 
-    def _fetch_category_row_cur(self, cur: sqlite3.Cursor, catid: Any) -> Optional[Dict[str, Any]]:
+    def _fetch_category_row_cur(self, cur: sqlite3.Cursor, catid: Any) -> dict[str, Any] | None:
         catid_i = self._to_int(catid, -1)
         if catid_i <= 0:
             return None
@@ -3675,7 +3672,7 @@ class AiMcpServer:
             (catid_i,),
         )
 
-    def _fetch_code_row_cur(self, cur: sqlite3.Cursor, cid: Any) -> Optional[Dict[str, Any]]:
+    def _fetch_code_row_cur(self, cur: sqlite3.Cursor, cid: Any) -> dict[str, Any] | None:
         cid_i = self._to_int(cid, -1)
         if cid_i <= 0:
             return None
@@ -3686,7 +3683,7 @@ class AiMcpServer:
             (cid_i,),
         )
 
-    def _fetch_text_coding_row_cur(self, cur: sqlite3.Cursor, ctid: Any) -> Optional[Dict[str, Any]]:
+    def _fetch_text_coding_row_cur(self, cur: sqlite3.Cursor, ctid: Any) -> dict[str, Any] | None:
         ctid_i = self._to_int(ctid, -1)
         if ctid_i <= 0:
             return None
@@ -3697,7 +3694,7 @@ class AiMcpServer:
             (ctid_i,),
         )
 
-    def _fetch_annotation_row_cur(self, cur: sqlite3.Cursor, anid: Any) -> Optional[Dict[str, Any]]:
+    def _fetch_annotation_row_cur(self, cur: sqlite3.Cursor, anid: Any) -> dict[str, Any] | None:
         """Return one annotation row as a dictionary."""
 
         anid_i = self._to_int(anid, -1)
@@ -3710,7 +3707,7 @@ class AiMcpServer:
             (anid_i,),
         )
 
-    def _fetch_case_row_cur(self, cur: sqlite3.Cursor, caseid: Any) -> Optional[Dict[str, Any]]:
+    def _fetch_case_row_cur(self, cur: sqlite3.Cursor, caseid: Any) -> dict[str, Any] | None:
         caseid_i = self._to_int(caseid, -1)
         if caseid_i <= 0:
             return None
@@ -3720,7 +3717,7 @@ class AiMcpServer:
             (caseid_i,),
         )
 
-    def _fetch_case_text_row_cur(self, cur: sqlite3.Cursor, link_id: Any) -> Optional[Dict[str, Any]]:
+    def _fetch_case_text_row_cur(self, cur: sqlite3.Cursor, link_id: Any) -> dict[str, Any] | None:
         link_id_i = self._to_int(link_id, -1)
         if link_id_i <= 0:
             return None
@@ -3730,7 +3727,7 @@ class AiMcpServer:
             (link_id_i,),
         )
 
-    def _fetch_source_row_cur(self, cur: sqlite3.Cursor, fid: Any) -> Optional[Dict[str, Any]]:
+    def _fetch_source_row_cur(self, cur: sqlite3.Cursor, fid: Any) -> dict[str, Any] | None:
         fid_i = self._to_int(fid, -1)
         if fid_i <= 0:
             return None
@@ -3741,7 +3738,7 @@ class AiMcpServer:
             (fid_i,),
         )
 
-    def _fetch_attribute_type_row_cur(self, cur: sqlite3.Cursor, attribute_name: Any) -> Optional[Dict[str, Any]]:
+    def _fetch_attribute_type_row_cur(self, cur: sqlite3.Cursor, attribute_name: Any) -> dict[str, Any] | None:
         name = str(attribute_name if attribute_name is not None else "")
         if name == "":
             return None
@@ -3752,7 +3749,7 @@ class AiMcpServer:
             (name,),
         )
 
-    def _fetch_attribute_type_rows_cur(self, cur: sqlite3.Cursor, attribute_names: List[str]) -> Dict[str, Dict[str, Any]]:
+    def _fetch_attribute_type_rows_cur(self, cur: sqlite3.Cursor, attribute_names: list[str]) -> dict[str, dict[str, Any]]:
         normalized_names = [str(name) for name in attribute_names if str(name).strip() != ""]
         normalized_names = list(dict.fromkeys(normalized_names))
         if len(normalized_names) == 0:
@@ -3766,7 +3763,7 @@ class AiMcpServer:
         )
         return {str(row.get("name", "")): row for row in rows}
 
-    def _fetch_attribute_row_cur(self, cur: sqlite3.Cursor, attrid: Any) -> Optional[Dict[str, Any]]:
+    def _fetch_attribute_row_cur(self, cur: sqlite3.Cursor, attrid: Any) -> dict[str, Any] | None:
         attrid_i = self._to_int(attrid, -1)
         if attrid_i <= 0:
             return None
@@ -3782,7 +3779,7 @@ class AiMcpServer:
             cur: sqlite3.Cursor,
             attribute_name: str,
             target_type: str,
-            target_id: int) -> Optional[Dict[str, Any]]:
+            target_id: int) -> dict[str, Any] | None:
         return self._fetchone_dict_cur(
             cur,
             "SELECT attrid, name, attr_type, ifnull(value,'') as value, id, ifnull(date,'') as date, "
@@ -3790,7 +3787,7 @@ class AiMcpServer:
             (attribute_name, target_type, target_id),
         )
 
-    def _fetch_attribute_target_ids_cur(self, cur: sqlite3.Cursor, target_type: str) -> List[int]:
+    def _fetch_attribute_target_ids_cur(self, cur: sqlite3.Cursor, target_type: str) -> list[int]:
         normalized_target_type = self._normalize_attribute_target_type(target_type)
         if normalized_target_type == "case":
             rows = cur.execute("SELECT caseid FROM cases ORDER BY caseid").fetchall()
@@ -3802,7 +3799,7 @@ class AiMcpServer:
             self,
             cur: sqlite3.Cursor,
             target_type: str,
-            target_id: int) -> Optional[Dict[str, Any]]:
+            target_id: int) -> dict[str, Any] | None:
         normalized_target_type = self._normalize_attribute_target_type(target_type)
         if normalized_target_type == "case":
             return self._fetch_case_row_cur(cur, target_id)
@@ -3839,7 +3836,7 @@ class AiMcpServer:
                 raise ValueError(f'Attribute "{attribute_name}" is numeric and requires a numeric value.')
         return normalized_value
 
-    def _validate_document_attribute_arguments(self, arguments: Dict[str, Any]) -> None:
+    def _validate_document_attribute_arguments(self, arguments: dict[str, Any]) -> None:
         forbidden_fields = []
         for field_name in ("text", "fulltext", "content", "memo"):
             if field_name in arguments:
@@ -3849,12 +3846,12 @@ class AiMcpServer:
                 "documents_update_attributes only supports document attributes and cannot modify memo or text."
             )
 
-    def _collect_category_subtree(self, cur: sqlite3.Cursor, root_catid: int) -> Dict[str, Any]:
+    def _collect_category_subtree(self, cur: sqlite3.Cursor, root_catid: int) -> dict[str, Any]:
         categories = self._fetchall_dict_cur(
             cur,
             "SELECT catid, name, ifnull(memo,'') as memo, owner, date, supercatid FROM code_cat ORDER BY catid",
         )
-        by_parent: Dict[Any, List[Dict[str, Any]]] = {}
+        by_parent: dict[Any, list[dict[str, Any]]] = {}
         root_category = None
         for category in categories:
             if int(category.get("catid", -1)) == root_catid:
@@ -3863,8 +3860,8 @@ class AiMcpServer:
         if root_category is None:
             raise ValueError(f"Category id {root_catid} not found.")
 
-        subtree_categories: List[Dict[str, Any]] = []
-        queue: List[Dict[str, Any]] = [root_category]
+        subtree_categories: list[dict[str, Any]] = []
+        queue: list[dict[str, Any]] = [root_category]
         seen = set()
         while len(queue) > 0:
             category = queue.pop(0)
@@ -3874,10 +3871,10 @@ class AiMcpServer:
             seen.add(catid)
             subtree_categories.append(category)
             for child in by_parent.get(catid, []):
-                queue.append(child)
+                queue.copy().append(child)
 
         category_ids = [int(item["catid"]) for item in subtree_categories]
-        codes: List[Dict[str, Any]] = []
+        codes: list[dict[str, Any]] = []
         if len(category_ids) > 0:
             category_id_set = set(category_ids)
             all_codes = self._fetchall_dict_cur(
@@ -3885,8 +3882,8 @@ class AiMcpServer:
                 "SELECT cid, name, ifnull(memo,'') as memo, catid, color, owner, date, supercid "
                 "FROM code_name ORDER BY cid",
             )
-            by_supercid: Dict[Any, List[Dict[str, Any]]] = {}
-            queue: List[Dict[str, Any]] = []
+            by_supercid: dict[Any, list[dict[str, Any]]] = {}
+            queue: list[dict[str, Any]] = []
             for code in all_codes:
                 by_supercid.setdefault(code.get("supercid", None), []).append(code)
                 if self._to_int(code.get("catid"), -1) in category_id_set:
@@ -3907,13 +3904,13 @@ class AiMcpServer:
             "codes": codes,
         }
 
-    def _collect_code_subtree(self, cur: sqlite3.Cursor, root_cid: int) -> Dict[str, Any]:
+    def _collect_code_subtree(self, cur: sqlite3.Cursor, root_cid: int) -> dict[str, Any]:
         codes = self._fetchall_dict_cur(
             cur,
             "SELECT cid, name, ifnull(memo,'') as memo, catid, color, owner, date, supercid "
             "FROM code_name ORDER BY cid",
         )
-        by_parent: Dict[Any, List[Dict[str, Any]]] = {}
+        by_parent: dict[Any, list[dict[str, Any]]] = {}
         root_code = None
         for code in codes:
             if int(code.get("cid", -1)) == root_cid:
@@ -3922,8 +3919,8 @@ class AiMcpServer:
         if root_code is None:
             raise ValueError(f"Code id {root_cid} not found.")
 
-        subtree_codes: List[Dict[str, Any]] = []
-        queue: List[Dict[str, Any]] = [root_code]
+        subtree_codes: list[dict[str, Any]] = []
+        queue: list[dict[str, Any]] = [root_code]
         seen = set()
         while len(queue) > 0:
             code = queue.pop(0)
@@ -3933,7 +3930,7 @@ class AiMcpServer:
             seen.add(cid)
             subtree_codes.append(code)
             for child in by_parent.get(cid, []):
-                queue.append(child)
+                queue.copy().append(child)
         return {
             "root_code": root_code,
             "codes": subtree_codes,
@@ -3949,7 +3946,7 @@ class AiMcpServer:
         return False
 
     def _collect_table_rows_by_cids(self, cur: sqlite3.Cursor, table_name: str,
-                                    cid_values: List[int]) -> List[Dict[str, Any]]:
+                                    cid_values: list[int]) -> list[dict[str, Any]]:
         if len(cid_values) == 0 or not self._table_exists_cur(cur, table_name):
             return []
         placeholders = ",".join(["?"] * len(cid_values))
@@ -3959,7 +3956,7 @@ class AiMcpServer:
             tuple(cid_values),
         )
 
-    def _count_codings_for_code_ids(self, cur: sqlite3.Cursor, cid_values: List[int]) -> Dict[str, int]:
+    def _count_codings_for_code_ids(self, cur: sqlite3.Cursor, cid_values: list[int]) -> dict[str, int]:
         counts = {"code_text": 0, "code_av": 0, "code_image": 0, "total": 0, "non_ai_codings": 0}
         if len(cid_values) == 0:
             return counts
@@ -3971,7 +3968,7 @@ class AiMcpServer:
             cur.execute(
                 f"SELECT count(*), sum(case when owner != ? then 1 else 0 end) "
                 f"FROM {table_name} WHERE cid IN ({placeholders})",
-                tuple([self.AI_AGENT_OWNER, *params]),
+                (self.AI_AGENT_OWNER, *params),
             )
             row = cur.fetchone()
             table_count = int((row or [0])[0] or 0)
@@ -3981,7 +3978,7 @@ class AiMcpServer:
             counts["non_ai_codings"] += table_non_ai
         return counts
 
-    def _build_category_tree_impact(self, cur: sqlite3.Cursor, subtree: Dict[str, Any]) -> Dict[str, Any]:
+    def _build_category_tree_impact(self, cur: sqlite3.Cursor, subtree: dict[str, Any]) -> dict[str, Any]:
         categories = subtree.get("categories", [])
         codes = subtree.get("codes", [])
         code_ids = [int(item.get("cid", -1)) for item in codes if int(item.get("cid", -1)) > 0]
@@ -4002,7 +3999,7 @@ class AiMcpServer:
             },
         }
 
-    def _build_code_impact(self, cur: sqlite3.Cursor, code: Dict[str, Any]) -> Dict[str, Any]:
+    def _build_code_impact(self, cur: sqlite3.Cursor, code: dict[str, Any]) -> dict[str, Any]:
         cid = int(code.get("cid", -1))
         subtree = self._collect_code_subtree(cur, cid) if cid > 0 else {"codes": []}
         code_rows = subtree.get("codes", [])
@@ -4022,7 +4019,7 @@ class AiMcpServer:
             },
         }
 
-    def _build_code_snapshot(self, cur: sqlite3.Cursor, cid: int) -> Dict[str, Any]:
+    def _build_code_snapshot(self, cur: sqlite3.Cursor, cid: int) -> dict[str, Any]:
         subtree = self._collect_code_subtree(cur, cid)
         codes = [dict(item) for item in subtree.get("codes", [])]
         code_ids = [int(item.get("cid", -1)) for item in codes if int(item.get("cid", -1)) > 0]
@@ -4035,7 +4032,7 @@ class AiMcpServer:
             }
         }
 
-    def _build_category_tree_snapshot(self, cur: sqlite3.Cursor, subtree: Dict[str, Any]) -> Dict[str, Any]:
+    def _build_category_tree_snapshot(self, cur: sqlite3.Cursor, subtree: dict[str, Any]) -> dict[str, Any]:
         categories = [dict(item) for item in subtree.get("categories", [])]
         codes = [dict(item) for item in subtree.get("codes", [])]
         code_ids = [int(item.get("cid", -1)) for item in codes if int(item.get("cid", -1)) > 0]
@@ -4049,7 +4046,7 @@ class AiMcpServer:
             }
         }
 
-    def _delete_codings_for_code_ids(self, cur: sqlite3.Cursor, code_ids: List[int]) -> None:
+    def _delete_codings_for_code_ids(self, cur: sqlite3.Cursor, code_ids: list[int]) -> None:
         if len(code_ids) == 0:
             return
         placeholders = ",".join(["?"] * len(code_ids))
@@ -4077,7 +4074,7 @@ class AiMcpServer:
             return "#D8D8D8"
         return str(random.choice(colors))
 
-    def _quote_search(self, quote: str, fulltext: str) -> Tuple[int, int]:
+    def _quote_search(self, quote: str, fulltext: str) -> tuple[int, int]:
         """Find quote boundaries: exact, then layout tolerant, then ai_llm.ai_quote_search."""
 
         quote_text = str(quote).strip()
@@ -4104,11 +4101,11 @@ class AiMcpServer:
         "\ufb00": "ff", "\ufb01": "fi", "\ufb02": "fl", "\ufb03": "ffi", "\ufb04": "ffl",
     }
 
-    def _layout_normalized(self, text: str) -> Tuple[str, List[int]]:
+    def _layout_normalized(self, text: str) -> tuple[str, list[int]]:
         """Return text without PDF layout noise, plus the source index of every kept character."""
 
-        chars: List[str] = []
-        index_map: List[int] = []
+        chars: list[str] = []
+        index_map: list[int] = []
         length = len(text)
         i = 0
         while i < length:
@@ -4137,7 +4134,7 @@ class AiMcpServer:
             i += 1
         return "".join(chars), index_map
 
-    def _layout_tolerant_quote_search(self, quote: str, fulltext: str) -> Tuple[int, int]:
+    def _layout_tolerant_quote_search(self, quote: str, fulltext: str) -> tuple[int, int]:
         """Match a quote ignoring line breaks, soft hyphens, split words, ligatures, quote marks and case."""
 
         needle = self._layout_normalized(quote)[0].strip()
@@ -4162,13 +4159,13 @@ class AiMcpServer:
             message += f" Approximate matching is unavailable in this QualCoder ({reason})."
         return message
 
-    def _exact_quote_positions(self, quote: str, fulltext: str) -> List[int]:
+    def _exact_quote_positions(self, quote: str, fulltext: str) -> list[int]:
         """Return every exact start position for a quote, including overlapping matches."""
 
         quote_text = str(quote if quote is not None else "")
         if quote_text == "":
             return []
-        positions: List[int] = []
+        positions: list[int] = []
         start = 0
         while start <= len(fulltext) - len(quote_text):
             match = fulltext.find(quote_text, start)
@@ -4178,7 +4175,7 @@ class AiMcpServer:
             start = match + 1
         return positions
 
-    def _record_ai_change(self, change_set_id: str, operation: Dict[str, Any]) -> None:
+    def _record_ai_change(self, change_set_id: str, operation: dict[str, Any]) -> None:
         ai = getattr(self.app, "ai", None)
         if ai is not None and hasattr(ai, "record_ai_change"):
             context = _execution_context.get()
@@ -4189,7 +4186,7 @@ class AiMcpServer:
                 recorded_operation["actor_client_name"] = context.client_name
             ai.record_ai_change(change_set_id, recorded_operation)
 
-    def _codes_tree(self) -> Dict[str, Any]:
+    def _codes_tree(self) -> dict[str, Any]:
         categories = []
         for row in self._fetchall(
             "SELECT catid, name, ifnull(memo,''), owner, supercatid "
@@ -4222,7 +4219,7 @@ class AiMcpServer:
                 }
             )
 
-        visible_text_coding_counts: Dict[int, int] = {}
+        visible_text_coding_counts: dict[int, int] = {}
         if self._view_exists("code_text_visible"):
             visible_text_coding_counts = {
                 int(row[0]): int(row[1])
@@ -4241,14 +4238,14 @@ class AiMcpServer:
             for code in codes
             if self._to_int(code.get("cid"), -1) > 0
         }
-        direct_child_counts: Dict[int, int] = {}
+        direct_child_counts: dict[int, int] = {}
         for code in codes:
             parent_id = self._to_int(code.get("supercid"), -1)
             if parent_id > 0:
                 direct_child_counts[parent_id] = direct_child_counts.get(parent_id, 0) + 1
 
-        def category_path_nodes(catid: Any) -> List[Dict[str, Any]]:
-            nodes: List[Dict[str, Any]] = []
+        def category_path_nodes(catid: Any) -> list[dict[str, Any]]:
+            nodes: list[dict[str, Any]] = []
             visited: set[int] = set()
             current_id = self._to_int(catid, -1)
             while current_id > 0 and current_id not in visited:
@@ -4265,8 +4262,8 @@ class AiMcpServer:
             nodes.reverse()
             return nodes
 
-        def code_path_nodes(code: Dict[str, Any]) -> List[Dict[str, Any]]:
-            code_nodes: List[Dict[str, Any]] = []
+        def code_path_nodes(code: dict[str, Any]) -> list[dict[str, Any]]:
+            code_nodes: list[dict[str, Any]] = []
             visited: set[int] = {self._to_int(code.get("cid"), -1)}
             current = code
             parent_id = self._to_int(current.get("supercid"), -1)
@@ -4319,7 +4316,7 @@ class AiMcpServer:
             "special_conventions": special_conventions,
         }
 
-    def _fetch_text_documents(self) -> List[Dict[str, Any]]:
+    def _fetch_text_documents(self) -> list[dict[str, Any]]:
         rows = self._fetchall(
             "SELECT id, name, ifnull(memo,''), owner, date, ifnull(length(fulltext),0) "
             "FROM source WHERE fulltext is not null ORDER BY lower(name)"
@@ -4342,14 +4339,14 @@ class AiMcpServer:
             )
         return docs
 
-    def _fetch_case_name(self, case_id: int) -> Optional[str]:
+    def _fetch_case_name(self, case_id: int) -> str | None:
         row = self._fetchone("SELECT name FROM cases WHERE caseid=?", (case_id,))
         if row is None:
             return None
         return row[0]
 
-    def _fetch_case_attributes(self, case_ids: List[int]) -> Dict[int, Dict[str, str]]:
-        normalized_ids: List[int] = []
+    def _fetch_case_attributes(self, case_ids: list[int]) -> dict[int, dict[str, str]]:
+        normalized_ids: list[int] = []
         for case_id in case_ids:
             case_id_i = self._to_int(case_id, -1)
             if case_id_i > 0:
@@ -4364,7 +4361,7 @@ class AiMcpServer:
             "ORDER BY id, lower(name)",
             tuple(normalized_ids),
         )
-        result: Dict[int, Dict[str, str]] = {}
+        result: dict[int, dict[str, str]] = {}
         for row in rows:
             case_id = self._to_int(row[0], -1)
             if case_id <= 0:
@@ -4375,8 +4372,8 @@ class AiMcpServer:
             result[case_id][attr_name] = "" if row[2] is None else str(row[2])
         return result
 
-    def _fetch_file_attributes(self, file_ids: List[int]) -> Dict[int, Dict[str, str]]:
-        normalized_ids: List[int] = []
+    def _fetch_file_attributes(self, file_ids: list[int]) -> dict[int, dict[str, str]]:
+        normalized_ids: list[int] = []
         for file_id in file_ids:
             file_id_i = self._to_int(file_id, -1)
             if file_id_i > 0:
@@ -4391,7 +4388,7 @@ class AiMcpServer:
             "ORDER BY id, lower(name)",
             tuple(normalized_ids),
         )
-        result: Dict[int, Dict[str, str]] = {}
+        result: dict[int, dict[str, str]] = {}
         for row in rows:
             file_id = self._to_int(row[0], -1)
             if file_id <= 0:
@@ -4402,8 +4399,8 @@ class AiMcpServer:
             result[file_id][attr_name] = "" if row[2] is None else str(row[2])
         return result
 
-    def _fetch_case_link_counts(self, case_ids: List[int]) -> Dict[int, Dict[str, int]]:
-        normalized_ids: List[int] = []
+    def _fetch_case_link_counts(self, case_ids: list[int]) -> dict[int, dict[str, int]]:
+        normalized_ids: list[int] = []
         for case_id in case_ids:
             case_id_i = self._to_int(case_id, -1)
             if case_id_i > 0:
@@ -4417,7 +4414,7 @@ class AiMcpServer:
             f"FROM case_text WHERE caseid IN ({placeholders}) GROUP BY caseid",
             tuple(normalized_ids),
         )
-        result: Dict[int, Dict[str, int]] = {}
+        result: dict[int, dict[str, int]] = {}
         for row in rows:
             case_id = self._to_int(row[0], -1)
             if case_id <= 0:
@@ -4428,14 +4425,14 @@ class AiMcpServer:
             }
         return result
 
-    def _fetch_cases(self) -> List[Dict[str, Any]]:
+    def _fetch_cases(self) -> list[dict[str, Any]]:
         rows = self._fetchall(
             "SELECT caseid, name, ifnull(memo,''), owner, date FROM cases ORDER BY lower(name)"
         )
         case_ids = [self._to_int(row[0], -1) for row in rows]
         attributes_by_case = self._fetch_case_attributes(case_ids)
         counts_by_case = self._fetch_case_link_counts(case_ids)
-        result: List[Dict[str, Any]] = []
+        result: list[dict[str, Any]] = []
         for row in rows:
             case_id = self._to_int(row[0], -1)
             counts = counts_by_case.get(case_id, {})
@@ -4453,19 +4450,19 @@ class AiMcpServer:
             )
         return result
 
-    def _fetch_source_name(self, file_id: int) -> Optional[str]:
+    def _fetch_source_name(self, file_id: int) -> str | None:
         row = self._fetchone("SELECT name FROM source WHERE id=?", (file_id,))
         if row is None:
             return None
         return row[0]
 
-    def _fetch_category_name(self, catid: int) -> Optional[str]:
+    def _fetch_category_name(self, catid: int) -> str | None:
         row = self._fetchone("SELECT name FROM code_cat WHERE catid=?", (catid,))
         if row is None:
             return None
         return row[0]
 
-    def _fetch_code_name(self, cid: int) -> Optional[str]:
+    def _fetch_code_name(self, cid: int) -> str | None:
         row = self._fetchone("SELECT name FROM code_name WHERE cid=?", (cid,))
         if row is None:
             return None
@@ -4478,7 +4475,7 @@ class AiMcpServer:
         )
         return row is not None
 
-    def _parse_code_segments_options(self, query: Dict[str, List[str]]) -> Dict[str, Any]:
+    def _parse_code_segments_options(self, query: dict[str, list[str]]) -> dict[str, Any]:
         strategy = str(query.get("strategy", ["diverse_by_document"])[0]).strip()
         allowed = {"diverse_by_document", "recent_first", "sequential"}
         if strategy not in allowed:
@@ -4515,7 +4512,7 @@ class AiMcpServer:
             "owners": owners,
         }
 
-    def _parse_case_text_options(self, query: Dict[str, List[str]]) -> Dict[str, Any]:
+    def _parse_case_text_options(self, query: dict[str, list[str]]) -> dict[str, Any]:
         max_segments = self._to_int(
             query.get("max_segments", [self.default_segments_max_segments])[0],
             self.default_segments_max_segments,
@@ -4539,7 +4536,7 @@ class AiMcpServer:
             "file_ids": file_ids,
         }
 
-    def _parse_annotation_options(self, query: Dict[str, List[str]]) -> Dict[str, Any]:
+    def _parse_annotation_options(self, query: dict[str, list[str]]) -> dict[str, Any]:
         """Parse filters and pagination for annotation reads."""
 
         cursor = max(0, self._to_int(query.get("cursor", [0])[0], 0))
@@ -4562,15 +4559,15 @@ class AiMcpServer:
             "owners": self._parse_string_list_options(query, ("owner", "owners")),
         }
 
-    def _parse_string_list_options(self, query: Dict[str, List[str]], keys: Tuple[str, ...]) -> List[str]:
-        values: List[str] = []
+    def _parse_string_list_options(self, query: dict[str, list[str]], keys: tuple[str, ...]) -> list[str]:
+        values: list[str] = []
         for key in keys:
             for raw in query.get(key, []):
                 parts = [p.strip() for p in str(raw).split(",")]
                 for part in parts:
                     if part != "":
                         values.append(part)
-        unique_values: List[str] = []
+        unique_values: list[str] = []
         seen: set[str] = set()
         for value in values:
             norm = value.casefold()
@@ -4580,8 +4577,8 @@ class AiMcpServer:
             unique_values.append(value)
         return unique_values
 
-    def _parse_positive_int_list_options(self, query: Dict[str, List[str]], keys: Tuple[str, ...]) -> List[int]:
-        values: List[int] = []
+    def _parse_positive_int_list_options(self, query: dict[str, list[str]], keys: tuple[str, ...]) -> list[int]:
+        values: list[int] = []
         for key in keys:
             for raw in query.get(key, []):
                 parts = [p.strip() for p in str(raw).split(",")]
@@ -4592,7 +4589,7 @@ class AiMcpServer:
                     if val > 0:
                         values.append(val)
         # Keep input order while removing duplicates.
-        unique_values: List[int] = []
+        unique_values: list[int] = []
         seen = set()
         for val in values:
             if val in seen:
@@ -4601,8 +4598,8 @@ class AiMcpServer:
             unique_values.append(val)
         return unique_values
 
-    def _parse_help_search_options(self, query: Dict[str, List[str]]) -> Dict[str, Any]:
-        query_strings: List[str] = []
+    def _parse_help_search_options(self, query: dict[str, list[str]]) -> dict[str, Any]:
+        query_strings: list[str] = []
         for key in ("q", "query", "queries"):
             values = query.get(key, [])
             for raw in values:
@@ -4614,7 +4611,7 @@ class AiMcpServer:
                     if line_clean != "":
                         query_strings.append(line_clean)
 
-        deduped_queries: List[str] = []
+        deduped_queries: list[str] = []
         seen_queries: set[str] = set()
         for q in query_strings:
             q_key = q.lower()
@@ -4636,8 +4633,8 @@ class AiMcpServer:
             "page_size": page_size,
         }
 
-    def _parse_vector_search_options(self, query: Dict[str, List[str]]) -> Dict[str, Any]:
-        query_strings: List[str] = []
+    def _parse_vector_search_options(self, query: dict[str, list[str]]) -> dict[str, Any]:
+        query_strings: list[str] = []
         for key in ("q", "query", "queries"):
             values = query.get(key, [])
             for raw in values:
@@ -4650,7 +4647,7 @@ class AiMcpServer:
                         query_strings.append(line_clean)
 
         # Keep order, remove duplicates case-insensitively.
-        deduped_queries: List[str] = []
+        deduped_queries: list[str] = []
         seen_queries: set[str] = set()
         for q in query_strings:
             q_key = q.lower()
@@ -4684,8 +4681,8 @@ class AiMcpServer:
             "score_threshold": score_threshold,
         }
 
-    def _parse_bm25_search_options(self, query: Dict[str, List[str]]) -> Dict[str, Any]:
-        query_strings: List[str] = []
+    def _parse_bm25_search_options(self, query: dict[str, list[str]]) -> dict[str, Any]:
+        query_strings: list[str] = []
         for key in ("q", "query", "queries"):
             values = query.get(key, [])
             for raw in values:
@@ -4697,7 +4694,7 @@ class AiMcpServer:
                     if line_clean != "":
                         query_strings.append(line_clean)
 
-        deduped_queries: List[str] = []
+        deduped_queries: list[str] = []
         seen_queries: set[str] = set()
         for q in query_strings:
             q_key = q.lower()
@@ -4728,7 +4725,7 @@ class AiMcpServer:
             "exclude_cids": exclude_cids,
         }
 
-    def _parse_regex_search_options(self, query: Dict[str, List[str]]) -> Dict[str, Any]:
+    def _parse_regex_search_options(self, query: dict[str, list[str]]) -> dict[str, Any]:
         pattern = ""
         for key in ("pattern", "q", "query"):
             values = query.get(key, [])
@@ -4804,7 +4801,7 @@ class AiMcpServer:
             )
         return vectorstore
 
-    def _read_vector_search(self, options: Dict[str, Any]) -> Dict[str, Any]:
+    def _read_vector_search(self, options: dict[str, Any]) -> dict[str, Any]:
         vectorstore = self._require_ready_vectorstore()
 
         queries = options.get("queries", [])
@@ -4874,12 +4871,11 @@ class AiMcpServer:
             else:
                 cache_id, total_hits = cache_meta
 
-            if cursor > total_hits:
-                cursor = total_hits
+            cursor = min(cursor, total_hits)
 
             cur = conn.cursor()
 
-            hits: List[Dict[str, Any]] = []
+            hits: list[dict[str, Any]] = []
             next_cursor = cursor
             fetch_batch_size = max(page_size * 3, 50)
             while len(hits) < page_size and next_cursor < total_hits:
@@ -4957,8 +4953,7 @@ class AiMcpServer:
                     if len(hits) >= page_size:
                         break
 
-            if next_cursor > total_hits:
-                next_cursor = total_hits
+            next_cursor = min(next_cursor, total_hits)
             truncated = next_cursor < total_hits
 
             return {
@@ -4978,7 +4973,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _read_bm25_search(self, options: Dict[str, Any]) -> Dict[str, Any]:
+    def _read_bm25_search(self, options: dict[str, Any]) -> dict[str, Any]:
         vectorstore = self._require_ready_vectorstore()
 
         queries = options.get("queries", [])
@@ -5021,12 +5016,12 @@ class AiMcpServer:
                     "hits": [],
                 }
         excluded_ranges = self._fetch_excluded_coding_ranges(exclude_cids, effective_file_ids) if len(exclude_cids) > 0 else {}
-        fused_hits: Dict[int, Dict[str, Any]] = {}
+        fused_hits: dict[int, dict[str, Any]] = {}
 
         search_conn = sqlite3.connect(search_db_path, timeout=30)
         try:
             for query_text in queries:
-                params: List[Any] = [str(query_text)]
+                params: list[Any] = [str(query_text)]
                 where_sql = " WHERE search_chunk_fts MATCH ?"
                 normalized_file_ids = []
                 for fid in effective_file_ids:
@@ -5063,8 +5058,8 @@ class AiMcpServer:
                         case_ranges.get(source_id, []),
                     ):
                         continue
-                    if len(excluded_ranges) > 0:
-                        if self._range_overlaps_any(start_index, start_index + length, excluded_ranges.get(source_id, [])):
+                    if len(excluded_ranges) > 0\
+                        and self._range_overlaps_any(start_index, start_index + length, excluded_ranges.get(source_id, [])):
                             continue
                     raw_score = self._to_float(row[6], 0.0)
                     lexical_score = 1.0 / (1.0 + max(0.0, raw_score))
@@ -5096,12 +5091,11 @@ class AiMcpServer:
             ),
         )
         total_hits = len(ordered_hits)
-        if cursor > total_hits:
-            cursor = total_hits
+        cursor = min(cursor, total_hits)
         sliced_hits = ordered_hits[cursor:cursor + page_size]
         source_texts = self._fetch_sources_texts([self._to_int(hit.get("source_id"), -1) for hit in sliced_hits])
         case_memberships = self._fetch_case_memberships([self._to_int(hit.get("source_id"), -1) for hit in sliced_hits])
-        returned_hits: List[Dict[str, Any]] = []
+        returned_hits: list[dict[str, Any]] = []
         for hit in sliced_hits:
             source_id = self._to_int(hit.get("source_id"), -1)
             source_fulltext = ""
@@ -5140,7 +5134,7 @@ class AiMcpServer:
                 "hits": returned_hits,
             }
 
-    def _read_regex_search(self, options: Dict[str, Any]) -> Dict[str, Any]:
+    def _read_regex_search(self, options: dict[str, Any]) -> dict[str, Any]:
         pattern_text = str(options.get("pattern", "")).strip()
         if pattern_text == "":
             raise ValueError("Missing regex pattern.")
@@ -5217,11 +5211,10 @@ class AiMcpServer:
             else:
                 cache_id, total_hits = cache_meta
 
-            if cursor > total_hits:
-                cursor = total_hits
+            cursor = min(cursor, total_hits)
 
             cur = conn.cursor()
-            hits: List[Dict[str, Any]] = []
+            hits: list[dict[str, Any]] = []
             next_cursor = cursor
             fetch_batch_size = max(page_size * 3, 50)
 
@@ -5301,8 +5294,7 @@ class AiMcpServer:
                     if len(hits) >= page_size:
                         break
 
-            if next_cursor > total_hits:
-                next_cursor = total_hits
+            next_cursor = min(next_cursor, total_hits)
             truncated = next_cursor < total_hits
 
             return {
@@ -5410,7 +5402,7 @@ class AiMcpServer:
         )
         conn.commit()
 
-    def _get_vector_search_cache(self, conn: sqlite3.Connection, cache_key: str) -> Optional[Tuple[int, int]]:
+    def _get_vector_search_cache(self, conn: sqlite3.Connection, cache_key: str) -> tuple[int, int] | None:
         cur = conn.cursor()
         cur.execute(
             "SELECT id, total_hits FROM mcp_vector_search_cache "
@@ -5424,7 +5416,7 @@ class AiMcpServer:
         total_hits = max(0, self._to_int(row[1], 0))
         if cache_id <= 0:
             return None
-        now = datetime.utcnow().isoformat(timespec="seconds")
+        now = datetime.now(UTC).isoformat(timespec="seconds")
         cur.execute(
             "UPDATE mcp_vector_search_cache SET last_used_at=? WHERE id=?",
             (now, cache_id),
@@ -5433,9 +5425,9 @@ class AiMcpServer:
         return cache_id, total_hits
 
     def _build_vector_search_cache(self, conn: sqlite3.Connection, cache_key: str,
-                                   vectorstore_sig: str, queries: List[str], file_ids: List[int],
-                                   case_ids: List[int], exclude_cids: List[int], score_threshold: float,
-                                   k_per_query: int) -> Tuple[int, int]:
+                                   vectorstore_sig: str, queries: list[str], file_ids: list[int],
+                                   case_ids: list[int], exclude_cids: list[int], score_threshold: float,
+                                   k_per_query: int) -> tuple[int, int]:
         vectorstore = self._require_ready_vectorstore()
         doc_filter = file_ids if len(file_ids) > 0 else None
         chunks = vectorstore.retrieve_similar_documents(
@@ -5478,7 +5470,7 @@ class AiMcpServer:
             chunks = filtered_chunks
 
         total_hits = len(chunks)
-        now = datetime.utcnow().isoformat(timespec="seconds")
+        now = datetime.now(UTC).isoformat(timespec="seconds")
 
         cur = conn.cursor()
         try:
@@ -5508,7 +5500,7 @@ class AiMcpServer:
                 raise
             return existing
 
-        rows_to_insert: List[Tuple[Any, ...]] = []
+        rows_to_insert: list[tuple[Any, ...]] = []
         for pos, chunk_doc in enumerate(chunks):
             docstore_id = getattr(chunk_doc, "id", None)
             if docstore_id is None:
@@ -5550,7 +5542,7 @@ class AiMcpServer:
         conn.commit()
         return cache_id, total_hits
 
-    def _get_regex_search_cache(self, conn: sqlite3.Connection, cache_key: str) -> Optional[Tuple[int, int]]:
+    def _get_regex_search_cache(self, conn: sqlite3.Connection, cache_key: str) -> tuple[int, int] | None:
         cur = conn.cursor()
         cur.execute(
             "SELECT id, total_hits FROM mcp_regex_search_cache WHERE cache_key=? LIMIT 1",
@@ -5563,7 +5555,7 @@ class AiMcpServer:
         total_hits = max(0, self._to_int(row[1], 0))
         if cache_id <= 0:
             return None
-        now = datetime.utcnow().isoformat(timespec="seconds")
+        now = datetime.now(UTC).isoformat(timespec="seconds")
         cur.execute(
             "UPDATE mcp_regex_search_cache SET last_used_at=? WHERE id=?",
             (now, cache_id),
@@ -5572,8 +5564,8 @@ class AiMcpServer:
         return cache_id, total_hits
 
     def _build_regex_search_cache(self, conn: sqlite3.Connection, cache_key: str, pattern_text: str,
-                                  flags_text: str, file_ids: List[int], case_ids: List[int], exclude_cids: List[int],
-                                  context_chars: int) -> Tuple[int, int]:
+                                  flags_text: str, file_ids: list[int], case_ids: list[int], exclude_cids: list[int],
+                                  context_chars: int) -> tuple[int, int]:
         re_flags = self._regex_flags_to_re_flags(flags_text)
         try:
             regex = re.compile(pattern_text, re_flags)
@@ -5581,8 +5573,8 @@ class AiMcpServer:
             raise ValueError(f"Invalid regex pattern: {err}")
 
         where_sql = " WHERE fulltext is not null"
-        params: List[Any] = []
-        norm_file_ids: List[int] = []
+        params: list[Any] = []
+        norm_file_ids: list[int] = []
         for fid in file_ids:
             try:
                 fid_i = int(fid)
@@ -5603,7 +5595,7 @@ class AiMcpServer:
             tuple(params),
         )
 
-        now = datetime.utcnow().isoformat(timespec="seconds")
+        now = datetime.now(UTC).isoformat(timespec="seconds")
         cur = conn.cursor()
         try:
             cur.execute(
@@ -5631,7 +5623,7 @@ class AiMcpServer:
 
         case_ranges = self._fetch_case_ranges(case_ids, norm_file_ids if len(norm_file_ids) > 0 else None) if len(case_ids) > 0 else {}
         excluded_ranges = self._fetch_excluded_coding_ranges(exclude_cids, norm_file_ids) if len(exclude_cids) > 0 else {}
-        match_rows: List[Tuple[Any, ...]] = []
+        match_rows: list[tuple[Any, ...]] = []
         for row in rows:
             source_id = self._to_int(row[0], -1)
             fulltext = "" if row[2] is None else str(row[2])
@@ -5646,8 +5638,8 @@ class AiMcpServer:
                     case_range_matches = case_ranges.get(source_id, [])
                     if not self._range_within_any(match_start, match_end, case_range_matches):
                         continue
-                if len(excluded_ranges) > 0:
-                    if self._range_overlaps_any(match_start, match_end, excluded_ranges.get(source_id, [])):
+                if len(excluded_ranges) > 0\
+                    and self._range_overlaps_any(match_start, match_end, excluded_ranges.get(source_id, [])):
                         continue
                 context_start = max(0, match_start - context_chars)
                 context_end = min(len(fulltext), match_end + context_chars)
@@ -5672,7 +5664,7 @@ class AiMcpServer:
         rng = random.Random(cache_key)
         rng.shuffle(match_rows)
 
-        insert_rows: List[Tuple[Any, ...]] = []
+        insert_rows: list[tuple[Any, ...]] = []
         for pos, row_data in enumerate(match_rows):
             insert_rows.append((cache_id, pos, *row_data))
 
@@ -5690,10 +5682,10 @@ class AiMcpServer:
         conn.commit()
         return cache_id, len(insert_rows)
 
-    def _vector_search_cache_key(self, queries: List[str], file_ids: List[int],
-                                 case_ids: List[int], exclude_cids: List[int], score_threshold: float,
+    def _vector_search_cache_key(self, queries: list[str], file_ids: list[int],
+                                 case_ids: list[int], exclude_cids: list[int], score_threshold: float,
                                  k_per_query: int) -> str:
-        norm_file_ids: List[int] = []
+        norm_file_ids: list[int] = []
         for fid in file_ids:
             try:
                 fid_i = int(fid)
@@ -5701,7 +5693,7 @@ class AiMcpServer:
                 continue
             if fid_i > 0:
                 norm_file_ids.append(fid_i)
-        norm_case_ids: List[int] = []
+        norm_case_ids: list[int] = []
         for case_id in case_ids:
             try:
                 case_id_i = int(case_id)
@@ -5709,7 +5701,7 @@ class AiMcpServer:
                 continue
             if case_id_i > 0:
                 norm_case_ids.append(case_id_i)
-        norm_exclude_cids: List[int] = []
+        norm_exclude_cids: list[int] = []
         for cid in exclude_cids:
             try:
                 cid_i = int(cid)
@@ -5728,9 +5720,9 @@ class AiMcpServer:
         canonical = json.dumps(payload, sort_keys=True, ensure_ascii=False)
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
-    def _regex_search_cache_key(self, pattern_text: str, flags_text: str, file_ids: List[int],
-                                case_ids: List[int], exclude_cids: List[int], context_chars: int) -> str:
-        norm_file_ids: List[int] = []
+    def _regex_search_cache_key(self, pattern_text: str, flags_text: str, file_ids: list[int],
+                                case_ids: list[int], exclude_cids: list[int], context_chars: int) -> str:
+        norm_file_ids: list[int] = []
         for fid in file_ids:
             try:
                 fid_i = int(fid)
@@ -5738,7 +5730,7 @@ class AiMcpServer:
                 continue
             if fid_i > 0:
                 norm_file_ids.append(fid_i)
-        norm_case_ids: List[int] = []
+        norm_case_ids: list[int] = []
         for case_id in case_ids:
             try:
                 case_id_i = int(case_id)
@@ -5746,7 +5738,7 @@ class AiMcpServer:
                 continue
             if case_id_i > 0:
                 norm_case_ids.append(case_id_i)
-        norm_exclude_cids: List[int] = []
+        norm_exclude_cids: list[int] = []
         for cid in exclude_cids:
             try:
                 cid_i = int(cid)
@@ -5795,8 +5787,8 @@ class AiMcpServer:
         except OSError:
             return "unknown"
 
-    def _fetch_cached_documents_by_docstore_id(self, docstore_ids: List[str]) -> Dict[str, Any]:
-        result: Dict[str, Any] = {}
+    def _fetch_cached_documents_by_docstore_id(self, docstore_ids: list[str]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
         vectorstore = getattr(self.app, "vectorstore", None)
         if vectorstore is None:
             return result
@@ -5813,8 +5805,8 @@ class AiMcpServer:
             result[key] = doc
         return result
 
-    def _fetch_sources_texts(self, source_ids: List[int]) -> Dict[int, Tuple[str, str]]:
-        normalized_ids: List[int] = []
+    def _fetch_sources_texts(self, source_ids: list[int]) -> dict[int, tuple[str, str]]:
+        normalized_ids: list[int] = []
         for source_id in source_ids:
             try:
                 source_id_i = int(source_id)
@@ -5831,7 +5823,7 @@ class AiMcpServer:
             f"WHERE id IN ({placeholders})",
             tuple(normalized_ids),
         )
-        result: Dict[int, Tuple[str, str]] = {}
+        result: dict[int, tuple[str, str]] = {}
         for row in rows:
             source_id = self._to_int(row[0], -1)
             if source_id <= 0:
@@ -5841,10 +5833,10 @@ class AiMcpServer:
             result[source_id] = (source_name, fulltext)
         return result
 
-    def _fetch_case_ranges(self, case_ids: List[int], file_ids: Optional[List[int]] = None) -> Dict[int, List[Tuple[int, int]]]:
+    def _fetch_case_ranges(self, case_ids: list[int], file_ids: list[int] | None = None) -> dict[int, list[tuple[int, int]]]:
         """Fetch text-backed case ranges grouped by source id."""
 
-        normalized_case_ids: List[int] = []
+        normalized_case_ids: list[int] = []
         for case_id in list(case_ids or []):
             case_id_i = self._to_int(case_id, -1)
             if case_id_i > 0:
@@ -5853,10 +5845,10 @@ class AiMcpServer:
         if len(normalized_case_ids) == 0:
             return {}
 
-        where_parts: List[str] = ["ct.caseid IN (" + ",".join(["?"] * len(normalized_case_ids)) + ")", "source.fulltext is not null", "ct.pos1 > ct.pos0"]
-        params: List[Any] = list(normalized_case_ids)
+        where_parts: list[str] = ["ct.caseid IN (" + ",".join(["?"] * len(normalized_case_ids)) + ")", "source.fulltext is not null", "ct.pos1 > ct.pos0"]
+        params: list[Any] = list(normalized_case_ids)
 
-        normalized_file_ids: List[int] = []
+        normalized_file_ids: list[int] = []
         for fid in list(file_ids or []):
             fid_i = self._to_int(fid, -1)
             if fid_i > 0:
@@ -5874,7 +5866,7 @@ class AiMcpServer:
             "ORDER BY ct.fid, ct.pos0, ct.pos1",
             tuple(params),
         )
-        result: Dict[int, List[Tuple[int, int]]] = {}
+        result: dict[int, list[tuple[int, int]]] = {}
         for row in rows:
             fid = self._to_int(row[0], -1)
             pos0 = self._to_int(row[1], -1)
@@ -5886,10 +5878,10 @@ class AiMcpServer:
             result[fid].append((pos0, pos1))
         return result
 
-    def _fetch_case_memberships(self, file_ids: List[int]) -> Dict[int, List[Tuple[int, int, int, str]]]:
+    def _fetch_case_memberships(self, file_ids: list[int]) -> dict[int, list[tuple[int, int, int, str]]]:
         """Fetch text-backed case memberships grouped by source id."""
 
-        normalized_file_ids: List[int] = []
+        normalized_file_ids: list[int] = []
         for fid in list(file_ids or []):
             fid_i = self._to_int(fid, -1)
             if fid_i > 0:
@@ -5909,7 +5901,7 @@ class AiMcpServer:
             "ORDER BY ct.fid, ct.pos0, ct.pos1, c.caseid",
             tuple(normalized_file_ids),
         )
-        result: Dict[int, List[Tuple[int, int, int, str]]] = {}
+        result: dict[int, list[tuple[int, int, int, str]]] = {}
         for row in rows:
             fid = self._to_int(row[0], -1)
             pos0 = self._to_int(row[1], -1)
@@ -5924,14 +5916,14 @@ class AiMcpServer:
         return result
 
     def _matching_cases_for_range(self, start: int, end: int,
-                                  memberships: List[Tuple[int, int, int, str]]) -> List[Dict[str, Any]]:
+                                  memberships: list[tuple[int, int, int, str]]) -> list[dict[str, Any]]:
         """Return case identifiers for memberships that fully contain [start, end)."""
 
         if start < 0 or end <= start:
             return []
         if not isinstance(memberships, list) or len(memberships) == 0:
             return []
-        matches: List[Dict[str, Any]] = []
+        matches: list[dict[str, Any]] = []
         seen_case_ids: Set[int] = set()
         for r_start, r_end, case_id, case_name in memberships:
             if r_start > start:
@@ -5941,7 +5933,7 @@ class AiMcpServer:
                 matches.append({"caseid": case_id, "name": case_name})
         return matches
 
-    def _range_within_any(self, start: int, end: int, ranges: List[Tuple[int, int]]) -> bool:
+    def _range_within_any(self, start: int, end: int, ranges: list[tuple[int, int]]) -> bool:
         """Return True if [start, end) is fully contained in any range in ranges."""
 
         if end <= start:
@@ -5955,13 +5947,13 @@ class AiMcpServer:
                 break
         return False
 
-    def _line_ranges(self, fulltext: str) -> List[Tuple[int, int]]:
+    def _line_ranges(self, fulltext: str) -> list[tuple[int, int]]:
         """Return 0-based [start, end) character ranges for each logical line."""
 
         text = "" if fulltext is None else str(fulltext)
         if text == "":
             return []
-        ranges: List[Tuple[int, int]] = []
+        ranges: list[tuple[int, int]] = []
         pos = 0
         for line_text in text.splitlines(keepends=True):
             next_pos = pos + len(line_text)
@@ -5986,7 +5978,7 @@ class AiMcpServer:
                 return idx
         return len(line_ranges)
 
-    def _char_range_to_line_range(self, fulltext: str, start: int, length: int) -> Tuple[int, int]:
+    def _char_range_to_line_range(self, fulltext: str, start: int, length: int) -> tuple[int, int]:
         """Return 1-based logical line numbers touched by one character range."""
 
         text = "" if fulltext is None else str(fulltext)
@@ -6002,7 +5994,7 @@ class AiMcpServer:
         end_line = self._char_position_to_line_number(text, end_exclusive - 1)
         return start_line, end_line
 
-    def _line_range_to_char_window(self, fulltext: str, line_start: int, line_end: int) -> Tuple[int, int, int, int]:
+    def _line_range_to_char_window(self, fulltext: str, line_start: int, line_end: int) -> tuple[int, int, int, int]:
         """Convert one 1-based logical line window to a character start/length pair."""
 
         line_ranges = self._line_ranges(fulltext)
@@ -6017,8 +6009,8 @@ class AiMcpServer:
         end_pos = line_ranges[end_line - 1][1]
         return start_pos, max(0, end_pos - start_pos), start_line, end_line
 
-    def _append_line_range_fields(self, payload: Dict[str, Any], fulltext: str,
-                                  start: Any, length: Any) -> Dict[str, Any]:
+    def _append_line_range_fields(self, payload: dict[str, Any], fulltext: str,
+                                  start: Any, length: Any) -> dict[str, Any]:
         """Attach line_start and line_end to one payload using its character window."""
 
         start_i = self._to_int(start, -1)
@@ -6032,7 +6024,7 @@ class AiMcpServer:
         payload["line_end"] = line_end
         return payload
 
-    def _find_context_start_boundary(self, fulltext: str, floor: int, ceiling: int) -> Optional[int]:
+    def _find_context_start_boundary(self, fulltext: str, floor: int, ceiling: int) -> int | None:
         """Prefer paragraph or line starts within one backwards context search window."""
 
         text = "" if fulltext is None else str(fulltext)
@@ -6054,7 +6046,7 @@ class AiMcpServer:
                 line_boundary = candidate
         return line_boundary
 
-    def _find_context_end_boundary(self, fulltext: str, floor: int, ceiling: int) -> Optional[int]:
+    def _find_context_end_boundary(self, fulltext: str, floor: int, ceiling: int) -> int | None:
         """Prefer paragraph or line ends within one forward context search window."""
 
         text = "" if fulltext is None else str(fulltext)
@@ -6072,7 +6064,7 @@ class AiMcpServer:
                 return candidate
         return None
 
-    def _snippet_context_fields(self, fulltext: str, start: Any, length: Any) -> Dict[str, str]:
+    def _snippet_context_fields(self, fulltext: str, start: Any, length: Any) -> dict[str, str]:
         """Return surrounding snippet context with natural boundaries where possible."""
 
         text = "" if fulltext is None else str(fulltext)
@@ -6098,14 +6090,14 @@ class AiMcpServer:
 
         before_floor = max(0, snippet_start - max_chars)
         before_ceiling = max(0, snippet_start - min_chars)
-        before_start = before_floor if before_ceiling <= before_floor else before_ceiling
+        before_start = max(before_floor, before_ceiling)
         preferred_before_start = self._find_context_start_boundary(text, before_floor, before_ceiling)
         if preferred_before_start is not None:
             before_start = preferred_before_start
 
         after_floor = min(text_len, snippet_end + min_chars)
         after_ceiling = min(text_len, snippet_end + max_chars)
-        after_end = after_ceiling if after_floor >= after_ceiling else after_floor
+        after_end = min(after_ceiling, after_floor)
         preferred_after_end = self._find_context_end_boundary(text, after_floor, after_ceiling)
         if preferred_after_end is not None:
             after_end = preferred_after_end
@@ -6117,17 +6109,17 @@ class AiMcpServer:
             "context_after": text[snippet_end:after_end],
         }
 
-    def _append_snippet_context_fields(self, payload: Dict[str, Any], fulltext: str,
-                                       start: Any, length: Any) -> Dict[str, Any]:
+    def _append_snippet_context_fields(self, payload: dict[str, Any], fulltext: str,
+                                       start: Any, length: Any) -> dict[str, Any]:
         """Attach context_before and context_after to one payload."""
 
         payload.update(self._snippet_context_fields(fulltext, start, length))
         return payload
 
-    def _fetch_excluded_coding_ranges(self, exclude_cids: List[int], file_ids: List[int]) -> Dict[int, List[Tuple[int, int]]]:
+    def _fetch_excluded_coding_ranges(self, exclude_cids: list[int], file_ids: list[int]) -> dict[int, list[tuple[int, int]]]:
         """Fetch coded text ranges grouped by source id for exclusion filtering."""
 
-        normalized_cids: List[int] = []
+        normalized_cids: list[int] = []
         for cid in exclude_cids:
             cid_i = self._to_int(cid, -1)
             if cid_i > 0:
@@ -6137,14 +6129,14 @@ class AiMcpServer:
             return {}
 
         where_parts = []
-        params: List[Any] = []
+        params: list[Any] = []
 
         cid_placeholders = ",".join(["?"] * len(normalized_cids))
         where_parts.append(f"cid IN ({cid_placeholders})")
         params.extend(normalized_cids)
         where_parts.append("pos1 > pos0")
 
-        normalized_fids: List[int] = []
+        normalized_fids: list[int] = []
         for fid in file_ids:
             fid_i = self._to_int(fid, -1)
             if fid_i > 0:
@@ -6163,7 +6155,7 @@ class AiMcpServer:
             )
         except sqlite3.OperationalError:
             return {}
-        ranges_by_fid: Dict[int, List[Tuple[int, int]]] = {}
+        ranges_by_fid: dict[int, list[tuple[int, int]]] = {}
         for row in rows:
             fid = self._to_int(row[0], -1)
             pos0 = self._to_int(row[1], -1)
@@ -6175,7 +6167,7 @@ class AiMcpServer:
             ranges_by_fid[fid].append((pos0, pos1))
         return ranges_by_fid
 
-    def _range_overlaps_any(self, start: int, end: int, ranges: List[Tuple[int, int]]) -> bool:
+    def _range_overlaps_any(self, start: int, end: int, ranges: list[tuple[int, int]]) -> bool:
         """Return True if [start, end) intersects any range in ranges."""
 
         if end <= start:
@@ -6189,7 +6181,7 @@ class AiMcpServer:
                 break
         return False
 
-    def _read_annotations(self, options: Dict[str, Any]) -> Dict[str, Any]:
+    def _read_annotations(self, options: dict[str, Any]) -> dict[str, Any]:
         """Read a filtered, paginated set of text annotations."""
 
         cursor = int(options.get("cursor", 0))
@@ -6212,8 +6204,8 @@ class AiMcpServer:
                 raise RuntimeError("Required view 'annotation_visible' not found.")
             table_name = "annotation_visible"
 
-        where_parts: List[str] = []
-        where_params: List[Any] = []
+        where_parts: list[str] = []
+        where_params: list[Any] = []
         if len(file_ids) > 0:
             placeholders = ",".join(["?"] * len(file_ids))
             where_parts.append(f"a.fid IN ({placeholders})")
@@ -6247,7 +6239,7 @@ class AiMcpServer:
 
         source_texts = self._fetch_sources_texts([self._to_int(row[1], -1) for row in rows])
         case_memberships = self._fetch_case_memberships([self._to_int(row[1], -1) for row in rows])
-        annotations: List[Dict[str, Any]] = []
+        annotations: list[dict[str, Any]] = []
         used_chars = 0
         hit_max_char_limit = False
         for row in rows:
@@ -6306,7 +6298,7 @@ class AiMcpServer:
             "annotations": annotations,
         }
 
-    def _read_annotation(self, anid: int, owners: List[str]) -> Dict[str, Any]:
+    def _read_annotation(self, anid: int, owners: list[str]) -> dict[str, Any]:
         """Read one annotation, respecting visibility unless an owner is explicit."""
 
         if anid <= 0:
@@ -6318,7 +6310,7 @@ class AiMcpServer:
                 raise RuntimeError("Required view 'annotation_visible' not found.")
             table_name = "annotation_visible"
         where_owner = ""
-        params: List[Any] = [anid]
+        params: list[Any] = [anid]
         if len(owners) > 0:
             placeholders = ",".join(["?"] * len(owners))
             where_owner = f" AND a.owner IN ({placeholders})"
@@ -6359,7 +6351,7 @@ class AiMcpServer:
         self._append_snippet_context_fields(annotation, fulltext, pos0, pos1 - pos0)
         return {"annotation": annotation}
 
-    def _read_code_segments(self, cid: int, options: Dict[str, Any]) -> Dict[str, Any]:
+    def _read_code_segments(self, cid: int, options: dict[str, Any]) -> dict[str, Any]:
         code_name = self._fetch_code_name(cid)
         if code_name is None:
             raise ValueError(f"Code id {cid} not found.")
@@ -6386,7 +6378,7 @@ class AiMcpServer:
             table_name = "code_text_visible"
 
         where_parts = ["ct.cid=?"]
-        where_params: List[Any] = [cid]
+        where_params: list[Any] = [cid]
         if len(file_ids) > 0:
             placeholders = ",".join(["?"] * len(file_ids))
             where_parts.append(f"ct.fid IN ({placeholders})")
@@ -6456,7 +6448,7 @@ class AiMcpServer:
                 )
             )
 
-        segments: List[Dict[str, Any]] = []
+        segments: list[dict[str, Any]] = []
         used_chars = 0
         hit_max_char_limit = False
         source_texts = self._fetch_sources_texts([self._to_int(row[2], -1) for row in segment_rows])
@@ -6512,8 +6504,7 @@ class AiMcpServer:
             used_chars += quote_length
 
         next_cursor = cursor + len(segments)
-        if next_cursor > total_segments:
-            next_cursor = total_segments
+        next_cursor = min(next_cursor, total_segments)
         truncated = next_cursor < total_segments
 
         return {
@@ -6534,7 +6525,7 @@ class AiMcpServer:
             "segments": segments,
         }
 
-    def _read_case(self, case_id: int) -> Dict[str, Any]:
+    def _read_case(self, case_id: int) -> dict[str, Any]:
         row = self._fetchone(
             "SELECT caseid, name, ifnull(memo,''), owner, date FROM cases WHERE caseid=?",
             (case_id,),
@@ -6557,7 +6548,7 @@ class AiMcpServer:
         )
         file_ids = [self._to_int(file_row[0], -1) for file_row in file_rows]
         attributes_by_file = self._fetch_file_attributes(file_ids)
-        files: List[Dict[str, Any]] = []
+        files: list[dict[str, Any]] = []
         for file_row in file_rows:
             file_id = self._to_int(file_row[0], -1)
             files.append(
@@ -6585,7 +6576,7 @@ class AiMcpServer:
             }
         }
 
-    def _read_case_text(self, case_id: int, options: Dict[str, Any]) -> Dict[str, Any]:
+    def _read_case_text(self, case_id: int, options: dict[str, Any]) -> dict[str, Any]:
         case_name = self._fetch_case_name(case_id)
         if case_name is None:
             raise ValueError(f"Case id {case_id} not found.")
@@ -6598,7 +6589,7 @@ class AiMcpServer:
             file_ids = []
 
         where_parts = ["ct.caseid=?", "source.fulltext is not null"]
-        where_params: List[Any] = [case_id]
+        where_params: list[Any] = [case_id]
         if len(file_ids) > 0:
             placeholders = ",".join(["?"] * len(file_ids))
             where_parts.append(f"ct.fid IN ({placeholders})")
@@ -6625,8 +6616,7 @@ class AiMcpServer:
         total_links = 0 if all_link_count_row is None else self._to_int(all_link_count_row[0], 0)
         skipped_nontext_segments = max(0, total_links - total_segments)
 
-        if cursor > total_segments:
-            cursor = total_segments
+        cursor = min(cursor, total_segments)
 
         rows = self._fetchall(
             "SELECT ct.id, ct.caseid, ct.fid, ct.pos0, ct.pos1, ct.owner, ct.date, ifnull(ct.memo,''), "
@@ -6638,7 +6628,7 @@ class AiMcpServer:
             tuple(where_params + [max_segments, cursor]),
         )
 
-        segments: List[Dict[str, Any]] = []
+        segments: list[dict[str, Any]] = []
         used_chars = 0
         hit_max_char_limit = False
         for row in rows:
@@ -6674,8 +6664,7 @@ class AiMcpServer:
             used_chars += excerpt_length
 
         next_cursor = cursor + len(segments)
-        if next_cursor > total_segments:
-            next_cursor = total_segments
+        next_cursor = min(next_cursor, total_segments)
         truncated = next_cursor < total_segments
 
         return {
@@ -6695,7 +6684,7 @@ class AiMcpServer:
             "segments": segments,
         }
 
-    def _read_document(self, file_id: int, window: Dict[str, Any]) -> Dict[str, Any]:
+    def _read_document(self, file_id: int, window: dict[str, Any]) -> dict[str, Any]:
         row = self._fetchone(
             "SELECT id, name, ifnull(memo,''), owner, ifnull(fulltext,'') "
             "FROM source WHERE id=? AND fulltext is not null",
@@ -6772,7 +6761,7 @@ class AiMcpServer:
             return sqlite3.connect(self._project_db_path(), timeout=0)
         return sqlite3.connect(self._project_db_path())
 
-    def _fetchall(self, sql: str, params: Tuple[Any, ...] = ()) -> List[Tuple[Any, ...]]:
+    def _fetchall(self, sql: str, params: tuple[Any, ...] = ()) -> list[tuple[Any, ...]]:
         conn = self._connect()
         try:
             cur = conn.cursor()
@@ -6781,7 +6770,7 @@ class AiMcpServer:
         finally:
             conn.close()
 
-    def _fetchone(self, sql: str, params: Tuple[Any, ...] = ()) -> Optional[Tuple[Any, ...]]:
+    def _fetchone(self, sql: str, params: tuple[Any, ...] = ()) -> tuple[Any, ...] | None:
         conn = self._connect()
         try:
             cur = conn.cursor()

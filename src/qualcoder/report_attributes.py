@@ -21,13 +21,14 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
-from PyQt6 import QtCore, QtWidgets
 import logging
+
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from PyQt6 import QtCore, QtWidgets
 
 from .GUI.ui_report_attribute_parameters import Ui_Dialog_report_attribute_parameters
-from .select_items import DialogSelectItems
 from .helpers import Message
+from .select_items import DialogSelectItems
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +66,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
     def __init__(self, app, limiter:str="all", parent=None):
         """ limiter can be 'all', 'file' or 'case' This restricts the attributes to be displayed. """
 
-        super(DialogSelectAttributeParameters, self).__init__(parent)
+        super().__init__(parent)
         self.app = app
         self.limiter = limiter
         self.parameters = []
@@ -212,7 +213,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             if attribute[2] == 'character':
                 attribute[4] = attribute[4].replace('"', '')
             found = False
-            for row in range(0, self.ui.tableWidget.rowCount()):
+            for row in range(self.ui.tableWidget.rowCount()):
                 if self.ui.tableWidget.item(row, self.NAME_COLUMN).text() == attribute[0]:
                     self.ui.tableWidget.cellWidget(row, self.OPERATOR_COLUMN).setCurrentText(attribute[3])
                     value = attribute[4]
@@ -227,7 +228,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
     def clear_parameters(self):
         """ Clear attribute_list and empty table cells. """
 
-        for x in range(0, self.ui.tableWidget.rowCount()):
+        for x in range(self.ui.tableWidget.rowCount()):
             val_text = ""
             self.ui.tableWidget.item(x, self.VALUE_LIST_COLUMN).setText(val_text)
             self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).setCurrentText("")
@@ -249,7 +250,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         else:
             self.ui.radioButton_and.setChecked(True)
         for a in attribute_list:
-            for x in range(0, self.ui.tableWidget.rowCount()):
+            for x in range(self.ui.tableWidget.rowCount()):
                 if self.ui.tableWidget.item(x, self.NAME_COLUMN).text() == a[0]:
                     val_text = ""
                     if len(a[4]) == 1:
@@ -271,7 +272,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             self.parameters.append(["BOOLEAN_OR"])
         else:
             self.parameters.append(["BOOLEAN_AND"])
-        for x in range(0, self.ui.tableWidget.rowCount()):
+        for x in range(self.ui.tableWidget.rowCount()):
             values = self.ui.tableWidget.item(x, self.VALUE_LIST_COLUMN).text()
             values = values.split(';')
             tmp = [i for i in values if i != '']
@@ -299,7 +300,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                 values = []
             # Add single quotes to character values
             if type_ == "character":
-                for i in range(0, len(values)):
+                for i in range(len(values)):
                     values[i] = f"'{values[i]}'"
             if values:
                 self.parameters.append([self.ui.tableWidget.item(x, self.NAME_COLUMN).text(),
@@ -314,7 +315,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         self.get_results_case_ids()
         self.get_results_file_ids()
         self.get_results_message()
-        super(DialogSelectAttributeParameters, self).accept()
+        super().accept()
 
     def get_results_case_ids(self):
         """ Consolidate list of case ids from case parameters. """
@@ -633,7 +634,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
 
     def reject(self):
         self.parameters = []
-        super(DialogSelectAttributeParameters, self).reject()
+        super().reject()
 
     def cell_modified(self):
         """ Values entered or changed in the values_list column. Allow value entry

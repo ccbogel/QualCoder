@@ -3,20 +3,25 @@
 """Local Streamable HTTP transport for QualCoder's shared MCP server."""
 
 import asyncio
-from collections import deque
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
 import logging
 import re
 import sqlite3
 import threading
-from typing import Any, Callable
+from collections import deque
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+from typing import Any
 
-from PyQt6 import QtCore
 import uvicorn
+from PyQt6 import QtCore
 
-from .ai_mcp_server import AiMcpExecutionContext, AiMcpServer, EXPECTED_TOOL_ERRORS, ProjectDatabaseLockedError
-
+from .ai_mcp_server import (
+    EXPECTED_TOOL_ERRORS,
+    AiMcpExecutionContext,
+    AiMcpServer,
+    ProjectDatabaseLockedError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -283,7 +288,7 @@ class ExternalMcpController(QtCore.QObject):
     def _remember_gui_statement(self, statement: str) -> None:
         """Trace callback, runs on the GUI thread for every statement, so it only stores."""
 
-        self._gui_statements.append((datetime.now().strftime("%H:%M:%S"), statement[:240]))
+        self._gui_statements.append((datetime.now().astimezone().strftime("%H:%M:%S"), statement[:240]))
 
     def _gui_statement_trail(self) -> str:
         """Return the remembered statements without their text values, which may be research data."""
