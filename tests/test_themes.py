@@ -147,6 +147,30 @@ class TestFusionThemes(TestCase):
                     progress.close()
                     progress.deleteLater()
 
+    def test_coding_toolbar_has_no_visible_group_box_frame(self):
+        from qualcoder.GUI.ui_dialog_code_text import Ui_Dialog_code_text
+
+        for theme_name in STYLE_OPTIONS:
+            with self.subTest(theme=theme_name):
+                self.apply_theme(theme_name)
+                dialog = QtWidgets.QDialog()
+                ui = Ui_Dialog_code_text()
+                ui.setupUi(dialog)
+                dialog.setStyleSheet('font: 12pt "Segoe UI";')
+                dialog.resize(1000, 700)
+                dialog.show()
+                try:
+                    self.qt_app.processEvents()
+                    image = ui.groupBox.grab().toImage()
+                    background = ui.groupBox.palette().color(QtGui.QPalette.ColorRole.Window)
+                    # Fusion's rounded group frame is inset from the outermost pixel.
+                    for column in (1, 2):
+                        for row in range(25, 35):
+                            self.assertEqual(image.pixelColor(column, row), background)
+                finally:
+                    dialog.close()
+                    dialog.deleteLater()
+
     def test_controls_keep_fusion_geometry_for_every_theme(self):
         fusion_style = QtWidgets.QStyleFactory.create('Fusion')
         for theme_name in STYLE_OPTIONS:

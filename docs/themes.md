@@ -13,7 +13,8 @@ indicators, hover states and button shapes are shared; colors come from QPalette
 roles. The two columns in `THEME_COLORS` are the original and dark colors. Selection
 colors also cover inactive views; disabled text and icons use muted foregrounds.
 Links, visited links, placeholders, tooltips and alternating rows have explicit colors.
-Application QSS only sets shared font sizes. Avoid adding global control borders,
+Application QSS sets shared font sizes and removes group box frames, including
+toolbar and layout containers. Avoid adding other global control borders,
 backgrounds or indicator rules: these can replace Fusion rendering.
 Progress bars use the orange accent in the fixed themes, independently of text
 selection colors, so Fusion's busy animation remains visible.

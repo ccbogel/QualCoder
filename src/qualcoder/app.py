@@ -1114,7 +1114,8 @@ class App(object):
         QtWidgets.QToolTip.setPalette(application.palette())
         application.setStyleSheet(
             f"* {{font-size: {settings['fontsize']}pt;}}\n"
-            f"QTreeWidget {{font-size: {settings['treefontsize']}pt;}}"
+            f"QTreeWidget {{font-size: {settings['treefontsize']}pt;}}\n"
+            'QGroupBox {border: none;}'
         )
         progress_palette = application.palette()
         if settings['stylesheet'] in ('original', 'dark'):
