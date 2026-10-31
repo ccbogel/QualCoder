@@ -81,6 +81,33 @@ class TestRecentActivityNavigation(TestCase):
         self.window.activateWindow()
         self.qt_app.processEvents()
 
+    def test_document_mode_keeps_footer_visible_and_clickable_after_resize(self):
+        self.tabs.setDocumentMode(True)
+        footer = QtWidgets.QWidget()
+        footer_layout = QtWidgets.QVBoxLayout(footer)
+        buttons = [QtWidgets.QToolButton(footer), QtWidgets.QToolButton(footer)]
+        handlers = [MagicMock(), MagicMock()]
+        for button, handler in zip(buttons, handlers):
+            button.setFixedSize(40, 40)
+            button.clicked.connect(handler)
+            footer_layout.addWidget(button)
+        self.rail.set_footer(footer)
+        for height in (600, 300, 500):
+            with self.subTest(height=height):
+                self.window.resize(700, height)
+                self.qt_app.processEvents()
+                self.assertTrue(footer.isVisible())
+                self.assertTrue(self.tabs.rect().contains(footer.geometry()))
+                self.assertLess(self.tabs.tabBar().geometry().bottom(), footer.geometry().top())
+                for button, handler in zip(buttons, handlers):
+                    handler.reset_mock()
+                    center = button.mapTo(self.tabs, button.rect().center())
+                    self.assertIs(self.tabs.childAt(center), button)
+                    QTest.mouseClick(button, QtCore.Qt.MouseButton.LeftButton)
+                    handler.assert_called_once()
+        self.rail.set_footer(None)
+        self.assertEqual(self.tabs.tabBar().maximumHeight(), self.rail.original['maximum_height'])
+
     def add_project_contents(self) -> None:
         """Add real summary tiles, text links and menu actions to the navigation fixture."""
 

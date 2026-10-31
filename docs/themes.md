@@ -15,6 +15,10 @@ colors also cover inactive views; disabled text and icons use muted foregrounds.
 Links, visited links, placeholders, tooltips and alternating rows have explicit colors.
 Application QSS only sets shared font sizes. Avoid adding global control borders,
 backgrounds or indicator rules: these can replace Fusion rendering.
+Progress bars use the orange accent in the fixed themes, independently of text
+selection colors, so Fusion's busy animation remains visible.
+The main navigation uses Qt's document mode so its pages share the window
+background without a separating tab frame, in both top and left navigation layouts.
 
 When settings are loaded, retired themes are migrated and saved automatically:
 

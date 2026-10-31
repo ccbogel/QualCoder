@@ -1094,6 +1094,7 @@ class App(object):
         self._system_theme_palette = QtGui.QPalette(palette)
         updated_palette = theme_palette('native', palette)
         QtWidgets.QToolTip.setPalette(updated_palette)
+        QtWidgets.QApplication.instance().setPalette(updated_palette, 'QProgressBar')
         # setPalette emits paletteChanged again; only write when colors differ.
         if updated_palette != palette:
             QtWidgets.QApplication.instance().setPalette(updated_palette)
@@ -1115,6 +1116,12 @@ class App(object):
             f"* {{font-size: {settings['fontsize']}pt;}}\n"
             f"QTreeWidget {{font-size: {settings['treefontsize']}pt;}}"
         )
+        progress_palette = application.palette()
+        if settings['stylesheet'] in ('original', 'dark'):
+            # Fusion's busy stripes disappear with a black selection color.
+            progress_palette.setColor(QtGui.QPalette.ColorRole.Highlight, QtGui.QColor(self.highlight_color()))
+            progress_palette.setColor(QtGui.QPalette.ColorRole.HighlightedText, QtGui.QColor('#202020'))
+        application.setPalette(progress_palette, 'QProgressBar')
         if not getattr(self, '_native_palette_connected', False):
             application.paletteChanged.connect(self._update_native_palette)
             self._native_palette_connected = True

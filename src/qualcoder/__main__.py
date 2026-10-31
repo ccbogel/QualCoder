@@ -344,6 +344,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ai_sidebar_splitter_is_restoring = False
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        # Blend every workspace page into the navigation background, without a tab frame.
+        self.ui.tabWidget.setDocumentMode(True)
         self.init_action_log()
         self.init_placeholder_tab_layouts()
         # Keep platform menu integration consistent across themes.

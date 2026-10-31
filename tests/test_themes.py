@@ -8,6 +8,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtTest import QTest
 
 from qualcoder.app import App
 from qualcoder.themes import LEGACY_THEMES, STYLE_OPTIONS, palette_is_dark, theme_palette
@@ -58,6 +59,7 @@ class TestFusionThemes(TestCase):
 
     def setUp(self):
         self.original_palette = self.qt_app.palette()
+        self.original_progress_palette = self.qt_app.palette('QProgressBar')
         self.original_stylesheet = self.qt_app.styleSheet()
         self.qt_app.setStyleSheet('')
         self.qt_app.setStyle('Fusion')
@@ -70,6 +72,7 @@ class TestFusionThemes(TestCase):
         self.qt_app.paletteChanged.disconnect(self.application._update_native_palette)
         self.qt_app.setStyleSheet(self.original_stylesheet)
         self.qt_app.setPalette(self.original_palette)
+        self.qt_app.setPalette(self.original_progress_palette, 'QProgressBar')
         QtWidgets.QToolTip.setPalette(self.original_palette)
 
     def apply_theme(self, theme_name: str) -> None:
@@ -123,6 +126,26 @@ class TestFusionThemes(TestCase):
         self.assertTrue(palette_is_dark())
         self.assertNotEqual(self.qt_app.palette().color(roles.Base),
                             self.qt_app.palette().color(roles.AlternateBase))
+
+    def test_busy_progress_animates_without_changing_text_selection(self):
+        roles = QtGui.QPalette.ColorRole
+        for theme_name, selection in (('original', '#000000'), ('dark', '#ffffff')):
+            with self.subTest(theme=theme_name):
+                self.apply_theme(theme_name)
+                progress = QtWidgets.QProgressBar()
+                progress.setRange(0, 0)
+                progress.resize(350, 40)
+                progress.show()
+                try:
+                    self.assertEqual(progress.palette().color(roles.Highlight).name(), '#f89407')
+                    self.assertEqual(self.qt_app.palette().color(roles.Highlight).name(), selection)
+                    QTest.qWait(100)
+                    first_frame = progress.grab().toImage()
+                    QTest.qWait(180)
+                    self.assertNotEqual(first_frame, progress.grab().toImage())
+                finally:
+                    progress.close()
+                    progress.deleteLater()
 
     def test_controls_keep_fusion_geometry_for_every_theme(self):
         fusion_style = QtWidgets.QStyleFactory.create('Fusion')
