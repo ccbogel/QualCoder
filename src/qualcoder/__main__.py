@@ -3281,15 +3281,16 @@ Click "Yes" to start now.')
         for tab_widget in (self.ui.tab_reports, self.ui.tab_coding, self.ui.tab_manage):
             self.clear_tab_widgets(tab_widget, show_placeholder=True)
 
-    def change_settings(self, section=None, enable_ai=False):
-        """ Change default settings - the coder name, font, font size.
-        Language, Backup options.
-        As this dialog affects all others if the coder name changes, on exit of the dialog,
-        all other opened dialogs are destroyed.
-        
-        section = 'AI' moves to the AI settings at the bottom of the dialog
-        enable_ai = if True, the AI will be enabled in settings
+    def change_settings(self, section: Optional[str] = None, enable_ai: bool = False) -> None:
+        """Change settings, closing other dialogs if coder names change.
+
+        Args:
+            section: 'AI' or 'advanced AI' scrolls to the requested AI settings.
+            enable_ai: Whether to enable AI in the settings dialog.
         """
+        if (enable_ai or self.app.settings['ai_enable'] == 'True') and not ai_runtime_ready(self.app):
+            if not self.load_ai_runtime_modal(_("AI Settings")):
+                return
         current_coder = self.app.settings['codername']
         ui = DialogSettings(
             self.app,
