@@ -43,6 +43,7 @@ class MainTabRail(QtCore.QObject):
             "expanding": self.bar.expanding(),
             "draw_base": self.bar.drawBase(),
             "scroll_buttons": self.bar.usesScrollButtons(),
+            "maximum_height": self.bar.maximumHeight(),
             "stylesheet": self.bar.styleSheet(),
             "hover": self.bar.testAttribute(QtCore.Qt.WidgetAttribute.WA_Hover),
         }
@@ -106,6 +107,7 @@ class MainTabRail(QtCore.QObject):
             self.bar.setExpanding(self.original["expanding"])
             self.bar.setDrawBase(self.original["draw_base"])
             self.bar.setUsesScrollButtons(self.original["scroll_buttons"])
+            self.bar.setMaximumHeight(self.original["maximum_height"])
             self.bar.setAttribute(QtCore.Qt.WidgetAttribute.WA_Hover, self.original["hover"])
             for index in range(self.bar.count()):
                 widget = self.tab_widget.widget(index)
@@ -124,6 +126,8 @@ class MainTabRail(QtCore.QObject):
         self.footer = widget
         if widget is not None:
             widget.setParent(self.tab_widget)
+        else:
+            self.bar.setMaximumHeight(self.original["maximum_height"])
         self.place_footer()
 
     def place_footer(self):
@@ -133,7 +137,10 @@ class MainTabRail(QtCore.QObject):
             return
         hint = self.footer.sizeHint()
         x = self.bar.x() + max(0, (self.bar.width() - hint.width()) // 2)
-        y = max(self.bar.geometry().bottom() + 8, self.tab_widget.height() - hint.height() - 8)
+        y = max(0, self.tab_widget.height() - hint.height() - 8)
+        # In document mode the tab bar fills the column, including its empty area.
+        # Reserve room for the footer rather than placing it below that full-height bar.
+        self.bar.setMaximumHeight(max(1, y - 8))
         self.footer.setGeometry(x, y, hint.width(), hint.height())
         self.footer.show()
         self.footer.raise_()

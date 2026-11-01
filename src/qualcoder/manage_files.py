@@ -3139,7 +3139,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Fire-and-forget worker thread so importing long media does not freeze the UI.
         # Runs are serialised in the helper; the coding dialog waits if still pending.
         generate_waveform_png_async(abs_path, waveform_path,
-                                    waveform_colour(self.app.settings['stylesheet']))
+                                    waveform_colour())
 
     def remove_waveform_png(self, file_id):
         """ Remove the cached waveform image for a deleted media file, to avoid residual files. """
