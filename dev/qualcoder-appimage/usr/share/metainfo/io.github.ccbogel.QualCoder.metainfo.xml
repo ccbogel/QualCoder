@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>QualCoder</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>QualCoder</name>
+  <summary>Qualitative data analysis for text, images, audio, video</summary>
+
+  <developer id="io.github.ccbogel">
+    <name>Colin Curtain</name>
+  </developer>
+
+  <description>
+    <p>QualCoder can code text, images, audio and video, write journal notes and memos. You can organise codes in a tree-like categorisation scheme. Various reports can be generated. Most reports can be exported as html, open document text (ODT), plain text or Excel files.</p>
+  </description>
+
+  <launchable type="desktop-id">io.github.ccbogel.QualCoder.desktop</launchable>
+
+  <url type="homepage">https://qualcoder.wordpress.com/</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://qualcoder.org/images/dcb4d4e7-a39b-424b-84c4-d2915098914f.png</image>
+    </screenshot>
+  </screenshots>
+
+  <content_rating type="oars-1.1" />
+
+  <categories>
+    <category>Science</category>
+  </categories>
+
+  <keywords>
+    <keyword>qualitative</keyword>
+    <keyword>coding</keyword>
+    <keyword>analysis</keyword>
+  </keywords>
+
+  <provides>
+    <binary>qualcoder</binary>
+  </provides>
+</component>

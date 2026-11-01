@@ -1,6 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_data_files, copy_metadata, collect_submodules
 import sys
+
+from PyInstaller.utils.hooks import (
+    collect_data_files,
+    collect_submodules,
+    copy_metadata,
+)
+
 sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 
 block_cipher = None
@@ -13,6 +19,7 @@ datas += collect_data_files('langchain_text_splitters')
 datas += [('src/qualcoder/ai_prompts', 'qualcoder/ai_prompts')]
 datas += collect_data_files('transformers', include_py_files=True)
 datas += collect_data_files('plotly')
+datas += collect_data_files('pymupdf') # Without this the pyinstaller bin would not open
 # datas += collect_data_files('sentence_transformers')
 datas += copy_metadata('tqdm')
 datas += copy_metadata('regex')
