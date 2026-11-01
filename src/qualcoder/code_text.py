@@ -150,7 +150,7 @@ class DialogCodeText(QtWidgets.QWidget):
         except (KeyError, AttributeError):
             saved_style = None
 
-        if saved_style in ('marker', 'underline'):
+        if saved_style in ('marker', 'marker light', 'underline'):
             self.highlight_style = saved_style
         else:
             self.highlight_style = 'marker'
@@ -860,11 +860,17 @@ class DialogCodeText(QtWidgets.QWidget):
 
         style_menu = menu.addMenu(_("Highlight style"))
         action_style_marker = None
+        action_style_marker_light = None
         action_style_underline = None
-        if self.highlight_style != 'marker':
-            action_style_marker = style_menu.addAction(_("Marker"))
-        if self.highlight_style != 'underline':
+        if self.highlight_style == 'marker':
+            action_style_marker_light = style_menu.addAction(_("Marker light"))
             action_style_underline = style_menu.addAction(_("Underline"))
+        if self.highlight_style == 'marker light':
+            action_style_marker = style_menu.addAction(_("Marker"))
+            action_style_underline = style_menu.addAction(_("Underline"))
+        if self.highlight_style == 'underline':
+            action_style_marker = style_menu.addAction(_("Marker"))
+            action_style_marker_light = style_menu.addAction(_("Marker light"))
 
         global_pos = source_widget.mapToGlobal(position)
         action = menu.exec(global_pos)
@@ -882,6 +888,9 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if action == action_style_marker:
             self._set_highlight_style('marker')
+            return
+        if action == action_style_marker_light:
+            self._set_highlight_style('marker light')
             return
         if action == action_style_underline:
             self._set_highlight_style('underline')
@@ -1164,7 +1173,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def _set_highlight_style(self, style):  # <- L
         """ Switch in-text highlight style between 'marker' and 'underline'. """
 
-        if style not in ('marker', 'underline'):
+        if style not in ('marker', 'marker light', 'underline'):
             return
         if style == self.highlight_style:
             return
@@ -1184,7 +1193,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if style is None:
             style = self.app.settings.get('codetext_highlight_style', 'marker')
-        if style not in ('marker', 'underline'):
+        if style not in ('marker', 'marker light', 'underline'):
             style = 'marker'
         self._set_highlight_style(style)
 
@@ -3010,11 +3019,15 @@ class DialogCodeText(QtWidgets.QWidget):
             if code['cid'] == item['cid']:
                 color = code['color']
         fmt = QtGui.QTextCharFormat()
-        brush = QBrush(QColor(color.replace("#", "#70")))
-        fmt.setBackground(brush)
+        if self.highlight_style == 'marker light':
+            brush = QBrush(QColor(color.replace("#", "#70")))
+            fmt.setBackground(brush)
+        if self.highlight_style == 'marker':
+            brush = QBrush(QColor(color))
+            fmt.setBackground(brush)
+            fmt.setForeground(QBrush(QColor(TextColor(color).recommendation)))
         if item['important']:
             fmt.setFontWeight(QtGui.QFont.Weight.Bold)
-        fmt.setForeground(QBrush(QColor(TextColor(color).recommendation)))
         cursor.setCharFormat(fmt)
         self.apply_underline_to_overlaps()
 
@@ -4853,14 +4866,17 @@ class DialogCodeText(QtWidgets.QWidget):
             cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
             color = codes.get(item['cid'], {}).get('color', "#777777")  # default gray
 
-            # choose between underline-only and full background fill <- L
+            # choose between underline-only and full or transparency background fill
             if self.highlight_style == 'underline':
                 fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
                 fmt.setUnderlineColor(self._code_label_contrast_color(color))
-            else:
+            if self.highlight_style == "marker light":
                 brush = QBrush(QColor(color.replace("#", "#70")))
                 fmt.setBackground(brush)
-                # Foreground depends on the defined need_white_text color in color_selector
+            # Foreground depends on the defined need_white_text color in color_selector
+            if self.highlight_style == "marker":
+                brush = QBrush(QColor(color))
+                fmt.setBackground(brush)
                 text_brush = QBrush(QColor(TextColor(color).recommendation))
                 fmt.setForeground(text_brush)
 
