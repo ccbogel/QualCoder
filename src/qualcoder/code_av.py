@@ -1136,15 +1136,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.ui.widget_tracks.set_code_structure(self.codes, self.categories)
             self.ui.widget_tracks.set_segments(self.segments)
 
-    def _strip_tree_color_icons(self):
-        """ No colour chips before code names in this dialog's tree. """
-        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        while it.value():
-            item = it.value()
-            if item.text(1)[0:3] == 'cid':
-                item.setIcon(0, QtGui.QIcon())
-            it += 1
-
     def fill_code_counts_in_tree(self):
         """ Calculate the frequency of each code and category for this coder and the selected file.
         Add a list item to each code that can be used to display in treeWidget.
@@ -1264,8 +1255,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                 else:
                     item.setText(3, str(own_n))
             iterator += 1  # Move to the next item
-        self._strip_tree_color_icons()
-
 
     def tree_item_clicked(self, item, column):
         """ Use to quicky open memo. Or,
