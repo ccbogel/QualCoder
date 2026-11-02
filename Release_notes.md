@@ -18,7 +18,7 @@ QualCoder_4_1_Win_Portable.exe: A portable binary. Double-click to run and wait 
 
 On first use of the exe, Windows will ask you to allow to run QualCoder. This is because it is from an unknown publisher. It costs a lot of money to get a trusted publisher certificate - so that will not be possible for the foreseeable future.
 
-The executable files are large downloads. Occasionally you might get a CRDOWNLOAD issue. First, check the file is fully downloaded. If not, then Resume downloads in your browser. If it seems to be fully downloaded, then rename it to the name that was expected and double-click to run. (e.g. From CRDOWNLOAD to QualCoder_4_1_Win_Setup.exe)
+The executable files are large downloads. Occasionally you might get a Unconfirmed12345.CRDOWNLOAD file issue. First, check the file is fully downloaded. If not, then Resume downloads in your browser. If it seems to be fully downloaded, then rename Unconfirmed12345.CRDOWNLOAD to the name that was expected and double-click to run. (e.g. to QualCoder_4_1_Win_Setup.exe)
 
 ## MacOS
 
