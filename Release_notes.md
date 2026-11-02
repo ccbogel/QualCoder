@@ -174,7 +174,7 @@ Added option to select multiple coded text segments and resize them, providing t
 
 **Bug fixes**
 
--macOS merge projects failed in 4.0. Fixed.
+- macOS merge projects failed in 4.0. Fixed.
 
 - emojis in text document causing some report issues: (1) (code retirval with context surrounding text); (2) resizing coded segment in thest text document stored incorrect text due to incorrectly identifed positions. Work has been done to improve emoji containing text. A Special Function has been added to fix older projects where the incorrectly stored coded text can be updated to the correct text.
 
