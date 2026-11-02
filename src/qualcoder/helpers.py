@@ -1252,9 +1252,7 @@ class MarkdownHighlighter(QtGui.QSyntaxHighlighter):
         # URLs
         ul_format = QtGui.QTextCharFormat()
         ul_format.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
-        brush = QtGui.QBrush(QtCore.Qt.GlobalColor.darkBlue, QtCore.Qt.BrushStyle.SolidPattern)
-        if self.app.settings['stylesheet'] in ('dark', 'rainbow'):  
-            brush = QtGui.QBrush(QtGui.QColor("#00BFFF"), QtCore.Qt.BrushStyle.SolidPattern)
+        brush = QtWidgets.QApplication.instance().palette().brush(QtGui.QPalette.ColorRole.Link)
         ul_format.setForeground(brush)
         # HTTP HTTPS protocol
         self.highlighting_rules += [(QtCore.QRegularExpression(r"https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)"), ul_format)]
@@ -1450,30 +1448,31 @@ class NumberBar(QtWidgets.QFrame):
 
 class CodeResizeHandle(QtWidgets.QWidget):
     """ Overlay widget used as visual drag handles for text code resizing.
-    Used in code_text, code_av, code_pdf. """
+    Used in code_text, code_av, code_pdf. 
+    code_items is a list of coded segments to resize. All codes must be same pos0 and pos1. """
 
-    def __init__(self, parent_editor, is_start, code_item, main_dialog):
+    def __init__(self, parent_editor, is_start, code_items, main_dialog):
         super().__init__(parent_editor.viewport())
         self.editor = parent_editor
         self.is_start = is_start
-        self.code_item = code_item
+        self.code_items = code_items
+        #self.code_item = code_item
         self.main_dialog = main_dialog
-
         # Store original positions in case of cancel or error
-        self.orig_pos0 = code_item['pos0']
-        self.orig_pos1 = code_item['pos1']
+        self.orig_pos0 = code_items[0]['pos0']
+        self.orig_pos1 = code_items[0]['pos1']
         self.setCursor(QtCore.Qt.CursorShape.SizeHorCursor)
-        self.setFixedSize(20, 26)  # larger to fit the Android-style teardrop <- L
-        # transparent background so only the painted teardrop shape is visible <- L
+        self.setFixedSize(20, 26)  # larger to fit the Android-style teardrop
+        # transparent background so only the painted teardrop shape is visible
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
-        self._color = self.code_item.get('color', '#0078d7')  # store color for paintEvent <- L
+        self._color = self.code_items[0].get('color', '#0078d7')  # store color for paintEvent
         self.dragging = False
         self.show()
         self.raise_()  # Ensure it stays on top of the text
 
     # Draw an Android-style text-selection teardrop handle.
-    # Start handle points to the bottom-right, end handle points to the bottom-left <- L
+    # Start handle points to the bottom-right, end handle points to the bottom-left
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)
@@ -1507,7 +1506,7 @@ class CodeResizeHandle(QtWidgets.QWidget):
             # Move the handle visually
             cursor = self.editor.cursorForPosition(viewport_pos)
             cursor_rect = self.editor.cursorRect(cursor)
-            # keep teardrop tip aligned during drag (start->top-right, end->top-left) <- L
+            # keep teardrop tip aligned during drag (start->top-right, end->top-left)
             if self.is_start:
                 self.move(cursor_rect.x() - self.width(), cursor_rect.y())
             else:
@@ -1522,11 +1521,15 @@ class CodeResizeHandle(QtWidgets.QWidget):
 
             # Update position in memory for live highlight feedback
             if self.is_start:
-                if new_pos < self.code_item['pos1']:
-                    self.code_item['pos0'] = new_pos
+                if new_pos < self.code_items[0]['pos1']:
+                    for c in self.code_items:
+                        c['pos0'] = new_pos
+                    #self.code_item['pos0'] = new_pos
             else:
-                if new_pos > self.code_item['pos0']:
-                    self.code_item['pos1'] = new_pos
+                if new_pos > self.code_items[0]['pos0']:
+                    for c in self.code_items:
+                        c['pos1'] = new_pos
+                    #self.code_item['pos1'] = new_pos
 
             # Refresh the text highlighting
             self.main_dialog.unlight()
@@ -1539,8 +1542,10 @@ class CodeResizeHandle(QtWidgets.QWidget):
             cursor = self.editor.cursorForPosition(viewport_pos)
             new_pos = cursor.position() + self.main_dialog.file_['start']
             # Pass original positions for potential revert
-            self.main_dialog.update_code_position_from_handle(self.code_item, new_pos, self.is_start, self.orig_pos0,
+            self.main_dialog.update_code_position_from_handle(self.code_items, new_pos, self.is_start, self.orig_pos0,
                                                               self.orig_pos1)
+            '''self.main_dialog.update_code_position_from_handle(self.code_item, new_pos, self.is_start, self.orig_pos0,
+                                                                          self.orig_pos1)'''
 
 
 class ToolTipEventFilter(QtCore.QObject):

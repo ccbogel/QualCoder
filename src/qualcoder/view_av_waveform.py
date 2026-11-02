@@ -719,11 +719,10 @@ logger = logging.getLogger(__name__)
 _generation_lock = threading.Lock()
 
 
-def waveform_colour(stylesheet):
-    """
-    Waveform colour matching the app theme.
-    """
-    return '#4a9eff' if stylesheet in ("dark", "rainbow") else '#1f6fb2'
+def waveform_colour() -> str:
+    """Return a waveform color matching the application background."""
+    base_color = QtWidgets.QApplication.instance().palette().color(QtGui.QPalette.ColorRole.Base)
+    return '#4a9eff' if base_color.lightness() < 128 else '#1f6fb2'
 
 
 
