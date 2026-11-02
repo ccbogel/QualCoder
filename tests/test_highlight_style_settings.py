@@ -198,7 +198,7 @@ class TestHighlightStyleSettings(TestCase):
             (QtCore.QRectF(20, 10, 30, 20), QtGui.QColor('red'),
              {'color': '#ff0000', 'date': '2026-11-02', 'ctid': 2}),
         ]
-        for style, alpha in (('marker', 110), ('marker light', 51), ('underline', 0)):
+        for style, alpha in (('marker', 110), ('marker light', 40), ('underline', 0)):
             with self.subTest(style=style):
                 view.dialog.highlight_style = style
                 rendered = QtGui.QImage(60, 40, QtGui.QImage.Format.Format_RGB32)
