@@ -43,6 +43,7 @@ from .context_help import open_module_help
 from .helpers import NumberBar, msecs_to_hours_mins_secs, Message, ExportDirectoryPathDialog
 from .html_parser import html_to_text  # Homologate transcript formats with Manage files
 from .select_items import DialogSelectItems
+from .text_positions import to_py, to_qt
 from .view_av_waveform import waveform_backend_available, waveform_png_is_current, generate_waveform_png_async, \
     waveform_colour, keyframe_interval_seconds  # noqa: F401  (WaveformSeekBar used via the promoted .ui widget)
 
@@ -911,8 +912,8 @@ class DialogViewAV(QtWidgets.QDialog):
         cursor = self.ui.textEdit.textCursor()
         if not cursor.hasSelection() or not self.time_positions:
             return None, None
-        sel0 = cursor.selectionStart()
-        sel1 = cursor.selectionEnd()
+        sel0 = self.from_editor_pos(cursor.selectionStart())
+        sel1 = self.from_editor_pos(cursor.selectionEnd())
         stamps = sorted(self.time_positions, key=lambda x: x[0])
         ms0 = None
         for c0, c1, ms in stamps:
@@ -979,7 +980,7 @@ class DialogViewAV(QtWidgets.QDialog):
         if self.mediaplayer is None or not self.time_positions:
             return
         cursor = self.ui.textEdit.cursorForPosition(event.position().toPoint())
-        char = cursor.position()
+        char = self.from_editor_pos(cursor.position())
         for c0, c1, ms in self.time_positions:
             if c0 <= char <= c1:
                 self._seek_to_ms(ms)
@@ -1207,18 +1208,28 @@ class DialogViewAV(QtWidgets.QDialog):
             self.sync_position_slider(result[1], self.media.get_duration())
         self.mediaplayer.pause()
         cursor = self.ui.textEdit.textCursor()
-        cursor.setPosition(result[2])
+        cursor.setPosition(self.to_editor_pos(result[2]))
         endpos = result[2] - 1
         if endpos < 0:
             endpos = 0
-        cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(endpos), QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
+
+    def to_editor_pos(self, text_pos):
+        """ Qt editor position for a code point index into the transcript. """
+
+        return to_qt(self.ui.textEdit.toPlainText(), int(text_pos))
+
+    def from_editor_pos(self, editor_pos):
+        """ Code point index into the transcript for a Qt editor position. """
+
+        return to_py(self.ui.textEdit.toPlainText(), editor_pos)
 
     def set_bookmark(self):
         """ Ctrl B or button. """
 
         cur = self.app.conn.cursor()
-        cursor_pos = self.ui.textEdit.textCursor().position()
+        cursor_pos = self.from_editor_pos(self.ui.textEdit.textCursor().position())
         cur.execute("update project set avbookmarkfile=?, avbookmarkmsec=?, avbookmarktextpos=?",
                     [self.file_['id'], self.mediaplayer.get_time(), cursor_pos])
         self.app.conn.commit()
@@ -1844,7 +1855,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 if self.time_positions[i - 1][2] < msecs < self.time_positions[i][2]:
                     text_pos = self.time_positions[i][0]
                     text_cursor = self.ui.textEdit.textCursor()
-                    text_cursor.setPosition(text_pos)
+                    text_cursor.setPosition(self.to_editor_pos(text_pos))
                     self.ui.textEdit.setTextCursor(text_cursor)
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
@@ -1934,8 +1945,8 @@ class DialogViewAV(QtWidgets.QDialog):
         cursor = self.ui.textEdit.textCursor()
         prev_result = self.search_indices[self.search_index]
         # prev_result is a tuple containing: char position and search string length
-        cursor.setPosition(prev_result[0])
-        cursor.setPosition(cursor.position() + prev_result[1], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(prev_result[0]))
+        cursor.setPosition(self.to_editor_pos(prev_result[0] + prev_result[1]), QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
@@ -1950,8 +1961,8 @@ class DialogViewAV(QtWidgets.QDialog):
         cursor = self.ui.textEdit.textCursor()
         next_result = self.search_indices[self.search_index]
         # next_result is a tuple containing: char position and search string length
-        cursor.setPosition(next_result[0])
-        cursor.setPosition(cursor.position() + next_result[1], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(next_result[0]))
+        cursor.setPosition(self.to_editor_pos(next_result[0] + next_result[1]), QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
@@ -2222,25 +2233,26 @@ class DialogViewAV(QtWidgets.QDialog):
         format_.setFontPointSize(self.app.settings['docfontsize'])
 
         self.ui.textEdit.blockSignals(True)
+        text = self.ui.textEdit.toPlainText()
         cursor = self.ui.textEdit.textCursor()
         for item in self.casetext:
             if item['newpos0'] is not None:
-                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(to_qt(text, item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(to_qt(text, item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.green)
                 cursor.setCharFormat(format_)
         for item in self.annotations:
             if item['newpos0'] is not None:
-                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(to_qt(text, item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(to_qt(text, item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
         for item in self.codetext:
             if item['newpos0'] is not None:
-                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(to_qt(text, item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(to_qt(text, item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
@@ -2256,6 +2268,6 @@ class DialogViewAV(QtWidgets.QDialog):
         format_.setFontPointSize(self.app.settings['docfontsize'])
         cursor = self.ui.textEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.ui.textEdit.document().characterCount() - 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(format_)
         self.ui.textEdit.blockSignals(False)

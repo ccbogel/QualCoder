@@ -32,6 +32,7 @@ from PyQt6.QtCore import Qt
 from .GUI.ui_case_file_manager import Ui_Dialog_case_file_manager
 from .confirm_delete import DialogConfirmDelete
 from .helpers import DialogGetStartAndEndMarks, Message
+from .text_positions import qt_length, to_py, to_qt
 from .view_av import DialogViewAV
 from .view_image import DialogViewImage
 
@@ -454,7 +455,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         if selected_text != "":
             action_copy = menu.addAction(_("Copy"))
         for item in self.case_text:
-            if item['pos0'] <= cursor.position() <= item['pos1']:
+            if item['pos0'] <= self.from_editor_pos(cursor.position()) <= item['pos1']:
                 action_unmark = menu.addAction(_("Unmark"))
                 break
         action = menu.exec(self.ui.textBrowser.mapToGlobal(position))
@@ -469,11 +470,21 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         if action == action_select_all:
             self.ui.textBrowser.selectAll()
 
+    def to_editor_pos(self, text_pos):
+        """ Qt editor position for a code point index into the selected file. """
+
+        return to_qt(self.selected_text_file[FULLTEXT] or "", int(text_pos))
+
+    def from_editor_pos(self, editor_pos):
+        """ Code point index into the selected file for a Qt editor position. """
+
+        return to_py(self.selected_text_file[FULLTEXT] or "", editor_pos)
+
     def is_marked(self):
         """ Check current text selection and return False if not marked and True if marked. """
 
-        pos0 = self.ui.textBrowser.textCursor().selectionStart()
-        pos1 = self.ui.textBrowser.textCursor().selectionEnd()
+        pos0 = self.from_editor_pos(self.ui.textBrowser.textCursor().selectionStart())
+        pos1 = self.from_editor_pos(self.ui.textBrowser.textCursor().selectionEnd())
         for c in self.case_text:
             if c['pos0'] <= pos0 <= c['pos1']:
                 return True
@@ -497,7 +508,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         cursor = self.ui.textBrowser.textCursor()
         try:
             cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-            cursor.setPosition(len(self.selected_text_file[FULLTEXT]) - 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
+            cursor.setPosition(qt_length(self.selected_text_file[FULLTEXT]), QtGui.QTextCursor.MoveMode.KeepAnchor)
             cursor.setCharFormat(QtGui.QTextCharFormat())
         except Exception as e:
             logger.debug(f"{e}\n Unlight, text length: {len(self.ui.textBrowser.toPlainText())}")
@@ -515,8 +526,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         cursor = self.ui.textBrowser.textCursor()
         for item in self.case_text:
             try:
-                cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(self.to_editor_pos(item['pos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(self.to_editor_pos(item['pos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
@@ -531,8 +542,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         if self.selected_text_file is None:
             return
         # selectedText = self.textBrowser.textCursor().selectedText()
-        pos0 = self.ui.textBrowser.textCursor().selectionStart()
-        pos1 = self.ui.textBrowser.textCursor().selectionEnd()
+        pos0 = self.from_editor_pos(self.ui.textBrowser.textCursor().selectionStart())
+        pos1 = self.from_editor_pos(self.ui.textBrowser.textCursor().selectionEnd())
         if pos0 == pos1:
             return
         # Add new item to case_text list and database and update GUI
@@ -574,7 +585,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         cursor = self.ui.textBrowser.cursorForPosition(position)
         self.ui.textBrowser.setTextCursor(cursor)
 
-        location = self.ui.textBrowser.textCursor().selectionStart()
+        location = self.from_editor_pos(self.ui.textBrowser.textCursor().selectionStart())
         unmarked = None
         for item in self.case_text:
             if item['pos0'] <= location <= item['pos1']:

@@ -24,7 +24,6 @@ https://qualcoder.org/
 import sqlite3
 from copy import copy, deepcopy
 import datetime
-import emoji
 import logging
 import os
 from pathlib import Path
@@ -52,6 +51,7 @@ from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 from .speakers import DialogSpeakers, speaker_coder_name
+from .text_positions import qt_length, to_py, to_qt
 from .ris import Ris
 from .ai_agent_prompts import AiAgentPromptsCatalog
 from .ai_runtime import ensure_ai_ready
@@ -520,7 +520,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         file_text = res[0] if res is not None and res[0] is not None else ""
         if file_text == "":
             return
-        emojis = emoji.emoji_list(file_text)
         found_instances = 0
         undo_list = []
         msg = _("Autocode transcript") + f": {find_texts}\n"
@@ -532,11 +531,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                 for index in range(len(text_starts)):
                     pos0 = text_starts[index]
                     pos1 = text_ends[index]
-                    # Adjust for emoji length, as in code_text auto_code
-                    for emo in emojis:
-                        if emo['match_end'] < pos0:
-                            pos0 += emo['match_end'] - emo['match_start']
-                            pos1 += emo['match_end'] - emo['match_start']
                     item = {'cid': cid, 'fid': fid, 'seltext': str(find_txt), 'pos0': pos0, 'pos1': pos1,
                             'owner': self.app.settings['codername'], 'memo': "",
                             'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
@@ -686,8 +680,8 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         result = self.search_indices[self.search_index]
         cursor = self.ui.plainTextEdit.textCursor()
-        cursor.setPosition(result[0])
-        cursor.setPosition(cursor.position() + result[1], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(result[0]))
+        cursor.setPosition(self.to_editor_pos(result[0] + result[1]), QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.plainTextEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
@@ -2221,7 +2215,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.ui.plainTextEdit.textCursor().hasSelection():
             return
         cursor = self.ui.plainTextEdit.cursorForPosition(event.position().toPoint())
-        char = cursor.position()
+        char = self.from_editor_pos(cursor.position())
         for c0, c1, ms in self.time_positions:
             if c0 <= char <= c1:
                 self.seek_to_ms(ms)
@@ -2790,7 +2784,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if self.time_positions[i - 1][2] < msecs < self.time_positions[i][2]:
                     text_pos = self.time_positions[i][0]
                     text_cursor = self.ui.plainTextEdit.textCursor()
-                    text_cursor.setPosition(text_pos)
+                    text_cursor.setPosition(self.to_editor_pos(text_pos))
                     self.ui.plainTextEdit.setTextCursor(text_cursor)
 
         # No need to call this function if nothing is played
@@ -3147,7 +3141,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             if self.file_ is None:
                 return
             cur = self.app.conn.cursor()
-            cursor_pos = self.ui.plainTextEdit.textCursor().position()
+            cursor_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position())
             cur.execute("update project set avbookmarkfile=?, avbookmarkmsec=?, avbookmarktextpos=?", [self.file_['id'], self.mediaplayer.get_time(), cursor_pos])
             self.app.conn.commit()
             return
@@ -3244,7 +3238,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         '''# Ignore all other key events if edit mode is active  # Edit mode not used here yet
         if self.edit_mode:
             return'''
-        cursor_pos = self.ui.plainTextEdit.textCursor().position()
+        cursor_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position())
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         codes_here = []
         for item in self.code_text:
@@ -3352,11 +3346,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.sync_position_slider(result[1], self.media.get_duration())
         self.mediaplayer.pause()
         cursor = self.ui.plainTextEdit.textCursor()
-        cursor.setPosition(result[2])
+        cursor.setPosition(self.to_editor_pos(result[2]))
         endpos = result[2] - 1
         if endpos < 0:
             endpos = 0
-        cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(endpos), QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.plainTextEdit.setTextCursor(cursor)
 
     def save_screenshot(self):
@@ -3464,7 +3458,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
         if self.ui.plainTextEdit.hasFocus():
-            cursor_pos = self.ui.plainTextEdit.textCursor().position()
+            cursor_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position())
             codes_here = []
             for item in self.code_text:
                 if item['pos0'] <= cursor_pos <= item['pos1'] and \
@@ -3535,7 +3529,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Cycle through coded text items located at current cursor position.
         Highlight the coded text. """
 
-        pos = self.ui.plainTextEdit.textCursor().position()
+        pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position())
         codes_here = [c for c in self.code_text if c['pos0'] <= pos <= c['pos1']]
         self.overlap_code_index += 1
         if self.overlap_code_index >= len(codes_here):
@@ -3547,8 +3541,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 break
         # Remove formatting
         cursor = self.ui.plainTextEdit.textCursor()
-        cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(item['pos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(self.to_editor_pos(item['pos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(QtGui.QTextCharFormat())
         # Reapply formatting
         fmt = QtGui.QTextCharFormat()
@@ -3640,7 +3634,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     def extend_right(self, code_):
         """ Extend to right coded text. Shift right arrow """
 
-        if code_['pos1'] + 1 >= len(self.ui.plainTextEdit.toPlainText()):
+        if code_['pos1'] + 1 >= len(self.transcription[1]):
             return
         code_['pos1'] += 1
         cur = self.app.conn.cursor()
@@ -3787,7 +3781,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         cursor = self.ui.plainTextEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(len(self.transcription[1]) - 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(qt_length(self.transcription[1]), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(QtGui.QTextCharFormat())
 
     def _underline_contrast_color(self, color):
@@ -3826,8 +3820,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         for item in self.code_text:
             fmt = QtGui.QTextCharFormat()
             cursor = self.ui.plainTextEdit.textCursor()
-            cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-            cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+            cursor.setPosition(self.to_editor_pos(item['pos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+            cursor.setPosition(self.to_editor_pos(item['pos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
             color = "#F8E0E0"  # default light red
             for fcode in self.codes:
                 if fcode['cid'] == item['cid']:
@@ -3861,8 +3855,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         for note in self.annotations:
             if note['fid'] == self.transcription[0]:
                 cursor = self.ui.plainTextEdit.textCursor()
-                cursor.setPosition(int(note['pos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(note['pos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(self.to_editor_pos(note['pos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(self.to_editor_pos(note['pos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 fmt_bold = QtGui.QTextCharFormat()
                 fmt_bold.setFontWeight(QtGui.QFont.Weight.Bold)
                 cursor.mergeCharFormat(fmt_bold)
@@ -3892,14 +3886,27 @@ class DialogCodeAV(QtWidgets.QDialog):
                 fmt.setUnderlineColor(QColor("#000000"))
             else:
                 fmt.setUnderlineColor(QColor("#FFFFFF"))
-            cursor.setPosition(overlap[0], QtGui.QTextCursor.MoveMode.MoveAnchor)
-            cursor.setPosition(overlap[1], QtGui.QTextCursor.MoveMode.KeepAnchor)
+            cursor.setPosition(self.to_editor_pos(overlap[0]), QtGui.QTextCursor.MoveMode.MoveAnchor)
+            cursor.setPosition(self.to_editor_pos(overlap[1]), QtGui.QTextCursor.MoveMode.KeepAnchor)
             cursor.mergeCharFormat(fmt)
+
+    def to_editor_pos(self, text_pos):
+        """ Qt editor position for a code point index into the transcript. """
+
+        text = self.transcription[1] if self.transcription is not None else ""
+        return to_qt(text, int(text_pos))
+
+    def from_editor_pos(self, editor_pos):
+        """ Code point index into the transcript for a Qt editor position. """
+
+        text = self.transcription[1] if self.transcription is not None else ""
+        return to_py(text, editor_pos)
 
     def textedit_menu(self, position):
         """ Context menu for textEdit. Mark, unmark, annotate, copy. """
 
         cursor = self.ui.plainTextEdit.cursorForPosition(position)
+        text_pos = self.from_editor_pos(cursor.position())
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
@@ -3923,7 +3930,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         action_copy_metadata = None
 
         for item in self.code_text:
-            if item['pos0'] <= cursor.position() <= item['pos1']:
+            if item['pos0'] <= text_pos <= item['pos1']:
                 if item['avid'] is not None:
                     action_play_text = QtGui.QAction(_("Play text"))
                     # TODO select which avid if multiple coded here
@@ -3932,7 +3939,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 action_code_memo = QtGui.QAction(_("Memo coded text (M)"))
                 action_change_code = QtGui.QAction(_("Change code"))
                 action_show_handles = QtGui.QAction(_("Resize"))
-            if item['pos0'] <= cursor.position() <= item['pos1']:
+            if item['pos0'] <= text_pos <= item['pos1']:
                 if item['important'] is None or item['important'] > 1:
                     action_important = QtGui.QAction(_("Add important mark (I)"))
                 if item['important'] == 1:
@@ -3983,7 +3990,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 ac.setProperty('submenu', 'ai_text_analysis_prompts')
             else:
                 submenu_ai_text_analysis.setEnabled(False)
-        if selected_text == "" and self.is_annotated(cursor.position()):
+        if selected_text == "" and self.is_annotated(text_pos):
             action_edit_annotate = menu.addAction(_("Edit annotation"))
         action_set_bookmark = None
         if self.transcription is not None:
@@ -4001,7 +4008,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             menu.addAction(action_play_text)
         action_video_position_timestamp = -1
         for ts in self.time_positions:
-            if ts[0] <= cursor.position() <= ts[1]:
+            if ts[0] <= text_pos <= ts[1]:
                 action_video_position_timestamp = menu.addAction(_("Video position to timestamp"))
         action_mark_speakers = None
         if self.transcription is not None:
@@ -4035,48 +4042,48 @@ class DialogCodeAV(QtWidgets.QDialog):
         if action_set_bookmark is not None and action == action_set_bookmark:
             cur = self.app.conn.cursor()
             cur.execute("update project set bookmarkfile=?, bookmarkpos=?",
-                        [self.transcription[0], cursor.position()])
+                        [self.transcription[0], text_pos])
             self.app.conn.commit()
             return
         if selected_text != "" and self.ui.treeWidget.currentItem() is not None and action == action_mark:
             self.mark()
             return
         if action == action_important:
-            self.set_important(cursor.position())
+            self.set_important(text_pos)
             return
         if action == action_not_important:
-            self.set_important(cursor.position(), False)
+            self.set_important(text_pos, False)
             return
         if action == action_code_memo:
-            self.coded_text_memo(cursor.position())
+            self.coded_text_memo(text_pos)
             return
         if action_unmark is not None and action == action_unmark:
-            self.unmark(cursor.position())
+            self.unmark(text_pos)
             return
         if action_play_text is not None and action == action_play_text:
             self.play_text(play_text_avid)
             return
         if selected_text != "" and action == action_annotate:
-            self.annotate(cursor.position())
+            self.annotate(text_pos)
             return
         if action == action_edit_annotate:
             # Used fora point text press rather than a selected text
-            self.annotate(cursor.position())
+            self.annotate(text_pos)
             return
         try:
             if action == action_video_position_timestamp:
-                self.set_video_to_timestamp_position(cursor.position())
+                self.set_video_to_timestamp_position(text_pos)
                 return
         except Exception as e_:
             print("action_video_position_timestamp ", str(e_))
             logger.warning(str(e_))
             return
         if action == action_change_code:
-            self.change_code_to_another_code(cursor.position())
+            self.change_code_to_another_code(text_pos)
             return
         # ---  handles experimental
         if action == action_show_handles:
-            self.display_handles_for_code(cursor.position())
+            self.display_handles_for_code(text_pos)
             return
         if action.property('submenu') == 'ai_text_analysis':
             if not ensure_ai_ready(self.app, _("AI Text Analysis")):
@@ -4085,7 +4092,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 Message(self.app, _('Warning'), _("No transcript for this file."), "warning").exec()
                 return
             selected_text = self.ui.plainTextEdit.textCursor().selectedText()
-            start_pos = self.ui.plainTextEdit.textCursor().selectionStart()
+            start_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionStart())
             ai_chat_signal_emitter.newTextChatSignal.emit(int(self.transcription[0]),
                                                           self.transcription[2],
                                                           selected_text,
@@ -4182,7 +4189,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Need to get coded segments at this position
         if position is None:
             # Called via button
-            position = self.ui.plainTextEdit.textCursor().position()
+            position = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position())
         if self.file_ is None:
             return
         coded_text_list = []
@@ -4295,8 +4302,8 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         text = self.ui.plainTextEdit.textCursor().selectedText()
         if metadata and self.transcription is not None:
-            start_pos = self.ui.plainTextEdit.textCursor().selectionStart()
-            end_pos = self.ui.plainTextEdit.textCursor().selectionEnd()
+            start_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionStart())
+            end_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionEnd())
             text += f"\nFile: {self.transcription[2]} [{start_pos} - {end_pos}] "
             code_names = {c['cid']: c['name'] for c in self.codes}
             codes = ""
@@ -4415,8 +4422,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         cid = int(item.text(1).split(':')[1])
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
-        pos0 = self.ui.plainTextEdit.textCursor().selectionStart()
-        pos1 = self.ui.plainTextEdit.textCursor().selectionEnd()
+        pos0 = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionStart())
+        pos1 = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionEnd())
         if pos0 == pos1:  # Something quirky happened
             return
         # Add the coded section to code text, add to database and update GUI
@@ -4638,9 +4645,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.transcription is None or self.ui.plainTextEdit.toPlainText() == "":
             Message(self.app, _('Warning'), _("No media transcription selected"), "warning").exec()
             return
-        pos0 = self.ui.plainTextEdit.textCursor().selectionStart()
-        pos1 = self.ui.plainTextEdit.textCursor().selectionEnd()
-        text_length = len(self.ui.plainTextEdit.toPlainText())
+        pos0 = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionStart())
+        pos1 = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionEnd())
+        text_length = len(self.transcription[1])
         if pos0 >= text_length or pos1 > text_length:
             return
         item = None
@@ -5000,7 +5007,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # Create start handle
         cursor_start = self.ui.plainTextEdit.textCursor()
-        cursor_start.setPosition(max(0, codes_to_handle[0]['pos0']))
+        cursor_start.setPosition(self.to_editor_pos(max(0, codes_to_handle[0]['pos0'])))
         rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
         h_start = CodeResizeHandle(self.ui.plainTextEdit, True, codes_to_handle, self)
         # start teardrop tip is at its top-right corner -> shift left by full width
@@ -5009,7 +5016,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # Create end handle
         cursor_end = self.ui.plainTextEdit.textCursor()
-        cursor_end.setPosition(min(len(self.ui.plainTextEdit.toPlainText()), codes_to_handle[0]['pos1']))
+        cursor_end.setPosition(self.to_editor_pos(min(len(self.text), codes_to_handle[0]['pos1'])))
         rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
         h_end = CodeResizeHandle(self.ui.plainTextEdit, False, codes_to_handle, self)
         # end teardrop tip is at its top-left corner -> align directly to the cursor x
@@ -5028,7 +5035,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         they belong to (i.e. when the user clicks elsewhere in the transcript). """
         if not getattr(self, 'active_handles', []):
             return
-        pos = self.ui.plainTextEdit.textCursor().position()
+        pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position())
         for h in self.active_handles:
             item = getattr(h, 'code_item', None)
             if item and item['pos0'] <= pos <= item['pos1']:
@@ -5048,7 +5055,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 h.orig_pos1 = fresh['pos1']
             anchor = h.code_items[0]['pos0'] if h.is_start else h.code_items[0]['pos1']
             cursor = self.ui.plainTextEdit.textCursor()
-            cursor.setPosition(max(0, min(len(self.ui.plainTextEdit.toPlainText()), anchor)))
+            cursor.setPosition(self.to_editor_pos(max(0, min(len(self.transcription[1]), anchor))))
             rect = self.ui.plainTextEdit.cursorRect(cursor)
             if h.is_start:
                 h.move(rect.x() - h.width(), rect.y())  # start tip at top-right
@@ -5080,8 +5087,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 code_item['pos1'] = new_pos
 
         cursor = self.ui.plainTextEdit.textCursor()
-        cursor.setPosition(code_items[0]['pos0'])
-        cursor.setPosition(code_items[0]['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(code_items[0]['pos0']))
+        cursor.setPosition(self.to_editor_pos(code_items[0]['pos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
         seltext = cursor.selectedText()
 
         ''' OLD 
@@ -5422,8 +5429,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         seg = {}
         cursor = self.code_av_dialog.ui.plainTextEdit.textCursor()
-        seg['pos0'] = cursor.selectionStart()
-        seg['pos1'] = cursor.selectionEnd()
+        seg['pos0'] = self.code_av_dialog.from_editor_pos(cursor.selectionStart())
+        seg['pos1'] = self.code_av_dialog.from_editor_pos(cursor.selectionEnd())
         seg['seltext'] = cursor.selectedText()
         self.segment['seltext'] = seg['seltext']
         seg['cid'] = self.segment['cid']

@@ -33,7 +33,8 @@ import sqlite3
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from .GUI.ui_dialog_cooccurrence import Ui_Dialog_Coocurrence
-from .helpers import ExportDirectoryPathDialog, Message
+from .helpers import ExportDirectoryPathDialog, Message, doc_end_position
+from .text_positions import qt_length
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 
@@ -988,12 +989,12 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             # Coded text highlights - yellow code 0, green overlap, blue code 1
             # +1 skips the newline that append() inserts, so each span is exact
             # and an empty text_before no longer paints the previous line end
-            start_pos_yellow = len(self.ui.textEdit.toPlainText()) + 1
-            end_pos_yellow = start_pos_yellow + len(data[13])
+            start_pos_yellow = doc_end_position(self.ui.textEdit) + 1
+            end_pos_yellow = start_pos_yellow + qt_length(data[13])
             start_pos_green = end_pos_yellow
-            end_pos_green = start_pos_green + len(data[14])
+            end_pos_green = start_pos_green + qt_length(data[14])
             start_pos_blue = end_pos_green
-            end_pos_blue = start_pos_blue + len(data[15])
+            end_pos_blue = start_pos_blue + qt_length(data[15])
 
             msg = f"{data[13]}{data[14]}{data[15]}"
             self.ui.textEdit.append(msg)

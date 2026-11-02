@@ -31,6 +31,7 @@ import sqlite3
 from PyQt6 import QtCore, QtWidgets
 
 from .helpers import Message
+from .text_positions import positions_may_change
 
 logger = logging.getLogger(__name__)
 
@@ -1036,6 +1037,16 @@ class MergeProjects:
             self.summary_msg += _("This will update the database schema. Then try merging again.")
             self.summary_msg += _("Project not merged") + "\n"
             return False
+        # Positions saved before v18 count Qt units where texts have emoji
+        try:
+            cur_s.execute("select position_units from project")
+        except sqlite3.OperationalError:
+            if positions_may_change(self.conn_s):
+                self.summary_msg += _("Need to update the source project database.") + "\n"
+                self.summary_msg += _("Please open the source project using QualCoder. Then close the project.") + "\n"
+                self.summary_msg += _("This will update the database schema. Then try merging again.")
+                self.summary_msg += _("Project not merged") + "\n"
+                return False
         # Journal data
         sql_journal = "select name, jentry, date, owner from journal"
         cur_s.execute(sql_journal)

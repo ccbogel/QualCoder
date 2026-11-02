@@ -22,10 +22,9 @@ https://qualcoder.org/
 """
 
 from contextlib import closing
-import emoji
 import logging
 from pathlib import Path
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import sqlite3
 
@@ -36,6 +35,7 @@ from .helpers import Message
 from .merge_projects import MergeProjects
 from .select_items import DialogSelectItems
 from .text_file_replacement import ReplaceTextFile
+from .text_positions import has_astral, same_text
 
 logger = logging.getLogger(__name__)
 
@@ -318,30 +318,22 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
                     break
 
     def update_emoji_seltext(self):
-        """ Fix out of sync stored seltext. where emoji character positions
-        have changed the recorded seltext. """
+        """ Fix out of sync stored seltext, in files with emoji or other characters above U+FFFF.
+        Positions count code points, so the stored text is the slice of the file text. """
 
         file_dicts = self.app.get_file_texts()
-        emoji_files = []
-        for file_dict in file_dicts:
-            has_emoji = any(emoji.is_emoji(char) for char in file_dict['fulltext'])
-            if has_emoji:
-                emoji_files.append(file_dict)
+        emoji_files = [file_dict for file_dict in file_dicts if has_astral(file_dict['fulltext'])]
         counter = 0
         fixes_text = ""
         cur = self.app.conn.cursor()
         sql_coded = "select ctid, pos0, pos1, seltext from code_text where fid=?"
         sql_fix = "update code_text set seltext=? where ctid=?"
         for text_file in emoji_files:
-            text_edit = QtWidgets.QPlainTextEdit(text_file['fulltext'])
             cur.execute(sql_coded, [text_file['id']])
             res = cur.fetchall()
             for r in res:
-                cursor = text_edit.textCursor()
-                cursor.setPosition(r[1])
-                cursor.setPosition(r[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
-                seltext = cursor.selectedText()
-                if seltext != r[3]:
+                seltext = text_file['fulltext'][r[1]:r[2]]
+                if not same_text(seltext, r[3]):
                     line = f"{text_file['name']}, (ctid,pos0,pos1): {r[0:3]}\n- {r[3]}\n+ {seltext}\n\n"
                     fixes_text += (line)
                     counter += 1

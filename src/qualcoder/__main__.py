@@ -111,6 +111,7 @@ from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_exact_matches import DialogReportExactTextMatches
 from qualcoder.report_relations import DialogReportRelations
 from qualcoder.report_sql import DialogSQL
+from qualcoder.text_positions import migrate_positions_to_code_points, positions_may_change
 from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
@@ -3169,7 +3170,8 @@ Click "Yes" to start now.')
         cur = self.app.conn.cursor()
         cur.execute(
             "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, "
-            "bookmarkpos integer, codername text, recently_used_codes text, avbookmarkfile integer, avbookmarkmsec integer, avbookmarktextpos integer)")
+            "bookmarkpos integer, codername text, recently_used_codes text, avbookmarkfile integer, avbookmarkmsec integer, avbookmarktextpos integer, "
+            "position_units text)")
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
             "owner text, date text, av_text_id integer, risid integer, unique(name))")
@@ -3244,9 +3246,10 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE manage_files_display (mfid integer primary key, name text, tblrows text, tblcolumns text, owner text);")
         cur.execute("CREATE TABLE files_filter (filterid integer primary key, name text, filter text, owner text);")
         self.app.update_coder_names()  # Create table coder_names, add current coder, create views, etc.
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?,null,null,null)",
-                    ('v17', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', self.app.version, 0,
-                     0, self.app.settings['codername'], ""))
+        # Database version v18. Text positions count code points
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?,null,null,null,?)",
+                    ('v18', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', self.app.version, 0,
+                     0, self.app.settings['codername'], "", "codepoint"))
         self.app.conn.commit()
         try:
             # Get and display some project details
@@ -3782,6 +3785,29 @@ Click "Yes" to start now.')
             cur.execute('update project set databaseversion="v17", about=?', [self.app.version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v17")
+        # Database version v18. Text positions count code points, not Qt UTF-16 units
+        try:
+            cur.execute("select position_units from project")
+        except sqlite3.OperationalError:
+            if newproject == "no" and positions_may_change(self.app.conn):
+                backup_msg, backup_name = self.app.save_backup("_before_v18")
+                self.ui.textEdit.append(backup_msg)
+            counts, unresolved = migrate_positions_to_code_points(self.app.conn)
+            cur.execute("alter table project add position_units text")
+            cur.execute('update project set databaseversion="v18", position_units="codepoint", about=?',
+                        [self.app.version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v18")
+            changed = counts['converted'] + counts['relocated'] + counts['annotations'] + counts['case_text']
+            if changed or unresolved:
+                msg = _("Text positions adjusted for emoji and similar characters") + ": "
+                msg += _("codings") + f" {counts['converted'] + counts['relocated']}, "
+                msg += _("annotations") + f" {counts['annotations']}, "
+                msg += _("case links") + f" {counts['case_text']}"
+                if unresolved:
+                    msg += "\n" + _("Codings to check") + f" (ctid): {unresolved}"
+                self.ui.textEdit.append(msg)
+                logger.info(f"v18 position migration {counts}, unresolved ctids {unresolved}")
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
         cur.execute(sql)

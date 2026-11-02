@@ -40,7 +40,7 @@ from .case_file_manager import DialogCaseFileManager
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_cases import Ui_Dialog_cases
 from .context_help import open_module_help
-from .helpers import Message, ExportDirectoryPathDialog
+from .helpers import Message, ExportDirectoryPathDialog, doc_end_position
 
 from .memo import DialogMemo
 from .view_av import DialogViewAV
@@ -1137,25 +1137,25 @@ class DialogCases(QtWidgets.QDialog):
         for c in display_text:
             if c['mediapath'] is None or c['mediapath'] == '' or c['mediapath'][:5] == "docs:":  # text source
                 header = f"\n{_('File:')} {c['name']}, {_('Characters:')} {c['pos1']} - {c['pos0']}"
-                pos0 = len(self.ui.textBrowser.toPlainText())
+                pos0 = doc_end_position(self.ui.textBrowser)
                 self.ui.textBrowser.append(header)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-                pos1 = len(self.ui.textBrowser.toPlainText())
+                pos1 = doc_end_position(self.ui.textBrowser)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 cursor.setCharFormat(format_bold)
-                pos0 = len(self.ui.textBrowser.toPlainText())
+                pos0 = doc_end_position(self.ui.textBrowser)
                 self.ui.textBrowser.append(c['text'])
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-                pos1 = len(self.ui.textBrowser.toPlainText())
+                pos1 = doc_end_position(self.ui.textBrowser)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 cursor.setCharFormat(format_reg)
 
             if c['mediapath'][:7] in ("/images", "images:"):
                 header = f"\n{_('Image:')} {c['name']}"
-                pos0 = len(self.ui.textBrowser.toPlainText())
+                pos0 = doc_end_position(self.ui.textBrowser)
                 self.ui.textBrowser.append(header)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-                pos1 = len(self.ui.textBrowser.toPlainText())
+                pos1 = doc_end_position(self.ui.textBrowser)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 cursor.setCharFormat(format_accent)
                 data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],
@@ -1164,10 +1164,10 @@ class DialogCases(QtWidgets.QDialog):
 
             if c['mediapath'][:6] in ("/audio", "audio:", "/video", "video:"):
                 header = f"\n{_('AV media:')} {c['name']}"
-                pos0 = len(self.ui.textBrowser.toPlainText())
+                pos0 = doc_end_position(self.ui.textBrowser)
                 self.ui.textBrowser.append(header)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-                pos1 = len(self.ui.textBrowser.toPlainText())
+                pos1 = doc_end_position(self.ui.textBrowser)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 cursor.setCharFormat(format_accent)
                 data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],

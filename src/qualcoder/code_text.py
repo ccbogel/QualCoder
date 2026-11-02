@@ -26,7 +26,6 @@ from copy import copy, deepcopy
 import datetime
 # import difflib  # Slow, kept this in case need to revert to it. Now using diff_match_patch
 import diff_match_patch
-import emoji
 import html
 import logging
 # Required for the _export_odt_clean method which generates native ODF files with ranged annotations using odfpy
@@ -63,6 +62,7 @@ from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
 from .select_items import DialogSelectItems  # For isinstance()
 from .speakers import DialogSpeakers, speaker_coder_name
+from .text_positions import qt_length, to_py, to_qt
 from .coder_names import DialogCoderNames
 
 ai_search_analysis_max_count = 10  # How many chunks of data are analysed in the second stage
@@ -902,9 +902,9 @@ class DialogCodeText(QtWidgets.QWidget):
             return
 
         file_start = self.file_.get('start', 0)
-        text_len = len(self.ui.plainTextEdit.toPlainText())
+        text_len = len(self.text)
         editor_pos = code['pos0'] - file_start
-        editor_pos = max(0, min(editor_pos, max(0, text_len - 1)))
+        editor_pos = self.to_editor_pos(max(0, min(editor_pos, max(0, text_len - 1))))
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
@@ -1100,7 +1100,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Create start handle
         cursor_start = self.ui.plainTextEdit.textCursor()
-        cursor_start.setPosition(max(0, code_to_handle['pos0'] - self.file_['start']))
+        cursor_start.setPosition(self.to_editor_pos(max(0, code_to_handle['pos0'] - self.file_['start'])))
         rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
         h_start = CodeResizeHandle(self.ui.plainTextEdit, True, code_to_handle, self)
         # start teardrop tip is at its top-right corner -> shift left by full width
@@ -1109,8 +1109,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Create end handle
         cursor_end = self.ui.plainTextEdit.textCursor()
-        cursor_end.setPosition(min(len(self.ui.plainTextEdit.toPlainText()),
-                                   code_to_handle['pos1'] - self.file_['start']))
+        cursor_end.setPosition(self.to_editor_pos(min(len(self.text),
+                                   code_to_handle['pos1'] - self.file_['start'])))
         rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
         h_end = CodeResizeHandle(self.ui.plainTextEdit, False, code_to_handle, self)
         # end teardrop tip is at its top-left corner -> align directly to the cursor x
@@ -1909,8 +1909,8 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.lineEdit_search.setText(self.search_term)
         view_pos = next_result[1] - self.file_['start']
         cursor = self.ui.plainTextEdit.textCursor()  # re-acquire after possible reload
-        cursor.setPosition(view_pos)
-        cursor.setPosition(view_pos + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(view_pos))
+        cursor.setPosition(self.to_editor_pos(view_pos + next_result[2]), QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.plainTextEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
         self.scroll_text_into_view()
@@ -1946,8 +1946,8 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.lineEdit_search.setText(self.search_term)
         view_pos = prev_result[1] - self.file_['start']
         cursor = self.ui.plainTextEdit.textCursor()  # re-acquire after possible reload
-        cursor.setPosition(view_pos)
-        cursor.setPosition(view_pos + prev_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(view_pos))
+        cursor.setPosition(self.to_editor_pos(view_pos + prev_result[2]), QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.plainTextEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
         self.scroll_text_into_view()
@@ -2096,6 +2096,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.ui.plainTextEdit.toPlainText() == "" or self.edit_mode:
             return
         cursor = self.ui.plainTextEdit.cursorForPosition(position)
+        text_pos = self.from_editor_pos(cursor.position())
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet(f"font-size:{self.app.settings['fontsize']}pt")
@@ -2114,7 +2115,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Can have multiple coded text at this position
         for item in self.code_text:
-            if cursor.position() + self.file_['start'] >= item['pos0'] and cursor.position() + self.file_['start'] <= item['pos1']:
+            if text_pos + self.file_['start'] >= item['pos0'] and text_pos + self.file_['start'] <= item['pos1']:
                 action_unmark = QtGui.QAction(_("Unmark (U)"))
                 action_code_memo = QtGui.QAction(_("Memo coded text (M)"))
                 # removed action_start_pos, action_end_pos, action_change_pos <- L
@@ -2151,7 +2152,7 @@ class DialogCodeText(QtWidgets.QWidget):
         action_annotate = menu.addAction(_("Annotate (A)"))
         action_copy = menu.addAction(_("Copy to clipboard"))
         action_copy_metadata = menu.addAction(_("Copy with metadata"))
-        if selected_text == "" and self.is_annotated(cursor.position()):
+        if selected_text == "" and self.is_annotated(text_pos):
             action_edit_annotate = menu.addAction(_("Edit annotation"))
         action_set_bookmark = menu.addAction(_("Set bookmark (B)"))
         if selected_text != "":
@@ -2186,10 +2187,10 @@ class DialogCodeText(QtWidgets.QWidget):
             self.event_filter_installed = not self.event_filter_installed
             return
         if action == action_important:
-            self.set_important(cursor.position())
+            self.set_important(text_pos)
             return
         if action == action_not_important:
-            self.set_important(cursor.position(), False)
+            self.set_important(text_pos, False)
             return
         if selected_text != "" and action == action_copy:
             self.copy_selected_text_to_clipboard(False)
@@ -2205,26 +2206,26 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if action == action_edit_annotate:
             # Used fora point text press rather than a selected text
-            self.annotate(cursor.position())
+            self.annotate(text_pos)
             return
         if action == action_unmark:
-            self.unmark(cursor.position())
+            self.unmark(text_pos)
             return
         if action == action_code_memo:
-            self.coded_text_memo(cursor.position())
+            self.coded_text_memo(text_pos)
             return
         if action == action_set_bookmark:
             cur = self.app.conn.cursor()
-            bookmark_pos = cursor.position() + self.file_['start']
+            bookmark_pos = text_pos + self.file_['start']
             cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], bookmark_pos])
             self.app.conn.commit()
             return
         if action == action_change_code:
-            self.change_code_to_another_code(cursor.position())
+            self.change_code_to_another_code(text_pos)
             return
         # ---  handles experimental
         if action == action_show_handles:
-            self.display_handles_for_code(cursor.position())
+            self.display_handles_for_code(text_pos)
             return
         if action == action_show_top_groupbox:
             self.ui.groupBox.setVisible(True)
@@ -2245,7 +2246,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 Message(self.app, _('Warning'), _("No file was selected"), "warning").exec()
                 return
             selected_text = self.ui.plainTextEdit.textCursor().selectedText()
-            start_pos = self.ui.plainTextEdit.textCursor().selectionStart() + self.file_['start']
+            start_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionStart()) + self.file_['start']
             ai_chat_signal_emitter.newTextChatSignal.emit(int(self.file_['id']),
                                                           self.file_['name'],
                                                           selected_text,
@@ -2393,7 +2394,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Need to get coded segments at this position
         if position is None:
             # Called via button
-            position = self.ui.plainTextEdit.textCursor().position()
+            position = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position())
         if self.file_ is None:
             return
         coded_text_list = []
@@ -2473,7 +2474,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if position is None:
             # Called via button
-            position = self.ui.plainTextEdit.textCursor().position()
+            position = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position())
         if self.file_ is None:
             return
         coded_text_list = []
@@ -2583,8 +2584,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
         text = self.ui.plainTextEdit.textCursor().selectedText()
         if metadata:
-            start_pos = self.ui.plainTextEdit.textCursor().selectionStart() + self.file_['start']
-            end_pos = self.ui.plainTextEdit.textCursor().selectionEnd() + self.file_['start']
+            start_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionStart()) + self.file_['start']
+            end_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionEnd()) + self.file_['start']
             text += f"\nFile: {self.file_['name']} [{start_pos} - {end_pos}] "
             codes = ""
             for coded in self.code_text:
@@ -2916,7 +2917,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         key = event.key()
         # mod = QtGui.QGuiApplication.keyboardModifiers()
-        cursor_pos = self.ui.plainTextEdit.textCursor().position()
+        cursor_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position())
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         codes_here = []
         for item in self.code_text:
@@ -2928,7 +2929,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         # $ shift code positions
         if key == QtCore.Qt.Key.Key_Dollar:
-            self.shift_code_positions(self.ui.plainTextEdit.textCursor().position() + self.file_['start'])
+            self.shift_code_positions(self.from_editor_pos(self.ui.plainTextEdit.textCursor().position()) + self.file_['start'])
             return
         # Annotate selected
         if key == QtCore.Qt.Key.Key_A and selected_text != "":
@@ -2940,7 +2941,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         # Bookmark
         if key == QtCore.Qt.Key.Key_B and self.file_ is not None:
-            text_pos = self.ui.plainTextEdit.textCursor().position() + self.file_['start']
+            text_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position()) + self.file_['start']
             cur = self.app.conn.cursor()
             cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], text_pos])
             self.app.conn.commit()
@@ -3009,8 +3010,8 @@ class DialogCodeText(QtWidgets.QWidget):
         item = self.overlaps_at_pos[self.overlaps_at_pos_idx]
         # Remove formatting
         cursor = self.ui.plainTextEdit.textCursor()
-        cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(self.to_editor_pos(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(QtGui.QTextCharFormat())
         # Reapply formatting
         color = ""
@@ -3062,7 +3063,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.overlaps_at_pos_idx = 0
         if self.ai_search_message_shown:
             return
-        pos = self.ui.plainTextEdit.textCursor().position()
+        pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position())
         for item in self.code_text:
             if item['pos0'] <= pos + self.file_['start'] <= item['pos1']:
                 self.overlaps_at_pos.append(item)
@@ -3884,7 +3885,7 @@ class DialogCodeText(QtWidgets.QWidget):
             # Ignore all other key events if edit mode is active
             if self.edit_mode:
                 return False
-            cursor_pos = self.ui.plainTextEdit.textCursor().position()
+            cursor_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position())
             codes_here = []
             for item in self.code_text:
                 if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1']:
@@ -4032,7 +4033,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 tt_code_text.append(ct)
         indexes = sorted(indexes, key=itemgetter('pos0'))
         cursor = self.ui.plainTextEdit.textCursor()
-        cur_pos = cursor.position()
+        cur_pos = self.from_editor_pos(cursor.position())
         end_pos = 0
         found_larger = False
         msg = "/" + str(len(indexes))
@@ -4061,10 +4062,10 @@ class DialogCodeText(QtWidgets.QWidget):
         for c in self.codes:
             if c['cid'] == cid:
                 color = c['color']
-        cursor.setPosition(cur_pos)
+        cursor.setPosition(self.to_editor_pos(cur_pos))
         self.ui.plainTextEdit.setTextCursor(cursor)
-        cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(cur_pos), QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(self.to_editor_pos(end_pos), QtGui.QTextCursor.MoveMode.KeepAnchor)
         brush = QBrush(QColor(color.replace("#", "#40")))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
@@ -4107,7 +4108,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 tt_code_text.append(ct)
         indexes = sorted(indexes, key=itemgetter('pos0'), reverse=True)
         cursor = self.ui.plainTextEdit.textCursor()
-        cur_pos = cursor.position()
+        cur_pos = self.from_editor_pos(cursor.position())
         end_pos = 0
         found_smaller = False
         msg = f"/{len(indexes)}"
@@ -4132,11 +4133,11 @@ class DialogCodeText(QtWidgets.QWidget):
         for c in self.codes:
             if c['cid'] == cid:
                 color = c['color']
-        cursor.setPosition(cur_pos)
+        cursor.setPosition(self.to_editor_pos(cur_pos))
         self.ui.plainTextEdit.setTextCursor(cursor)
-        cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        brush = QBrush(QColor(color.replace("#," "#40")))
+        cursor.setPosition(self.to_editor_pos(cur_pos), QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(self.to_editor_pos(end_pos), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        brush = QBrush(QColor(color.replace("#", "#40")))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
         foreground_colour = TextColor(color).recommendation
@@ -4475,11 +4476,11 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.search_term = ""
                     # Set text cursor position and also highlight one character, to show location.
                     text_cursor = self.ui.plainTextEdit.textCursor()
-                    text_cursor.setPosition(result[1])
+                    text_cursor.setPosition(self.to_editor_pos(result[1]))
                     endpos = result[1] - 1
                     if endpos < 0:
                         endpos = 0
-                    text_cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
+                    text_cursor.setPosition(self.to_editor_pos(endpos), QtGui.QTextCursor.MoveMode.KeepAnchor)
                     self.ui.plainTextEdit.setTextCursor(text_cursor)
                 except Exception as e:
                     logger.debug(str(e))
@@ -4582,6 +4583,16 @@ class DialogCodeText(QtWidgets.QWidget):
             self.selected_code_index = 0
 
         self.load_file(self.files[row])
+
+    def to_editor_pos(self, text_pos):
+        """ Qt editor position for a code point index relative to the loaded text. """
+
+        return to_qt(self.text, int(text_pos))
+
+    def from_editor_pos(self, editor_pos):
+        """ Code point index relative to the loaded text for a Qt editor position. """
+
+        return to_py(self.text, editor_pos)
 
     def load_file(self, file_):
         """ Load and display file text for this file.
@@ -4723,7 +4734,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         cursor = self.ui.plainTextEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(len(self.text), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(qt_length(self.text), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(QtGui.QTextCharFormat())
 
     def _apply_format_to_code_item(self, item, codes_lookup):  
@@ -4737,9 +4748,9 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         fmt = QtGui.QTextCharFormat()
         cursor = self.ui.plainTextEdit.textCursor()
-        cursor.setPosition(int(item['pos0'] - self.file_['start']),
+        cursor.setPosition(self.to_editor_pos(item['pos0'] - self.file_['start']),
                            QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(int(item['pos1'] - self.file_['start']),
+        cursor.setPosition(self.to_editor_pos(item['pos1'] - self.file_['start']),
                            QtGui.QTextCursor.MoveMode.KeepAnchor)
         color = codes_lookup.get(item['cid'], {}).get('color', "#777777")
 
@@ -4838,9 +4849,9 @@ class DialogCodeText(QtWidgets.QWidget):
                 ov_end = min(new_p1, o_p1)
                 if ov_start >= ov_end:
                     continue
-                cursor.setPosition(ov_start - self.file_['start'],
+                cursor.setPosition(self.to_editor_pos(ov_start - self.file_['start']),
                                    QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(ov_end - self.file_['start'],
+                cursor.setPosition(self.to_editor_pos(ov_end - self.file_['start']),
                                    QtGui.QTextCursor.MoveMode.KeepAnchor)
                 cursor.mergeCharFormat(fmt)
         finally:
@@ -4864,8 +4875,8 @@ class DialogCodeText(QtWidgets.QWidget):
         for item in self.code_text:
             fmt = QtGui.QTextCharFormat()
             cursor = self.ui.plainTextEdit.textCursor()
-            cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-            cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+            cursor.setPosition(self.to_editor_pos(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+            cursor.setPosition(self.to_editor_pos(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
             color = codes.get(item['cid'], {}).get('color', "#777777")  # default gray
 
             # choose between underline-only and full or transparency background fill
@@ -4905,10 +4916,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 cursor = self.ui.plainTextEdit.textCursor()
                 if note['fid'] == self.file_['id'] and \
                         0 <= int(note['pos0']) - self.file_['start'] < int(note['pos1']) - self.file_['start'] <= \
-                        len(self.ui.plainTextEdit.toPlainText()):
-                    cursor.setPosition(int(note['pos0']) - self.file_['start'],
+                        len(self.text):
+                    cursor.setPosition(self.to_editor_pos(int(note['pos0']) - self.file_['start']),
                                        QtGui.QTextCursor.MoveMode.MoveAnchor)
-                    cursor.setPosition(int(note['pos1']) - self.file_['start'],
+                    cursor.setPosition(self.to_editor_pos(int(note['pos1']) - self.file_['start']),
                                        QtGui.QTextCursor.MoveMode.KeepAnchor)
                     format_bold = QtGui.QTextCharFormat()
                     format_bold.setFontWeight(QtGui.QFont.Weight.Bold)
@@ -4952,8 +4963,8 @@ class DialogCodeText(QtWidgets.QWidget):
                 fmt.setUnderlineColor(QColor("#000000"))
             else:
                 fmt.setUnderlineColor(QColor("#FFFFFF"))
-            cursor.setPosition(o[0] - self.file_['start'], QtGui.QTextCursor.MoveMode.MoveAnchor)
-            cursor.setPosition(o[1] - self.file_['start'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+            cursor.setPosition(self.to_editor_pos(o[0] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+            cursor.setPosition(self.to_editor_pos(o[1] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
             cursor.mergeCharFormat(fmt)
 
     def mark(self):
@@ -4978,8 +4989,8 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         cid = int(item.text(1).split(':')[1])
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
-        pos0 = self.ui.plainTextEdit.textCursor().selectionStart() + self.file_['start']
-        pos1 = self.ui.plainTextEdit.textCursor().selectionEnd() + self.file_['start']
+        pos0 = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionStart()) + self.file_['start']
+        pos1 = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionEnd()) + self.file_['start']
         if pos0 == pos1:
             return
 
@@ -5157,9 +5168,9 @@ class DialogCodeText(QtWidgets.QWidget):
             Message(self.app, _('Warning'), _("No file was selected"), "warning").exec()
             return
         self.clear_edit_variables()
-        pos0 = self.ui.plainTextEdit.textCursor().selectionStart()
-        pos1 = self.ui.plainTextEdit.textCursor().selectionEnd()
-        text_length = len(self.ui.plainTextEdit.toPlainText())
+        pos0 = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionStart())
+        pos1 = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionEnd())
+        text_length = len(self.text)
         if pos0 >= text_length or pos1 > text_length:
             return
         item = None
@@ -5292,7 +5303,6 @@ class DialogCodeText(QtWidgets.QWidget):
         for f in files:
             text_starts = [match.start() for match in re.finditer(re.escape(start_mark), f['fulltext'])]
             text_ends = [match.start() for match in re.finditer(re.escape(end_mark), f['fulltext'])]
-            emojis = emoji.emoji_list(f['fulltext'])
             try:
                 for start_pos in text_starts:
                     # pos1 = -1  # Default if not found. Not Used
@@ -5311,16 +5321,6 @@ class DialogCodeText(QtWidgets.QWidget):
                         res = cur.fetchone()
                         if res is None:
                             seltext = f['fulltext'][start_pos: pos1]
-
-                            # Check and add emoji character length, after seltext is selected
-                            for emo in emojis:
-                                if emo['match_end'] < start_pos:
-                                    # Emojis can be 2 or more characters in length
-                                    start_pos += emo['match_end'] - emo['match_start']
-                                    pos1 += emo['match_end'] - emo['match_start']
-                                if start_pos <= emo['match_end'] <= pos1:
-                                    pos1 += emo['match_end'] - emo['match_start']
-
                             sql = "insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)"
                             cur.execute(sql, (cid, f['id'], seltext, start_pos, pos1,
                                               self.app.settings['codername'], now_date, ""))
@@ -5468,8 +5468,6 @@ class DialogCodeText(QtWidgets.QWidget):
                     if not surround_codes:
                         return
 
-                emojis = emoji.emoji_list(f['fulltext'])
-
                 for sentence in sentences:
                     if (find_text in sentence and not regex_pattern) or (
                             regex_pattern and regex_pattern.search(sentence)):
@@ -5477,15 +5475,6 @@ class DialogCodeText(QtWidgets.QWidget):
                              'pos0': pos0, 'pos1': pos0 + len(sentence),
                              'owner': self.app.settings['codername'], 'memo': "",
                              'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
-
-                        # Check and add emoji character length
-                        for emo in emojis:
-                            if emo['match_end'] < i['pos0']:
-                                # Emojis can be 2 or more characters in length
-                                i['pos0'] += emo['match_end'] - emo['match_start']
-                                i['pos1'] += emo['match_end'] - emo['match_start']
-                            if i['pos0'] <= emo['match_end'] <= i['pos1']:
-                                i['pos1'] += emo['match_end'] - emo['match_start']
 
                         # For code within a code, if selected
                         found_code_in_code = False
@@ -5621,7 +5610,6 @@ class DialogCodeText(QtWidgets.QWidget):
                         logger.error(f"File not found,  file id: {f['id']}")
                         continue
                     file_text = current_file[2]
-                    emojis = emoji.emoji_list(file_text)
                     text_starts = []
                     text_ends = []
                     if regex_pattern:
@@ -5672,12 +5660,6 @@ class DialogCodeText(QtWidgets.QWidget):
 
                         pos0 = text_starts[index]
                         pos1 = text_ends[index]
-                        # Have the seltext, now adjust pos0, pos1 for emoji length, by adding to the character positions
-                        for emo in emojis:
-                            if emo['match_end'] < pos0:
-                                # Emojis can be 2 or more characters in length
-                                pos0 += emo['match_end'] - emo['match_start']
-                                pos1 += emo['match_end'] - emo['match_start']
                         item = {'cid': cid, 'fid': int(f['id']), 'seltext': seltext,
                                 'pos0': pos0, 'pos1': pos1,
                                 'owner': self.app.settings['codername'], 'memo': "",
@@ -5753,9 +5735,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.update_file_tooltip()
         self.highlight()
         text_cursor = self.ui.plainTextEdit.textCursor()
-        if self.edit_pos > len(self.ui.plainTextEdit.toPlainText()):
-            self.edit_pos = max(0, len(self.ui.plainTextEdit.toPlainText()) - 1)
-        text_cursor.setPosition(self.edit_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
+        if self.edit_pos > len(self.text):
+            self.edit_pos = max(0, len(self.text) - 1)
+        text_cursor.setPosition(self.to_editor_pos(self.edit_pos - self.file_['start']),
+                                QtGui.QTextCursor.MoveMode.MoveAnchor)
         self.ui.plainTextEdit.setTextCursor(text_cursor)
         msg = _("Text reverted to prior to edit")
         Message(self.app, _("Undo last edited text"), msg).exec()
@@ -5836,7 +5819,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.coding_margin.hide()
         self._set_margin_container_visibility(False)
 
-        temp_edit_pos = self.ui.plainTextEdit.textCursor().position() + self.file_['start']
+        temp_edit_pos = self.from_editor_pos(self.ui.plainTextEdit.textCursor().position()) + self.file_['start']
         if temp_edit_pos > 0:
             self.edit_pos = temp_edit_pos
         self.ui.groupBox.hide()
@@ -5868,7 +5851,8 @@ class DialogCodeText(QtWidgets.QWidget):
         text_cursor = self.ui.plainTextEdit.textCursor()
         if self.edit_pos >= len(self.text):
             self.edit_pos = len(self.text) - 1
-        text_cursor.setPosition(self.edit_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
+        text_cursor.setPosition(self.to_editor_pos(self.edit_pos - self.file_['start']),
+                                QtGui.QTextCursor.MoveMode.MoveAnchor)
         self.ui.plainTextEdit.setTextCursor(text_cursor)
 
     def edit_mode_off(self):
@@ -5918,9 +5902,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.update_file_tooltip()
         self.highlight()
         text_cursor = self.ui.plainTextEdit.textCursor()
-        if self.edit_pos > len(self.ui.plainTextEdit.toPlainText()):
-            self.edit_pos = max(0, len(self.ui.plainTextEdit.toPlainText()) - 1)
-        text_cursor.setPosition(self.edit_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
+        if self.edit_pos > len(self.text):
+            self.edit_pos = max(0, len(self.text) - 1)
+        text_cursor.setPosition(self.to_editor_pos(self.edit_pos - self.file_['start']),
+                                QtGui.QTextCursor.MoveMode.MoveAnchor)
         self.ui.plainTextEdit.setTextCursor(text_cursor)
 
         # repaint the margin after exiting edit mode. load_file (called
@@ -5956,27 +5941,28 @@ class DialogCodeText(QtWidgets.QWidget):
         if pattern is None:
             return
         result = None
+        cursor_pos = self.from_editor_pos(cursor.position())
         try:
             if direction == "next":
                 for match in pattern.finditer(self.text):
-                    if match.start() > cursor.position():
-                        result = match.start()
+                    if match.start() > cursor_pos:
+                        result = match
                         break
             else:  # previous
                 matches = []
                 for match in pattern.finditer(self.text):
-                    matches.insert(0, match.start())
+                    matches.insert(0, match)
                 for match in matches:
-                    if match + len(search_term) < cursor.position():
+                    if match.end() < cursor_pos:
                         result = match
                         break
         except re.error:
             logger.exception('Failed searching text for %s', search_term)
         if result is None:
             return
-        cursor.setPosition(result)
+        cursor.setPosition(self.to_editor_pos(result.start()))
         self.ui.plainTextEdit.setTextCursor(cursor)
-        cursor.setPosition(cursor.position() + len(search_term), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(result.end()), QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.plainTextEdit.setTextCursor(cursor)
 
     def update_positions(self):
@@ -6244,22 +6230,22 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor = self.ui.plainTextEdit.textCursor()
         for item in self.ed_casetext:
             if item['newpos0'] is not None:
-                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(self.to_editor_pos(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(self.to_editor_pos(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.green)
                 cursor.setCharFormat(format_)
         for item in self.ed_annotations:
             if item['newpos0'] is not None:
-                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(self.to_editor_pos(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(self.to_editor_pos(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.yellow)
                 cursor.setCharFormat(format_)
         for item in self.ed_codetext:
             if item['newpos0'] is not None:
-                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(self.to_editor_pos(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(self.to_editor_pos(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
@@ -6275,7 +6261,8 @@ class DialogCodeText(QtWidgets.QWidget):
         format_.setFontPointSize(self.app.settings['docfontsize'])
         cursor = self.ui.plainTextEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(len(self.ui.plainTextEdit.toPlainText()), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.ui.plainTextEdit.document().characterCount() - 1,
+                           QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(format_)
         self.ui.plainTextEdit.blockSignals(False)
 
@@ -6709,7 +6696,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.ui.listWidget.setCurrentRow(i)
                     self.load_file(f)
                     # Set text cursor position
-                    doc_len = len(self.ui.plainTextEdit.toPlainText())
+                    doc_len = len(self.text)
                     start = max(0, int(sel_start))
                     endpos = int(sel_end)
                     if endpos <= start:
@@ -6722,8 +6709,8 @@ class DialogCodeText(QtWidgets.QWidget):
                         start = 0
                         endpos = 0
                     text_cursor = self.ui.plainTextEdit.textCursor()
-                    text_cursor.setPosition(start)
-                    text_cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
+                    text_cursor.setPosition(self.to_editor_pos(start))
+                    text_cursor.setPosition(self.to_editor_pos(endpos), QtGui.QTextCursor.MoveMode.KeepAnchor)
                     self.ui.plainTextEdit.setTextCursor(text_cursor)
                     self.ui.plainTextEdit.setFocus()
                     QtCore.QTimer.singleShot(0, self.scroll_text_into_view)  # scroll into view after window is updated
@@ -6793,8 +6780,8 @@ class DialogCodeText(QtWidgets.QWidget):
             return None
 
         # Get the adjusted start and end positions from the text editor's current selection
-        pos0 = self.ui.plainTextEdit.textCursor().selectionStart() + self.file_['start']
-        pos1 = self.ui.plainTextEdit.textCursor().selectionEnd() + self.file_['start']
+        pos0 = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionStart()) + self.file_['start']
+        pos1 = self.from_editor_pos(self.ui.plainTextEdit.textCursor().selectionEnd()) + self.file_['start']
         if pos0 == pos1:
             return None
 
@@ -6851,7 +6838,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Create start handle
         cursor_start = self.ui.plainTextEdit.textCursor()
-        cursor_start.setPosition(max(0, codes_to_handle[0]['pos0'] - self.file_['start']))
+        cursor_start.setPosition(self.to_editor_pos(max(0, codes_to_handle[0]['pos0'] - self.file_['start'])))
         rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
         h_start = CodeResizeHandle(self.ui.plainTextEdit, True, codes_to_handle, self)
         h_start.move(rect_start.x() - 6, rect_start.y() + 2)
@@ -6859,7 +6846,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Create end handle
         cursor_end = self.ui.plainTextEdit.textCursor()
-        cursor_end.setPosition(min(len(self.ui.plainTextEdit.toPlainText()), codes_to_handle[0]['pos1'] - self.file_['start']))
+        cursor_end.setPosition(self.to_editor_pos(min(len(self.text), codes_to_handle[0]['pos1'] - self.file_['start'])))
         rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
         h_end = CodeResizeHandle(self.ui.plainTextEdit, False, codes_to_handle, self)
         h_end.move(rect_end.x() - 6, rect_end.y() + 2)
@@ -6898,8 +6885,9 @@ class DialogCodeText(QtWidgets.QWidget):
                 code_item['pos1'] = new_pos
 
         cursor = self.ui.plainTextEdit.textCursor()
-        cursor.setPosition(code_items[0]['pos0'])
-        cursor.setPosition(code_items[0]['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.to_editor_pos(code_items[0]['pos0'] - self.file_['start']))
+        cursor.setPosition(self.to_editor_pos(code_items[0]['pos1'] - self.file_['start']),
+                           QtGui.QTextCursor.MoveMode.KeepAnchor)
         seltext = cursor.selectedText()
 
         sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
