@@ -1,6 +1,7 @@
-# QualCoder 4.0
+# QualCoder 4.1
 
-We have jumped to version 4.0 as there are quite a few changes in this release.
+**This is an _in development_ release note so executables are not made until 4.1 is actually released.
+Notes below will be updated as functions are added and identtified errors fixed.**
 
 # Installation
 
@@ -12,12 +13,12 @@ Attached to the end of the release page, you will find two options:
 
 Executables will be available when a release is made.
 
-QualCoder_4_0_Win_setup.exe: a Windows installer will set up QualCoder like any normal app, with entries in the start menu, etc.
-QualCoder_4_0_Win_Portable.exe: A portable binary. Double-click to run and wait for 15 seconds.
+QualCoder_4_1_Win_setup.exe: a Windows installer will set up QualCoder like any normal app, with entries in the start menu, etc.
+QualCoder_4_1_Win_Portable.exe: A portable binary. Double-click to run and wait for 15 seconds.
 
 On first use of the exe, Windows will ask you to allow to run QualCoder. This is because it is from an unknown publisher. It costs a lot of money to get a trusted publisher certificate - so that will not be possible for the foreseeable future.
 
-The executable files are large downloads. Occasionally you might get a CRDOWNLOAD issue. First, check the file is fully downloaded. If not, then Resume downloads in your browser. If it seems to be fully downloaded, then rename it to the name that was expected and double-click to run. (e.g. From CRDOWNLOAD to QualCoder_4_0_Win_Setup.exe)
+The executable files are large downloads. Occasionally you might get a CRDOWNLOAD issue. First, check the file is fully downloaded. If not, then Resume downloads in your browser. If it seems to be fully downloaded, then rename it to the name that was expected and double-click to run. (e.g. From CRDOWNLOAD to QualCoder_4_1_Win_Setup.exe)
 
 ## MacOS
 
@@ -25,7 +26,7 @@ Attached to the end of the release page, you will find two options:
 
 Executables will be available when a release is made.
 
-QualCoder_4_0_arm64.dmg: App bundle for newer Macs with Apple Silicon (M1 ... M4 processors)
+QualCoder_4_1_arm64.dmg: App bundle for newer Macs with Apple Silicon (M1 ... M4 processors)
 We are not able to compile a binary for Intel-based Macs right now due to incompatibilities in the libraries we use.
 The app bundles are compiled on macOS Sequoia. They might also work on Sonoma and Ventura.
 
@@ -52,10 +53,10 @@ Use a virtual environment (commands in point 6 below). Not using a virtual envir
 
 4. Use the Terminal app (`Applications -> Utilities -> Terminal`).
 
-5. In the terminal, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-4.0 folder, e.g. 
+5. In the terminal, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-4.1 folder, e.g. 
 
 ```bash
-cd Downloads/QualCoder-4.0
+cd Downloads/QualCoder-4.1
 ```
 
 6. Install the virtual environment and required python modules. 
@@ -91,7 +92,7 @@ The command prompt will then remove the *(env)* wording.
 If you are not using a virtual environment:
 
 ```bash
-cd Downloads/QualCoder-4.0
+cd Downloads/QualCoder-4.1
 cd src 
 python3 -m qualcoder
 ```
@@ -99,7 +100,7 @@ python3 -m qualcoder
 If you are using a virtual environment:
 
 ```bash
-cd Downloads/QualCoder-4.0
+cd Downloads/QualCoder-4.1
 source env/bin/activate
 cd src 
 python3 -m qualcoder
@@ -120,7 +121,7 @@ python3 -m qualcoder
 
 For example, you may now be in this folder, where you unzipped QualCoder: 
 
-yourcomputer:~Downloads/QualCoder-4.0
+yourcomputer:~Downloads/QualCoder-4.1
 
 3a. Instead of the commands from 3b. onwards, run the shell file which will run all these below commands. Make this file executable (Right-click and go to Properties), then type the below command and press Enter: 
 
@@ -165,122 +166,18 @@ Create a .Desktop file for launch, enter this command (adapt it according to the
 
 # Changes in this release
 
-Core languages will be English, German, French, Spanish. this is due to having regular human review and updates. Additional languages are located in the Other Languages folder. These may not be human reviewed, and may not be updated recently.
+Overall, improved the user interface styling to give a modern look. Reduced the number of style options to three only, to make maintenance easier: native, original, dark.
 
-## Data structure change
+## Code Text, Code A/V
 
-One major change is to allow codes to have sub-codes. This makes it possible to build hierarchies of codes and not only of categories.
-
-## Backups
-
-Project backups are now located in the same folder as the project path.
-
-## Artificial Intelligence changes
-
-Agentic restructure of AI features. Turns the AI chat into an agent that can not only talk, but also do things in QualCoder.
-* Read-only gives the AI agent read access to the complete code tree, all the memos and codings, as well as the empirical data through a diverse set of search tools (text only).
-*  Sandboxed allows for limited write-access: The agent can create new codes and codings, but it cannot change or delete existing ones. 
-* Full access gives additional write access to existing codes, codings, attributes, and cases - with precautions: Destructive operation must be confirmed by the user.
-
-## Menus and tabs
-
-A new menu option Analysis has been added. Menu items have been re-organised between Analysis and Reports. The manage, Coding and Reports tabs have placeholder information that explains in more detail what each of these tabs is used for.
-
-## Journals
-
-Export are now to ODT format. Right-click on a journal name to have an option to convert a journal to a file for coding within the QualCoder project.
-Right-click on a URL to open a URL from the journal text. URLs must start with: http, https or www.
-Once a journal is opened, there are additional buttons that allow insert of a timestamp, a bibliographic reference, and coded text.
-
-## Manage files
-
-There is an 'Import survey' button for importing surveys from Excel and csv files. Multiple rows selection. For context menu Delete and Export. When in the file name column, pressing delete will delete the file(s).
-
-PDFs with highlights can be imported and their highlighted segments coded automatically, one code per highlight colour under a 'PDF Highlights' category, using the closest QualCoder palette colours.
-
-LaTeX import, converts LaTeX content to readable plain text. Complex presentations may not import perfectly, |input and |include files are not resolved.
-
-## The Codes Tree in all coding screens
-
-Added sub-menus for Modify (Code or categories selected), Filter, Sort. Added a Filter icon when the Codes tree is filtered to specific codes (via Show codes like, or Show codes by colour). Added a code names text filter underneath the codes tree. Add a move category underneath category function. Can move a dragged item to the top and bottom of the visible tree, and the tree will scroll. Menu for the header section of the codes-tree to have automatic column resizing or manual resizing. Also for code trees in other coding areas.
-
-## Code text
-
-Can set font and size for the document. Can resize codes with movable handles. Can change text highlighting from marker style to underline style and or vertical code stripes. Can export the coded document (to ODF format) via: coding with coloured highlights, commments, or as an analytic report. Key presse for Shift B to go to bookmark, andC to add a new category. Edit text mode - now has a search bar.
-
-## Code PDF
-
-Vastly improved PDF presentation and manipulation (Thanks to Lorenzo for this). Text coding and image area coding can be performed on the PDF page. AI-assisted text analysis can be applied directly from the Code PDF window.
-
-A refactoring method was added for older QualCoder projects. the text is re-extracted and existing codings are matched against the new text extraction method. Any codings that cannot be remapped are recorded in Journals as lost codes, so the user can review them.
-
-PDF highlight export: generates a copy of the original PDF with the coded segments embedded as native highlight annotations (in each code's color, with the code name as annotation comment), so the coded document can be opened and reviewed in any standard PDF reader.
-
-ODT report: exports a coding report in OpenDocument Text format (.odt), listing the coded segments with their codes (text and images).
-
-## Code images
-
-Can resize coded areas using rightclick menu option and resize using handles.
-
-## Code Audio / Video
-
-VLC is now optional. There is an option to open audio/video using the Qt Player which is a part of the Qt interface that QualCoder uses. 
-
-A bookmark option has been added. So after it is applied, in code A/V and view A/V (from manage files) the ime position in the A/V will be restored and the text position will be restored. Key presses are B (make bookmark) and Shift B (go to bookmark).
-
-## Co-occurrence report
-
-Proximity graphs. Export format for Gephi import.
-
-## Graph (mind map)
-
-Improved manipulation of objects. Export format for draw.io import. Ability to expand and collapse graph portions (categories). Another way via a dialog window to add coded segments. Options to organise the graph layout - radion, vertical, horizontal. Improved selection of font sizes and colours in menus. A mini map for scrolling. Different node styles are available - box, oval, more. Multiple selection options are available.
-
-## Report codes
+Added option to select multiple coded text segments and resize them, providing they are all in the exact same positions. Marker options now are: underline, marker (a strong coloured highlight of the coded text), marker light (a light coloured highlight of the coded text).
 
 **Bug fixes**
 
--A/V search by cases:
---fixed an issue where the "important" filter and the ORDER BY clause were being applied to the wrong SQL query, causing incorrect filtering in audio/video results.
+-macOS merge projects failed in 4.0. Fixed.
 
--Excel (XLSX) export: Fixed a duplicated column that incorrectly shifted the "a/v" value in case reports.
+- emojis in text document causing some report issues: (1) (code retirval with context surrounding text); (2) resizing coded segment in thest text document stored incorrect text due to incorrectly identifed positions. Work has been done to improve emoji containing text. A Special Function has been added to fix older projects where the incorrectly stored coded text can be updated to the correct text.
 
--"Only memos" filter in translated languages: The strings "Only memos" and "Only coded memos" were not marked for translation, causing the filter to fail in the Spanish version. It now works correctly in any language.
-
--Matrix headers: Fixed four issues that prevented code, file, and case memos from displaying correctly in the matrix view (including an "alll" typo, a comparison with an extra colon 'Case:', an incorrect tuple validation, and a misplaced "All memo" literal).
-
--"Also all memos" option: Now correctly displays the coded segment memo, a behaviour that was previously missing despite being implied by the label.
-
--Fix merge projects error. Occurred sometimes when projects with audio, video or image files are merged.
-
-**New functions**
-
--Category hierarchy in headers: Full hierarchical path is now displayed before the code name (Root Category > Subcategory > … > Code), making the contextual reading of each segment easier.
-
--Co-occurring codes: Below each coded segment memo, the set of overlapping codes within the same file is listed in brackets, allowing quick identification of coding overlaps. Works for text, audio/video, and image data. View and export the overlapping codes.
-
--New category sorting option: Added a "Category A - z" "Category Z - a"  option to the sorting menu, which organizes results alphabetically according to the category hierarchy (with code name as a secondary criterion).
-
-## Database queries
-
-Run the sql using key press: Control + Enter Keys
-Menu option - comment out selected text.
-
-When running the sql statement, if a section of sql text is selected, only that selected text sql will be run.
-
-## Charts
-
-Can select stopwords from a list of several languages for the word cloud.
-
-Added text filters to the combo-boxes for files, cases and categories. Right-click menu option.
-
-## Report codes summary
-
-Added context menu to Show coded files
-
-## Report codes frequency
-
-Added context menu to Show coded files, toggle automatic column width resize, show expanded code names.
 
 # Known issues
 
