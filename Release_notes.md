@@ -1,7 +1,7 @@
 # QualCoder 4.1
 
 **This is an _in development_ release note so executables are not made until 4.1 is actually released.
-Notes below will be updated as functions are added and identtified errors fixed.**
+Notes below will be updated as functions are added and identified errors fixed.**
 
 # Installation
 
