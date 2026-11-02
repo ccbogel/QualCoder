@@ -172,7 +172,7 @@ Overall, improved the user interface styling to give a modern look. Reduced the 
 
 Added option to select multiple coded text segments and resize them, providing they are all in the exact same positions. Marker options now are: underline, marker (a strong coloured highlight of the coded text), marker light (a light coloured highlight of the coded text).
 
-**Bug fixes**
+## Bug fixes
 
 - macOS merge projects failed in 4.0. Fixed.
 
