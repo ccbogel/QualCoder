@@ -5,11 +5,11 @@
 
 echo "Starting"
 # Create venv
-if [ -d ".env" ]; then
+if [ -d ".venv" ]; then
     echo "Virtual environment exists."
 else
     echo "Creating virtual environment."
-    python3 -m venv ".env"
+    python3 -m venv ".venv"
 fi
 
 # Activate environment
