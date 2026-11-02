@@ -4375,7 +4375,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             target = self._select_single(
                 [{'name': c['name'], 'ref': c} for c in texts_here], _("Select code to resize"))
             if target is not None:
-                self.show_resize_handles(target)
+                self.show_resize_handles([target])
             return
         if action == action_area_interactive:
             target = self._select_single(
@@ -5576,7 +5576,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Creates the two teardrops (start and end) for the exact segment,
         like _margin_resize_ctid of code_text. """
 
-        if code_item is None or code_item.get('ctid') is None:
+        if code_item[0] is None or code_item[0].get('ctid') is None:
             return
         if not self.text_ready():
             Message(self.app, _("Warning"),
@@ -5584,7 +5584,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         self.cancel_interactive_area_resize()
         self.hide_resize_handles()
-        target = next((c for c in self.code_text if c.get('ctid') == code_item['ctid']), None)
+        target = next((c for c in self.code_text if c.get('ctid') == code_item[0]['ctid']), None)
         if target is None:
             return
         anchor_start = self._text_handle_anchor(target, True)
@@ -5652,17 +5652,15 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.rebuild_marks()
                 return
             code_item['pos1'] = new_pos
+
+        # Get seltext from textEdit
+        plain_text_edit = QtWidgets.QPlainTextEdit(self.file_['fulltext'])
+        cursor = plain_text_edit.textCursor()
+        cursor.setPosition(code_item['pos0'])
+        cursor.setPosition(code_item['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        seltext = cursor.selectedText()
+
         cur = self.app.conn.cursor()
-        cur.execute("select substr(fulltext,?,?) from source where id=?",
-                    [code_item['pos0'] + 1, code_item['pos1'] - code_item['pos0'], code_item['fid']])
-        res = cur.fetchone()
-        if not res:
-            code_item['pos0'] = orig_pos0
-            code_item['pos1'] = orig_pos1
-            self.hide_resize_handles()
-            self.rebuild_marks()
-            return
-        seltext = res[0]
         try:
             cur.execute("update code_text set pos0=?, pos1=?, seltext=? where ctid=?",
                         [code_item['pos0'], code_item['pos1'], seltext, code_item['ctid']])
