@@ -302,8 +302,9 @@ class PdfPageItem(QtWidgets.QGraphicsItem):
         painter.setBrush(Qt.BrushStyle.NoBrush)
         painter.setPen(QtGui.QPen(QColor(170, 170, 175), 0))
         painter.drawRect(rect)
-        # Text codings: style shared with code_text ('marker' = translucent fill, 'underline' = dashed underline)
-        if getattr(self.view.dialog, 'highlight_style') == 'underline':
+        # Text codings: full or light marker fill, or a dashed underline.
+        highlight_style = getattr(self.view.dialog, 'highlight_style', 'marker')
+        if highlight_style == 'underline':
             for mark_rect, _color, info in self.text_marks:
                 pen = QtGui.QPen(QColor(info['color']), 1.2, Qt.PenStyle.DashLine)
                 pen.setCosmetic(True)
@@ -312,7 +313,7 @@ class PdfPageItem(QtWidgets.QGraphicsItem):
                 painter.drawLine(QtCore.QPointF(mark_rect.left(), y_under),
                                  QtCore.QPointF(mark_rect.right(), y_under))
             painter.setPen(Qt.PenStyle.NoPen)
-        if getattr(self.view.dialog, 'highlight_style') == 'marker light':
+        else:
             # Marker: overlap colors do not blend; the most recent code shows over
             # the text (painted newest-to-oldest, each area filled once) and every
             # code's identity is still given by the margin bars.
@@ -330,29 +331,7 @@ class PdfPageItem(QtWidgets.QGraphicsItem):
                         continue
                     painter.setClipRegion(remaining)
                     fill = QColor(info['color'])
-                    fill.setAlpha(40)
-                    painter.fillRect(mark_rect, fill)
-                    painted_region = painted_region.united(aligned)
-                painter.restore()
-        if getattr(self.view.dialog, 'highlight_style') == 'marker':
-            # Marker: overlap colors do not blend; the most recent code shows over
-            # the text (painted newest-to-oldest, each area filled once) and every
-            # code's identity is still given by the margin bars.
-            if self.text_marks:
-                painter.save()
-                painter.setPen(Qt.PenStyle.NoPen)
-                painted_region = QtGui.QRegion()
-                for mark_rect, _color, info in sorted(
-                        self.text_marks,
-                        key=lambda m: (m[2].get('date', ''), m[2].get('ctid', 0)),
-                        reverse=True):
-                    aligned = mark_rect.toAlignedRect()
-                    remaining = QtGui.QRegion(aligned).subtracted(painted_region)
-                    if remaining.isEmpty():
-                        continue
-                    painter.setClipRegion(remaining)
-                    fill = QColor(info['color'])
-                    fill.setAlpha(110)
+                    fill.setAlpha(40 if highlight_style == 'marker light' else 110)
                     painter.fillRect(mark_rect, fill)
                     painted_region = painted_region.united(aligned)
                 painter.restore()
@@ -4330,18 +4309,17 @@ class DialogCodePdf(QtWidgets.QWidget):
         else:
             action_margin_right = margin_menu.addAction(_("Move margin to the right"))
         style_menu = menu.addMenu(_("Highlight style"))
-        action_style_marker = None
-        action_style_marker_light = None
-        action_style_underline = None
-        if self.highlight_style == 'marker':
-            action_style_marker_light = style_menu.addAction(_("Marker light"))
-            action_style_underline = style_menu.addAction(_("Underline"))
-        if self.highlight_style == 'marker light':
-            action_style_marker = style_menu.addAction(_("Marker"))
-            action_style_underline = style_menu.addAction(_("Underline"))
-        if self.highlight_style == 'underline':
-            action_style_marker = style_menu.addAction(_("Marker"))
-            action_style_marker_light = style_menu.addAction(_("Marker light"))
+        action_style_marker = style_menu.addAction(_("Marker"))
+        action_style_marker_light = style_menu.addAction(_("Marker light"))
+        action_style_underline = style_menu.addAction(_("Underline"))
+        style_group = QtGui.QActionGroup(style_menu)
+        style_group.setExclusive(True)
+        for style_action, style in ((action_style_marker, 'marker'),
+                                    (action_style_marker_light, 'marker light'),
+                                    (action_style_underline, 'underline')):
+            style_action.setCheckable(True)
+            style_group.addAction(style_action)
+            style_action.setChecked(self.highlight_style == style)
         menu.addSeparator()
         action_goto = menu.addAction(_("Go to page"))
         action_fit = menu.addAction(_("Fit page width"))
@@ -5402,20 +5380,17 @@ class DialogCodePdf(QtWidgets.QWidget):
             action_move_right = menu.addAction(_("Move margin to the right"))
         menu.addSeparator()
         style_menu = menu.addMenu(_("Highlight style"))
-
-        action_style_marker = None
-        action_style_marker_light = None
-        action_style_underline = None
-        if self.highlight_style == 'marker':
-            action_style_marker_light = style_menu.addAction(_("Marker light"))
-            action_style_underline = style_menu.addAction(_("Underline"))
-        if self.highlight_style == 'marker light':
-            action_style_marker = style_menu.addAction(_("Marker"))
-            action_style_underline = style_menu.addAction(_("Underline"))
-        if self.highlight_style == 'underline':
-            action_style_marker = style_menu.addAction(_("Marker"))
-            action_style_marker_light = style_menu.addAction(_("Marker light"))
-
+        action_style_marker = style_menu.addAction(_("Marker"))
+        action_style_marker_light = style_menu.addAction(_("Marker light"))
+        action_style_underline = style_menu.addAction(_("Underline"))
+        style_group = QtGui.QActionGroup(style_menu)
+        style_group.setExclusive(True)
+        for style_action, style in ((action_style_marker, 'marker'),
+                                    (action_style_marker_light, 'marker light'),
+                                    (action_style_underline, 'underline')):
+            style_action.setCheckable(True)
+            style_group.addAction(style_action)
+            style_action.setChecked(self.highlight_style == style)
         global_pos = source_widget.mapToGlobal(position)
         action = menu.exec(global_pos)
         if action is None:
@@ -5432,11 +5407,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         if action == action_style_marker:
             self._set_highlight_style('marker')
             return
+        if action == action_style_marker_light:
+            self._set_highlight_style('marker light')
+            return
         if action == action_style_underline:
             self._set_highlight_style('underline')
             return
-        if action == action_style_marker_light:
-            self._set_highlight_style('marker light')
 
     def _coding_margin_code_actions_menu(self, code, source_widget, position):
         """
@@ -5549,10 +5525,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         if getattr(self, 'coding_margin', None) is not None:
             self.coding_margin.update()
 
-    def _set_highlight_style(self, style):
-        """
-        Changes the highlight style between 'marker' and 'underline',
-        persists the shared preference and repaints the layers.
+    def _set_highlight_style(self, style: str):
+        """Change the PDF highlight style and repaint the layers.
+
+        Args:
+            style: The shared highlight style ('marker', 'marker light', or 'underline').
         """
 
         if style not in ('marker', 'marker light', 'underline') or style == self.highlight_style:
@@ -5564,12 +5541,12 @@ class DialogCodePdf(QtWidgets.QWidget):
             pass
         self.rebuild_marks()
 
-    def apply_highlight_style_setting(self, style:str|None=None):
+    def apply_highlight_style_setting(self, style: str | None = None):
         """Apply the saved highlight style without relying on translated UI text."""
 
         if style is None:
             style = self.app.settings.get('codetext_highlight_style', 'marker')
-        if style not in ('marker', 'underline'):
+        if style not in ('marker', 'marker light', 'underline'):
             style = 'marker'
         self._set_highlight_style(style)
 

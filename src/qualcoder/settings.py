@@ -82,7 +82,7 @@ Notes
 FONT_SIZES = [8, 10, 12, 14, 16, 18]        # comboBox_fontsize / codetree / docfontsize  
 BACKUP_COUNTS = [0, 1, 2, 3, 4, 5]          # comboBox_backups  
 CONTEXT_CHARS = [100, 200, 300]             # comboBox_surrounding_chars  
-HIGHLIGHT_STYLE_OPTIONS = ["marker", "underline"]
+HIGHLIGHT_STYLE_OPTIONS = ["marker", "marker light", "underline"]
 MAIN_TABS_OPTIONS = ["top", "left"]
 
 

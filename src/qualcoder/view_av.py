@@ -1956,16 +1956,20 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
     def closeEvent(self, event):
-        """ Stop the vlc player and timers on close.
-        Record the dialog and video dialog0 size and positions. """
+        """Stop timers and playback, save edits, and record window geometry."""
 
+        # Qt player release processes events: no playback or save timer may run
+        # while the player and its video surface are being torn down.
+        for timer in self.findChildren(QtCore.QTimer):
+            timer.stop()
+        # Initialization may have failed before the player and UI were ready.
+        if getattr(self, 'mediaplayer', None) is None:
+            return
         self.update_sizes()
         self.ddialog.close()
         self.stop()
         if type(self.mediaplayer).__module__.endswith('media_player_qt'):
             self.mediaplayer.release()  # free the file handle (WinError 32 on delete)
-        self.textchanged_timer.stop()
-        self.timer.stop()
         self.app.write_config_ini(self.app.settings, self.app.ai_models)  # persist volume/sizes
         self.update_database_text()
         
