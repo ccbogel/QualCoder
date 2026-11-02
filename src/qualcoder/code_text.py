@@ -3020,7 +3020,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 color = code['color']
         fmt = QtGui.QTextCharFormat()
         if self.highlight_style == 'marker light':
-            brush = QBrush(QColor(color.replace("#", "#70")))
+            brush = QBrush(QColor(color.replace("#", "#40")))
             fmt.setBackground(brush)
         if self.highlight_style == 'marker':
             brush = QBrush(QColor(color))
@@ -4066,7 +4066,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.plainTextEdit.setTextCursor(cursor)
         cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        brush = QBrush(QColor(color.replace("#", "#70")))
+        brush = QBrush(QColor(color.replace("#", "#40")))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
         foreground_color = TextColor(color).recommendation
@@ -4137,7 +4137,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.plainTextEdit.setTextCursor(cursor)
         cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        brush = QBrush(QColor(color.replace("#," "#70")))
+        brush = QBrush(QColor(color.replace("#," "#40")))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
         foreground_colour = TextColor(color).recommendation
@@ -4727,7 +4727,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.setPosition(len(self.text), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(QtGui.QTextCharFormat())
 
-    def _apply_format_to_code_item(self, item, codes_lookup):  # <- L
+    def _apply_format_to_code_item(self, item, codes_lookup):  
         """ Apply highlight formatting to a single coded text item.
         Extracted from highlight() so it can be reused by the incremental
         refresh path in mark(). Honors self.highlight_style and important state.
@@ -4747,11 +4747,14 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.highlight_style == 'underline':
             fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
             fmt.setUnderlineColor(self._code_label_contrast_color(color))
-        else:
-            brush = QBrush(QColor(color.replace("#", "#70")))
+        if self.highlight_style == 'marker':
+            brush = QBrush(QColor(color))
             fmt.setBackground(brush)
             text_brush = QBrush(QColor(TextColor(color).recommendation))
             fmt.setForeground(text_brush)
+        if self.highlight_style == 'marker light':
+            brush = QBrush(QColor(color.replace("#", "#40")))
+            fmt.setBackground(brush)
 
         if item.get('memo', '') != "":
             fmt.setFontItalic(True)
@@ -4871,7 +4874,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
                 fmt.setUnderlineColor(self._code_label_contrast_color(color))
             if self.highlight_style == "marker light":
-                brush = QBrush(QColor(color.replace("#", "#70")))
+                brush = QBrush(QColor(color.replace("#", "#40")))
                 fmt.setBackground(brush)
             # Foreground depends on the defined need_white_text color in color_selector
             if self.highlight_style == "marker":
