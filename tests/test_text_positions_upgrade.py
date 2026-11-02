@@ -78,7 +78,8 @@ check("merge refuses an unmigrated source with emoji", ok is False, merger.summa
 merger.conn_s.close()
 win.close_project()
 
-# open the legacy project: v18 upgrade with backup
+# open the legacy project: v18 upgrade with backup, ordinary backups off
+win.app.settings['backup_on_open'] = 'False'
 win.open_project(path)
 cur = win.app.conn.cursor()
 check("upgraded to v18", cur.execute("select databaseversion, position_units from project").fetchone() == ("v18", "codepoint"))
@@ -88,9 +89,11 @@ a0, a1 = cur.execute("select pos0, pos1 from annotation").fetchone()
 check("annotation converted", TEXT[a0:a1] == "seguimos", (a0, a1))
 backups = [p.name for p in Path(HOME).iterdir() if "_before_v18" in p.name]
 check("backup taken before converting", len(backups) == 1, list(Path(HOME).iterdir()))
+check("backup is outside the backup rotation", backups and "_BKUP_" not in backups[0], backups)
 log = win.ui.textEdit.toPlainText()
 check("action log reports the adjustment", "Text positions adjusted" in log)
 win.close_project()
+check("backup survives closing an unchanged project", (Path(HOME) / backups[0]).exists(), list(Path(HOME).iterdir()))
 win.open_project(path)
 p0b, p1b = win.app.conn.execute("select pos0, pos1 from code_text").fetchone()
 check("reopening does not convert again", (p0b, p1b) == (p0, p1))
