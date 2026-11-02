@@ -859,18 +859,17 @@ class DialogCodeText(QtWidgets.QWidget):
         menu.addSeparator()
 
         style_menu = menu.addMenu(_("Highlight style"))
-        action_style_marker = None
-        action_style_marker_light = None
-        action_style_underline = None
-        if self.highlight_style == 'marker':
-            action_style_marker_light = style_menu.addAction(_("Marker light"))
-            action_style_underline = style_menu.addAction(_("Underline"))
-        if self.highlight_style == 'marker light':
-            action_style_marker = style_menu.addAction(_("Marker"))
-            action_style_underline = style_menu.addAction(_("Underline"))
-        if self.highlight_style == 'underline':
-            action_style_marker = style_menu.addAction(_("Marker"))
-            action_style_marker_light = style_menu.addAction(_("Marker light"))
+        action_style_marker = style_menu.addAction(_("Marker"))
+        action_style_marker_light = style_menu.addAction(_("Marker light"))
+        action_style_underline = style_menu.addAction(_("Underline"))
+        style_group = QtGui.QActionGroup(style_menu)
+        style_group.setExclusive(True)
+        for style_action, style in ((action_style_marker, 'marker'),
+                                    (action_style_marker_light, 'marker light'),
+                                    (action_style_underline, 'underline')):
+            style_action.setCheckable(True)
+            style_group.addAction(style_action)
+            style_action.setChecked(self.highlight_style == style)
 
         global_pos = source_widget.mapToGlobal(position)
         action = menu.exec(global_pos)

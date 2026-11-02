@@ -128,7 +128,7 @@ class TestHighlightStyleSettings(TestCase):
                 loaded_settings, _ = self.application._load_config_ini()
                 self.assertEqual(loaded_settings['codetext_highlight_style'], style)
 
-    def test_pdf_context_menus_allow_switching_between_all_styles(self):
+    def test_highlight_context_menus_show_all_styles_and_check_current_choice(self):
         source_widget = SimpleNamespace(mapToGlobal=lambda position: position)
         view = SimpleNamespace(
             app=self.application,
@@ -145,22 +145,33 @@ class TestHighlightStyleSettings(TestCase):
                 single_page_mode=False,
             ),
         )
-        view._set_highlight_style = DialogCodePdf._set_highlight_style.__get__(view)
-        for menu_method in (DialogCodePdf.view_menu, DialogCodePdf.coding_margin_context_menu):
+        menu_methods = (
+            (DialogCodeText.coding_margin_context_menu, DialogCodeText._set_highlight_style),
+            (DialogCodePdf.view_menu, DialogCodePdf._set_highlight_style),
+            (DialogCodePdf.coding_margin_context_menu, DialogCodePdf._set_highlight_style),
+        )
+        for menu_method, set_highlight_style in menu_methods:
+            view._set_highlight_style = set_highlight_style.__get__(view)
             for current_style in self.styles:
                 for selected_style in self.styles:
-                    if selected_style == current_style:
-                        continue
                     with self.subTest(menu=menu_method.__name__, current=current_style, selected=selected_style):
                         view.highlight_style = current_style
+                        self.application.settings['codetext_highlight_style'] = current_style
 
                         def select_style(menu: QtWidgets.QMenu, *args):
                             style_menu = next(action.menu() for action in menu.actions()
                                               if action.text() == 'Highlight style')
-                            offered = {action.text().lower() for action in style_menu.actions()}
-                            self.assertEqual(offered, set(self.styles) - {current_style})
-                            return next(action for action in style_menu.actions()
-                                        if action.text().lower() == selected_style)
+                            actions = style_menu.actions()
+                            self.assertEqual([action.text().lower() for action in actions], list(self.styles))
+                            self.assertTrue(all(action.isCheckable() for action in actions))
+                            self.assertEqual([action.text().lower() for action in actions if action.isChecked()],
+                                             [current_style])
+                            selected_action = next(action for action in actions
+                                                   if action.text().lower() == selected_style)
+                            selected_action.trigger()
+                            self.assertEqual([action.text().lower() for action in actions if action.isChecked()],
+                                             [selected_style])
+                            return selected_action
 
                         with patch.object(QtWidgets.QMenu, 'exec', select_style):
                             if menu_method == DialogCodePdf.view_menu:
