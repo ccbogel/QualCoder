@@ -605,6 +605,22 @@ def add_linked_categories_to_node(node, sql, sql_params, line_color):
 # One entry point per path: schedule() coalesces external bus events through a
 # single-shot timer; sync_now() serves internal callers that need an immediate
 # refresh. The SQL workers of phases 1-3 below are unchanged.
+# hierarchy rule shared by the line synchronizer and the organization layouts
+def is_parent_child(c, p):
+    """ True if code/category node c hangs directly from node p (category, parent category or supercid code). """
+    if p.code_or_cat.get('cid') is not None:
+        # Parent is a code: child must be a sub-code pointing to it
+        return c.code_or_cat.get('cid') is not None and \
+            c.code_or_cat.get('supercid') is not None and \
+            c.code_or_cat.get('supercid') == p.code_or_cat.get('cid')
+    p_catid = p.code_or_cat.get('catid')
+    if c.code_or_cat.get('cid') is not None:
+        if c.code_or_cat.get('supercid'):
+            return False  # Sub-codes hang from their parent code, not from the category
+        return c.code_or_cat.get('catid') == p_catid
+    return c.code_or_cat.get('supercatid') == p_catid and c.code_or_cat.get('supercatid') is not None
+
+
 class GraphSynchronizer:
     """ Reactive synchronization for the graph view.
 
@@ -1095,20 +1111,6 @@ class GraphSynchronizer:
         """ Sync LinkGraphicsItem lines: category->category, code->category and
         sub-code->parent code (supercid). """
         text_nodes = [n for n in self.vg.scene.items() if isinstance(n, TextGraphicsItem)]
-
-        # (sub-codes): a code may be the parent of another code via supercid
-        def is_parent_child(c, p):
-            if p.code_or_cat.get('cid') is not None:
-                # Parent is a code: child must be a sub-code pointing to it
-                return c.code_or_cat.get('cid') is not None and \
-                    c.code_or_cat.get('supercid') is not None and \
-                    c.code_or_cat.get('supercid') == p.code_or_cat.get('cid')
-            p_catid = p.code_or_cat.get('catid')
-            if c.code_or_cat.get('cid') is not None:
-                if c.code_or_cat.get('supercid'):
-                    return False  # Sub-codes hang from their parent code, not from the category
-                return c.code_or_cat.get('catid') == p_catid
-            return c.code_or_cat.get('supercatid') == p_catid and c.code_or_cat.get('supercatid') is not None
 
         # Prune obsolete hierarchical lines
         for line in list(self.vg.scene.items()):
@@ -3140,418 +3142,349 @@ class ViewGraph(QDialog):
                 -len(adjacency.get(n, ())),
                 str(getattr(n, 'text', '')))
 
-    def organize_hierarchically(self):
-        """ Top-Down Tree Layout
-          1. Smart root: prioritize categories without supercatid (real semantic root).
-          2. Adaptive vertical spacing based on the actual height of each level.
-          3. Explicit gap between disconnected subtrees/components.
-          4. Second centering pass so parents align on the exact center of their children.
-          5. Subtree width calculated recursively to avoid overlaps.
-        """
+    # --- organization layouts: shared forest and block packing (2026-11-02) ---
+    def _organize_collect(self):
+        """ Visible nodes plus all lines considered by the organization layouts. """
 
-        # 0. Collect visible nodes and links.
+        node_types = (TextGraphicsItem, FreeTextGraphicsItem, CaseTextGraphicsItem,
+                      FileTextGraphicsItem, PixmapGraphicsItem, AVGraphicsItem, MemoGraphicsItem)
         nodes = []
         links = []
         for item in self.scene.items():
-            if not item.isVisible():
-                continue
-            if isinstance(item, (TextGraphicsItem, FreeTextGraphicsItem,
-                                 CaseTextGraphicsItem, FileTextGraphicsItem,
-                                 PixmapGraphicsItem, AVGraphicsItem)):
-                nodes.append(item)
-            elif isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)):
+            if isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)):
                 links.append(item)
+            elif isinstance(item, node_types) and item.isVisible():
+                nodes.append(item)
+        return nodes, links
 
-        if not nodes:
-            return
+    @staticmethod
+    def _is_structural_link(link):
+        """ Hierarchy and case/file membership lines shape the trees; relations and co-occurrences do not. """
 
-        # 1. Undirected graph
+        if isinstance(link, LinkGraphicsItem):
+            # co-occurrence links lose their flag on reload, so judge by the codes themselves
+            a, b = link.from_widget, link.to_widget
+            if getattr(link, '_is_cooc_line', False) or not isinstance(a, TextGraphicsItem) \
+                    or not isinstance(b, TextGraphicsItem):
+                return False
+            return is_parent_child(a, b) or is_parent_child(b, a)
+        member_types = (CaseTextGraphicsItem, FileTextGraphicsItem)
+        return isinstance(link.from_widget, member_types) or isinstance(link.to_widget, member_types)
+
+    def _organize_forest(self):
+        """ Spanning forest shared by the layouts.
+        1. One tree per structural component (hierarchy or case/file lines), so unrelated
+           branches never merge and a relation line cannot hang one branch under another.
+        2. Loose nodes linked by other lines (segments, memos, free text) join the nearest tree.
+        3. Whatever is left forms its own trees over any line.
+        Returns (nodes, links, roots, children). """
+
+        nodes, links = self._organize_collect()
+        node_set = set(nodes)
         adjacency = {n: set() for n in nodes}
+        structural = {n: set() for n in nodes}
         for link in links:
-            if hasattr(link, 'from_widget') and hasattr(link, 'to_widget'):
-                u, v = link.from_widget, link.to_widget
-                if u in adjacency and v in adjacency:
-                    adjacency[u].add(v)
-                    adjacency[v].add(u)
+            if not link.isVisible():
+                continue
+            u = getattr(link, 'from_widget', None)
+            v = getattr(link, 'to_widget', None)
+            if u is v or u not in node_set or v not in node_set:
+                continue
+            adjacency[u].add(v)
+            adjacency[v].add(u)
+            if self._is_structural_link(link):
+                structural[u].add(v)
+                structural[v].add(u)
 
-        # 2. Connected components
-        visited_global = set()
-        components = []
-        for n in nodes:
-            if n not in visited_global:
-                comp = []
-                queue = [n]
-                visited_global.add(n)
-                while queue:
-                    curr = queue.pop(0)
-                    comp.append(curr)
-                    for nb in adjacency[curr]:
-                        if nb not in visited_global:
-                            visited_global.add(nb)
-                            queue.append(nb)
-                components.append(comp)
+        def key(n):
+            return self.organize_sort_key(n, adjacency)
 
-        # 3. Smart root selection by component
-        # priority order cases > files > supercategories >
-        # categories > codes > sub-codes; ties broken by connection count.
-        def pick_root(comp_nodes):
-            return min(comp_nodes, key=lambda x: self.organize_sort_key(x, adjacency))
-
-        # 4. Spanning Tree (BFS) by component
-        tree_children = {n: [] for n in nodes}
+        ordered = sorted(nodes, key=key)
+        children = {n: [] for n in nodes}
+        claimed = set()
         roots = []
-        for comp in components:
-            root = pick_root(comp)
-            roots.append(root)
-            visited_tree = {root}
-            queue = [root]
-            while queue:
-                curr = queue.pop(0)
-                # deterministic layout by priority rank
-                # (cases > files > supercats > cats > codes > sub-codes), then name
-                sorted_neighbors = sorted(
-                    adjacency[curr],
-                    key=lambda n: self.organize_sort_key(n, adjacency)
-                )
-                for nb in sorted_neighbors:
-                    if nb not in visited_tree:
-                        visited_tree.add(nb)
-                        tree_children[curr].append(nb)
-                        queue.append(nb)
 
-        # 5. Actual dimensions of each node
-        H_PAD = 30  # Minimum horizontal spacing between sibling nodes
-        V_PAD = 40  # Extra space above the maximum level height
-        COMP_GAP = 80  # Horizontal space between disconnected components
+        def grow(root, graph):
+            claimed.add(root)
+            order = [root]
+            i = 0
+            while i < len(order):
+                curr = order[i]
+                i += 1
+                for nb in sorted(graph[curr], key=key):
+                    if nb not in claimed:
+                        claimed.add(nb)
+                        children[curr].append(nb)
+                        order.append(nb)
+            return order
 
-        def node_width(n):
-            if hasattr(n, 'boundingRect'):
-                return n.boundingRect().width()
-            return 100
+        # first unclaimed node in priority order is always the best root of its component
+        tree_nodes = []
+        for n in ordered:
+            if structural[n] and n not in claimed:
+                roots.append(n)
+                tree_nodes.extend(grow(n, structural))
 
-        def node_height(n):
-            if hasattr(n, 'boundingRect'):
-                return n.boundingRect().height()
-            return 30
+        queue = list(tree_nodes)
+        i = 0
+        while i < len(queue):
+            curr = queue[i]
+            i += 1
+            for nb in sorted(adjacency[curr], key=key):
+                if nb not in claimed:
+                    claimed.add(nb)
+                    children[curr].append(nb)
+                    queue.append(nb)
 
-        # 6. Maximum height per level (depth)
-        level_max_height = {}
+        for n in ordered:
+            if n not in claimed:
+                roots.append(n)
+                grow(n, adjacency)
+        return nodes, links, roots, children
 
-        def compute_level_heights(node, depth):
-            h = node_height(node)
-            if depth not in level_max_height or h > level_max_height[depth]:
-                level_max_height[depth] = h
-            for child in tree_children.get(node, []):
-                compute_level_heights(child, depth + 1)
+    @staticmethod
+    def _node_size(n):
+        if hasattr(n, 'boundingRect'):
+            r = n.boundingRect()
+            return r.width(), r.height()
+        return 100, 30
 
-        for r in roots:
-            compute_level_heights(r, 0)
+    @staticmethod
+    def _shelf_offsets(sizes, axis, limit, gap):
+        """ Offsets that place boxes in rows (axis 'x') or columns (axis 'y'), wrapping at limit. """
 
-        # Convert max heights into cumulative Y positions
-        max_depth = max(level_max_height.keys()) if level_max_height else 0
-        level_y = {}
-        cumulative_y = 0
-        for d in range(max_depth + 1):
-            level_y[d] = cumulative_y
-            cumulative_y += level_max_height.get(d, 30) + V_PAD
+        offsets = []
+        main_pos = 0
+        cross_pos = 0
+        line_thickness = 0
+        for w, h in sizes:
+            main, cross = (w, h) if axis == 'x' else (h, w)
+            if main_pos > 0 and main_pos + main > limit:
+                cross_pos += line_thickness + gap
+                main_pos = 0
+                line_thickness = 0
+            offsets.append((main_pos, cross_pos) if axis == 'x' else (cross_pos, main_pos))
+            main_pos += main + gap
+            line_thickness = max(line_thickness, cross)
+        return offsets
 
-        # 7. Subtree width (recursive, bottom-up)
-        subtree_width = {}
+    def _best_shelf_offsets(self, sizes, axis, gap, aspect=1.5):
+        """ Shelf offsets with the wrap limit that best fills a landscape view. """
 
-        def compute_subtree_width(node):
-            children = tree_children.get(node, [])
-            if not children:
-                w = node_width(node)
-                subtree_width[node] = w
-                return w
-            children_total = sum(compute_subtree_width(c) for c in children)
-            children_total += H_PAD * (len(children) - 1)
-            w = max(node_width(node), children_total)
-            subtree_width[node] = w
-            return w
+        mains = [w if axis == 'x' else h for w, h in sizes]
+        best = None
+        run = -gap
+        for m in mains:
+            run += m + gap
+            offsets = self._shelf_offsets(sizes, axis, run + 1, gap)
+            width = max(ox + w for (ox, _oy), (w, _h) in zip(offsets, sizes))
+            height = max(oy + h for (_ox, oy), (_w, h) in zip(offsets, sizes))
+            score = max(width / aspect, height)
+            if best is None or score < best[0]:
+                best = (score, offsets)
+        return best[1]
 
-        for r in roots:
-            compute_subtree_width(r)
+    def _normalize_block(self, pos):
+        """ Shift block positions so its bounding box starts at 0,0. Returns (pos, width, height). """
 
-        # 8. Position nodes
-        def set_pos(n, x, y):
-            if hasattr(n, 'code_or_cat') and n.code_or_cat is not None:
-                n.code_or_cat['x'] = x
-                n.code_or_cat['y'] = y
-            n.setPos(x, y)
+        min_x = min(x for x, _y in pos.values())
+        min_y = min(y for _x, y in pos.values())
+        max_x = max(x + self._node_size(n)[0] for n, (x, _y) in pos.items())
+        max_y = max(y + self._node_size(n)[1] for n, (_x, y) in pos.items())
+        shifted = {n: (x - min_x, y - min_y) for n, (x, y) in pos.items()}
+        return shifted, max_x - min_x, max_y - min_y
 
-        def layout_subtree(node, left_x, depth):
-            """ Positions 'node' and all its descendants.
-            'left_x' is the left edge of the space allocated to this subtree.
-            Returns the center X of the node so that the parent centers over its children. """
-            children = tree_children.get(node, [])
-            my_width = subtree_width[node]
-            y = level_y[depth]
+    def _organize_apply(self, blocks, links, axis, mirror=False):
+        """ Pack the per-tree blocks, move the nodes and refresh.
+        Trees with lines go first in priority order; loose nodes are gathered in a compact grid. """
 
-            if not children:
-                # Leaf: center the node within its assigned space.
-                node_x = left_x + (my_width - node_width(node)) / 2
-                set_pos(node, node_x, y)
-                return left_x + my_width / 2  # Return the center
+        GAP = 80
+        LOOSE_GAP = 30
+        anchor = self.scene.itemsBoundingRect().topLeft()
+        trees = []
+        loose = []
+        for pos in blocks:
+            if len(pos) == 1:
+                loose.append(next(iter(pos)))
+            else:
+                trees.append(self._normalize_block(pos))
+        if loose:
+            sizes = [self._node_size(n) for n in loose]
+            offsets = self._best_shelf_offsets(sizes, 'x', LOOSE_GAP)
+            trees.append(self._normalize_block({n: offsets[i] for i, n in enumerate(loose)}))
 
-            # Put children within subtree space
-            children_total_width = (
-                    sum(subtree_width[c] for c in children)
-                    + H_PAD * (len(children) - 1)
-            )
-            # Center child block within parent's space
-            child_left = left_x + (my_width - children_total_width) / 2
+        sizes = [(w, h) for _pos, w, h in trees]
+        offsets = self._best_shelf_offsets(sizes, axis, GAP)
+        total_w = max(ox + w for (ox, _oy), (w, _h) in zip(offsets, sizes))
 
-            child_centers = []
-            for child in children:
-                cx = layout_subtree(child, child_left, depth + 1)
-                child_centers.append(cx)
-                child_left += subtree_width[child] + H_PAD
-
-            # Center parent on the avg of children's centers
-            parent_center = sum(child_centers) / len(child_centers)
-            parent_x = parent_center - node_width(node) / 2
-            set_pos(node, parent_x, y)
-            return parent_center
-
-        # Walk each root with gap between components
-        rect = self.scene.itemsBoundingRect()
-        current_left = rect.left() + 50
-
-        for root in roots:
-            layout_subtree(root, current_left, 0)
-            current_left += subtree_width[root] + COMP_GAP
-
-        # 9. Redraw connections
+        for (pos, w, _h), (ox, oy) in zip(trees, offsets):
+            if mirror:
+                ox = total_w - ox - w
+            for n, (x, y) in pos.items():
+                nx = anchor.x() + ox + x
+                ny = anchor.y() + oy + y
+                if getattr(n, 'code_or_cat', None) is not None:
+                    n.code_or_cat['x'] = nx
+                    n.code_or_cat['y'] = ny
+                n.setPos(nx, ny)
         for link in links:
             if hasattr(link, 'redraw'):
                 link.redraw()
-        # centralized refresh hook (fit + clamp + minimap + DB sync)
         self.finalize_graph_operation()
 
-    def organize_horizontal(self, direction="LR"):
-        """ Horizontal Tree Layout over undirected graph. LR (Left-Right) or RL (Right-Left). """
+    def _layout_tree_top_down(self, root, children):
+        """ Top-left positions for one tree: parents centered over their children. """
 
-        nodes = []
-        links = []
-        for item in self.scene.items():
-            if not item.isVisible(): continue
-            if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
-                    isinstance(item, CaseTextGraphicsItem) or isinstance(item, FileTextGraphicsItem) or \
-                    isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
-                nodes.append(item)
-            elif isinstance(item, LinkGraphicsItem) or isinstance(item, FreeLineGraphicsItem):
-                links.append(item)
+        H_PAD = 30
+        V_PAD = 40
+        level_height = {}
+        subtree_width = {}
 
-        if not nodes: return
+        def measure(node, depth):
+            w, h = self._node_size(node)
+            level_height[depth] = max(level_height.get(depth, 0), h)
+            kids = children.get(node, [])
+            if not kids:
+                subtree_width[node] = w
+                return w
+            total = sum(measure(c, depth + 1) for c in kids) + H_PAD * (len(kids) - 1)
+            subtree_width[node] = max(w, total)
+            return subtree_width[node]
 
-        # 1. Undirected graph
-        adjacency = {n: set() for n in nodes}
-        for link in links:
-            if hasattr(link, 'from_widget') and hasattr(link, 'to_widget'):
-                u, v = link.from_widget, link.to_widget
-                if u in adjacency and v in adjacency:
-                    adjacency[u].add(v)
-                    adjacency[v].add(u)
+        measure(root, 0)
+        level_y = {}
+        y = 0
+        for d in range(max(level_height) + 1):
+            level_y[d] = y
+            y += level_height.get(d, 30) + V_PAD
+        pos = {}
 
-        # 2. Connected components and roots
-        visited_global = set()
-        components = []
-        for n in nodes:
-            if n not in visited_global:
-                comp_nodes = []
-                queue = [n]
-                visited_global.add(n)
-                while queue:
-                    curr = queue.pop(0)
-                    comp_nodes.append(curr)
-                    for neighbor in adjacency[curr]:
-                        if neighbor not in visited_global:
-                            visited_global.add(neighbor)
-                            queue.append(neighbor)
-                components.append(comp_nodes)
+        def place(node, left_x, depth):
+            kids = children.get(node, [])
+            w = self._node_size(node)[0]
+            if not kids:
+                pos[node] = (left_x + (subtree_width[node] - w) / 2, level_y[depth])
+                return left_x + subtree_width[node] / 2
+            kids_width = sum(subtree_width[c] for c in kids) + H_PAD * (len(kids) - 1)
+            child_left = left_x + (subtree_width[node] - kids_width) / 2
+            centers = []
+            for c in kids:
+                centers.append(place(c, child_left, depth + 1))
+                child_left += subtree_width[c] + H_PAD
+            center = sum(centers) / len(centers)
+            pos[node] = (center - w / 2, level_y[depth])
+            return center
 
-        # 3. Build BFS tree
-        tree_children = {n: [] for n in nodes}
-        roots = []
-        for comp in components:
-            # root by priority (cases > files > supercats > cats
-            # > codes > sub-codes), ties broken by connection count
-            root = min(comp, key=lambda x: self.organize_sort_key(x, adjacency))
-            roots.append(root)
-            visited_tree = set([root])
-            queue = [root]
-            while queue:
-                curr = queue.pop(0)
-                # siblings in priority order, then name
-                for neighbor in sorted(adjacency[curr],
-                                       key=lambda n: self.organize_sort_key(n, adjacency)):
-                    if neighbor not in visited_tree:
-                        visited_tree.add(neighbor)
-                        tree_children[curr].append(neighbor)
-                        queue.append(neighbor)
+        place(root, 0, 0)
+        return pos
 
-        # 4. Assign spatial positions
-        rect = self.scene.itemsBoundingRect()
-        start_y = rect.center().y() - (len(nodes) * 20)
+    def _layout_tree_horizontal(self, root, children, direction):
+        """ Top-left positions for one tree in columns, LR or RL; columns sized to their widest node. """
 
-        start_x = rect.left() + 50 if direction == "LR" else rect.right() - 50
-        x_multiplier = 1 if direction == "LR" else -1
+        H_GAP = 80
+        V_GAP = 20
+        level_width = {}
 
-        def set_pos(n, x, y):
-            if hasattr(n, 'code_or_cat') and n.code_or_cat is not None:
-                n.code_or_cat['x'], n.code_or_cat['y'] = x, y
-            n.setPos(x, y)
-        current_y = start_y
+        def measure(node, depth):
+            level_width[depth] = max(level_width.get(depth, 0), self._node_size(node)[0])
+            for c in children.get(node, []):
+                measure(c, depth + 1)
 
-        def layout_node(node, depth):
+        measure(root, 0)
+        level_x = {}
+        x = 0
+        for d in range(max(level_width) + 1):
+            level_x[d] = x
+            x += level_width.get(d, 100) + H_GAP
+        pos = {}
+        current_y = 0
+
+        def place(node, depth):
             nonlocal current_y
-            node_h = node.boundingRect().height() if hasattr(node, 'boundingRect') else 40
-            node_x = start_x + (depth * 280 * x_multiplier)
-            ch = tree_children.get(node, [])
-            if not ch:
+            w, h = self._node_size(node)
+            node_x = level_x[depth] if direction == "LR" else -level_x[depth] - w
+            kids = children.get(node, [])
+            if not kids:
+                pos[node] = (node_x, current_y)
                 y = current_y
-                set_pos(node, node_x, y)
-                current_y += node_h + 20
+                current_y += h + V_GAP
                 return y
-
-            c_ys = [layout_node(c, depth + 1) for c in ch]
-            parent_y = sum(c_ys) / len(c_ys) if c_ys else current_y
-            set_pos(node, node_x, parent_y)
-            expected_bottom = parent_y + node_h + 20
-            if current_y < expected_bottom: current_y = expected_bottom
+            ys = [place(c, depth + 1) for c in kids]
+            parent_y = sum(ys) / len(ys)
+            pos[node] = (node_x, parent_y)
+            current_y = max(current_y, parent_y + h + V_GAP)
             return parent_y
 
-        for r in roots:
-            layout_node(r, 0)
-        for link in links:
-            if hasattr(link, 'redraw'): link.redraw()
-        # centralized refresh hook
-        self.finalize_graph_operation()
+        place(root, 0)
+        return pos
+
+    def _layout_tree_radial(self, root, children):
+        """ Top-left positions for one tree as a star; ring spacing grows when the rim gets crowded. """
+
+        leaves = {}
+        depth_of = {}
+
+        def count(node, depth):
+            depth_of[node] = depth
+            kids = children.get(node, [])
+            leaves[node] = sum(count(c, depth + 1) for c in kids) if kids else 1
+            return leaves[node]
+
+        count(root, 0)
+        max_depth = max(depth_of.values())
+        rim = sum(self._node_size(n)[0] + 20 for n in depth_of if not children.get(n))
+        radius_step = 280
+        if max_depth > 0:
+            radius_step = max(radius_step, rim / (2 * math.pi * max_depth))
+        pos = {}
+
+        def place(node, depth, a0, a1):
+            w, h = self._node_size(node)
+            if depth == 0:
+                cx, cy = 0, 0
+            else:
+                r = max(200, depth * radius_step)
+                mid = (a0 + a1) / 2
+                cx, cy = r * math.cos(mid), r * math.sin(mid)
+            pos[node] = (cx - w / 2, cy - h / 2)
+            kids = children.get(node, [])
+            if kids:
+                per_leaf = (a1 - a0) / leaves[node]
+                a = a0
+                for c in kids:
+                    span = leaves[c] * per_leaf
+                    place(c, depth + 1, a, a + span)
+                    a += span
+
+        place(root, 0, 0, 2 * math.pi)
+        return pos
+
+    def organize_hierarchically(self):
+        """ Top-down tree layout, one tree per branch placed side by side. """
+
+        nodes, links, roots, children = self._organize_forest()
+        if not nodes:
+            return
+        blocks = [self._layout_tree_top_down(r, children) for r in roots]
+        self._organize_apply(blocks, links, 'x')
+
+    def organize_horizontal(self, direction="LR"):
+        """ Horizontal tree layout, LR (left to right) or RL (right to left), one tree per branch stacked. """
+
+        nodes, links, roots, children = self._organize_forest()
+        if not nodes:
+            return
+        blocks = [self._layout_tree_horizontal(r, children, direction) for r in roots]
+        self._organize_apply(blocks, links, 'y', mirror=(direction == "RL"))
 
     def organize_radially(self):
-        """ Radial Tree Layout: most connected node at the absolute center,
-        its connections opened as a star. """
+        """ Radial layout, one star per branch arranged in a grid. """
 
-        nodes = []
-        links = []
-        for item in self.scene.items():
-            if not item.isVisible(): continue
-            if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
-                    isinstance(item, CaseTextGraphicsItem) or isinstance(item, FileTextGraphicsItem) or \
-                    isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
-                nodes.append(item)
-            elif isinstance(item, LinkGraphicsItem) or isinstance(item, FreeLineGraphicsItem):
-                links.append(item)
-
-        if not nodes: return
-
-        rect = self.scene.itemsBoundingRect()
-        center_x, center_y = rect.center().x(), rect.center().y()
-
-        def set_pos(n, x, y):
-            w = n.boundingRect().width() / 2 if hasattr(n, 'boundingRect') else 0
-            h = n.boundingRect().height() / 2 if hasattr(n, 'boundingRect') else 0
-            nx, ny = x - w, y - h
-            if hasattr(n, 'code_or_cat') and n.code_or_cat is not None:
-                n.code_or_cat['x'], n.code_or_cat['y'] = nx, ny
-            n.setPos(nx, ny)
-
-        # 1. Undirected graph (true center regardless of arrow direction)
-        adjacency = {n: set() for n in nodes}
-        for link in links:
-            if hasattr(link, 'from_widget') and hasattr(link, 'to_widget'):
-                u, v = link.from_widget, link.to_widget
-                if u in adjacency and v in adjacency:
-                    adjacency[u].add(v)
-                    adjacency[v].add(u)
-
-        # 2. Center node
-        connected_nodes = [n for n in nodes if len(adjacency[n]) > 0]
-        candidates = connected_nodes if connected_nodes else nodes
-        main_root = min(candidates, key=lambda n: self.organize_sort_key(n, adjacency))
-
-        # 3. Fan tree (BFS) from the main_root
-        tree_children = {n: [] for n in nodes}
-        visited_tree = set([main_root])
-        queue = [main_root]
-        while queue:
-            current = queue.pop(0)
-            # fan the star in priority order, then name
-            for neighbor in sorted(adjacency[current],
-                                   key=lambda n: self.organize_sort_key(n, adjacency)):
-                if neighbor not in visited_tree:
-                    visited_tree.add(neighbor)
-                    tree_children[current].append(neighbor)
-                    queue.append(neighbor)
-
-        # 4. Count "leaves" evenly
-        leaves_count = {}
-
-        def calc_leaves(node):
-            ch = tree_children.get(node, [])
-            if not ch:
-                leaves_count[node] = 1
-                return 1
-            count = sum(calc_leaves(c) for c in ch)
-            leaves_count[node] = count
-            return count
-
-        calc_leaves(main_root)
-        radius_step = 280  # Distance between rings, increased for a cleaner look
-
-        # 5. Draw the main star
-        drawn_nodes = set()
-
-        def layout_radial(node, depth, angle_start, angle_end):
-            drawn_nodes.add(node)
-            mid_angle = (angle_start + angle_end) / 2
-
-            if depth == 0:
-                set_pos(node, center_x, center_y)
-            else:
-                current_radius = max(200, depth * radius_step)
-                x = center_x + current_radius * math.cos(mid_angle)
-                y = center_y + current_radius * math.sin(mid_angle)
-                set_pos(node, x, y)
-
-            ch = tree_children.get(node, [])
-            if ch:
-                angle_per_leaf = (angle_end - angle_start) / leaves_count[node]
-                current_angle = angle_start
-                for child in ch:
-                    child_leaves = leaves_count[child]
-                    child_angle_end = current_angle + (child_leaves * angle_per_leaf)
-                    layout_radial(child, depth + 1, current_angle, child_angle_end)
-                    current_angle = child_angle_end
-
-        layout_radial(main_root, 0, 0, 2 * math.pi)
-
-        # 6. Outer ring for disconnected items
-        unvisited = [n for n in nodes if n not in drawn_nodes]
-        if unvisited:
-            max_depth = 0
-
-            def get_depth(node, d):
-                nonlocal max_depth
-                max_depth = max(max_depth, d)
-                for c in tree_children.get(node, []): get_depth(c, d + 1)
-
-            get_depth(main_root, 0)
-
-            outer_radius = (max_depth + 1) * radius_step + 150
-            angle_step = (2 * math.pi) / len(unvisited)
-            for i, node in enumerate(unvisited):
-                angle = i * angle_step
-                x = center_x + outer_radius * math.cos(angle)
-                y = center_y + outer_radius * math.sin(angle)
-                set_pos(node, x, y)
-
-        # 7. Redraw the lines
-        for link in links:
-            if hasattr(link, 'redraw'): link.redraw()
-        # centralized refresh hook
-        self.finalize_graph_operation()
+        nodes, links, roots, children = self._organize_forest()
+        if not nodes:
+            return
+        blocks = [self._layout_tree_radial(r, children) for r in roots]
+        self._organize_apply(blocks, links, 'x')
 
     def add_codes_of_av_files(self, x=10, y=10):
         """ Show selected codes of selected audio/video files as av graphics items.
