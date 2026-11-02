@@ -1511,12 +1511,13 @@ class App(object):
             pass
         return coder_names
 
-    def save_backup(self, suffix: str = ""):
+    def save_backup(self, suffix: str = "", keep: bool = False):
         """ Save a date and hours stamped backup.
         Do not back up if the name already exists.
         A backup can be generated in the subsequent hour.
         Args:
             suffix : String to add to end of backup name. Use this for special ops
+            keep : Bool. Outside the backup rotation and not deleted on close, e.g. before a migration
         Returns:
             msg: String: for textedit display
             backup: String: full project path for backup
@@ -1524,6 +1525,8 @@ class App(object):
 
         nowdate = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H")  # -%S")
         backup = f"{self.project_path[0:-4]}_BKUP_{nowdate}{suffix}.qda"
+        if keep:
+            backup = f"{self.project_path[0:-4]}{suffix}_{nowdate}.qda"
         # USED IN 3.8 - 3.8.2 CAUSED CONFUSION backup = os.path.join(self.settings['directory'], f"{self.project_name[:-4]}_BKUP_{nowdate}{suffix}.qda")
         # Do not try and create another backup with same date and hour, unless suffix present
         result = Path(backup).exists()
@@ -1569,7 +1572,8 @@ class App(object):
             return msg, backup
         msg += _("Project backup created: ") + backup
         # Delete backup path - delete the backup if no changes occurred in the project during the session
-        self.delete_backup_path_name = backup
+        if not keep:
+            self.delete_backup_path_name = backup
         return msg, backup
 
     def help_wiki(self, page_path: str):
