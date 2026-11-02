@@ -111,7 +111,7 @@ from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_exact_matches import DialogReportExactTextMatches
 from qualcoder.report_relations import DialogReportRelations
 from qualcoder.report_sql import DialogSQL
-from qualcoder.text_positions import migrate_positions_to_code_points, positions_may_change
+from qualcoder.text_positions import positions_may_change, upgrade_positions_v18
 from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
@@ -3790,24 +3790,33 @@ Click "Yes" to start now.')
             cur.execute("select position_units from project")
         except sqlite3.OperationalError:
             if newproject == "no" and positions_may_change(self.app.conn):
-                backup_msg, backup_name = self.app.save_backup("_before_v18")
+                backup_msg, backup_name = self.app.save_backup("_before_v18", keep=True)
                 self.ui.textEdit.append(backup_msg)
-            counts, unresolved = migrate_positions_to_code_points(self.app.conn)
-            cur.execute("alter table project add position_units text")
-            cur.execute('update project set databaseversion="v18", position_units="codepoint", about=?',
-                        [self.app.version])
-            self.app.conn.commit()
-            self.ui.textEdit.append(_("Updating database to version") + " v18")
-            changed = counts['converted'] + counts['relocated'] + counts['annotations'] + counts['case_text']
-            if changed or unresolved:
-                msg = _("Text positions adjusted for emoji and similar characters") + ": "
-                msg += _("codings") + f" {counts['converted'] + counts['relocated']}, "
-                msg += _("annotations") + f" {counts['annotations']}, "
-                msg += _("case links") + f" {counts['case_text']}"
-                if unresolved:
-                    msg += "\n" + _("Codings to check") + f" (ctid): {unresolved}"
-                self.ui.textEdit.append(msg)
-                logger.info(f"v18 position migration {counts}, unresolved ctids {unresolved}")
+            try:
+                counts, review = upgrade_positions_v18(self.app.conn)
+            except sqlite3.Error as err:
+                logger.exception("v18 position migration failed")
+                self.ui.textEdit.append(_("Text positions could not be updated, the project was not changed") +
+                                        f": {err}")
+            else:
+                cur.execute("update project set about=?", [self.app.version])
+                self.app.conn.commit()
+                self.ui.textEdit.append(_("Updating database to version") + " v18")
+                changed = counts['converted'] + counts['relocated'] + counts['annotations'] + counts['case_text']
+                if changed or counts['merged'] or any(review.values()):
+                    msg = _("Text positions adjusted for emoji and similar characters") + ": "
+                    msg += _("codings") + f" {counts['converted'] + counts['relocated']}, "
+                    msg += _("annotations") + f" {counts['annotations']}, "
+                    msg += _("case links") + f" {counts['case_text']}, "
+                    msg += _("duplicates merged") + f" {counts['merged']}"
+                    if review['codings']:
+                        msg += "\n" + _("Codings to check") + f" (ctid): {review['codings']}"
+                    if review['annotations']:
+                        msg += "\n" + _("Annotations to check") + f" (anid): {review['annotations']}"
+                    if review['case_text']:
+                        msg += "\n" + _("Case links to check") + f" (id): {review['case_text']}"
+                    self.ui.textEdit.append(msg)
+                    logger.info(f"v18 position migration {counts}, to review {review}")
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
         cur.execute(sql)
