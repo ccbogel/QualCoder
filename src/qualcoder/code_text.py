@@ -29,21 +29,20 @@ import diff_match_patch
 import emoji
 import html
 import logging
+# Required for the _export_odt_clean method which generates native ODF files with ranged annotations using odfpy
+from odf.opendocument import OpenDocumentText  # Required for _export_odt_clean method
+from odf import text as odf_text, office as odf_office, dc as odf_dc, style as odf_style  # Need for _export_odt_clean
+from odf.namespaces import OFFICENS, DRAWNS  # Required for _export_odt_clean method
 from operator import itemgetter
 from pathlib import Path
+from PyQt6 import QtCore, QtGui, QtWidgets, sip
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QBrush, QColor
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
 import sqlite3
 import unicodedata
 import webbrowser
-
-from PyQt6 import QtCore, QtGui, QtWidgets, sip
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QBrush, QColor
-# Required for the _export_odt_clean method which generates native ODF files with ranged annotations using odfpy
-from odf.opendocument import OpenDocumentText  # Required for _export_odt_clean method
-from odf import text as odf_text, office as odf_office, dc as odf_dc, style as odf_style  # Need for _export_odt_clean
-from odf.namespaces import OFFICENS, DRAWNS  # Required for _export_odt_clean method
 
 from .ai_agent_prompts import AiAgentPromptsCatalog, prompt_name_and_scope
 from .ai_runtime import AI_READY, ensure_ai_ready
@@ -150,7 +149,7 @@ class DialogCodeText(QtWidgets.QWidget):
         except (KeyError, AttributeError):
             saved_style = None
 
-        if saved_style in ('marker', 'underline'):
+        if saved_style in ('marker', 'marker light', 'underline'):
             self.highlight_style = saved_style
         else:
             self.highlight_style = 'marker'
@@ -859,12 +858,17 @@ class DialogCodeText(QtWidgets.QWidget):
         menu.addSeparator()
 
         style_menu = menu.addMenu(_("Highlight style"))
-        action_style_marker = None
-        action_style_underline = None
-        if self.highlight_style != 'marker':
-            action_style_marker = style_menu.addAction(_("Marker"))
-        if self.highlight_style != 'underline':
-            action_style_underline = style_menu.addAction(_("Underline"))
+        action_style_marker = style_menu.addAction(_("Marker"))
+        action_style_marker_light = style_menu.addAction(_("Marker light"))
+        action_style_underline = style_menu.addAction(_("Underline"))
+        style_group = QtGui.QActionGroup(style_menu)
+        style_group.setExclusive(True)
+        for style_action, style in ((action_style_marker, 'marker'),
+                                    (action_style_marker_light, 'marker light'),
+                                    (action_style_underline, 'underline')):
+            style_action.setCheckable(True)
+            style_group.addAction(style_action)
+            style_action.setChecked(self.highlight_style == style)
 
         global_pos = source_widget.mapToGlobal(position)
         action = menu.exec(global_pos)
@@ -882,6 +886,9 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if action == action_style_marker:
             self._set_highlight_style('marker')
+            return
+        if action == action_style_marker_light:
+            self._set_highlight_style('marker light')
             return
         if action == action_style_underline:
             self._set_highlight_style('underline')
@@ -1164,7 +1171,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def _set_highlight_style(self, style):  # <- L
         """ Switch in-text highlight style between 'marker' and 'underline'. """
 
-        if style not in ('marker', 'underline'):
+        if style not in ('marker', 'marker light', 'underline'):
             return
         if style == self.highlight_style:
             return
@@ -1184,7 +1191,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if style is None:
             style = self.app.settings.get('codetext_highlight_style', 'marker')
-        if style not in ('marker', 'underline'):
+        if style not in ('marker', 'marker light', 'underline'):
             style = 'marker'
         self._set_highlight_style(style)
 
@@ -3010,11 +3017,15 @@ class DialogCodeText(QtWidgets.QWidget):
             if code['cid'] == item['cid']:
                 color = code['color']
         fmt = QtGui.QTextCharFormat()
-        brush = QBrush(QColor(color))
-        fmt.setBackground(brush)
+        if self.highlight_style == 'marker light':
+            brush = QBrush(QColor(color.replace("#", "#40")))
+            fmt.setBackground(brush)
+        if self.highlight_style == 'marker':
+            brush = QBrush(QColor(color))
+            fmt.setBackground(brush)
+            fmt.setForeground(QBrush(QColor(TextColor(color).recommendation)))
         if item['important']:
             fmt.setFontWeight(QtGui.QFont.Weight.Bold)
-        fmt.setForeground(QBrush(QColor(TextColor(color).recommendation)))
         cursor.setCharFormat(fmt)
         self.apply_underline_to_overlaps()
 
@@ -4053,7 +4064,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.plainTextEdit.setTextCursor(cursor)
         cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        brush = QBrush(QColor(color))
+        brush = QBrush(QColor(color.replace("#", "#40")))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
         foreground_color = TextColor(color).recommendation
@@ -4124,7 +4135,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.plainTextEdit.setTextCursor(cursor)
         cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        brush = QBrush(QColor(color))
+        brush = QBrush(QColor(color.replace("#," "#40")))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
         foreground_colour = TextColor(color).recommendation
@@ -4714,7 +4725,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.setPosition(len(self.text), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(QtGui.QTextCharFormat())
 
-    def _apply_format_to_code_item(self, item, codes_lookup):  # <- L
+    def _apply_format_to_code_item(self, item, codes_lookup):  
         """ Apply highlight formatting to a single coded text item.
         Extracted from highlight() so it can be reused by the incremental
         refresh path in mark(). Honors self.highlight_style and important state.
@@ -4734,11 +4745,14 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.highlight_style == 'underline':
             fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
             fmt.setUnderlineColor(self._code_label_contrast_color(color))
-        else:
+        if self.highlight_style == 'marker':
             brush = QBrush(QColor(color))
             fmt.setBackground(brush)
             text_brush = QBrush(QColor(TextColor(color).recommendation))
             fmt.setForeground(text_brush)
+        if self.highlight_style == 'marker light':
+            brush = QBrush(QColor(color.replace("#", "#40")))
+            fmt.setBackground(brush)
 
         if item.get('memo', '') != "":
             fmt.setFontItalic(True)
@@ -4853,14 +4867,17 @@ class DialogCodeText(QtWidgets.QWidget):
             cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
             color = codes.get(item['cid'], {}).get('color', "#777777")  # default gray
 
-            # choose between underline-only and full background fill <- L
+            # choose between underline-only and full or transparency background fill
             if self.highlight_style == 'underline':
                 fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.DashUnderline)
                 fmt.setUnderlineColor(self._code_label_contrast_color(color))
-            else:
+            if self.highlight_style == "marker light":
+                brush = QBrush(QColor(color.replace("#", "#40")))
+                fmt.setBackground(brush)
+            # Foreground depends on the defined need_white_text color in color_selector
+            if self.highlight_style == "marker":
                 brush = QBrush(QColor(color))
                 fmt.setBackground(brush)
-                # Foreground depends on the defined need_white_text color in color_selector
                 text_brush = QBrush(QColor(TextColor(color).recommendation))
                 fmt.setForeground(text_brush)
 
@@ -6812,28 +6829,38 @@ class DialogCodeText(QtWidgets.QWidget):
                 coded_text_list.append(item)
         if not coded_text_list:
             return
-        code_to_handle = coded_text_list[-1]
+        codes_to_handle = [coded_text_list[-1]]
         if len(coded_text_list) > 1:
-            ui = DialogSelectItems(self.app, coded_text_list, _("Select code to resize"), "single")
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select code to resize. Select multiple if exactly overlapping."), "multiple")
             if ui.exec():
-                code_to_handle = ui.get_selected()
+                codes_to_handle = ui.get_selected()
             else:
                 return
+        # Ensure all codes have same segment length
+        pos0 = codes_to_handle[0]['pos0']
+        pos1 = codes_to_handle[0]['pos1']
+        if len(codes_to_handle) > 1:
+            for c in codes_to_handle:
+                if c['pos0'] != pos0 or c['pos1'] != pos1:
+                    msg = _("Selected codes have differing start and end positions to other codes selected.\nMultiple selected coded segments must have identical positions")
+                    Message(self.app,_('Different positions'),msg, 'warning').exec()
+                    return
+
         self.hide_resize_handles()
 
         # Create start handle
         cursor_start = self.ui.plainTextEdit.textCursor()
-        cursor_start.setPosition(max(0, code_to_handle['pos0'] - self.file_['start']))
+        cursor_start.setPosition(max(0, codes_to_handle[0]['pos0'] - self.file_['start']))
         rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
-        h_start = CodeResizeHandle(self.ui.plainTextEdit, True, code_to_handle, self)
+        h_start = CodeResizeHandle(self.ui.plainTextEdit, True, codes_to_handle, self)
         h_start.move(rect_start.x() - 6, rect_start.y() + 2)
         self.active_handles.append(h_start)
 
         # Create end handle
         cursor_end = self.ui.plainTextEdit.textCursor()
-        cursor_end.setPosition(min(len(self.ui.plainTextEdit.toPlainText()), code_to_handle['pos1'] - self.file_['start']))
+        cursor_end.setPosition(min(len(self.ui.plainTextEdit.toPlainText()), codes_to_handle[0]['pos1'] - self.file_['start']))
         rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
-        h_end = CodeResizeHandle(self.ui.plainTextEdit, False, code_to_handle, self)
+        h_end = CodeResizeHandle(self.ui.plainTextEdit, False, codes_to_handle, self)
         h_end.move(rect_end.x() - 6, rect_end.y() + 2)
         self.active_handles.append(h_end)
 
@@ -6844,53 +6871,51 @@ class DialogCodeText(QtWidgets.QWidget):
             h.deleteLater()
         self.active_handles = []
 
-    def update_code_position_from_handle(self, code_item, new_pos, is_start, orig_pos0, orig_pos1):
-        """ Receive final drop coordinates from a handle and update the database. """
+    def update_code_position_from_handle(self, code_items, new_pos, is_start, orig_pos0, orig_pos1):
+        """ Receive final drop coordinates from a handle and update the database. 
+        For one or more codes if they have exact same start and end positions. """
+
         if is_start:
-            if new_pos >= code_item['pos1']:
-                code_item['pos0'] = orig_pos0  # Revert visually
+            if new_pos >= code_items[0]['pos1']:
+                for code_item in code_items:
+                    code_item['pos0'] = orig_pos0  # Revert visually
                 self.hide_resize_handles()
                 self.unlight()
                 self.highlight()
                 return
-            code_item['pos0'] = new_pos
+            for code_item in code_items:
+                code_item['pos0'] = new_pos
         else:
-            if new_pos <= code_item['pos0']:
-                code_item['pos1'] = orig_pos1  # Revert visually
+            if new_pos <= code_items[0]['pos0']:
+                for code_item in code_items:
+                    code_item['pos1'] = orig_pos1  # Revert visually
                 self.hide_resize_handles()
                 self.unlight()
                 self.highlight()
                 return
-            code_item['pos1'] = new_pos
+            for code_item in code_items:
+                code_item['pos1'] = new_pos
 
+        cursor = self.ui.plainTextEdit.textCursor()
+        cursor.setPosition(code_items[0]['pos0'])
+        cursor.setPosition(code_items[0]['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        seltext = cursor.selectedText()
+
+        sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
         cur = self.app.conn.cursor()
-        cur.execute("select substr(fulltext,?,?) from source where id=?",
-                    [code_item['pos0'] + 1, code_item['pos1'] - code_item['pos0'], code_item['fid']])
-        res = cur.fetchone()
-        
-        if not res:
-            # Revert on extraction error
-            code_item['pos0'] = orig_pos0
-            code_item['pos1'] = orig_pos1
-            self.hide_resize_handles()
-            self.unlight()
-            self.highlight()
-            return
-        seltext = res[0]
-
-        try:
-            sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
-            cur.execute(sql, [code_item['pos0'], code_item['pos1'], seltext, code_item['ctid']])
-            self.app.conn.commit()
-            self.app.delete_backup = False
-            self._emit_project_table_changes(['code_text'])
-        except sqlite3.IntegrityError:
-            self.app.conn.rollback()
-            # Revert in-memory positions to undo temporary highlight
-            code_item['pos0'] = orig_pos0
-            code_item['pos1'] = orig_pos1
-            Message(self.app, _("Duplicate Error"),
-                    _("This code already exists at this exact location."), "warning").exec()
+        for code_item in code_items:
+            try:
+                cur.execute(sql, [code_item['pos0'], code_item['pos1'], seltext, code_item['ctid']])
+                self.app.conn.commit()
+                self.app.delete_backup = False
+                self._emit_project_table_changes(['code_text'])
+            except sqlite3.IntegrityError:
+                self.app.conn.rollback()
+                # Revert in-memory positions to undo temporary highlight
+                code_item['pos0'] = orig_pos0
+                code_item['pos1'] = orig_pos1
+                Message(self.app, _("Duplicate Error"),
+                        _("This code already exists at this exact location."), "warning").exec()
         self.hide_resize_handles()
         self.get_coded_text_update_eventfilter_tooltips()
 

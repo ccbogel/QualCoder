@@ -1121,22 +1121,17 @@ class DialogCases(QtWidgets.QDialog):
                                  'av_text_id': av_text_id})
 
         format_reg = QtGui.QTextCharFormat()
-        brush = QtGui.QBrush(QtGui.QColor(QtCore.Qt.GlobalColor.black))
-        if self.app.settings['stylesheet'] in ('dark', 'rainbow'):
-            brush = QtGui.QBrush(QtGui.QColor("#eeeeee"))
+        brush = self.ui.textBrowser.palette().brush(QtGui.QPalette.ColorRole.Text)
         format_reg.setForeground(brush)
 
         format_bold = QtGui.QTextCharFormat()
         format_bold.setFontWeight(QtGui.QFont.Weight.Bold)
-        brush_bold = QtGui.QBrush(QtGui.QColor(QtCore.Qt.GlobalColor.black))
-        if self.app.settings['stylesheet'] in ('dark', 'rainbow'):
-            brush_bold = QtGui.QBrush(QtGui.QColor("#eeeeee"))
+        brush_bold = self.ui.textBrowser.palette().brush(QtGui.QPalette.ColorRole.Text)
         format_bold.setForeground(brush_bold)
 
-        format_blue = QtGui.QTextCharFormat()
-        format_blue.setFontWeight(QtGui.QFont.Weight.Bold)
-        # This blue colour good on dark and light background
-        format_blue.setForeground(QtGui.QBrush(QtGui.QColor("#9090e3")))
+        format_accent = QtGui.QTextCharFormat()
+        format_accent.setFontWeight(QtGui.QFont.Weight.Bold)
+        format_accent.setForeground(self.ui.textBrowser.palette().brush(QtGui.QPalette.ColorRole.Link))
 
         cursor = self.ui.textBrowser.textCursor()
         for c in display_text:
@@ -1162,7 +1157,7 @@ class DialogCases(QtWidgets.QDialog):
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 pos1 = len(self.ui.textBrowser.toPlainText())
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
-                cursor.setCharFormat(format_blue)
+                cursor.setCharFormat(format_accent)
                 data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],
                         'owner': c['owner'], 'date': c['date'], 'memo': c['memo'], 'name': c['name']}
                 self.display_text_links.append(data)
@@ -1174,7 +1169,7 @@ class DialogCases(QtWidgets.QDialog):
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 pos1 = len(self.ui.textBrowser.toPlainText())
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
-                cursor.setCharFormat(format_blue)
+                cursor.setCharFormat(format_accent)
                 data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],
                         'owner': c['owner'], 'date': c['date'], 'memo': c['memo'], 'name': c['name'],
                         'av_text_id': c['av_text_id']}

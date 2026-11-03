@@ -25,23 +25,23 @@ import sqlite3
 from copy import deepcopy
 import csv
 import datetime
-import pymupdf
+import emoji
 import logging
 import openpyxl
-from PyQt6.QtWidgets import QTextEdit
 from openpyxl.styles import Font, Alignment
 from openpyxl.utils import get_column_letter
 import os
 import PIL
 from PIL import Image
+import pymupdf
+from PyQt6.QtWidgets import QTextEdit
+from PyQt6 import QtGui, QtWidgets, QtCore
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QBrush
 import qtawesome as qta  # See https://pictogrammers.com/library/mdi/
 import re
 from shutil import copyfile
 from typing import Any
-
-from PyQt6 import QtGui, QtWidgets, QtCore
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QBrush
 
 from .code_in_all_files import DialogCodedIds
 from .color_selector import TextColor
@@ -716,7 +716,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 clicked_selected.setSelected(False)
             # Input dialog narrow, so code below
             dialog = QtWidgets.QInputDialog(None)
-            dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
             dialog.setWindowTitle(_("Select some codes"))
             dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
             dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
@@ -1751,7 +1751,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             tmp['caseid'] = -1  # Need a placeholder if export vars is checked
             self.results.append(tmp)
         if self.ui.checkBox_text_context.isChecked():
-            self.get_prettext_and_posttext()
+            self.get_pretext_and_posttext()
 
         # Coded images
         parameters = []
@@ -1879,7 +1879,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             tmp['posttext'] = ""
             self.results.append(tmp)
         if self.ui.checkBox_text_context.isChecked():
-            self.get_prettext_and_posttext()
+            self.get_pretext_and_posttext()
 
         # Coded images
         parameters = []
@@ -2017,12 +2017,40 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.results = tmp_results
             return
 
-    def get_prettext_and_posttext(self):
+    def get_pretext_and_posttext(self):
         """ Get surrounding text 100 - 300 characters. See Settings for options.
         When context checkbox is checked """
 
         cur = self.app.conn.cursor()
+        sql = "select fulltext from source where id=?"
         for r in self.results:
+            cur.execute(sql, [r['fid']])
+            fulltext = cur.fetchone()
+            if fulltext is None:
+                continue
+            # This is the easiest way to work with emojis in text
+            text_edit = QtWidgets.QPlainTextEdit(fulltext[0])
+            # Pre text
+            if r['pos0'] > self.app.settings['report_text_context_characters']:
+                pre_text_start = r['pos0'] - self.app.settings['report_text_context_characters']
+            else:
+                pre_text_start = 0
+                pre_text_length = r['pos0']
+            if pre_text_start < 0:
+                pre_text_start = 0
+            cursor = text_edit.textCursor()
+            cursor.setPosition(pre_text_start)
+            cursor.setPosition(r['pos0'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+            r['pretext'] = cursor.selectedText()
+            # Post text
+            cursor = text_edit.textCursor()
+            cursor.setPosition(r['pos1'])
+            cursor.setPosition(r['pos1'] + self.app.settings['report_text_context_characters'],
+                               QtGui.QTextCursor.MoveMode.KeepAnchor)
+            r['posttext'] = cursor.selectedText()
+
+        # OLD - ERROR WITH EMOJIs
+        '''for r in self.results:
             # Pre text
             pre_text_length = self.app.settings['report_text_context_characters']
             if r['pos0'] > pre_text_length - 1:
@@ -2044,7 +2072,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             cur.execute(sql, [post_text_start, post_text_length, r['fid']])
             res_post = cur.fetchone()
             if res_post is not None:
-                r['posttext'] = res_post[0]
+                r['posttext'] = res_post[0]'''
 
     def text_code_count_and_percent(self):
         """ First part of results, fill code counts and text percentages.

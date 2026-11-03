@@ -250,6 +250,68 @@ class TestAiRuntime(TestCase):
 
                 self.assertEqual(original_intent, window.ai_initialize_llm_after_load)
 
+    def test_settings_stay_closed_when_modal_loading_does_not_finish(self):
+        for runtime_state in (AI_UNLOADED, AI_LOADING, AI_INITIALIZING, AI_FAILED):
+            with self.subTest(runtime_state=runtime_state):
+                app = SimpleNamespace(
+                    settings={'ai_enable': 'True', 'codername': 'test'},
+                    ai_runtime_state=runtime_state,
+                )
+                window = SimpleNamespace(
+                    app=app,
+                    start_ai_background_loading=MagicMock(),
+                )
+                window.load_ai_runtime_modal = lambda *args: (
+                    MainWindow.load_ai_runtime_modal(window, *args)
+                )
+
+                with patch('qualcoder.__main__.QtWidgets.QProgressDialog') as progress_class, \
+                        patch('qualcoder.__main__.QtCore.QTimer'), \
+                        patch('qualcoder.__main__.show_ai_runtime_not_ready') as show_not_ready, \
+                        patch('qualcoder.__main__.DialogSettings') as settings_class:
+                    progress_class.return_value.exec.return_value = QtWidgets.QDialog.DialogCode.Rejected
+
+                    MainWindow.change_settings(window)
+
+                show_not_ready.assert_called_once_with(app, 'AI Settings')
+                settings_class.assert_not_called()
+                self.assertEqual(runtime_state, app.ai_runtime_state)
+                self.assertEqual('True', app.settings['ai_enable'])
+
+    def test_enabling_ai_settings_stay_closed_when_loading_is_cancelled(self):
+        window = SimpleNamespace(
+            app=SimpleNamespace(
+                settings={'ai_enable': 'False', 'codername': 'test'},
+                ai_runtime_state=AI_DISABLED,
+            ),
+            load_ai_runtime_modal=MagicMock(return_value=False),
+        )
+
+        with patch('qualcoder.__main__.DialogSettings') as settings_class:
+            MainWindow.change_settings(window, section='AI', enable_ai=True)
+
+        window.load_ai_runtime_modal.assert_called_once_with('AI Settings')
+        settings_class.assert_not_called()
+
+    def test_settings_open_without_loading_when_ai_is_ready_or_disabled(self):
+        for ai_enabled, runtime_state in (('True', AI_READY), ('False', AI_DISABLED)):
+            with self.subTest(ai_enabled=ai_enabled):
+                window = SimpleNamespace(
+                    app=SimpleNamespace(
+                        settings={'ai_enable': ai_enabled, 'codername': 'test'},
+                        ai_runtime_state=runtime_state,
+                    ),
+                    load_ai_runtime_modal=MagicMock(),
+                )
+
+                with patch('qualcoder.__main__.DialogSettings') as settings_class:
+                    settings_class.return_value.exec.return_value = QtWidgets.QDialog.DialogCode.Rejected
+
+                    MainWindow.change_settings(window)
+
+                window.load_ai_runtime_modal.assert_not_called()
+                settings_class.return_value.exec.assert_called_once_with()
+
     def test_cancelled_settings_during_startup_still_initialize_ai(self):
         for background_started in (True, False):
             with self.subTest(background_started=background_started):
@@ -280,6 +342,7 @@ class TestAiRuntime(TestCase):
                 service = MagicMock()
 
                 def create_settings(*args, **kwargs):
+                    self.assertEqual(AI_READY, app.ai_runtime_state)
                     self.assertTrue(kwargs['ai_runtime_loader']('AI Settings'))
                     dialog = MagicMock()
                     dialog.exec.return_value = QtWidgets.QDialog.DialogCode.Rejected
