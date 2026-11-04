@@ -138,6 +138,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         self.ui.checkBox_show_refs.toggled.connect(self.select_reference_style)
+        self.ui.label_coders.setPixmap(qta.icon('mdi6.account-multiple').pixmap(26, 26))
+        self.ui.label_text_limiter.setPixmap(qta.icon('mdi6.text-box-minus-outline').pixmap(26, 26))
+        self.ui.label_search.setPixmap(qta.icon('mdi6.text-search').pixmap(26, 26))
+        self.ui.label_variables.setPixmap(qta.icon('mdi6.variable').pixmap(26, 26))
+        self.ui.label_matrix.setPixmap(qta.icon('mdi6.table').pixmap(26, 26))
+        self.ui.label_export_matrix.setPixmap(qta.icon('mdi6.export').pixmap(22, 22))
+        self.ui.label_sort.setPixmap(qta.icon('mdi6.sort').pixmap(26, 26))
         # Canonical keys in userData, labels translatable
         matrix_options = [("", ""), ("top_cat_case", _("Top categories by case")),
                           ("top_cat_file", _("Top categories by file")),
