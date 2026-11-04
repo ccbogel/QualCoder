@@ -76,7 +76,7 @@ exe = EXE(
     name='QualCoder',
     debug=False,
     bootloader_ignore_signals=False,
-    strip=False,
+    strip=sys.platform == 'linux', # Only strips debug strings for linux -> smaller binary
     upx=True,
     console=sys.platform == 'win32',
     hide_console='hide-early' if sys.platform == 'win32' else None,
