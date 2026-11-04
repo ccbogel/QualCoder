@@ -31,7 +31,9 @@ dependencies = [
   "openpyxl>=3.1.5",
   "pandas>=3.1.0",
   "pdfminer-six>=20260107",
-  "pefile<2024.8.26",
+  # The bootloader in the most recent version of pyinstaller is often falsely detected as malware
+  # by anti virus software, so, it's safer to use a version that has been released a few months ago.
+  "pefile<2024.8.26", # see: https://github.com/pyinstaller/pyinstaller/issues/8832#issuecomment-2413203254
   "pillow>=13.0.0",
   "plotly>=7.1.0",
   "ply>=3.11",
@@ -47,7 +49,7 @@ dependencies = [
   "sentence-transformers>=5.7.0",
   "six>=1.17.0",
   "striprtf>=0.0.35",
-  "transformers<=4.53.0",
+  "transformers<=4.53.0", # see https://github.com/huggingface/transformers/issues/38402 
   "uvicorn>=0.30,<1",
   "wordcloud>=1.9.6",
 ]
@@ -60,9 +62,14 @@ requires = ["uv_build>=0.12.21,<0.13.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
-dev = ["pytest>=9.2.0", "ruff>=0.17.3", "uv>=0.13.6"]
+dev = [
+    "pytest>=9.2.0",
+    "ruff>=0.17.3",
+    "ty>=0.0.96",
+    "uv>=0.13.6",
+]
 
-# Explicit pinning for torch
+# Makes sure that torch CPU is installed instead of CUDA, this saves space
 [tool.uv.sources]
 torch = { index = "pytorch" }
 
@@ -71,7 +78,7 @@ name = "pytorch"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
-# So the ruff stops about gettetx syntax
+# So ruff stops flaging gettetx syntax as a problemm
 [tool.ruff]
 builtins = [
   "_",
