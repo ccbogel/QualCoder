@@ -163,7 +163,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Canonical keys for .ui-defined items, labels may be translated
         for i_, key_ in enumerate(["", "html", "txt", "odt", "xlsx", "csv", "iramuteq"]):
             self.ui.comboBox_export.setItemData(i_, key_)
-        for i_, key_ in enumerate(["az", "za", "10-1", "1-10"]):
+        # Override and replace items in ui.combobox_sort
+        self.ui.comboBox_sort.clear()
+        sort_items = ["az", "za",_("Category az"), _("Category za"), _("Frequency descending"), _("Frequency ascending"), _("Images vertically"), _("AV timeline")]
+        self.ui.comboBox_sort.addItems(sort_items)
+        for i_, key_ in enumerate(["az", "za","Category az", "Category za", "Frequency descending", "Frequency ascending", "Images vertically", "AV timeline"]):
             self.ui.comboBox_sort.setItemData(i_, key_)
         self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
         self.ui.comboBox_export.setEnabled(False)
@@ -1227,7 +1231,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         elif item.get('result_type') == 'image':
             imgids = []
             # Two rectangles overlap if they intersect on both axes.
-            sql = ("select code_name.name, x1, y1, width, height, imid from code_image "
+            sql = ("select code_name.name, x1, y1, width, height, pdf_page, imid from code_image "
                    "join code_name on code_name.cid = code_image.cid "
                    "where code_image.id=? and code_image.imid<>?")
             cur.execute(sql, [item['fid'], item['imid']])
@@ -1236,10 +1240,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             ax2 = ax1 + item['width']
             ay2 = ay1 + item['height']
             for row in cur.fetchall():
-                name, bx1, by1, bw, bh, iid = row
+                name, bx1, by1, bw, bh, pdf_page, iid = row
                 bx2 = bx1 + bw
                 by2 = by1 + bh
-                if ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1:
+                if item['pdf_page'] == pdf_page and ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1:
                     cooccuring_code_names.append(name)
                     imgids.append(row[5])
             if imgids:
@@ -1975,7 +1979,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
 
         # Sort alphabetically by category hierarchy (root>...>nearest), fallback to codename
-        if sort_by in ("cat_az", "cat_za"):  # items not yet in the .ui
+        if sort_by in ("Category az", "Category za"):  # items not yet in the .ui
             def category_sort_key(item):
                 hierarchy = self.categories_of_code(item['cid'])
                 # categories_of_code returns nearest-first, reverse for root-first ordering
@@ -1987,6 +1991,22 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.results = sorted(self.results, key=category_sort_key, reverse=reverse_order)
             return
 
+        if sort_by == "Images vertically":
+            """ Sort images by image results first then other results types (text, A/V) later. 
+            Images are sorted vertically by filename, pdf page number (None ofr other image types), then y axis. """
+            tmp_results = [item for item in self.results if item['result_type'] == "image"]
+            other_results = [item for item in self.results if item['result_type'] != "image"]
+            self.results = sorted(tmp_results, key=lambda x: (x['file_or_casename'], x['pdf_page'], x['y1'])) + other_results
+            return
+
+        if sort_by == "AV timeline":
+            """ Sort A/V by A/V results first then other results types (images, text) later. 
+            A/V segments are sorted by filename, then msecs ascending. """
+            tmp_results = [item for item in self.results if item['result_type'] == "av"]
+            other_results = [item for item in self.results if item['result_type'] != "av"]
+            self.results = sorted(tmp_results, key=lambda x: (x['file_or_casename'], x['pos0'])) + other_results 
+            return
+        
         # Order code names by frequency
         # Get unique code names
         tmp_names = [r['codename'] for r in self.results]
@@ -2000,7 +2020,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     count += 1
             name_and_count.append({'codename': codename, 'count': count})
         tmp_results = []
-        if sort_by == "1-10":
+        if sort_by == "Frequency ascending":
             small_to_large = sorted(name_and_count, key=lambda d: d['count'])
             for s in small_to_large:
                 for r in self.results:
@@ -2008,7 +2028,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         tmp_results.append(r)
             self.results = tmp_results
             return
-        if sort_by == "10-1":
+        if sort_by == "Frequency descending":
             large_to_small = sorted(name_and_count, key=lambda d: d['count'], reverse=True)
             for s in large_to_small:
                 for r in self.results:
