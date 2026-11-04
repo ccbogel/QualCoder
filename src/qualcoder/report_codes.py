@@ -1996,7 +1996,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             Images are sorted vertically by filename, pdf page number (None ofr other image types), then y axis. """
             tmp_results = [item for item in self.results if item['result_type'] == "image"]
             other_results = [item for item in self.results if item['result_type'] != "image"]
-            self.results = sorted(tmp_results, key=lambda x: (x['file_or_casename'], x['pdf_page'], x['y1'])) + other_results
+            self.results = sorted(tmp_results, key=lambda x: (x['file_or_casename'], x['pdf_page'] if x['pdf_page'] is not None else 0, x['y1'])) 
+            self.results += other_results
             return
 
         if sort_by == "AV timeline":
