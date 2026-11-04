@@ -1,19 +1,19 @@
 #!/bin/bash
 # Make this script executable
 # Run it by typing inside the Qualcoder folder: ./run_from_source_Linux.sh
-# Works on Ubuntu 24 and Fedora 44
+# Works on Ubuntu 24, Fedora 44 and CachyOS
 
 echo "Starting"
 # Create venv
 if [ -d ".venv" ]; then
-    echo "Virtual environment exists."
+  echo "Virtual environment exists."
 else
-    echo "Creating virtual environment."
-    python3 -m venv ".venv"
+  echo "Creating virtual environment."
+  python3 -m venv ".venv"
 fi
 
 # Activate environment
-source .env/bin/activate
+source .venv/bin/activate
 
 # Install required modules
 echo "Installing requirements. This may take 10 minutes."
@@ -22,7 +22,7 @@ pip install -r requirements.txt
 
 # Move to src folder to then run qualcoder module
 echo "Starting QualCoder."
-cd src
+cd src || exit
 python3 -m qualcoder
 
 # Exit environment
