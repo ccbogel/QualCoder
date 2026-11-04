@@ -1365,10 +1365,10 @@ class RefiImport:
 
         name, creating_user, create_date, source_path, path_type, rich_text_path = \
             self.name_creating_user_create_date_source_path_helper(element)
-        name = self.unique_source_name(name)
         # pdf suffix may need to be added on
         if name.lower()[-4:] != ".pdf":
             name += ".pdf"
+        name = self.unique_source_name(name)
         # print("source path: ", source_path, "name: ", name)
         media_path = f"/docs/{name}"  # Default
         if path_type == "internal":
@@ -1414,10 +1414,6 @@ class RefiImport:
                 # print("PDF Representation element found")
                 self.load_text_source(el, name, create_date, media_path)
                 break
-            else:
-                cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values (?,?,?,?,?,?)",
-                    [name, "", media_path, "", creating_user, create_date])
-                self.app.conn.commit()
         # Coded areas over pages (PDFSelection): previously ignored, so area codings
         # were lost when importing a REFI-QDA project. Loaded after the Representation,
         # once the source row exists.
@@ -1427,6 +1423,10 @@ class RefiImport:
             for el in element:
                 if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}PDFSelection":
                     self.load_codings_for_pdf_areas(res_id[0], el)
+            else:
+                cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values (?,?,?,?,?,?)",
+                    [name, "", media_path, "", creating_user, create_date])
+                self.app.conn.commit()
 
     def load_codings_for_pdf_areas(self, id_:int, element):
         """ Loads coded areas over PDF pages (PDFSelection) into code_image with pdf_page.
