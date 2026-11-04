@@ -13,16 +13,17 @@ if [ -d dist ]; then
 else
     echo Compile QualCoder
     # Compile QualCoder
-    python3 -m venv .env
-    source .env/bin/activate
+    python3 -m venv .venv
+    source .venv/bin/activate
     python3 -m pip install --upgrade pip
     pip install -r requirements.txt
-    pyinstaller --clean --noconfirm "qualcoder_release.spec"
+    # For the AppImage, using the "folder" spec results in a slightly faster binary
+    pyinstaller --clean --noconfirm "qualcoder.spec"
     deactivate
 fi
 
 # App Image Structure
-rm -rf QualCoder-x86_64.AppDir
+rm -rf QualCoder-x86_64.AppDir #if some artifacts exist for some reason
 mkdir -p QualCoder-x86_64.AppDir/usr/bin
 cp -r dev/qualcoder-appimage/. QualCoder-x86_64.AppDir/
 chmod +x QualCoder-x86_64.AppDir/AppRun

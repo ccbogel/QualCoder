@@ -1,13 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="4.1.0.dev0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>QualCoder</id>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <name>QualCoder</name>
-  <summary>Qualitative data analysis for text, images, audio, video</summary>
+  <summary>The free, open source desktop software for qualitative data analysis</summary>
 
   <developer id="io.github.ccbogel">
     <name>Colin Curtain</name>
+    <email>ccbogel@hotmail.com</email>
+  </developer>
+  <developer id="io.github.kaixxx">
+    <name>Kai Dröge</name>
+  </developer>
+  <developer id="io.github.qwertygc">
+    <name>Justin Missaghieh-Poncet</name>
+  </developer>
+  <developer id="io.github.mazatlan_salomon">
+    <name>Lorenzo Salomón Cárdenas</name>
   </developer>
 
   <description>
