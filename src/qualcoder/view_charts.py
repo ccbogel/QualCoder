@@ -43,21 +43,7 @@ logger = logging.getLogger(__name__)
 
 
 class ViewCharts(QDialog):
-    """ Dialog to view various charts of codes and categories.
-    """
-
-    app = None
-    conn = None
-    settings = None
-    categories = []
-    codes = []
-    files = []
-    cases = []
-    attributes = []  # For charts of attributes
-    attribute_file_ids = []  # For filtering based on attribute selection
-    attributes_msg = ""  # Tooltip msg for filtering based on attribute selection
-    attribute_case_ids_and_names = []  # Used for Case heatmaps based on attribute selection
-    stopwords_filepath = None
+    """ Dialog to view various charts of codes and categories. """
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -66,8 +52,11 @@ class ViewCharts(QDialog):
         self.app = app
         self.settings = app.settings
         self.conn = app.conn
-        self.attribute_file_ids = []
-        self.attributes_msg = ""
+        self.attribute_file_ids = []  # For filtering based on attribute selection
+        self.case_id = -1
+        self.attributes_msg = ""  # Tooltip msg for filtering based on attribute selection
+        self.attribute_case_ids_and_names = []  # Used for Case heatmaps based on attribute selection
+
         self.stopwords_filepath = None
         self.last_wordcloud_dir = self.app.settings['directory']  # Remember the last save location for WordCloud
         # Set up the user interface from Designer.
@@ -92,8 +81,7 @@ class ViewCharts(QDialog):
             if row[0] != "":
                 coders.append(row[0])
         self.ui.comboBox_coders.addItems(coders)
-
-        self.attributes = []
+        self.attributes = []  # For charts of attributes
         self._load_attributes()
         self.fill_combobox_attributes()
         self.ui.radioButton_file.clicked.connect(self.fill_combobox_attributes)
@@ -109,6 +97,7 @@ class ViewCharts(QDialog):
         self.ui.comboBox_case.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.comboBox_case.customContextMenuRequested.connect(self.combobox_case_menu)
         self.ui.comboBox_case.currentIndexChanged.connect(self.clear_combobox_files)
+        self.categories, self.codes = [], []
         self.get_selected_categories_and_codes()
         self.fill_categories_combobox()
         self.ui.comboBox_category.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
@@ -417,6 +406,7 @@ class ViewCharts(QDialog):
         self.attributes_msg = ""
         self.ui.pushButton_attributes.setToolTip("")
         self.ui.pushButton_attributes.setIcon(QtGui.QIcon())
+        self.case_id = -1
 
     def set_stopwords_filepath(self):
         """ Set stopwords from a user selected file for the word cloud.
@@ -461,14 +451,14 @@ class ViewCharts(QDialog):
             for f in self.files:
                 if f['name'] == file_name:
                     return _("File: ") + file_name + " ", f"={f['id']}"
-        case_id = -1
+        self.case_id = -1
         for c in self.cases:
             if c['name'] == case_name:
-                case_id = c['id']
+                self.case_id = c['id']
                 break
         cur = self.app.conn.cursor()
         sql = "select distinct fid from case_text where caseid=?"
-        cur.execute(sql, [case_id, ])
+        cur.execute(sql, [self.case_id, ])
         res = cur.fetchall()
         file_ids = ""
         for r in res:
@@ -1058,21 +1048,33 @@ class ViewCharts(QDialog):
         values = []
         labels = []
         case_file_name, file_ids = self.get_file_ids()
+        
         for c in self.codes:
-            sql = "select count(cid) from code_text where cid=? and owner like ?"
-            if file_ids != "":
+            if file_ids == "":
+                sql = "select count(cid) from code_text where cid=? and owner like ?"
+                cur.execute(sql, [c['cid'], owner])
+                res_text = cur.fetchone()
+            if file_ids != "" and self.case_id == -1:  
                 sql = "select count(cid) from code_text where cid=? and owner like ? and fid" + file_ids
-            cur.execute(sql, [c['cid'], owner])
-            res_text = cur.fetchone()
+                cur.execute(sql, [c['cid'], owner])
+                res_text = cur.fetchone()
+            if file_ids != "" and self.case_id > 0:
+                sql = "select count(code_text.cid) from code_text "
+                sql += "join case_text on case_text.fid=code_text.fid "
+                sql += "where code_text.cid=? and code_text.owner like ? and case_text.caseid=? and case_text.fid " + file_ids + " "
+                sql += "and code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1 "
+                cur.execute(sql, [c['cid'], owner, self.case_id])
+                res_text = cur.fetchone()      
+
             sql = "select count(cid) from code_image where cid=? and owner like ?"
-            if file_ids != "":
-                sql = "select count(cid) from code_image where cid=? and owner like ? and id" + file_ids
+            if file_ids != "" and self.case_id == -1:
+                sql = "select count(cid) from code_image where cid=? and owner like ? and id " + file_ids
 
             cur.execute(sql, [c['cid'], owner])
             res_image = cur.fetchone()
             sql = "select count(cid) from code_av where cid=? and owner like ?"
             if file_ids != "":
-                sql = "select count(cid) from code_av where cid=? and owner like ? and id" + file_ids
+                sql = "select count(cid) from code_av where cid=? and owner like ? and id " + file_ids
             cur.execute(sql, [c['cid'], owner])
             res_av = cur.fetchone()
             labels.append(c['name'])
@@ -1099,11 +1101,22 @@ class ViewCharts(QDialog):
         labels = []
         case_file_name, file_ids = self.get_file_ids()
         for c in self.codes:
-            sql = "select ifnull(sum(pos1 - pos0), 0) from code_text where cid=? and owner like ?"
-            if file_ids != "":
+            if file_ids == "":
+                sql = "select ifnull(sum(pos1 - pos0), 0) from code_text where cid=? and owner like ?"
+                cur.execute(sql, [c['cid'], owner])
+                res = cur.fetchone()
+            if file_ids != "" and self.case_id == -1:
                 sql = "select ifnull(sum(pos1 - pos0), 0) from code_text where cid=? and owner like ? and fid" + file_ids
-            cur.execute(sql, [c['cid'], owner])
-            res = cur.fetchone()
+                cur.execute(sql, [c['cid'], owner])
+                res = cur.fetchone()
+            if file_ids != "" and self.case_id > 0:
+                sql = "select ifnull(sum(code_text.pos1 - code_text.pos0), 0) from code_text "
+                sql += "join case_text on case_text.fid=code_text.fid "
+                sql += "where code_text.cid=? and code_text.owner like ? and case_text.caseid=? and case_text.fid " + file_ids + " "
+                sql += "and code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1 "
+                cur.execute(sql, [c['cid'], owner, self.case_id])
+                res = cur.fetchone()   
+
             labels.append(c['name'])
             values.append(res[0])
         # Create pandas DataFrame
@@ -1206,11 +1219,21 @@ class ViewCharts(QDialog):
         labels = []
         case_file_name, file_ids = self.get_file_ids()
         for c in self.codes:
-            sql = "select count(cid) from code_text where cid=? and owner like ?"
-            if file_ids != "":
+            if file_ids == "":
+                sql = "select count(cid) from code_text where cid=? and owner like ?"
+                cur.execute(sql, [c['cid'], owner])
+                res_text = cur.fetchone()
+            if file_ids != "" and self.case_id == -1:  
                 sql = "select count(cid) from code_text where cid=? and owner like ? and fid" + file_ids
-            cur.execute(sql, [c['cid'], owner])
-            res_text = cur.fetchone()
+                cur.execute(sql, [c['cid'], owner])
+                res_text = cur.fetchone()
+            if file_ids != "" and self.case_id > 0:
+                sql = "select count(code_text.cid) from code_text "
+                sql += "join case_text on case_text.fid=code_text.fid "
+                sql += "where code_text.cid=? and code_text.owner like ? and case_text.caseid=? and case_text.fid " + file_ids + " "
+                sql += "and code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1 "
+                cur.execute(sql, [c['cid'], owner, self.case_id])
+                res_text = cur.fetchone()   
             sql = "select count(cid) from code_image where cid=? and owner like ?"
             if file_ids != "":
                 sql = "select count(cid) from code_image where cid=? and owner like ? and id" + file_ids
@@ -1245,11 +1268,22 @@ class ViewCharts(QDialog):
         labels = []
         case_file_name, file_ids = self.get_file_ids()
         for c in self.codes:
-            sql = "select ifnull(sum(pos1 - pos0), 0) from code_text where cid=? and owner like ?"
-            if file_ids != "":
+            if file_ids == "":
+                sql = "select ifnull(sum(pos1 - pos0), 0) from code_text where cid=? and owner like ?"
+                cur.execute(sql, [c['cid'], owner])
+                res = cur.fetchone()
+            if file_ids != "" and self.case_id == -1:
                 sql = "select ifnull(sum(pos1 - pos0), 0) from code_text where cid=? and owner like ? and fid" + file_ids
-            cur.execute(sql, [c['cid'], owner])
-            res = cur.fetchone()
+                cur.execute(sql, [c['cid'], owner])
+                res = cur.fetchone()
+            if file_ids != "" and self.case_id > 0:
+                sql = "select ifnull(sum(code_text.pos1 - code_text.pos0), 0) from code_text "
+                sql += "join case_text on case_text.fid=code_text.fid "
+                sql += "where code_text.cid=? and code_text.owner like ? and case_text.caseid=? and case_text.fid " + file_ids + " "
+                sql += "and code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1 "
+                cur.execute(sql, [c['cid'], owner, self.case_id])
+                res = cur.fetchone()   
+            
             labels.append(c['name'])
             values.append(res[0])
         # Create pandas DataFrame
