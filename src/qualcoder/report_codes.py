@@ -145,6 +145,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.label_matrix.setPixmap(qta.icon('mdi6.table').pixmap(26, 26))
         self.ui.label_export_matrix.setPixmap(qta.icon('mdi6.export').pixmap(22, 22))
         self.ui.label_sort.setPixmap(qta.icon('mdi6.sort').pixmap(26, 26))
+        self.ui.label_text_context.setPixmap(qta.icon('mdi6.text-shadow').pixmap(26, 26))
+        self.ui.label_important.setPixmap(qta.icon('mdi6.star-outline').pixmap(26, 26))
+        self.ui.label_statistics.setPixmap(qta.icon('mdi6.chart-bar').pixmap(26, 26))
+        self.ui.label_references.setPixmap(qta.icon('mdi6.book-open-variant').pixmap(26, 26))
         # Canonical keys in userData, labels translatable
         matrix_options = [("", ""), ("top_cat_case", _("Top categories by case")),
                           ("top_cat_file", _("Top categories by file")),
