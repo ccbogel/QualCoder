@@ -38,6 +38,7 @@ from .helpers import Message, msecs_to_hours_mins_secs, ExportDirectoryPathDialo
 from .information import DialogInformation
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
+from .text_positions import to_qt
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -859,8 +860,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         # Foreground depends on the defined need_white_text color in color_selector
         for i, c in enumerate(char_list_coders):
             if c == 'b':
-                cursor.setPosition(pos + i, QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(pos + i + 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(pos + to_qt(fulltext[0], i), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(pos + to_qt(fulltext[0], i + 1), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 color = "#81BEF7"
                 brush = QBrush(QtGui.QColor(color))
                 fmt.setBackground(brush)
@@ -868,8 +869,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 fmt.setForeground(text_brush)
                 cursor.setCharFormat(fmt)
             if c == 'g':
-                cursor.setPosition(pos + i, QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(pos + i + 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(pos + to_qt(fulltext[0], i), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(pos + to_qt(fulltext[0], i + 1), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 color = "#81F781"
                 brush = QBrush(QtGui.QColor(color))
                 fmt.setBackground(brush)
@@ -877,8 +878,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 fmt.setForeground(text_brush)
                 cursor.setCharFormat(fmt)
             if c == 'y':
-                cursor.setPosition(pos + i, QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(pos + i + 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(pos + to_qt(fulltext[0], i), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(pos + to_qt(fulltext[0], i + 1), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 color = "#F4FA58"
                 brush = QBrush(QtGui.QColor(color))
                 fmt.setBackground(brush)

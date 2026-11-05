@@ -33,6 +33,7 @@ import unicodedata
 
 from .GUI.ui_edit_text import Ui_Dialog_edit_text
 from .helpers import MarkdownHighlighter
+from .text_positions import to_py, to_qt
 
 logger = logging.getLogger(__name__)
 
@@ -183,27 +184,28 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if pattern is None:
             return
         result = None
+        cursor_pos = to_py(self.text, cursor.position())
         try:
             if direction == "next":
                 for match in pattern.finditer(self.text):
-                    if match.start() > cursor.position():
-                        result = match.start()
+                    if match.start() > cursor_pos:
+                        result = match
                         break
             else:  # previous
                 matches = []
                 for match in pattern.finditer(self.text):
-                    matches.insert(0, match.start())
+                    matches.insert(0, match)
                 for match in matches:
-                    if match + len(search_term) < cursor.position():
+                    if match.end() < cursor_pos:
                         result = match
                         break
         except re.error:
             logger.exception('Failed searching text for %s', search_term)
         if result is None:
             return
-        cursor.setPosition(result)
+        cursor.setPosition(to_qt(self.text, result.start()))
         self.ui.plainTextEdit.setTextCursor(cursor)
-        cursor.setPosition(cursor.position() + len(search_term), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(to_qt(self.text, result.end()), QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.plainTextEdit.setTextCursor(cursor)
 
     def update_positions(self):
@@ -552,22 +554,22 @@ class DialogEditTextFile(QtWidgets.QDialog):
         cursor = self.ui.plainTextEdit.textCursor()
         for item in self.casetext:
             if item['newpos0'] is not None:
-                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(to_qt(self.text, item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(to_qt(self.text, item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.green)
                 cursor.setCharFormat(format_)
         for item in self.annotations:
             if item['newpos0'] is not None:
-                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(to_qt(self.text, item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(to_qt(self.text, item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.yellow)
                 cursor.setCharFormat(format_)
         for item in self.codetext:
             if item['newpos0'] is not None:
-                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(to_qt(self.text, item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(to_qt(self.text, item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
@@ -583,7 +585,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         format_.setFontPointSize(self.app.settings['docfontsize'])
         cursor = self.ui.plainTextEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(len(self.ui.plainTextEdit.toPlainText()), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self.ui.plainTextEdit.document().characterCount() - 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(format_)
         self.ui.plainTextEdit.blockSignals(False)
 

@@ -50,6 +50,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets, sip  # sip: detect deleted C++ objec
 from .color_selector import TextColor
 from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 from .GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
+from .text_positions import qt_length, to_py, to_qt
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -587,6 +588,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         self.resize(400, 300)
         file_list = self.app.get_file_texts([data['fid'], ])
         file_text = file_list[0]
+        self.fulltext = file_text['fulltext']
         title = ""
         if data['file_or_case'] == "File":
             title = _("File: ") + data['file_or_casename']
@@ -606,7 +608,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         # Make marked text visible in view.
         text_cursor = self.te.textCursor()
         cur_pos = self.data['pos1']
-        text_cursor.setPosition(cur_pos)
+        text_cursor.setPosition(to_qt(self.fulltext, cur_pos))
         self.te.setTextCursor(text_cursor)
         self.event_filter_on = True
         if self.event_filter_on:
@@ -624,11 +626,11 @@ class DialogCodeInText(QtWidgets.QDialog):
 
         cursor = self.te.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(len(self.te.toPlainText()) - 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(qt_length(self.fulltext), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(QtGui.QTextCharFormat())
 
-        cursor.setPosition(self.data['pos0'], QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(self.data['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(to_qt(self.fulltext, self.data['pos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(to_qt(self.fulltext, self.data['pos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
         fmt = QtGui.QTextCharFormat()
         brush = QtGui.QBrush(QtGui.QColor(self.data['color']))
         fmt.setBackground(brush)
@@ -645,8 +647,8 @@ class DialogCodeInText(QtWidgets.QDialog):
 
         self.event_filter_on = False
         cursor = self.te.textCursor()
-        cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(data['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(to_qt(self.fulltext, data['pos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(to_qt(self.fulltext, data['pos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
         fmt = QtGui.QTextCharFormat()
         brush = QtGui.QBrush(QtGui.QColor(data['color']))
         fmt.setBackground(brush)
@@ -656,7 +658,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         # Make marked text visible, in view.
         text_cursor = self.te.textCursor()
         cur_pos = data['pos1']
-        text_cursor.setPosition(cur_pos)
+        text_cursor.setPosition(to_qt(self.fulltext, cur_pos))
 
     def eventFilter(self, object_, event):
         """ To detect key events in the textedit.
@@ -721,7 +723,7 @@ class DialogCodeInText(QtWidgets.QDialog):
     def extend_right(self):
         """ Shift right arrow. """
 
-        if self.data['pos1'] + 1 >= len(self.te.toPlainText()):
+        if self.data['pos1'] + 1 >= len(self.fulltext):
             return
         self.data['pos1'] += 1
         cur = self.app.conn.cursor()
@@ -1514,7 +1516,7 @@ class CodeResizeHandle(QtWidgets.QWidget):
             self.raise_()
 
             # Clamp new position to text boundaries
-            new_pos = cursor.position() + self.main_dialog.file_['start']
+            new_pos = self.main_dialog.from_editor_pos(cursor.position()) + self.main_dialog.file_['start']
             max_pos = len(self.main_dialog.text) + self.main_dialog.file_['start']
             min_pos = self.main_dialog.file_['start']
             new_pos = max(min_pos, min(new_pos, max_pos))
@@ -1540,7 +1542,7 @@ class CodeResizeHandle(QtWidgets.QWidget):
             self.dragging = False
             viewport_pos = self.editor.viewport().mapFromGlobal(event.globalPosition().toPoint())
             cursor = self.editor.cursorForPosition(viewport_pos)
-            new_pos = cursor.position() + self.main_dialog.file_['start']
+            new_pos = self.main_dialog.from_editor_pos(cursor.position()) + self.main_dialog.file_['start']
             # Pass original positions for potential revert
             self.main_dialog.update_code_position_from_handle(self.code_items, new_pos, self.is_start, self.orig_pos0,
                                                               self.orig_pos1)
@@ -1590,7 +1592,7 @@ class ToolTipEventFilter(QtCore.QObject):
         # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
         if event.type() == QtCore.QEvent.Type.ToolTip:
             cursor = receiver.cursorForPosition(event.pos())
-            pos = cursor.position()
+            pos = to_py(receiver.toPlainText(), cursor.position())
             receiver.setToolTip("")
             text_ = ""
             multiple_msg = '<p style="color:#f89407">' + _("Press O to cycle overlapping codes") + "</p>"

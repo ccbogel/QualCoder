@@ -5673,12 +5673,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                 return
             code_item['pos1'] = new_pos
 
-        # Get seltext from textEdit
-        plain_text_edit = QtWidgets.QPlainTextEdit(self.file_['fulltext'])
-        cursor = plain_text_edit.textCursor()
-        cursor.setPosition(code_item['pos0'])
-        cursor.setPosition(code_item['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
-        seltext = cursor.selectedText()
+        # Positions count code points, so slicing gives the exact seltext
+        seltext = self.file_['fulltext'][code_item['pos0']:code_item['pos1']]
 
         cur = self.app.conn.cursor()
         try:

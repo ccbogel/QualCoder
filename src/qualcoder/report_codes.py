@@ -2055,31 +2055,15 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         cur = self.app.conn.cursor()
         sql = "select fulltext from source where id=?"
+        context_chars = self.app.settings['report_text_context_characters']
         for r in self.results:
             cur.execute(sql, [r['fid']])
             fulltext = cur.fetchone()
-            if fulltext is None:
+            if fulltext is None or fulltext[0] is None:
                 continue
-            # This is the easiest way to work with emojis in text
-            text_edit = QtWidgets.QPlainTextEdit(fulltext[0])
-            # Pre text
-            if r['pos0'] > self.app.settings['report_text_context_characters']:
-                pre_text_start = r['pos0'] - self.app.settings['report_text_context_characters']
-            else:
-                pre_text_start = 0
-                pre_text_length = r['pos0']
-            if pre_text_start < 0:
-                pre_text_start = 0
-            cursor = text_edit.textCursor()
-            cursor.setPosition(pre_text_start)
-            cursor.setPosition(r['pos0'], QtGui.QTextCursor.MoveMode.KeepAnchor)
-            r['pretext'] = cursor.selectedText()
-            # Post text
-            cursor = text_edit.textCursor()
-            cursor.setPosition(r['pos1'])
-            cursor.setPosition(r['pos1'] + self.app.settings['report_text_context_characters'],
-                               QtGui.QTextCursor.MoveMode.KeepAnchor)
-            r['posttext'] = cursor.selectedText()
+            # Positions count code points, so slicing is exact with emojis
+            r['pretext'] = fulltext[0][max(0, r['pos0'] - context_chars):r['pos0']]
+            r['posttext'] = fulltext[0][r['pos1']:r['pos1'] + context_chars]
 
         # OLD - ERROR WITH EMOJIs
         '''for r in self.results:
