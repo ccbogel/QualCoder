@@ -30,7 +30,7 @@ class Ui_Dialog_reportCodings(object):
         self.lineEdit.setGeometry(QtCore.QRect(40, 60, 150, 26))
         self.lineEdit.setObjectName("lineEdit")
         self.pushButton_run_report = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_run_report.setGeometry(QtCore.QRect(520, 34, 51, 51))
+        self.pushButton_run_report.setGeometry(QtCore.QRect(510, 34, 51, 51))
         self.pushButton_run_report.setText("")
         self.pushButton_run_report.setObjectName("pushButton_run_report")
         self.comboBox_coders = QtWidgets.QComboBox(parent=self.groupBox)
@@ -123,7 +123,7 @@ class Ui_Dialog_reportCodings(object):
         self.label_search.setText("")
         self.label_search.setObjectName("label_search")
         self.label_text_limiter = QtWidgets.QLabel(parent=self.groupBox)
-        self.label_text_limiter.setGeometry(QtCore.QRect(8, 91, 26, 26))
+        self.label_text_limiter.setGeometry(QtCore.QRect(8, 60, 26, 26))
         self.label_text_limiter.setText("")
         self.label_text_limiter.setObjectName("label_text_limiter")
         self.label_matrix = QtWidgets.QLabel(parent=self.groupBox)
@@ -139,7 +139,7 @@ class Ui_Dialog_reportCodings(object):
         self.label_variables.setText("")
         self.label_variables.setObjectName("label_variables")
         self.label_sort = QtWidgets.QLabel(parent=self.groupBox)
-        self.label_sort.setGeometry(QtCore.QRect(10, 60, 26, 26))
+        self.label_sort.setGeometry(QtCore.QRect(10, 90, 26, 26))
         self.label_sort.setText("")
         self.label_sort.setObjectName("label_sort")
         self.label_text_context = QtWidgets.QLabel(parent=self.groupBox)
@@ -213,7 +213,7 @@ class Ui_Dialog_reportCodings(object):
         Dialog_reportCodings.setWindowTitle(_translate("Dialog_reportCodings", "Reports"))
         self.pushButton_run_report.setToolTip(_translate("Dialog_reportCodings", "Run report"))
         self.comboBox_coders.setToolTip(_translate("Dialog_reportCodings", "Select coder. Blank for all."))
-        self.pushButton_attributeselect.setToolTip(_translate("Dialog_reportCodings", "Attributes.\n"
+        self.pushButton_attributeselect.setToolTip(_translate("Dialog_reportCodings", "Select file and case attributes.\n"
 "Attribute selection will override files or cases selected in the left-hand-side lists."))
         self.label_exports.setToolTip(_translate("Dialog_reportCodings", "Export"))
         self.comboBox_export.setToolTip(_translate("Dialog_reportCodings", "Export format.\n"
