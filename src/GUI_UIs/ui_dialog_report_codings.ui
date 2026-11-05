@@ -456,7 +456,7 @@ AV timeline. Audio video codings shown first and ordered by their time positions
       <property name="geometry">
        <rect>
         <x>8</x>
-        <y>91</y>
+        <y>60</y>
         <width>26</width>
         <height>26</height>
        </rect>
@@ -520,7 +520,7 @@ AV timeline. Audio video codings shown first and ordered by their time positions
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>60</y>
+        <y>90</y>
         <width>26</width>
         <height>26</height>
        </rect>
