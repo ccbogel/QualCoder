@@ -10,6 +10,8 @@ on:
 
 jobs:
   sync-repo-to-forgejo:
+    # Only run in the upstream repo, never in forks.
+    if: github.repository == 'ccbogel/QualCoder'
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout"
