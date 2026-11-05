@@ -44,8 +44,8 @@
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>90</y>
-        <width>149</width>
+        <y>60</y>
+        <width>150</width>
         <height>26</height>
        </rect>
       </property>
@@ -53,7 +53,7 @@
      <widget class="QPushButton" name="pushButton_run_report">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>510</x>
         <y>34</y>
         <width>51</width>
         <height>51</height>
@@ -75,18 +75,21 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Select coder. Blank for all.</string>
+      </property>
      </widget>
      <widget class="QPushButton" name="pushButton_attributeselect">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>200</x>
         <y>90</y>
         <width>26</width>
         <height>26</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Attributes.
+       <string>Select file and case attributes.
 Attribute selection will override files or cases selected in the left-hand-side lists.</string>
       </property>
       <property name="text">
@@ -117,6 +120,11 @@ Attribute selection will override files or cases selected in the left-hand-side 
         <width>91</width>
         <height>28</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export format.
+
+To also export variables, check the variables checkbox and select csv or xlsx format.</string>
       </property>
       <item>
        <property name="text">
@@ -157,7 +165,7 @@ Attribute selection will override files or cases selected in the left-hand-side 
      <widget class="QLabel" name="label_title">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>1</x>
         <y>0</y>
         <width>191</width>
         <height>23</height>
@@ -171,7 +179,7 @@ Attribute selection will override files or cases selected in the left-hand-side 
       <property name="geometry">
        <rect>
         <x>229</x>
-        <y>30</y>
+        <y>1</y>
         <width>151</width>
         <height>26</height>
        </rect>
@@ -189,9 +197,9 @@ Attribute selection will override files or cases selected in the left-hand-side 
      <widget class="QCheckBox" name="checkBox_important">
       <property name="geometry">
        <rect>
-        <x>420</x>
-        <y>30</y>
-        <width>131</width>
+        <x>280</x>
+        <y>60</y>
+        <width>24</width>
         <height>26</height>
        </rect>
       </property>
@@ -199,14 +207,14 @@ Attribute selection will override files or cases selected in the left-hand-side 
        <string>Filter results for those marked Important</string>
       </property>
       <property name="text">
-       <string>Important</string>
+       <string/>
       </property>
      </widget>
      <widget class="QComboBox" name="comboBox_memos">
       <property name="geometry">
        <rect>
         <x>230</x>
-        <y>60</y>
+        <y>30</y>
         <width>151</width>
         <height>26</height>
        </rect>
@@ -219,7 +227,7 @@ Attribute selection will override files or cases selected in the left-hand-side 
       <property name="geometry">
        <rect>
         <x>200</x>
-        <y>60</y>
+        <y>30</y>
         <width>24</width>
         <height>24</height>
        </rect>
@@ -234,9 +242,9 @@ Attribute selection will override files or cases selected in the left-hand-side 
      <widget class="QCheckBox" name="checkBox_show_stats">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>330</x>
         <y>60</y>
-        <width>131</width>
+        <width>24</width>
         <height>26</height>
        </rect>
       </property>
@@ -244,14 +252,14 @@ Attribute selection will override files or cases selected in the left-hand-side 
        <string>Display summary statistics</string>
       </property>
       <property name="text">
-       <string>Statistics</string>
+       <string/>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_matrix_transpose">
       <property name="geometry">
        <rect>
         <x>382</x>
-        <y>30</y>
+        <y>1</y>
         <width>21</width>
         <height>24</height>
        </rect>
@@ -266,9 +274,9 @@ Attribute selection will override files or cases selected in the left-hand-side 
      <widget class="QCheckBox" name="checkBox_text_context">
       <property name="geometry">
        <rect>
-        <x>420</x>
-        <y>-1</y>
-        <width>131</width>
+        <x>230</x>
+        <y>60</y>
+        <width>24</width>
         <height>26</height>
        </rect>
       </property>
@@ -277,7 +285,7 @@ Attribute selection will override files or cases selected in the left-hand-side 
 Change Settings for number of characters and display style.</string>
       </property>
       <property name="text">
-       <string>Text context</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLineEdit" name="lineEdit_search_results">
@@ -313,7 +321,7 @@ Change Settings for number of characters and display style.</string>
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>60</y>
+        <y>90</y>
         <width>151</width>
         <height>26</height>
        </rect>
@@ -399,9 +407,9 @@ AV timeline. Audio video codings shown first and ordered by their time positions
      <widget class="QCheckBox" name="checkBox_show_refs">
       <property name="geometry">
        <rect>
-        <x>420</x>
-        <y>90</y>
-        <width>131</width>
+        <x>380</x>
+        <y>60</y>
+        <width>24</width>
         <height>26</height>
        </rect>
       </property>
@@ -409,7 +417,7 @@ AV timeline. Audio video codings shown first and ordered by their time positions
        <string>Show references</string>
       </property>
       <property name="text">
-       <string>References</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_coders">
@@ -448,7 +456,7 @@ AV timeline. Audio video codings shown first and ordered by their time positions
       <property name="geometry">
        <rect>
         <x>8</x>
-        <y>91</y>
+        <y>60</y>
         <width>26</width>
         <height>26</height>
        </rect>
@@ -464,7 +472,7 @@ AV timeline. Audio video codings shown first and ordered by their time positions
       <property name="geometry">
        <rect>
         <x>200</x>
-        <y>30</y>
+        <y>1</y>
         <width>26</width>
         <height>26</height>
        </rect>
@@ -512,13 +520,77 @@ AV timeline. Audio video codings shown first and ordered by their time positions
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>60</y>
+        <y>90</y>
         <width>26</width>
         <height>26</height>
        </rect>
       </property>
       <property name="toolTip">
        <string>Sort options</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_text_context">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>60</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Surround coded text with pre-text and post-text.</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_important">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>60</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Filter results for those marked important.</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_statistics">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>60</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Display summary statistics</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_references">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>60</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Show references</string>
       </property>
       <property name="text">
        <string/>
