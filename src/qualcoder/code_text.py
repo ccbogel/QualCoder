@@ -1101,7 +1101,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor_start = self.ui.plainTextEdit.textCursor()
         cursor_start.setPosition(max(0, code_to_handle['pos0'] - self.file_['start']))
         rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
-        h_start = CodeResizeHandle(self.ui.plainTextEdit, True, code_to_handle, self)
+        h_start = CodeResizeHandle(self.ui.plainTextEdit, True, [code_to_handle], self)
         # start teardrop tip is at its top-right corner -> shift left by full width
         h_start.move(rect_start.x() - h_start.width(), rect_start.y())
         self.active_handles.append(h_start)
@@ -1111,7 +1111,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor_end.setPosition(min(len(self.ui.plainTextEdit.toPlainText()),
                                    code_to_handle['pos1'] - self.file_['start']))
         rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
-        h_end = CodeResizeHandle(self.ui.plainTextEdit, False, code_to_handle, self)
+        h_end = CodeResizeHandle(self.ui.plainTextEdit, False, [code_to_handle], self)
         # end teardrop tip is at its top-left corner -> align directly to the cursor x
         h_end.move(rect_end.x(), rect_end.y())
         self.active_handles.append(h_end)
