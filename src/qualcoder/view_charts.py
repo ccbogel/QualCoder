@@ -1058,6 +1058,7 @@ class ViewCharts(QDialog):
                 sql = "select count(cid) from code_text where cid=? and owner like ? and fid" + file_ids
                 cur.execute(sql, [c['cid'], owner])
                 res_text = cur.fetchone()
+             # This is for a case selection. Particularly if a portion (or all) of text file(s) are assigned to a case. 
             if file_ids != "" and self.case_id > 0:
                 sql = "select count(code_text.cid) from code_text "
                 sql += "join case_text on case_text.fid=code_text.fid "
@@ -1109,6 +1110,7 @@ class ViewCharts(QDialog):
                 sql = "select ifnull(sum(pos1 - pos0), 0) from code_text where cid=? and owner like ? and fid" + file_ids
                 cur.execute(sql, [c['cid'], owner])
                 res = cur.fetchone()
+            # This is for a case selection. Particularly if a portion (or all) of text file(s) are assigned to a case. 
             if file_ids != "" and self.case_id > 0:
                 sql = "select ifnull(sum(code_text.pos1 - code_text.pos0), 0) from code_text "
                 sql += "join case_text on case_text.fid=code_text.fid "
@@ -1227,6 +1229,7 @@ class ViewCharts(QDialog):
                 sql = "select count(cid) from code_text where cid=? and owner like ? and fid" + file_ids
                 cur.execute(sql, [c['cid'], owner])
                 res_text = cur.fetchone()
+            # This is for a case selection. Particularly if a portion (or all) of text file(s) are assigned to a case. 
             if file_ids != "" and self.case_id > 0:
                 sql = "select count(code_text.cid) from code_text "
                 sql += "join case_text on case_text.fid=code_text.fid "
@@ -1276,6 +1279,7 @@ class ViewCharts(QDialog):
                 sql = "select ifnull(sum(pos1 - pos0), 0) from code_text where cid=? and owner like ? and fid" + file_ids
                 cur.execute(sql, [c['cid'], owner])
                 res = cur.fetchone()
+            # This is for a case selection. Particularly if a portion (or all) of text file(s) are assigned to a case. 
             if file_ids != "" and self.case_id > 0:
                 sql = "select ifnull(sum(code_text.pos1 - code_text.pos0), 0) from code_text "
                 sql += "join case_text on case_text.fid=code_text.fid "
@@ -1458,11 +1462,23 @@ class ViewCharts(QDialog):
         case_file_name, file_ids = self.get_file_ids()
         coded_data = []
         cur = self.app.conn.cursor()
-        sql_t = "select cid from code_text where owner like ?"
-        if file_ids != "":
+        if file_ids == "":
+            sql_t = "select cid from code_text where owner like ?"
+            cur.execute(sql_t, [owner])
+            result = cur.fetchall()
+        if file_ids != "" and self.case_id == -1:
             sql_t = "select cid from code_text where owner like ? and fid" + file_ids
-        cur.execute(sql_t, [owner])
-        result = cur.fetchall()
+            cur.execute(sql_t, [owner])
+            result = cur.fetchall()
+        # This is for a case selection. Particularly if a portion (or all) of text file(s) are assigned to a case. 
+        if file_ids != "" and self.case_id > 0:
+            sql = "select code_text.cid from code_text "
+            sql += "join case_text on case_text.fid=code_text.fid "
+            sql += "where code_text.owner like ? and case_text.caseid=? and case_text.fid " + file_ids + " "
+            sql += "and code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1 "
+            cur.execute(sql, [owner, self.case_id])
+            result = cur.fetchall()   
+        
         for row in result:
             coded_data.append(row)
         sql_i = "select cid from code_image where owner like ?"
@@ -1559,11 +1575,23 @@ class ViewCharts(QDialog):
         case_file_name, file_ids = self.get_file_ids()
         coded_data = []
         cur = self.app.conn.cursor()
-        sql = "select cid, pos1-pos0 from code_text where owner like ?"
+        if file_ids == "":
+            sql = "select cid, pos1-pos0 from code_text where owner like ?"
+            cur.execute(sql, [owner])
+            result = cur.fetchall()
         if file_ids != "":
             sql = "select cid, pos1-pos0 from code_text where owner like ? and fid" + file_ids
-        cur.execute(sql, [owner])
-        result = cur.fetchall()
+            cur.execute(sql, [owner])
+            result = cur.fetchall()
+        # This is for a case selection. Particularly if a portion (or all) of text file(s) are assigned to a case. 
+        if file_ids != "" and self.case_id > 0:
+            sql = "select code_text.cid, ifnull(code_text.pos1 - code_text.pos0, 0) from code_text "
+            sql += "join case_text on case_text.fid=code_text.fid "
+            sql += "where code_text.owner like ? and case_text.caseid=? and case_text.fid " + file_ids + " "
+            sql += "and code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1 "
+            cur.execute(sql, [owner, self.case_id])
+            result = cur.fetchall()  
+
         for row in result:
             coded_data.append(row)
         # Calculate the frequency of each code
