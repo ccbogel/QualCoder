@@ -1,6 +1,6 @@
 [project]
 name = "qualcoder"
-version = "4.1.0.dev0"
+version = "4.0"
 description = "The free, open source desktop software for qualitative data analysis"
 readme = "README.md"
 authors = [
@@ -63,19 +63,61 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "appimage>=4.1.0",
     "pytest>=9.2.0",
     "ruff>=0.17.3",
     "ty>=0.0.96",
     "uv>=0.13.6",
 ]
 
+# Had to manually block this
+[tool.uv]
+override-dependencies = [
+    "nvidia-cublas-cu12; sys_platform == 'never'",
+    "nvidia-cuda-cupti-cu12; sys_platform == 'never'",
+    "nvidia-cuda-nvrtc-cu12; sys_platform == 'never'",
+    "nvidia-cuda-runtime-cu12; sys_platform == 'never'",
+    "nvidia-cudnn-cu12; sys_platform == 'never'",
+    "nvidia-cufft-cu12; sys_platform == 'never'",
+    "nvidia-curand-cu12; sys_platform == 'never'",
+    "nvidia-cusolver-cu12; sys_platform == 'never'",
+    "nvidia-cusparse-cu12; sys_platform == 'never'",
+    "nvidia-cusparselt-cu12; sys_platform == 'never'",
+    "nvidia-nccl-cu12; sys_platform == 'never'",
+    "nvidia-nvjitlink-cu12; sys_platform == 'never'",
+    "nvidia-nvtx-cu12; sys_platform == 'never'",
+]
+
 # Makes sure that torch CPU is installed instead of CUDA, this saves space
 [tool.uv.sources]
-torch = { index = "pytorch" }
+torch = [
+  { index = "pytorch-cpu", marker = "extra != 'gpu'" },
+  { index = "pytorch-cu124", marker = "extra == 'gpu'" },
+]
+torchvision = [
+  { index = "pytorch-cpu", marker = "extra != 'gpu'" },
+  { index = "pytorch-cu124", marker = "extra == 'gpu'" },
+]
+torchaudio = [
+  { index = "pytorch-cpu", marker = "extra != 'gpu'" },
+  { index = "pytorch-cu124", marker = "extra == 'gpu'" },
+]
+
+[project.optional-dependencies]
+gpu = [
+  "torch<=4.53.0",
+  "torchvision",
+  "torchaudio",
+]
 
 [[tool.uv.index]]
-name = "pytorch"
+name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
 explicit = true
 
 # So ruff stops flaging gettetx syntax as a problemm
