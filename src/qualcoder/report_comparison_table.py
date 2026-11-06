@@ -799,7 +799,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                     item.setForeground(QtGui.QBrush(QtGui.QColor("#000000")))
                 if cell_data > 0:
                     item.setData(QtCore.Qt.ItemDataRole.DisplayRole, cell_data)
-                    item.setToolTip(_("Left-click for details.\nRight-click to crate merged code"))
+                    item.setToolTip(_("Left-click for details.\nRight-click to create merged code"))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
         self.ui.tableWidget.resizeColumnsToContents()  # Doesnt look great
