@@ -1,3 +1,9 @@
+# ------
+# PyProject.toml - required for uv, ruff, ty and appimage
+# ------
+# Due to pypy's and uv's interaction being really
+# specific, torch modules needed to be pinned
+
 [project]
 name = "qualcoder"
 version = "4.0"
@@ -41,6 +47,9 @@ dependencies = [
   "pylatexenc>=2.10,<3",
   "pymupdf>=2.0",
   "pyqt6>=6.5",
+  "torch==2.6.0+cpu",        # Needed to be pinned
+  "torchvision==0.21.0+cpu", # Needed to be pinned
+  "torchaudio==2.6.0+cpu",   # Needed to be pinned
   "python-vlc>=3.0.21203",
   "pyyaml>=6.0.3",
   "qtawesome>=1.4.2",
@@ -70,55 +79,21 @@ dev = [
     "uv>=0.13.6",
 ]
 
-# Had to manually block this
-[tool.uv]
-override-dependencies = [
-    "nvidia-cublas-cu12; sys_platform == 'never'",
-    "nvidia-cuda-cupti-cu12; sys_platform == 'never'",
-    "nvidia-cuda-nvrtc-cu12; sys_platform == 'never'",
-    "nvidia-cuda-runtime-cu12; sys_platform == 'never'",
-    "nvidia-cudnn-cu12; sys_platform == 'never'",
-    "nvidia-cufft-cu12; sys_platform == 'never'",
-    "nvidia-curand-cu12; sys_platform == 'never'",
-    "nvidia-cusolver-cu12; sys_platform == 'never'",
-    "nvidia-cusparse-cu12; sys_platform == 'never'",
-    "nvidia-cusparselt-cu12; sys_platform == 'never'",
-    "nvidia-nccl-cu12; sys_platform == 'never'",
-    "nvidia-nvjitlink-cu12; sys_platform == 'never'",
-    "nvidia-nvtx-cu12; sys_platform == 'never'",
-]
-
-# Makes sure that torch CPU is installed instead of CUDA, this saves space
-[tool.uv.sources]
-torch = [
-  { index = "pytorch-cpu", marker = "extra != 'gpu'" },
-  { index = "pytorch-cu124", marker = "extra == 'gpu'" },
-]
-torchvision = [
-  { index = "pytorch-cpu", marker = "extra != 'gpu'" },
-  { index = "pytorch-cu124", marker = "extra == 'gpu'" },
-]
-torchaudio = [
-  { index = "pytorch-cpu", marker = "extra != 'gpu'" },
-  { index = "pytorch-cu124", marker = "extra == 'gpu'" },
-]
-
-[project.optional-dependencies]
-gpu = [
-  "torch<=4.53.0",
-  "torchvision",
-  "torchaudio",
-]
-
 [[tool.uv.index]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
-[[tool.uv.index]]
-name = "pytorch-cu124"
-url = "https://download.pytorch.org/whl/cu124"
-explicit = true
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu" },
+]
+torchvision = [
+    { index = "pytorch-cpu" },
+]
+torchaudio = [
+    { index = "pytorch-cpu" },
+]
 
 # So ruff stops flaging gettetx syntax as a problemm
 [tool.ruff]
