@@ -6,7 +6,7 @@ This documentation contains a set of guidelines to help you during the contribut
 
 Below you will find the process and workflow used to review and merge your changes.
 
-Contributions are made under the project licence, [LGPL v3](https://www.gnu.org/licenses/lgpl-3.0.en.html. Also see [GitHub terms of services - contributions under repository license](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#6-contributions-under-repository-license).
+Contributions are made under the project licence, [LGPL v3](https://www.gnu.org/licenses/lgpl-3.0.en.html). Also see [GitHub terms of services - contributions under repository license](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#6-contributions-under-repository-license).
 
 ##  Choose an issue/ Create an issue
 
