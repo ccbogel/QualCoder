@@ -12,6 +12,7 @@ debian/qualcoder
 .pybuild/
 *.egg-info
 *.deb
+uv.lock
 */__pycache__
 __pycache__
 build
