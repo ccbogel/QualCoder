@@ -6,6 +6,8 @@ This documentation contains a set of guidelines to help you during the contribut
 
 Below you will find the process and workflow used to review and merge your changes.
 
+Contributions are made under the project licence, [LGPL v3](https://www.gnu.org/licenses/lgpl-3.0.en.html).
+
 ##  Choose an issue/ Create an issue
 
 - Look for the existing issue or create your own issue.
