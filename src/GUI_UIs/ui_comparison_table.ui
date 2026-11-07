@@ -117,7 +117,7 @@
        <rect>
         <x>230</x>
         <y>38</y>
-        <width>261</width>
+        <width>241</width>
         <height>20</height>
        </rect>
       </property>
@@ -125,7 +125,7 @@
        <string>Sum the code counts per case or per attribute value, instead of showing each file separately.</string>
       </property>
       <property name="text">
-       <string>Sum counts by case / attribute</string>
+       <string>Sum by case / attribute</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_select_files">
@@ -335,6 +335,22 @@
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_subcodes">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>40</y>
+        <width>161</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Show sub-code count, code count (sub-code count)</string>
+      </property>
+      <property name="text">
+       <string>(Sub-codes)</string>
       </property>
      </widget>
     </widget>
