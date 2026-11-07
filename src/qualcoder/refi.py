@@ -1184,8 +1184,9 @@ class RefiImport:
             return
 
         # Copy plain text file into documents folder, or if .srt into audio or video folder.
+        transcript_name = element.get("name")  # optional in the REFI-QDA XSD
+        name = transcript_name if transcript_name else f"{av_name}.txt"
         # TODO use Path object
-        name = element.get("name")
         destination = self.app.project_path + "/documents/" + name
         if name[-4:] == ".srt" and av_name[-4] in ("mp4", "ogg", "mov"):
             destination = self.app.project_path + "/video/" + name
@@ -1227,8 +1228,8 @@ class RefiImport:
             Message(self.app, _("Warning"), _("Cannot import") + f"{destination}\n{err}", "warning").exec()
 
         memo = ""
-        if name is not None:
-            memo = f"Name: {name}\n"
+        if transcript_name:
+            memo = f"Name: {transcript_name}\n"
         for el in list(element):
             if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                 if el.text is not None:
