@@ -386,7 +386,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         # Added checks to test for media presence
         if self.allfiles[index][MEDIAPATH][:6] in ("/video", "video:"):
             if self.allfiles[index][MEDIAPATH][:6] == "video:":
-                abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
+                abs_path = self.allfiles[index][MEDIAPATH][6:]
                 if not Path(abs_path).exists():
                     return
             if self.allfiles[index][MEDIAPATH][:6] == "/video":
@@ -397,7 +397,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             ui_av.exec()
         if self.allfiles[index][MEDIAPATH][:6] in ("/audio", "audio:"):
             if self.allfiles[index][MEDIAPATH][0:6] == "audio:":
-                abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
+                abs_path = self.allfiles[index][MEDIAPATH][6:]
                 if not Path(abs_path).exists():
                     return
             if self.allfiles[index][MEDIAPATH][0:6] == "/audio":
@@ -408,8 +408,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             ui_av.exec()
         if self.allfiles[index][MEDIAPATH][:7] in ("/images", "images:"):
             if self.allfiles[index][MEDIAPATH][0:7] == "images:":
-                abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
-                if not path(abs_path).exists():
+                abs_path = self.allfiles[index][MEDIAPATH][7:]
+                if not Path(abs_path).exists():
                     return
             if self.allfiles[index][MEDIAPATH][0:7] == "/images":
                 abs_path = self.app.project_path + self.allfiles[index][MEDIAPATH]
