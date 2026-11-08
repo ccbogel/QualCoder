@@ -182,7 +182,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         for i_, key_ in enumerate(["az", "za","Category az", "Category za", "Frequency descending", "Frequency ascending", "Images vertically", "AV timeline"]):
             self.ui.comboBox_sort.setItemData(i_, key_)
         self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
+        # Disable Export and results search, until results available
         self.ui.comboBox_export.setEnabled(False)
+        self.ui.checkBox_variables.setEnabled(False)
+        self.ui.pushButton_export_matrix.setEnabled(False)
+        self.ui.lineEdit_search_results.setEnabled(False)
+        self.ui.pushButton_search_next.setEnabled(False)
+
         self.ui.textEdit.installEventFilter(self)
         self.ui.textEdit.setReadOnly(True)
         self.ui.textEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -1415,6 +1421,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                 item.child(i).setSelected(True)
             self.recursive_set_selected(item.child(i))
 
+    def enable_export_and_search_widgets(self):
+        self.ui.checkBox_variables.setEnabled(True)
+        self.ui.pushButton_export_matrix.setEnabled(True)
+        self.ui.comboBox_export.setEnabled(True)
+        self.ui.lineEdit_search_results.setEnabled(True)
+        self.ui.pushButton_search_next.setEnabled(True)
+
     def search_codebook(self):
         """ Codebook display with memos. """
 
@@ -1461,7 +1474,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 fmt.setForeground(text_brush)
                 cursor.setCharFormat(fmt)
                 self.ui.textEdit.append(f"{r[2]}\n")
-        self.ui.comboBox_export.setEnabled(True)
+        self.enable_export_and_search_widgets()
 
     def search_annotations(self):
         """ Find and display annotations from selected text files. """
@@ -1533,7 +1546,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             txt += f"{_('TEXT')}: {a['text']}\n"
             txt += f"{_('ANNOTATION')}: {a['annotation']}"
             self.ui.textEdit.append(txt)
-        self.ui.comboBox_export.setEnabled(True)
+        self.enable_export_and_search_widgets()
 
     def select_attributes(self):
         """ Select files based on attribute selections.
@@ -1625,10 +1638,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        self.ui.comboBox_export.setEnabled(True)
         self.ui.textEdit.clear()
         self.te = []
         self.html_links = []  # For html file output with media
+
+        self.enable_export_and_search_widgets()
 
         # Add search terms to textEdit
         if memo_choice == "only_memos":
