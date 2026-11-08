@@ -890,7 +890,7 @@ class RefiImport:
         return name, creating_user, create_date, source_path, path_type, rich_text_path
 
     def unique_source_name(self, name):
-        """ Add _2, _3 etc before file extension, if source name is alreadytaken. """
+        """ Add _2, _3 etc before file extension, if source name is already taken. """
         stem, dot, ext = name.rpartition(".")
         if not dot:
             stem, ext = name, ""
@@ -1420,14 +1420,15 @@ class RefiImport:
         # once the source row exists.
         cur.execute("select id from source where name=?", [name])
         res_id = cur.fetchone()
-        if res_id is not None:
-            for el in element:
-                if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}PDFSelection":
-                    self.load_codings_for_pdf_areas(res_id[0], el)
-            else:
-                cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values (?,?,?,?,?,?)",
-                    [name, "", media_path, "", creating_user, create_date])
-                self.app.conn.commit()
+        if res_id is None:  # Extra check needed for some qdpx imports
+            cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values (?,?,?,?,?,?)",
+                [name, "", media_path, "", creating_user, create_date])
+            self.app.conn.commit()
+        cur.execute("select id from source where name=?", [name])
+        res_id = cur.fetchone()
+        for el in element:
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}PDFSelection":
+                self.load_codings_for_pdf_areas(res_id[0], el)
 
     def load_codings_for_pdf_areas(self, id_:int, element):
         """ Loads coded areas over PDF pages (PDFSelection) into code_image with pdf_page.
