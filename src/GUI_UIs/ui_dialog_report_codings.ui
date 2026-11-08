@@ -84,7 +84,7 @@
        <rect>
         <x>200</x>
         <y>90</y>
-        <width>26</width>
+        <width>41</width>
         <height>26</height>
        </rect>
       </property>
@@ -591,6 +591,40 @@ AV timeline. Audio video codings shown first and ordered by their time positions
       </property>
       <property name="toolTip">
        <string>Show references</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_image_size">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>90</y>
+        <width>24</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Checked. Maximise image size for A4 page.
+Unchecked. Maximum image width or height 400 pixels.</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_image_size">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>90</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Checked. Maximise image size for A4 page.
+Unchecked. Maximum image width or height 400 pixels.</string>
       </property>
       <property name="text">
        <string/>
