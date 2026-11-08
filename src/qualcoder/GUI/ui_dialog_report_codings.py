@@ -37,7 +37,7 @@ class Ui_Dialog_reportCodings(object):
         self.comboBox_coders.setGeometry(QtCore.QRect(40, 30, 151, 26))
         self.comboBox_coders.setObjectName("comboBox_coders")
         self.pushButton_attributeselect = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_attributeselect.setGeometry(QtCore.QRect(200, 90, 26, 26))
+        self.pushButton_attributeselect.setGeometry(QtCore.QRect(200, 90, 41, 26))
         self.pushButton_attributeselect.setText("")
         self.pushButton_attributeselect.setObjectName("pushButton_attributeselect")
         self.label_exports = QtWidgets.QLabel(parent=self.groupBox)
@@ -158,6 +158,14 @@ class Ui_Dialog_reportCodings(object):
         self.label_references.setGeometry(QtCore.QRect(350, 60, 24, 24))
         self.label_references.setText("")
         self.label_references.setObjectName("label_references")
+        self.checkBox_image_size = QtWidgets.QCheckBox(parent=self.groupBox)
+        self.checkBox_image_size.setGeometry(QtCore.QRect(280, 90, 24, 26))
+        self.checkBox_image_size.setText("")
+        self.checkBox_image_size.setObjectName("checkBox_image_size")
+        self.label_image_size = QtWidgets.QLabel(parent=self.groupBox)
+        self.label_image_size.setGeometry(QtCore.QRect(250, 90, 24, 24))
+        self.label_image_size.setText("")
+        self.label_image_size.setObjectName("label_image_size")
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(parent=Dialog_reportCodings)
         self.groupBox_2.setTitle("")
@@ -264,6 +272,10 @@ class Ui_Dialog_reportCodings(object):
         self.label_important.setToolTip(_translate("Dialog_reportCodings", "Filter results for those marked important."))
         self.label_statistics.setToolTip(_translate("Dialog_reportCodings", "Display summary statistics"))
         self.label_references.setToolTip(_translate("Dialog_reportCodings", "Show references"))
+        self.checkBox_image_size.setToolTip(_translate("Dialog_reportCodings", "Checked. Maximise image size for A4 page.\n"
+"Unchecked. Maximum image width or height 400 pixels."))
+        self.label_image_size.setToolTip(_translate("Dialog_reportCodings", "Checked. Maximise image size for A4 page.\n"
+"Unchecked. Maximum image width or height 400 pixels."))
 
 
 if __name__ == "__main__":
