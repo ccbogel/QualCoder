@@ -25,7 +25,6 @@ import sqlite3
 from copy import deepcopy
 import csv
 import datetime
-import emoji
 import logging
 import openpyxl
 from openpyxl.styles import Font, Alignment
@@ -149,6 +148,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.label_important.setPixmap(qta.icon('mdi6.star-outline').pixmap(26, 26))
         self.ui.label_statistics.setPixmap(qta.icon('mdi6.chart-bar').pixmap(26, 26))
         self.ui.label_references.setPixmap(qta.icon('mdi6.book-open-variant').pixmap(26, 26))
+        self.ui.label_image_size.setPixmap(qta.icon('mdi6.image-size-select-large').pixmap(26, 26))
+
         # Canonical keys in userData, labels translatable
         matrix_options = [("", ""), ("top_cat_case", _("Top categories by case")),
                           ("top_cat_file", _("Top categories by file")),
@@ -434,18 +435,22 @@ class DialogReportCodes(QtWidgets.QDialog):
             dialog.setWindowTitle(_("Select some files"))
             dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
             dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
-            dialog.setLabelText(_("Show files containing text"))
+            dialog.setLabelText(_("Filenames containing text.\n| pipe for multiple texts."))
             dialog.resize(200, 20)
             ok = dialog.exec()
             if not ok:
                 return
-            dlg_text = str(dialog.textValue())
             for i in range(self.ui.listWidget_files.count()):
-                item_name = self.ui.listWidget_files.item(i).text()
-                if dlg_text in item_name:
-                    self.ui.listWidget_files.item(i).setSelected(True)
-                else:
-                    self.ui.listWidget_files.item(i).setSelected(False)
+                self.ui.listWidget_files.item(i).setSelected(False)
+            dlg_filter_text = str(dialog.textValue())
+            # Use pipe for multiples e.g. png, jpg
+            filenames_filter = dlg_filter_text.split("|")
+            for i in range(self.ui.listWidget_files.count()):
+                file_name = self.ui.listWidget_files.item(i).text()
+                for file_filter in filenames_filter:
+                    if file_filter.lower() in file_name.lower():
+                        self.ui.listWidget_files.item(i).setSelected(True)
+
         if action == action_sort_name_asc:
             self.get_files_and_cases("name asc")
         if action == action_sort_name_desc:
@@ -2598,7 +2603,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if image is None:
             image = QtGui.QImageReader(path_).read()
         image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
-        # Scale to max 300 wide or high. perhaps add option to change maximum limit?
+        # Scale to max 400 wide or high. perhaps add option to change maximum limit?
         scaler_w = 1.0
         scaler_h = 1.0
         if image.width() > 400:
@@ -2609,6 +2614,17 @@ class DialogReportCodes(QtWidgets.QDialog):
             scaler = scaler_w
         else:
             scaler = scaler_h
+        # If max size checked. Scale to A4 with 25 mm margins and 96dpi
+        if self.ui.checkBox_image_size.isChecked():
+            if image.width() > 600:
+                scaler_w = 600 / image.width()
+            if image.height() > 900:
+                scaler_h = 900 / image.height()
+            if scaler_w < scaler_h:
+                scaler = scaler_w
+            else:
+                scaler = scaler_h
+
         # Need unique image names or the same image from the same path is reproduced
         # Default for an image  stored in the project folder.
         imagename = f'{counter}-{img["mediapath"]}'
