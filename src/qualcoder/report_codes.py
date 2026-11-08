@@ -2666,7 +2666,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         Inserts the heading into the main textEdit.
         Fills the textedit_start and textedit_end link positions
         Args:
-            item: dictionary of code, file_or_casename, positions, text, coder
+            item: dictionary of: codename, color, file_or_casename,  coder, mediapath, fid,
+            coded_memo, codename_memo, source_memo, cid, pdf_page, result_type, file_or_case, caseid
+            OPTIONAL: imid, x1, y1, width, height
+            OR: ctid, pos0,pos1, text, prettext, posttext
+            OR: avid, pos0, pos1, text
+
         """
 
         cur = self.app.conn.cursor()
@@ -2699,6 +2704,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             # append treats it as plain text and the tag would show literally
             head += _("CODE MEMO: ") + item['codename_memo'] + "\n"
         head += _("File: ") + filename + ", "
+        # If a PDF source add the page number, for images.
+        if 'pdf_page' in item and item['mediapath'].lower().endswith(".pdf"):
+            pdf_page = item['pdf_page'] + 1 if item['pdf_page'] is not None else 1
+            head += " " + _("Page") + f": {pdf_page}. "
+
         if memo_choice in ("also_all", "only_memos") and item['source_memo'] != "":
             head += _(" FILE MEMO: ") + item['source_memo']
         if item['file_or_case'] == 'Case':
