@@ -3178,8 +3178,9 @@ class DialogSelectBranch(QtWidgets.QDialog):
         # show the code colour (categories stay neutral), matching the main
         # code tree: coloured background with a light/dark text for contrast
         if color:
-            it.setBackground(0, QtGui.QBrush(QtGui.QColor(color)))
-            it.setForeground(0, QtGui.QBrush(QtGui.QColor(TextColor(color).recommendation)))
+            it.setIcon(0, qta.icon('mdi6.square-rounded', color=QtGui.QColor(color)))
+            #it.setBackground(0, QtGui.QBrush(QtGui.QColor(color)))
+            #it.setForeground(0, QtGui.QBrush(QtGui.QColor(TextColor(color).recommendation)))
         if parent is None:
             self.tree.addTopLevelItem(it)
         else:
