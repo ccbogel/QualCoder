@@ -7,6 +7,7 @@ debian/debhelper-build-stamp
 debian/files
 debian/qualcoder.substvars
 debian/qualcoder
+_internal/
 **dist*/
 .eggs
 .pybuild/
@@ -24,9 +25,14 @@ tmp*.*
 .coverage
 tools/QualCoder.mcpb
 tools/mcpb/node_modules/
-
 .flatpak-*/
 *.flatpak
 AGENTS.md
 windows_run_from_conda_*.bat
 *.code-workspace
+pyproject.toml
+.python-version
+uv.lock
+*.AppDir/
+*.AppImage
+squashfs-root/

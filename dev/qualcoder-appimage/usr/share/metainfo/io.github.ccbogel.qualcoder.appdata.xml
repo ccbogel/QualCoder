@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.ccbogel.qualcoder.desktop</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>QualCoder</name>
+  <summary>The free, open source desktop software for qualitative data analysis</summary>
+
+  <developer id="io.github.qualcoder">
+    <name>Colin Curtain
+      <email>ccbogel@hotmail.com</email>
+    </name>
+    <name>Kai Dröge</name>
+    <name>Justin Missaghieh-Poncet</name>
+    <name>Lorenzo Salomón Cárdenas</name>
+  </developer>
+
+
+  <description>
+    <p>QualCoder can code text, images, audio and video, write journal notes and memos. You can organise codes in a tree-like categorisation scheme. Various reports can be generated. Most reports can be exported as html, open document text (ODT), plain text or Excel files.</p>
+  </description>
+
+  <launchable type="desktop-id">io.github.ccbogel.qualcoder.desktop</launchable>
+
+  <url type="homepage">https://qualcoder.wordpress.com/</url>
+
+  <!--Maybe add more/more recent screenshots?-->
+  <screenshots>
+    <screenshot type="default">
+      <image>https://qualcoder.org/images/dcb4d4e7-a39b-424b-84c4-d2915098914f.png</image>
+      <caption>Qualcoder Window</caption>
+    </screenshot>
+  </screenshots>
+
+  <content_rating type="oars-1.1" />
+
+  <categories>
+    <category>Science</category>
+  </categories>
+
+  <keywords>
+    <keyword>qualitative</keyword>
+    <keyword>coding</keyword>
+    <keyword>analysis</keyword>
+  </keywords>
+
+  <provides>
+    <binary>QualCoder</binary>
+  </provides>
+
+
+  <!--Maybe add more screenshots?-->
+  <releases>
+    <release version="4.0.0" date="2026-10-02">
+      <description>
+        <p>QualCoder 4.0 adds hierarchical sub-codes, restructures AI features into an agent with tiered access, and reorganizes menus with a new Analysis menu.</p>
+        <ul>
+          <li>AI agent can search code trees, memos, codings, and data. Access modes: read-only, sandboxed write, and full write with confirmation for destructive actions.</li>
+          <li>Sub-codes allow code hierarchies in addition to category hierarchies.</li>
+          <li>Core languages: English, German, French, Spanish. Additional languages are in the Other Languages folder and may not be human-reviewed or recently updated.</li>
+          <li>New Analysis menu; Manage, Coding, and Reports tabs now include explanatory placeholder information.</li>
+          <li>Journals: ODT export, convert journal to a project file for coding, open URLs, and insert timestamps, coded text, and references.</li>
+          <li>Manage files: import surveys from Excel/CSV, import PDF highlights with automatic coding by highlight colour, and import LaTeX as plain text.</li>
+          <li>Coding screens: code-tree Modify/Filter/Sort submenus, code-name filter, move-category function, resizable columns, and improved tree navigation.</li>
+          <li>Code text: font/size selection, resizable codes, underline/vertical-stripe highlighting, ODF export, bookmark shortcuts, and search in edit mode.</li>
+          <li>Code PDF: improved PDF display/manipulation, text and image-area coding, AI-assisted text analysis, PDF highlight export, ODT reports, and legacy project refactoring.</li>
+          <li>A/V coding: bookmarks, restored time/text positions, and VLC or Qt Media Player support. Image coding areas can be resized.</li>
+        </ul>  
+      </description>
+    </release>
+  </releases>
+</component>
