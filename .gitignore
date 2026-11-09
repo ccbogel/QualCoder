@@ -25,10 +25,13 @@ tmp*.*
 .coverage
 tools/QualCoder.mcpb
 tools/mcpb/node_modules/
-QualCoder-x86_64.AppDir
-*.AppImage
 .flatpak-*/
 *.flatpak
 AGENTS.md
 windows_run_from_conda_*.bat
 *.code-workspace
+pyproject.toml
+.python-version
+uv.lock
+*.AppDir/
+*.AppImage

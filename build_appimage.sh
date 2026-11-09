@@ -2,13 +2,13 @@
 # set -e
 
 if [ -z "$1" ]; then
-    echo "Usage: $0 <version> (ex: 3.8.3)"
+    echo "Usage: $0 <version> (ex: 4.0.0)"
     exit 1
 fi
 
 VERSION="$1"
 
-if [ -d dist ]; then
+if [ -d dist ] && [ -d .venv ] && [ -n "$(ls -A dist 2>/dev/null)" ]; then
     echo Binary exist
 else
     echo Compile QualCoder
@@ -17,7 +17,7 @@ else
     source .venv/bin/activate
     python3 -m pip install --upgrade pip
     pip install -r requirements.txt
-    # For the AppImage, using the "folder" spec results in a slightly faster binary
+    # For the AppImage, using the "folder" spec results in a faster binary
     pyinstaller --clean --noconfirm "qualcoder.spec"
     deactivate
 fi
@@ -37,7 +37,7 @@ Name=QualCoder
 GenericName=QualCoder
 Icon=qualcoder
 Comment=Qualitative data analysis for text, images, audio, video.
-Exec=qualCoder %F
+Exec=qualcoder %F
 Terminal=false
 Type=Application
 Categories=Science;Education;
