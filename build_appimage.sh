@@ -31,7 +31,8 @@ cp qualcoder.png QualCoder-x86_64.AppDir/
 cp -r dist/QualCoder/. QualCoder-x86_64.AppDir/usr/bin/
 
 # Desktop File
-cat << EOF > QualCoder-x86_64.AppDir/io.github.ccbogel.QualCoder.desktop
+mkdir -p QualCoder-x86_64.AppDir/usr/share/applications
+cat << EOF > QualCoder-x86_64.AppDir/usr/share/applications/io.github.ccbogel.qualcoder.desktop
 [Desktop Entry]
 Name=QualCoder
 GenericName=QualCoder
@@ -43,6 +44,7 @@ Type=Application
 Categories=Science;Education;
 StartupWMClass=QualCoder
 EOF
+cp QualCoder-x86_64.AppDir/usr/share/applications/io.github.ccbogel.qualcoder.desktop QualCoder-x86_64.AppDir/
 
 #Tools
 wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -O /tmp/appimagetool

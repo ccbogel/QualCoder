@@ -1,30 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>QualCoder</id>
+  <id>io.github.ccbogel.qualcoder.desktop</id>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <name>QualCoder</name>
   <summary>The free, open source desktop software for qualitative data analysis</summary>
 
-  <developer id="io.github.ccbogel">
-    <name>Colin Curtain</name>
-    <email>ccbogel@hotmail.com</email>
-  </developer>
-  <developer id="io.github.kaixxx">
+  <developer id="io.github.qualcoder">
+    <name>Colin Curtain
+      <email>ccbogel@hotmail.com</email>
+    </name>
     <name>Kai Dröge</name>
-  </developer>
-  <developer id="io.github.qwertygc">
     <name>Justin Missaghieh-Poncet</name>
-  </developer>
-  <developer id="io.github.mazatlan_salomon">
     <name>Lorenzo Salomón Cárdenas</name>
   </developer>
+
 
   <description>
     <p>QualCoder can code text, images, audio and video, write journal notes and memos. You can organise codes in a tree-like categorisation scheme. Various reports can be generated. Most reports can be exported as html, open document text (ODT), plain text or Excel files.</p>
   </description>
 
-  <launchable type="desktop-id">io.github.ccbogel.QualCoder.desktop</launchable>
+  <launchable type="desktop-id">io.github.ccbogel.qualcoder.desktop</launchable>
 
   <url type="homepage">https://qualcoder.wordpress.com/</url>
 
@@ -32,6 +28,7 @@
   <screenshots>
     <screenshot type="default">
       <image>https://qualcoder.org/images/dcb4d4e7-a39b-424b-84c4-d2915098914f.png</image>
+      <caption>Qualcoder Window</caption>
     </screenshot>
   </screenshots>
 
