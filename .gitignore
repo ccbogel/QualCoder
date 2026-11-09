@@ -35,3 +35,4 @@ pyproject.toml
 uv.lock
 *.AppDir/
 *.AppImage
+squashfs-root/
