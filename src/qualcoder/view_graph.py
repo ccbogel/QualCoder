@@ -6121,10 +6121,8 @@ class DialogSelectGraphBranch(QDialog):
     def _add_item(self, parent, text, key, color=None):
         it = QtWidgets.QTreeWidgetItem([text])
         it.setData(0, QtCore.Qt.ItemDataRole.UserRole, key)
-        # code colour as background with contrast text (categories stay neutral)
         if color:
-            it.setBackground(0, QtGui.QBrush(QtGui.QColor(color)))
-            it.setForeground(0, QtGui.QBrush(QtGui.QColor(TextColor(color).recommendation)))
+            it.setIcon(0, qta.icon('mdi6.square-rounded', color=QtGui.QColor(color)))
         if parent is None:
             self.tree.addTopLevelItem(it)
         else:

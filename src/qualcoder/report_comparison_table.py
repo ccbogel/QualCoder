@@ -79,6 +79,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
         self.ui.checkBox_group_selection.setEnabled(False)
         self.ui.checkBox_group_selection.stateChanged.connect(self.group_selection_changed)
+        self.ui.checkBox_subcodes.stateChanged.connect(self.group_selection_changed)
         self.ui.listWidget.itemPressed.connect(self.show_list_item)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
@@ -98,6 +99,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.data = []
         self.max_count = 0
         self.data_counts = []
+        self.sub_code_counts = []
         self.data_colors = []
         self.data_list_widget = []   # Used to transfer data from list widget item to DialogCodeIn...
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
@@ -322,6 +324,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             return
         self.transposed = not(self.transposed)
         self.data_counts = [[row[i] for row in self.data_counts] for i in range(len(self.data_counts[0]))]
+        self.sub_code_counts = [[row[i] for row in self.sub_code_counts] for i in range(len(self.sub_code_counts[0]))]
         self.data_colors = [[row[i] for row in self.data_colors] for i in range(len(self.data_colors[0]))]
         self.data = [[row[i] for row in self.data] for i in range(len(self.data[0]))]
         self.fill_table()
@@ -365,6 +368,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 self.data_counts[row][col] = result_length
                 self.data[row][col] = cell_data
 
+        self.calculate_sub_code_counts()
+
         # Color heat map for spread across 5 colours
         colors = self.colours[self.color_choice]
         for row, row_data in enumerate(self.data_counts):
@@ -375,6 +380,30 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                         color_range_index = 0
                     self.data_colors[row][col] = colors[color_range_index]
         self.fill_table()
+
+    def calculate_sub_code_counts(self):
+
+        self.sub_code_counts = []
+        for row in self.codes:
+            self.sub_code_counts.append([0] * len(self.columns))
+        codes, categories = self.app.get_codes_categories()
+        for row, row_data in enumerate(self.data_counts):
+            # Include descendant sub-codes of this code.
+            selected_cids = [self.codes[row]['cid']]
+            selected_codes = [self.codes[row]['name']]
+            changed = True
+            sub_code_counter = 0
+            while changed:
+                changed = False
+                for code in codes:
+                    if code['cid'] not in selected_cids and code.get('supercid') in selected_cids:
+                        selected_codes.append(code['name'])
+            selected_codes.remove(self.codes[row]['name'])
+            for subcode_name in selected_codes:
+                for inner_row, inner_row_data in enumerate(self.data_counts):
+                    if self.codes[inner_row]['name'] == subcode_name:
+                        for col, i in enumerate(self.sub_code_counts[row]):
+                            self.sub_code_counts[row][col] += inner_row_data[col]
 
     def build_columns(self):
         """ Set self.columns from self.files.
@@ -400,7 +429,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             self.columns.append({'name': f"{group_name}\n{_('Files')}: {len(ids)}", 'ids': ids})
 
     def group_selection_changed(self):
-        """ Checkbox toggled: recalculate the table if there is something to show. """
+        """ Checkbox toggled: recalculate the table if there is something to show.
+        Also activated by sub-codes count toggle. """
 
         if not self.files or not self.codes:
             return
@@ -799,7 +829,11 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                     item.setForeground(QtGui.QBrush(QtGui.QColor("#000000")))
                 if cell_data > 0:
                     item.setData(QtCore.Qt.ItemDataRole.DisplayRole, cell_data)
-                    item.setToolTip(_("Left-click for details.\nRight-click to crate merged code"))
+                    item.setToolTip(_("Left-click for details.\nRight-click to create merged code"))
+                if self.ui.checkBox_subcodes.isChecked() and self.sub_code_counts[row][col] > 0:
+                    text = f"{cell_data} ({self.sub_code_counts[row][col]})"
+                    item.setData(QtCore.Qt.ItemDataRole.DisplayRole, text)
+
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
         self.ui.tableWidget.resizeColumnsToContents()  # Doesnt look great
@@ -879,17 +913,5 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             ui.exec()
 
 
-    ''' TODO for future expansion maybe.
-    def table_menu(self, position):
-        """ Context menu for displaying table cell coding details.
-        """
 
-        row = self.ui.tableWidget.currentRow()
-        col = self.ui.tableWidget.currentColumn()
-        text = self.ui.tableWidget.item(row, col).text()
-        print(row, col, text)
-
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_view = menu.addAction(_("View"))'''
 

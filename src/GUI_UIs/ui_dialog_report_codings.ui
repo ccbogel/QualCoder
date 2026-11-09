@@ -3,13 +3,13 @@
  <class>Dialog_reportCodings</class>
  <widget class="QDialog" name="Dialog_reportCodings">
   <property name="windowModality">
-   <enum>Qt::NonModal</enum>
+   <enum>Qt::WindowModality::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1085</width>
+    <width>1136</width>
     <height>580</height>
    </rect>
   </property>
@@ -43,34 +43,18 @@
      <widget class="QLineEdit" name="lineEdit">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>49</y>
-        <width>183</width>
-        <height>30</height>
+        <x>40</x>
+        <y>60</y>
+        <width>150</width>
+        <height>26</height>
        </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_text_limiter">
-      <property name="geometry">
-       <rect>
-        <x>200</x>
-        <y>23</y>
-        <width>183</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Text limiter:</string>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_run_report">
       <property name="geometry">
        <rect>
-        <x>539</x>
-        <y>3</y>
+        <x>510</x>
+        <y>34</y>
         <width>51</width>
         <height>51</height>
        </rect>
@@ -82,40 +66,30 @@
        <string/>
       </property>
      </widget>
-     <widget class="QLabel" name="label_coder">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>24</y>
-        <width>130</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Coder:</string>
-      </property>
-     </widget>
      <widget class="QComboBox" name="comboBox_coders">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>49</y>
-        <width>181</width>
-        <height>30</height>
+        <x>40</x>
+        <y>30</y>
+        <width>151</width>
+        <height>26</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Select coder. Blank for all.</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_attributeselect">
       <property name="geometry">
        <rect>
-        <x>120</x>
-        <y>82</y>
-        <width>34</width>
-        <height>32</height>
+        <x>200</x>
+        <y>90</y>
+        <width>41</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Attributes.
+       <string>Select file and case attributes.
 Attribute selection will override files or cases selected in the left-hand-side lists.</string>
       </property>
       <property name="text">
@@ -125,8 +99,8 @@ Attribute selection will override files or cases selected in the left-hand-side 
      <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>731</x>
-        <y>89</y>
+        <x>650</x>
+        <y>79</y>
         <width>24</width>
         <height>24</height>
        </rect>
@@ -141,11 +115,16 @@ Attribute selection will override files or cases selected in the left-hand-side 
      <widget class="QComboBox" name="comboBox_export">
       <property name="geometry">
        <rect>
-        <x>760</x>
-        <y>85</y>
+        <x>680</x>
+        <y>75</y>
         <width>91</width>
-        <height>30</height>
+        <height>28</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export format.
+
+To also export variables, check the variables checkbox and select csv or xlsx format.</string>
       </property>
       <item>
        <property name="text">
@@ -186,8 +165,8 @@ Attribute selection will override files or cases selected in the left-hand-side 
      <widget class="QLabel" name="label_title">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>-3</y>
+        <x>1</x>
+        <y>0</y>
         <width>191</width>
         <height>23</height>
        </rect>
@@ -199,10 +178,10 @@ Attribute selection will override files or cases selected in the left-hand-side 
      <widget class="QComboBox" name="comboBox_matrix">
       <property name="geometry">
        <rect>
-        <x>598</x>
-        <y>25</y>
-        <width>281</width>
-        <height>29</height>
+        <x>229</x>
+        <y>1</y>
+        <width>151</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="maximumSize">
@@ -218,9 +197,9 @@ Attribute selection will override files or cases selected in the left-hand-side 
      <widget class="QCheckBox" name="checkBox_important">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>30</y>
-        <width>131</width>
+        <x>280</x>
+        <y>60</y>
+        <width>24</width>
         <height>26</height>
        </rect>
       </property>
@@ -228,16 +207,16 @@ Attribute selection will override files or cases selected in the left-hand-side 
        <string>Filter results for those marked Important</string>
       </property>
       <property name="text">
-       <string>Important</string>
+       <string/>
       </property>
      </widget>
      <widget class="QComboBox" name="comboBox_memos">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>83</y>
-        <width>181</width>
-        <height>30</height>
+        <x>230</x>
+        <y>30</y>
+        <width>151</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -247,10 +226,10 @@ Attribute selection will override files or cases selected in the left-hand-side 
      <widget class="QLabel" name="label_memos">
       <property name="geometry">
        <rect>
-        <x>170</x>
-        <y>81</y>
-        <width>28</width>
-        <height>28</height>
+        <x>200</x>
+        <y>30</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -263,9 +242,9 @@ Attribute selection will override files or cases selected in the left-hand-side 
      <widget class="QCheckBox" name="checkBox_show_stats">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>330</x>
         <y>60</y>
-        <width>131</width>
+        <width>24</width>
         <height>26</height>
        </rect>
       </property>
@@ -273,28 +252,31 @@ Attribute selection will override files or cases selected in the left-hand-side 
        <string>Display summary statistics</string>
       </property>
       <property name="text">
-       <string>Statistics</string>
+       <string/>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_matrix_transpose">
       <property name="geometry">
        <rect>
-        <x>602</x>
-        <y>-1</y>
-        <width>231</width>
+        <x>382</x>
+        <y>1</y>
+        <width>21</width>
         <height>24</height>
        </rect>
       </property>
-      <property name="text">
+      <property name="toolTip">
        <string>Transpose matrix</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_text_context">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>-1</y>
-        <width>131</width>
+        <x>230</x>
+        <y>60</y>
+        <width>24</width>
         <height>26</height>
        </rect>
       </property>
@@ -303,48 +285,29 @@ Attribute selection will override files or cases selected in the left-hand-side 
 Change Settings for number of characters and display style.</string>
       </property>
       <property name="text">
-       <string>Text context</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLineEdit" name="lineEdit_search_results">
       <property name="geometry">
        <rect>
-        <x>537</x>
-        <y>85</y>
-        <width>151</width>
-        <height>30</height>
+        <x>684</x>
+        <y>1</y>
+        <width>121</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
        <string>Search results for text</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_search_results">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>58</y>
-        <width>101</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Search:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_search_next">
       <property name="geometry">
        <rect>
-        <x>690</x>
-        <y>85</y>
-        <width>34</width>
-        <height>30</height>
+        <x>810</x>
+        <y>1</y>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -357,15 +320,19 @@ Change Settings for number of characters and display style.</string>
      <widget class="QComboBox" name="comboBox_sort">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>83</y>
-        <width>101</width>
-        <height>30</height>
+        <x>40</x>
+        <y>90</y>
+        <width>151</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Code names sort order.
-Set this before running results.</string>
+       <string>Results sort order.
+Set this before running results.
+
+Images vertically. Image codings shown first and ordered by y values from the top downwards.
+AV timeline. Audio video codings shown first and ordered by their time positions.
+</string>
       </property>
       <item>
        <property name="text">
@@ -379,40 +346,41 @@ Set this before running results.</string>
       </item>
       <item>
        <property name="text">
-        <string>10 - 1</string>
+        <string>Category az</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>1 - 10</string>
+        <string>Category za</string>
        </property>
       </item>
-     </widget>
-     <widget class="QLabel" name="label_export">
-      <property name="geometry">
-       <rect>
-        <x>730</x>
-        <y>58</y>
-        <width>121</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Export:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
+      <item>
+       <property name="text">
+        <string>Frequency descending</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Frequency ascending</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Images vertically</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AV timeline</string>
+       </property>
+      </item>
      </widget>
      <widget class="QCheckBox" name="checkBox_variables">
       <property name="geometry">
        <rect>
-        <x>860</x>
-        <y>90</y>
-        <width>201</width>
+        <x>810</x>
+        <y>80</y>
+        <width>21</width>
         <height>20</height>
        </rect>
       </property>
@@ -420,16 +388,16 @@ Set this before running results.</string>
        <string>Export file or case variables in columns for CSV or XLSX export</string>
       </property>
       <property name="text">
-       <string>Variables CSV / XLSX</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_export_matrix">
       <property name="geometry">
        <rect>
-        <x>880</x>
-        <y>24</y>
-        <width>181</width>
-        <height>31</height>
+        <x>680</x>
+        <y>38</y>
+        <width>201</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="text">
@@ -439,9 +407,9 @@ Set this before running results.</string>
      <widget class="QCheckBox" name="checkBox_show_refs">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>90</y>
-        <width>131</width>
+        <x>380</x>
+        <y>60</y>
+        <width>24</width>
         <height>26</height>
        </rect>
       </property>
@@ -449,7 +417,217 @@ Set this before running results.</string>
        <string>Show references</string>
       </property>
       <property name="text">
-       <string>References</string>
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_coders">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>31</y>
+        <width>26</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Select Coder. Blank for all.</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_search">
+      <property name="geometry">
+       <rect>
+        <x>650</x>
+        <y>2</y>
+        <width>26</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Search results text</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_text_limiter">
+      <property name="geometry">
+       <rect>
+        <x>8</x>
+        <y>60</y>
+        <width>26</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Text limiter to restrict search results.</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_matrix">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>1</y>
+        <width>26</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Matrix</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_export_matrix">
+      <property name="geometry">
+       <rect>
+        <x>650</x>
+        <y>40</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export matrix</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_variables">
+      <property name="geometry">
+       <rect>
+        <x>777</x>
+        <y>76</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export file or case variables in columns for CSV or XLSX export</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_sort">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>26</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Sort options</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_text_context">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>60</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Surround coded text with pre-text and post-text.</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_important">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>60</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Filter results for those marked important.</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_statistics">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>60</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Display summary statistics</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_references">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>60</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Show references</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_image_size">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>90</y>
+        <width>24</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Checked. Maximise image size for A4 page.
+Unchecked. Maximum image width or height 400 pixels.</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_image_size">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>90</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Checked. Maximise image size for A4 page.
+Unchecked. Maximum image width or height 400 pixels.</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
@@ -469,11 +647,11 @@ Set this before running results.</string>
       <item row="0" column="0">
        <widget class="QSplitter" name="splitter">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <widget class="QSplitter" name="splitter_vert">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <widget class="QListWidget" name="listWidget_files"/>
          <widget class="QListWidget" name="listWidget_cases"/>

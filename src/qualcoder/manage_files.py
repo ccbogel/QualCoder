@@ -3932,6 +3932,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from code_image where id = ?", [file_id])
                 cur.execute("delete from code_av where id = ?", [file_id])
                 cur.execute("delete from attribute where attr_type='file' and id=?", [file_id])
+                # Reused source ids would hand these case links to the next imported file
+                cur.execute("delete from case_text where fid = ?", [file_id])
                 self.app.conn.commit()
                 # Not expected for non-text files; the safe helper survives index locks
                 self.vectorstore_delete_document_safe(file_id)

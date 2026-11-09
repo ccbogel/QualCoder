@@ -25,7 +25,6 @@ import sqlite3
 from copy import deepcopy
 import csv
 import datetime
-import emoji
 import logging
 import openpyxl
 from openpyxl.styles import Font, Alignment
@@ -138,6 +137,19 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         self.ui.checkBox_show_refs.toggled.connect(self.select_reference_style)
+        self.ui.label_coders.setPixmap(qta.icon('mdi6.account-multiple').pixmap(26, 26))
+        self.ui.label_text_limiter.setPixmap(qta.icon('mdi6.text-box-minus-outline').pixmap(26, 26))
+        self.ui.label_search.setPixmap(qta.icon('mdi6.text-search').pixmap(26, 26))
+        self.ui.label_variables.setPixmap(qta.icon('mdi6.variable').pixmap(26, 26))
+        self.ui.label_matrix.setPixmap(qta.icon('mdi6.table').pixmap(26, 26))
+        self.ui.label_export_matrix.setPixmap(qta.icon('mdi6.export').pixmap(22, 22))
+        self.ui.label_sort.setPixmap(qta.icon('mdi6.sort').pixmap(26, 26))
+        self.ui.label_text_context.setPixmap(qta.icon('mdi6.text-shadow').pixmap(26, 26))
+        self.ui.label_important.setPixmap(qta.icon('mdi6.star-outline').pixmap(26, 26))
+        self.ui.label_statistics.setPixmap(qta.icon('mdi6.chart-bar').pixmap(26, 26))
+        self.ui.label_references.setPixmap(qta.icon('mdi6.book-open-variant').pixmap(26, 26))
+        self.ui.label_image_size.setPixmap(qta.icon('mdi6.image-size-select-large').pixmap(26, 26))
+
         # Canonical keys in userData, labels translatable
         matrix_options = [("", ""), ("top_cat_case", _("Top categories by case")),
                           ("top_cat_file", _("Top categories by file")),
@@ -163,10 +175,20 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Canonical keys for .ui-defined items, labels may be translated
         for i_, key_ in enumerate(["", "html", "txt", "odt", "xlsx", "csv", "iramuteq"]):
             self.ui.comboBox_export.setItemData(i_, key_)
-        for i_, key_ in enumerate(["az", "za", "10-1", "1-10"]):
+        # Override and replace items in ui.combobox_sort
+        self.ui.comboBox_sort.clear()
+        sort_items = ["az", "za",_("Category az"), _("Category za"), _("Frequency descending"), _("Frequency ascending"), _("Images vertically"), _("AV timeline")]
+        self.ui.comboBox_sort.addItems(sort_items)
+        for i_, key_ in enumerate(["az", "za","Category az", "Category za", "Frequency descending", "Frequency ascending", "Images vertically", "AV timeline"]):
             self.ui.comboBox_sort.setItemData(i_, key_)
         self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
+        # Disable Export and results search, until results available
         self.ui.comboBox_export.setEnabled(False)
+        self.ui.checkBox_variables.setEnabled(False)
+        self.ui.pushButton_export_matrix.setEnabled(False)
+        self.ui.lineEdit_search_results.setEnabled(False)
+        self.ui.pushButton_search_next.setEnabled(False)
+
         self.ui.textEdit.installEventFilter(self)
         self.ui.textEdit.setReadOnly(True)
         self.ui.textEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -419,18 +441,22 @@ class DialogReportCodes(QtWidgets.QDialog):
             dialog.setWindowTitle(_("Select some files"))
             dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
             dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
-            dialog.setLabelText(_("Show files containing text"))
+            dialog.setLabelText(_("Filenames containing text.\n| pipe for multiple texts."))
             dialog.resize(200, 20)
             ok = dialog.exec()
             if not ok:
                 return
-            dlg_text = str(dialog.textValue())
             for i in range(self.ui.listWidget_files.count()):
-                item_name = self.ui.listWidget_files.item(i).text()
-                if dlg_text in item_name:
-                    self.ui.listWidget_files.item(i).setSelected(True)
-                else:
-                    self.ui.listWidget_files.item(i).setSelected(False)
+                self.ui.listWidget_files.item(i).setSelected(False)
+            dlg_filter_text = str(dialog.textValue())
+            # Use pipe for multiples e.g. png, jpg
+            filenames_filter = dlg_filter_text.split("|")
+            for i in range(self.ui.listWidget_files.count()):
+                file_name = self.ui.listWidget_files.item(i).text()
+                for file_filter in filenames_filter:
+                    if file_filter.lower() in file_name.lower():
+                        self.ui.listWidget_files.item(i).setSelected(True)
+
         if action == action_sort_name_asc:
             self.get_files_and_cases("name asc")
         if action == action_sort_name_desc:
@@ -1227,7 +1253,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         elif item.get('result_type') == 'image':
             imgids = []
             # Two rectangles overlap if they intersect on both axes.
-            sql = ("select code_name.name, x1, y1, width, height, imid from code_image "
+            sql = ("select code_name.name, x1, y1, width, height, pdf_page, imid from code_image "
                    "join code_name on code_name.cid = code_image.cid "
                    "where code_image.id=? and code_image.imid<>?")
             cur.execute(sql, [item['fid'], item['imid']])
@@ -1236,10 +1262,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             ax2 = ax1 + item['width']
             ay2 = ay1 + item['height']
             for row in cur.fetchall():
-                name, bx1, by1, bw, bh, iid = row
+                name, bx1, by1, bw, bh, pdf_page, iid = row
                 bx2 = bx1 + bw
                 by2 = by1 + bh
-                if ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1:
+                if item['pdf_page'] == pdf_page and ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1:
                     cooccuring_code_names.append(name)
                     imgids.append(row[5])
             if imgids:
@@ -1395,6 +1421,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                 item.child(i).setSelected(True)
             self.recursive_set_selected(item.child(i))
 
+    def enable_export_and_search_widgets(self):
+        self.ui.checkBox_variables.setEnabled(True)
+        self.ui.pushButton_export_matrix.setEnabled(True)
+        self.ui.comboBox_export.setEnabled(True)
+        self.ui.lineEdit_search_results.setEnabled(True)
+        self.ui.pushButton_search_next.setEnabled(True)
+
     def search_codebook(self):
         """ Codebook display with memos. """
 
@@ -1441,7 +1474,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 fmt.setForeground(text_brush)
                 cursor.setCharFormat(fmt)
                 self.ui.textEdit.append(f"{r[2]}\n")
-        self.ui.comboBox_export.setEnabled(True)
+        self.enable_export_and_search_widgets()
 
     def search_annotations(self):
         """ Find and display annotations from selected text files. """
@@ -1513,7 +1546,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             txt += f"{_('TEXT')}: {a['text']}\n"
             txt += f"{_('ANNOTATION')}: {a['annotation']}"
             self.ui.textEdit.append(txt)
-        self.ui.comboBox_export.setEnabled(True)
+        self.enable_export_and_search_widgets()
 
     def select_attributes(self):
         """ Select files based on attribute selections.
@@ -1605,10 +1638,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        self.ui.comboBox_export.setEnabled(True)
         self.ui.textEdit.clear()
         self.te = []
         self.html_links = []  # For html file output with media
+
+        self.enable_export_and_search_widgets()
 
         # Add search terms to textEdit
         if memo_choice == "only_memos":
@@ -1975,7 +2009,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
 
         # Sort alphabetically by category hierarchy (root>...>nearest), fallback to codename
-        if sort_by in ("cat_az", "cat_za"):  # items not yet in the .ui
+        if sort_by in ("Category az", "Category za"):  # items not yet in the .ui
             def category_sort_key(item):
                 hierarchy = self.categories_of_code(item['cid'])
                 # categories_of_code returns nearest-first, reverse for root-first ordering
@@ -1987,6 +2021,23 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.results = sorted(self.results, key=category_sort_key, reverse=reverse_order)
             return
 
+        if sort_by == "Images vertically":
+            """ Sort images by image results first then other results types (text, A/V) later. 
+            Images are sorted vertically by filename, pdf page number (None ofr other image types), then y axis. """
+            tmp_results = [item for item in self.results if item['result_type'] == "image"]
+            other_results = [item for item in self.results if item['result_type'] != "image"]
+            self.results = sorted(tmp_results, key=lambda x: (x['file_or_casename'], x['pdf_page'] if x['pdf_page'] is not None else 0, x['y1'])) 
+            self.results += other_results
+            return
+
+        if sort_by == "AV timeline":
+            """ Sort A/V by A/V results first then other results types (images, text) later. 
+            A/V segments are sorted by filename, then msecs ascending. """
+            tmp_results = [item for item in self.results if item['result_type'] == "av"]
+            other_results = [item for item in self.results if item['result_type'] != "av"]
+            self.results = sorted(tmp_results, key=lambda x: (x['file_or_casename'], x['pos0'])) + other_results 
+            return
+        
         # Order code names by frequency
         # Get unique code names
         tmp_names = [r['codename'] for r in self.results]
@@ -2000,7 +2051,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     count += 1
             name_and_count.append({'codename': codename, 'count': count})
         tmp_results = []
-        if sort_by == "1-10":
+        if sort_by == "Frequency ascending":
             small_to_large = sorted(name_and_count, key=lambda d: d['count'])
             for s in small_to_large:
                 for r in self.results:
@@ -2008,7 +2059,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         tmp_results.append(r)
             self.results = tmp_results
             return
-        if sort_by == "10-1":
+        if sort_by == "Frequency descending":
             large_to_small = sorted(name_and_count, key=lambda d: d['count'], reverse=True)
             for s in large_to_small:
                 for r in self.results:
@@ -2566,7 +2617,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if image is None:
             image = QtGui.QImageReader(path_).read()
         image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
-        # Scale to max 300 wide or high. perhaps add option to change maximum limit?
+        # Scale to max 400 wide or high. perhaps add option to change maximum limit?
         scaler_w = 1.0
         scaler_h = 1.0
         if image.width() > 400:
@@ -2577,6 +2628,17 @@ class DialogReportCodes(QtWidgets.QDialog):
             scaler = scaler_w
         else:
             scaler = scaler_h
+        # If max size checked. Scale to A4 with 25 mm margins and 96dpi
+        if self.ui.checkBox_image_size.isChecked():
+            if image.width() > 600:
+                scaler_w = 600 / image.width()
+            if image.height() > 900:
+                scaler_h = 900 / image.height()
+            if scaler_w < scaler_h:
+                scaler = scaler_w
+            else:
+                scaler = scaler_h
+
         # Need unique image names or the same image from the same path is reproduced
         # Default for an image  stored in the project folder.
         imagename = f'{counter}-{img["mediapath"]}'
@@ -2604,7 +2666,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         Inserts the heading into the main textEdit.
         Fills the textedit_start and textedit_end link positions
         Args:
-            item: dictionary of code, file_or_casename, positions, text, coder
+            item: dictionary of: codename, color, file_or_casename,  coder, mediapath, fid,
+            coded_memo, codename_memo, source_memo, cid, pdf_page, result_type, file_or_case, caseid
+            OPTIONAL: imid, x1, y1, width, height
+            OR: ctid, pos0,pos1, text, prettext, posttext
+            OR: avid, pos0, pos1, text
+
         """
 
         cur = self.app.conn.cursor()
@@ -2637,6 +2704,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             # append treats it as plain text and the tag would show literally
             head += _("CODE MEMO: ") + item['codename_memo'] + "\n"
         head += _("File: ") + filename + ", "
+        # If a PDF source add the page number, for images.
+        if 'pdf_page' in item and item['mediapath'].lower().endswith(".pdf"):
+            pdf_page = item['pdf_page'] + 1 if item['pdf_page'] is not None else 1
+            head += " " + _("Page") + f": {pdf_page}. "
+
         if memo_choice in ("also_all", "only_memos") and item['source_memo'] != "":
             head += _(" FILE MEMO: ") + item['source_memo']
         if item['file_or_case'] == 'Case':
