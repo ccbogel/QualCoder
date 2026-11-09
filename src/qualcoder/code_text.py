@@ -4135,7 +4135,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.plainTextEdit.setTextCursor(cursor)
         cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        brush = QBrush(QColor(color.replace("#," "#40")))
+        brush = QBrush(QColor(color.replace("#", "#40")))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
         foreground_colour = TextColor(color).recommendation
