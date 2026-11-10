@@ -291,6 +291,7 @@ class Ui_Dialog_settings(object):
         self.comboBox_code_highlight_style.setObjectName("comboBox_code_highlight_style")
         self.comboBox_code_highlight_style.addItem("")
         self.comboBox_code_highlight_style.addItem("")
+        self.comboBox_code_highlight_style.addItem("")
         self.gridLayout_4.addWidget(self.comboBox_code_highlight_style, 6, 2, 1, 1)
         self.horizontalLayout.addWidget(self.widget_ui_right)
         self.gridLayout.addWidget(self.widget_ui, 2, 0, 1, 3)
@@ -639,7 +640,8 @@ class Ui_Dialog_settings(object):
         self.label_main_tabs.setText(_translate("Dialog_settings", "Main tabs"))
         self.label_22.setText(_translate("Dialog_settings", "Code highlight style"))
         self.comboBox_code_highlight_style.setItemText(0, _translate("Dialog_settings", "marker"))
-        self.comboBox_code_highlight_style.setItemText(1, _translate("Dialog_settings", "underline"))
+        self.comboBox_code_highlight_style.setItemText(1, _translate("Dialog_settings", "marker light"))
+        self.comboBox_code_highlight_style.setItemText(2, _translate("Dialog_settings", "underline"))
         self.label_ai_integration.setText(_translate("Dialog_settings", "AI Integration"))
         self.checkBox_AI_enable.setText(_translate("Dialog_settings", "enable AI integration"))
         self.checkBox_MCP_enable.setToolTip(_translate("Dialog_settings", "This allows external AI agents such as Claude Code, Codex, OpenCode, or Hermes Agent to access the currently opened QualCoder project via MCP on localhost (127.0.0.1).\n"

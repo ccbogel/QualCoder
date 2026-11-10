@@ -721,6 +721,11 @@ language = it</string>
                </item>
                <item>
                 <property name="text">
+                 <string>marker light</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
                  <string>underline</string>
                 </property>
                </item>

@@ -858,18 +858,17 @@ class DialogCodeText(QtWidgets.QWidget):
         menu.addSeparator()
 
         style_menu = menu.addMenu(_("Highlight style"))
-        action_style_marker = None
-        action_style_marker_light = None
-        action_style_underline = None
-        if self.highlight_style == 'marker':
-            action_style_marker_light = style_menu.addAction(_("Marker light"))
-            action_style_underline = style_menu.addAction(_("Underline"))
-        if self.highlight_style == 'marker light':
-            action_style_marker = style_menu.addAction(_("Marker"))
-            action_style_underline = style_menu.addAction(_("Underline"))
-        if self.highlight_style == 'underline':
-            action_style_marker = style_menu.addAction(_("Marker"))
-            action_style_marker_light = style_menu.addAction(_("Marker light"))
+        action_style_marker = style_menu.addAction(_("Marker"))
+        action_style_marker_light = style_menu.addAction(_("Marker light"))
+        action_style_underline = style_menu.addAction(_("Underline"))
+        style_group = QtGui.QActionGroup(style_menu)
+        style_group.setExclusive(True)
+        for style_action, style in ((action_style_marker, 'marker'),
+                                    (action_style_marker_light, 'marker light'),
+                                    (action_style_underline, 'underline')):
+            style_action.setCheckable(True)
+            style_group.addAction(style_action)
+            style_action.setChecked(self.highlight_style == style)
 
         global_pos = source_widget.mapToGlobal(position)
         action = menu.exec(global_pos)
@@ -1102,7 +1101,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor_start = self.ui.plainTextEdit.textCursor()
         cursor_start.setPosition(max(0, code_to_handle['pos0'] - self.file_['start']))
         rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
-        h_start = CodeResizeHandle(self.ui.plainTextEdit, True, code_to_handle, self)
+        h_start = CodeResizeHandle(self.ui.plainTextEdit, True, [code_to_handle], self)
         # start teardrop tip is at its top-right corner -> shift left by full width
         h_start.move(rect_start.x() - h_start.width(), rect_start.y())
         self.active_handles.append(h_start)
@@ -1112,7 +1111,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor_end.setPosition(min(len(self.ui.plainTextEdit.toPlainText()),
                                    code_to_handle['pos1'] - self.file_['start']))
         rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
-        h_end = CodeResizeHandle(self.ui.plainTextEdit, False, code_to_handle, self)
+        h_end = CodeResizeHandle(self.ui.plainTextEdit, False, [code_to_handle], self)
         # end teardrop tip is at its top-left corner -> align directly to the cursor x
         h_end.move(rect_end.x(), rect_end.y())
         self.active_handles.append(h_end)
@@ -4136,7 +4135,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.plainTextEdit.setTextCursor(cursor)
         cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        brush = QBrush(QColor(color.replace("#," "#40")))
+        brush = QBrush(QColor(color.replace("#", "#40")))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
         foreground_colour = TextColor(color).recommendation

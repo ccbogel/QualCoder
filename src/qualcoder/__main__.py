@@ -3804,6 +3804,28 @@ Click "Yes" to start now.')
             self.ui.textEdit.append(_("Deleting code_av coding to deleted files: ") + str(res))
         for r in res:
             cur.execute("delete from code_av where id=?", [r[0]])
+        # Orphans keyed by file id would be inherited by the next import that reuses the id
+        sql = "select distinct fid from case_text where fid not in (select source.id from source)"
+        cur.execute(sql)
+        res = cur.fetchall()
+        if res:
+            self.ui.textEdit.append(_("Deleting case links to deleted files: ") + str(res))
+        for r in res:
+            cur.execute("delete from case_text where fid=?", [r[0]])
+        sql = "select distinct fid from annotation where fid not in (select source.id from source)"
+        cur.execute(sql)
+        res = cur.fetchall()
+        if res:
+            self.ui.textEdit.append(_("Deleting annotations to deleted files: ") + str(res))
+        for r in res:
+            cur.execute("delete from annotation where fid=?", [r[0]])
+        sql = "select distinct id from attribute where attr_type='file' and id not in (select source.id from source)"
+        cur.execute(sql)
+        res = cur.fetchall()
+        if res:
+            self.ui.textEdit.append(_("Deleting attributes of deleted files: ") + str(res))
+        for r in res:
+            cur.execute("delete from attribute where attr_type='file' and id=?", [r[0]])
         self.app.conn.commit()
 
         # Fix 'lost' categories if present.
