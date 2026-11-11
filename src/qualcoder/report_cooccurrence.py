@@ -233,8 +233,9 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         """ Select files, stored in self.file_ids_names, then re-load data. """
 
         selection_list = [{'id': -1, 'name': ''}]
-        for file_name in self.app.get_text_filenames():
-            selection_list.append(file_name)
+        # Text files, and image files for their coded areas
+        files = self.app.get_text_filenames() + self.app.get_image_filenames()
+        selection_list += sorted(files, key=lambda file_: file_['name'].lower())
         ui = DialogSelectItems(self.app, selection_list, _("Select files"), "multi")
         ok = ui.exec()
         if not ok:
