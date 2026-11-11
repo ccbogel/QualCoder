@@ -1521,12 +1521,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.delete_backup = False
         self.update_files_in_dialogs()
         self._emit_project_table_changes(['source'])
-        # update doc in vectorstore
-        id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
-        docs = self.app.get_file_texts(file_ids=[id_])
-        self.app.vectorstore_import_document(
-            docs[0]['id'], docs[0]['name'], docs[0]['fulltext']
-        )
+        # Update doc in vectorstore. The reload can move the row, files without text are not indexed
+        docs = self.app.get_file_texts(file_ids=[entry['fid']])
+        if docs:
+            self.app.vectorstore_import_document(
+                docs[0]['id'], docs[0]['name'], docs[0]['fulltext']
+            )
 
     def undo_file_rename(self):
         """ Undo file name rename. """
