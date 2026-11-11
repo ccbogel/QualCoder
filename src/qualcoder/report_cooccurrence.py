@@ -143,6 +143,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.data_colors = []
         self.data_details = []
         self.file_ids_names = self.app.get_text_filenames()
+        self.selected_file_ids = None  # None is all files, else ids that also limit image codings
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
         self.process_data()
 
@@ -216,10 +217,12 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         if source is self or not isinstance(tables, list):
             return
         tables = set(tables)
-        watched_tables = {"code_cat", "code_name", "code_text", "code_image"}
+        watched_tables = {"code_cat", "code_name", "code_text", "code_image", "source"}
         if watched_tables.isdisjoint(tables):
             return
 
+        if self.selected_file_ids is None:  # All files, include newly imported files
+            self.file_ids_names = self.app.get_text_filenames()
         self._refresh_selected_codes_from_project()
         if not self.selected_codes or not self.code_ids_str:
             self._clear_results()
@@ -239,7 +242,9 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         selected = ui.get_selected()
         if not selected or selected[0]['name'] == '':
             self.subtitle_files_selected = ""
+            self.subtitle_attributes_selected = ""
             self.file_ids_names = self.app.get_text_filenames()
+            self.selected_file_ids = None
             Message(self.app, _("Files selected"), _("All files selected")).exec()
             self.ui.pushButton_select_files.setToolTip(_("All files selected"))
             self.ui.pushButton_file_attributes.setToolTip(_("Select files by attributes"))
@@ -248,6 +253,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.attributes = []
         else:
             self.file_ids_names = selected
+            self.selected_file_ids = [item['id'] for item in selected]
+            self.subtitle_attributes_selected = ""
             msg = ""
             for item in self.file_ids_names:
                 msg += f"{item['name']}\n"
@@ -308,6 +315,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         # Limit to text files
         text_files = self.app.get_text_filenames()
         self.file_ids_names = []
+        self.selected_file_ids = list(ui.result_file_ids)
+        self.subtitle_files_selected = ""
         msg = ui.tooltip_msg
         for i, file_ in enumerate(text_files):
             if file_['id'] in ui.result_file_ids:
@@ -335,6 +344,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         if not ok:
             return
         self.selected_codes = ui.get_selected()
+        self.transposed = False  # New selection is in the normal order
         if not self.selected_codes or self.selected_codes[0]['name'] == '':
             self.selected_codes = deepcopy(self.codes)
             self.code_selection_mode = "all"
@@ -393,6 +403,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                 self.subtitle_categories_selected = f"{len(selected_categories)} " + _("Categories selected ")
             self.subtitle_codes_selected = ""
         self.code_selection_mode = "categories"
+        self.transposed = False  # New selection is in the normal order
         self.selected_codes = []
         for category in selected_categories:
             codes = self.codes_of_category(category)
@@ -663,8 +674,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         try:
             plt.savefig(filepath, dpi=300, bbox_inches='tight')
             plt.close(fig)
-            msg = f"Image successfully exported to:\n{filepath}"
-            Message(self.app, "Export Successful", msg, "information").exec()
+            msg = _("Image successfully exported to:") + f"\n{filepath}"
+            Message(self.app, _("Export Successful"), msg, "information").exec()
             self.parent_textEdit.append(msg)
         except Exception as e:
             logger.error(f"Error exporting graph: {e}")
@@ -733,7 +744,9 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         visible_indices = [i for i in range(len(self.selected_codes)) if not self.ui.tableWidget.isRowHidden(i) or
                            not self.ui.tableWidget.isColumnHidden(i)]
-        if not visible_indices: return
+        if not visible_indices:
+            Message(self.app, _("No data"), _("There are no visible codes to plot.")).exec()
+            return
 
         graph = nx.Graph()
         for i in visible_indices: graph.add_node(self.selected_codes[i]['name'])
@@ -747,7 +760,9 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                     graph.add_edge(source, target, weight=count)
                     graph[source][target]['distance'] = 1.0 / count
                     
-        if graph.number_of_nodes() == 0 or graph.number_of_edges() == 0: return
+        if graph.number_of_nodes() == 0 or graph.number_of_edges() == 0:
+            Message(self.app, _("No data"), _("There are no co-occurrences to plot.")).exec()
+            return
 
         weights_list = [d['weight'] for u, v, d in graph.edges(data=True)]
         mean_w = sum(weights_list) / len(weights_list) if weights_list else 0
@@ -814,8 +829,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         try:
             plt.savefig(filepath, dpi=300, bbox_inches='tight')
             plt.close(fig)
-            msg = f"Cluster image successfully exported to:\n{filepath}"
-            Message(self.app, "Export Successful", msg, "information").exec()
+            msg = _("Cluster image successfully exported to:") + f"\n{filepath}"
+            Message(self.app, _("Export Successful"), msg, "information").exec()
             self.parent_textEdit.append(msg)
         except Exception as e:
             logger.error(f"Error exporting clusters: {e}")
@@ -857,8 +872,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         try:
             nx.write_graphml(graph, filepath)
-            msg = f"File successfully exported as GrapgML format for Gephi:\n{filepath}"
-            Message(self.app, "Successful Export", msg, "information").exec()
+            msg = _("File successfully exported as GraphML format for Gephi:") + f"\n{filepath}"
+            Message(self.app, _("Export Successful"), msg, "information").exec()
             self.parent_textEdit.append(msg)
         except Exception as err:
             logger.error(f"Error exportando a Gephi: {err}")
@@ -988,12 +1003,13 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             # Coded text highlights - yellow code 0, green overlap, blue code 1
             # +1 skips the newline that append() inserts, so each span is exact
             # and an empty text_before no longer paints the previous line end
-            start_pos_yellow = len(self.ui.textEdit.toPlainText()) + 1
-            end_pos_yellow = start_pos_yellow + len(data[13])
+            # Qt positions count UTF-16 units, emojis take two
+            start_pos_yellow = self.ui.textEdit.document().characterCount()
+            end_pos_yellow = start_pos_yellow + self._qt_text_length(data[13])
             start_pos_green = end_pos_yellow
-            end_pos_green = start_pos_green + len(data[14])
+            end_pos_green = start_pos_green + self._qt_text_length(data[14])
             start_pos_blue = end_pos_green
-            end_pos_blue = start_pos_blue + len(data[15])
+            end_pos_blue = start_pos_blue + self._qt_text_length(data[15])
 
             msg = f"{data[13]}{data[14]}{data[15]}"
             self.ui.textEdit.append(msg)
@@ -1023,6 +1039,12 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.ui.textEdit.append(msg)
 
         self.ui.splitter.setSizes([300, 200])
+
+    @staticmethod
+    def _qt_text_length(text):
+        """ Length of text as counted by Qt text cursors (UTF-16 units). """
+
+        return len(text.encode('utf-16-le')) // 2
 
     def table_menu(self, position):
         """ Context menu for creating a new code by merging existing codes,
@@ -1250,13 +1272,17 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         """
 
         selected_relations = ['E', 'I', 'O']
+        # Apply the file selection to image codings too
+        files_sql = ""
+        if self.selected_file_ids is not None:
+            files_sql = "and code_image.id in (" + ",".join(str(id_) for id_ in self.selected_file_ids) + ") "
         cur = self.app.conn.cursor()
         sql = "select code_image.id, code_image.cid, x1, y1, width, height, imid, " \
               "ifnull(code_image.memo,''), code_image.owner, ifnull(pdf_page,0), " \
               "code_name.name, source.name from code_image " \
               "join code_name on code_name.cid=code_image.cid " \
               "join source on source.id=code_image.id " \
-              "where code_image.cid in (" + code_ids_str + ") " \
+              "where code_image.cid in (" + code_ids_str + ") " + files_sql + \
               "order by code_image.id, pdf_page, code_image.cid"
         cur.execute(sql)
         groups = {}
