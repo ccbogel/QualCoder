@@ -1173,8 +1173,8 @@ Classement par nom de fichier et nom de code.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_comparison_table.ui" line="0"/>
-        <source>Sum counts by case / attribute</source>
-        <translation>Somme des décomptes par cas / attribut</translation>
+        <source>Sum by case / attribute</source>
+        <translation>Somme par cas / attribut</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_comparison_table.ui" line="0"/>
@@ -1210,6 +1210,16 @@ Classement par nom de fichier et nom de code.</translation>
         <location filename="../../GUI_UIs/ui_comparison_table.ui" line="0"/>
         <source>Transpose table</source>
         <translation>Transposer un tableau</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_comparison_table.ui" line="0"/>
+        <source>Show sub-code count, code count (sub-code count)</source>
+        <translation>Afficher le nombre de sous-codes, le nombre de codes (nombre de sous-codes)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_comparison_table.ui" line="0"/>
+        <source>(Sub-codes)</source>
+        <translation>(Sous-codes)</translation>
     </message>
 </context>
 <context>
@@ -3792,30 +3802,34 @@ Sensible à la casse : ajouter une entrée par variante (ex. : Tom Jones et TOM 
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>Text limiter:</source>
-        <translation>Délimitateur de texte :</translation>
-    </message>
-    <message>
-        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>Run report</source>
         <translation>Lancer le rapport</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>Coder:</source>
-        <translation>Codeur:</translation>
+        <source>Select coder. Blank for all.</source>
+        <translation>Sélectionner le codeur·se. Vide pour tous.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>Attributes.
+        <source>Select file and case attributes.
 Attribute selection will override files or cases selected in the left-hand-side lists.</source>
-        <translation>Attributs.
-La sélection d’un attribut a priorité sur les dossiers ou les cas sélectionnés dans les listes de gauche.</translation>
+        <translation>Sélectionnez les attributs des fichiers et des dossiers.
+La sélection des attributs prévaudra sur les fichiers ou dossiers sélectionnés dans les listes situées à gauche.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>Export</source>
         <translation>Exporter</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <source>Export format.
+
+To also export variables, check the variables checkbox and select csv or xlsx format.</source>
+        <translation>Format d&apos;exportation.
+
+Pour exporter également les variables, cochez la case « Variables » et sélectionnez le format CSV ou XLSX.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
@@ -3864,24 +3878,15 @@ La sélection d’un attribut a priorité sur les dossiers ou les cas sélection
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>Important</source>
-        <translation>Important</translation>
-    </message>
-    <message>
-        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>Memo reporting options</source>
         <translation>Options de rapport pour mémo</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>Display summary statistics</source>
         <translation>Afficher le résumé des statistiques</translation>
-    </message>
-    <message>
-        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>Statistics</source>
-        <translation>Statistiques</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
@@ -3897,18 +3902,8 @@ Modifiez les paramètres du nombre de caractères et du style d’affichage.</tr
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>Text context</source>
-        <translation>Contexte textuel</translation>
-    </message>
-    <message>
-        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>Search results for text</source>
         <translation>Résultats de la recherche pour le texte</translation>
-    </message>
-    <message>
-        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>Search:</source>
-        <translation>Chercher :</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
@@ -3917,10 +3912,18 @@ Modifiez les paramètres du nombre de caractères et du style d’affichage.</tr
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>Code names sort order.
-Set this before running results.</source>
-        <translation>Ordre de tri des noms de code. 
-Définissez ce paramètre avant d’exécuter les résultats.</translation>
+        <source>Results sort order.
+Set this before running results.
+
+Images vertically. Image codings shown first and ordered by y values from the top downwards.
+AV timeline. Audio video codings shown first and ordered by their time positions.
+</source>
+        <translation>Ordre de tri des résultats.
+Définissez ce paramètre avant d&apos;afficher les résultats.
+
+Images à la verticale. Les codes d&apos;image sont affichés en premier et classés par ordre décroissant des valeurs y, de haut en bas.
+Chronologie AV. Les codes audio-vidéo sont affichés en premier et classés par ordre chronologique.
+</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
@@ -3934,43 +3937,94 @@ Définissez ce paramètre avant d’exécuter les résultats.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>10 - 1</source>
-        <translation></translation>
+        <source>Category az</source>
+        <translation>Catégorie az</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>1 - 10</source>
-        <translation></translation>
+        <source>Category za</source>
+        <translation>Catégorie za</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>Export:</source>
-        <translation>Exporter :</translation>
+        <source>Frequency descending</source>
+        <translation>Fréquence décroissant</translation>
     </message>
     <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <source>Frequency ascending</source>
+        <translation>Fréquence croissant</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <source>Images vertically</source>
+        <translation>Images à la verticale</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <source>AV timeline</source>
+        <translation>Chronologie audiovisuelle</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>Export file or case variables in columns for CSV or XLSX export</source>
         <translation>Exporter un fichier ou variables de cas dans les colonnes pour l’export CSV ou XLSX</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>Variables CSV / XLSX</source>
-        <translation>Variables CSV / XLSX</translation>
-    </message>
-    <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>Export matrix</source>
         <translation>Exporter la matrice</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
         <source>Show references</source>
         <translation>Montrer les références</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
-        <source>References</source>
-        <translation>Références</translation>
+        <source>Select Coder. Blank for all.</source>
+        <translation>Sélectionner le codeur·se. Vide pour tous.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <source>Search results text</source>
+        <translation>Texte des résultats de la recherche</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <source>Text limiter to restrict search results.</source>
+        <translation>Limiteur de texte permettant de restreindre les résultats de recherche.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <source>Matrix</source>
+        <translation>Matrice</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <source>Sort options</source>
+        <translation>Option de tri</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <source>Surround coded text with pre-text and post-text.</source>
+        <translation>Encadrer le texte codé par du texte avant/après.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <source>Filter results for those marked important.</source>
+        <translation>Filtrer les résultats marqués comme importants.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_report_codings.ui" line="0"/>
+        <source>Checked. Maximise image size for A4 page.
+Unchecked. Maximum image width or height 400 pixels.</source>
+        <translation>Cochée : agrandir l&apos;image au maximum pour une page A4.
+Décochée : largeur ou hauteur maximale de l&apos;image : 400 pixels.</translation>
     </message>
 </context>
 <context>
@@ -4468,6 +4522,11 @@ language = it</translation>
         <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
         <source>marker</source>
         <translation>marqueur</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
+        <source>marker light</source>
+        <translation>marqueur clair</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_settings.ui" line="0"/>
