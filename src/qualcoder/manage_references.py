@@ -653,6 +653,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
         row = self.ui.tableWidget_refs.currentRow()
         col = self.ui.tableWidget_refs.currentColumn()
+        if row == -1:  # Catch None type error
+            return
         item = self.ui.tableWidget_refs.item(row, col)
         item_text = ""
         if item is not None:
