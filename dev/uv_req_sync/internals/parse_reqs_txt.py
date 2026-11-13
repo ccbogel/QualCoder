@@ -104,5 +104,4 @@ reqs_lines, comms = strip_comments_from_line_list(reqs_lines, comms)
 
 reqs_lines, comms = search_for_comm_see(reqs_lines, comms)
 
-versionated_or_new:list[str] = check_versionated_or_new(reqs_lines, toml_deps_normalized)    #print(line)
-print(versionated_or_new)
+versionated_or_new:list[str] = check_versionated_or_new(reqs_lines, toml_deps_normalized)

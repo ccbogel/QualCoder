@@ -47,9 +47,9 @@ dependencies = [
   "pylatexenc>=2.10,<3",
   "pymupdf>=2.0",
   "pyqt6>=6.5",
-  "torch==2.6.0+cpu",        # Needed to be pinned
-  "torchvision==0.21.0+cpu", # Needed to be pinned
-  "torchaudio==2.6.0+cpu",   # Needed to be pinned
+  "torch",        # Needed to be pinned
+  "torchvision", # Needed to be pinned
+  "torchaudio",   # Needed to be pinned
   "python-vlc>=3.0.21203",
   "pyyaml>=6.0.3",
   "qtawesome>=1.4.2",
@@ -67,7 +67,7 @@ dependencies = [
 qualcoder = "qualcoder.__main__:gui"
 
 [build-system]
-requires = ["uv_build>=0.12.21"]
+requires = ["uv_build>=0.12.21,<13"]
 build-backend = "uv_build"
 
 [dependency-groups]

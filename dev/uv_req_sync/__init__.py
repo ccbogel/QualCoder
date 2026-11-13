@@ -6,6 +6,9 @@ from os import unlink as delete
 from pathlib import Path
 from sys import executable as python3
 from sys import exit
+from textwrap import dedent
+
+import tomli_w
 
 from uv_req_sync.internals.authors import authors_processing
 from uv_req_sync.internals.compare_n_dedup import compare_deps
@@ -58,9 +61,8 @@ def main() -> None:
     project["readme"]=check_and_return(project, 'project',"readme")
     project["authors"]=authors_processing(project["authors"])
     project["requires-python"]=check_and_return(project, 'project',"requires-python")
-    toml_deps:list[str]|None=compare_deps(dependencies_toml,versionated_or_new)
-    print(toml_deps)
-
+    new_toml_deps:list[str]|None=compare_deps(dependencies_toml,versionated_or_new)
+    project["dependencies"]=new_toml_deps
 
     # Scripts is already configured, it depends on project's 
     # main entrypoint, so it is easier to "manually"config
@@ -72,7 +74,7 @@ def main() -> None:
 
 
     #Tools
-    tool=data["tool"]
+    #tool=data["tool"]
 
     # This block may take a while
     #tool["uv"]=uv_parsing()
@@ -80,12 +82,39 @@ def main() -> None:
     # Ruff is already stabilized and does not require further parsing
     # or stabilizing for now
     # ruff=tool["ruff"]
+    # Write file
+    out_toml=root/"pyproject.toml"
+    with open(out_toml,"wb") as f:
+        tomli_w.dump(data, f)
 
     # Comment adition
     comments:list[dict]=comms
+    header_comment=dedent("""\
+    # ------
+    # PyProject.toml - required for uv, ruff, ty and appimage
+    # ------
+    # This file is generated from dev/uv_req_sync/__init__.py.
+    # It is used to sync pyproject.toml with requirements.txt. 
+    # Please do not touch
+    # 
+    # This one is just the "shell"/or base doc, it is this one
+    # that the build_toml.py will edit
 
-    # Write file
-    out_toml=root/"pyproject.toml"
+
+    """)
+
+    with open(out_toml,"r") as f:
+        pyproject_lines=f.readlines()
+
+    pyproject_lines.insert(0, header_comment)
+
+    with open(out_toml,"w") as w:
+        w.writelines(pyproject_lines)
+    
+    print(comments)
+
+
+
 
 
 # -------------------------------------
