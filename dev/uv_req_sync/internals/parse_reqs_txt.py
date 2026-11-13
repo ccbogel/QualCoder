@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 
-from .toml_data_import import (
+from uv_req_sync.internals.toml_data_import import (
   toml_module_dependencies_normalized as toml_deps_normalized,
 )
 
@@ -65,30 +65,22 @@ def search_for_comm_see(reqs_lines:list[str], comms:list[dict])->tuple[list[str]
       
   return reqs_lines, comms 
 
-
-def which_operator_am_i(str):
-  match str:
-    case "<=":
-      return "lesser-equal"
-    case ">=":
-      return "greater-equal"
-    case "="|"==":
-      return "equal"
-    case ">":
-      return "greater"
-    case ">":
-      return "lesser"
-
 def check_versionated_or_new(reqs_lines:list[str], toml_deps_normalized:list[str]):
   """This one takes the whole list of deps and returns only the ones that
   have versionated or new requirements"""
   versionated_or_new=[]
   for line in reqs_lines:
     search:re.Match[str]|None=re.search(r">=|<=|==|<|>",line)
-    line_mod_name = re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",line).strip()
+    line_mod_name = re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",line).replace("_","-")\
+      .replace("pdfminer.six","pdfminer-six").strip().lower()
+    # needed .lower() because requirements use, sometimes CamelCase (Pillow -> pillow; Bio -> bio)
+    # json-repair vs json_repair ->.replace
+    # pdfminer.six 
     if search is None and line_mod_name in toml_deps_normalized:
       continue
-    versionated_or_new.append(line.strip())
+    
+    
+    versionated_or_new.append(line.strip().lower())
 
   #add a check for NEW deps (new modules added to dep list)
 
@@ -113,3 +105,4 @@ reqs_lines, comms = strip_comments_from_line_list(reqs_lines, comms)
 reqs_lines, comms = search_for_comm_see(reqs_lines, comms)
 
 versionated_or_new:list[str] = check_versionated_or_new(reqs_lines, toml_deps_normalized)    #print(line)
+print(versionated_or_new)

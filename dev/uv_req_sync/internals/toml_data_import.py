@@ -1,7 +1,6 @@
 import re
-from pathlib import Path
-
 import tomllib
+from pathlib import Path
 
 dev_slash_uv=Path(__file__).parent.parent
 og_toml=dev_slash_uv / "origin.toml"

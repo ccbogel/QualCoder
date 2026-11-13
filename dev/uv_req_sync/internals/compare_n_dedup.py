@@ -1,7 +1,7 @@
 import re
 
 
-def compare_deps(deps:list[str], versionated:list[str]):
+def compare_deps(deps:list[str], versionated:list[str]) -> list[str]:
     """
     For every item on deps(toml) checks if it's equal to versionated[i].
     If so continue. If not try the next i up until the end of 
@@ -37,7 +37,8 @@ def compare_deps(deps:list[str], versionated:list[str]):
         dep_mod_name=re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",new_deps_list.copy()[idx]).strip()
         for each in added_lines:
             added_lines_dep_name = re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",each).strip()
-            if dep_mod_name != added_lines_dep_name or dep_mod_name in will_be_popped:
+            if dep_mod_name.strip() != added_lines_dep_name.strip() \
+             or dep_mod_name in will_be_popped:
                 continue
             else:
                 will_be_popped.append(dep_mod_name.strip())

@@ -25,7 +25,8 @@ if not Path.exists(hash_map):
         hash_lines.append({i:f"{line_hash}"})
     
     file_str= \
-f"""# This file is generated from dev/uv_req_sync/internals/hash.py
+f"""#  
+# This file is generated from dev/uv_req_sync/internals/hash.py
 # It is used as a "lock" for requirements.txt. Please do not touch
 hashmap=\"{reqs_txt_file}\"
 file_hash=\"{reqs_txt_hash}\"
@@ -34,5 +35,3 @@ list_lines_hash={hash_lines}
 
     with open(hash_map,"w") as w:
         w.write(file_str)
-
-print(__file__)
