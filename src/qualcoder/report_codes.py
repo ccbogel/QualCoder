@@ -42,6 +42,7 @@ import qtawesome as qta  # See https://pictogrammers.com/library/mdi/
 import re
 from shutil import copyfile
 from typing import Any
+from urllib.parse import quote
 
 from .code_in_all_files import DialogCodedIds
 from .color_selector import TextColor
@@ -76,9 +77,15 @@ def _report_image_file_name(image_name: str) -> str:
     counter, _sep, media_path = image_name.partition("-")
     stem, extension = os.path.splitext(re.split(r"[\\/:]", media_path)[-1])
     writable = {bytes(fmt).decode().lower() for fmt in QtGui.QImageWriter.supportedImageFormats()}
-    if extension[1:].lower() not in writable:
+    # Formats browsers show, others such as tif or pdf become png
+    if extension[1:].lower() not in writable & {"png", "jpg", "jpeg", "bmp", "webp"}:
         extension = ".png"
     return f"{counter}-{stem}{extension}"
+
+
+def _html_src_value(relative_path: str) -> str:
+    """ Relative path as an html attribute value, so '#', '?', '%' or '&' in names keep the link working. """
+    return _escape_like_qt_html(quote(relative_path, safe="/"))
 
 
 def _xlsx_safe(value):
@@ -1366,7 +1373,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     logger.warning(f"html report image not saved: {filename}")
                 # Whole src attribute, so 1-/images/a.png does not also match 11-/images/a.png
                 html = html.replace(f'src="{_escape_like_qt_html(item["imagename"])}"',
-                                    f'src="{_escape_like_qt_html(img_relative_link)}"')
+                                    f'src="{_html_src_value(img_relative_link)}"')
             if item['avname'] is not None:
                 html, start_pos = self._insert_av_player_into_html(html, item, html_folder_path,
                                                                    html_relative_path, start_pos)
@@ -1407,7 +1414,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 logger.warning(f"html report media not copied: {source_path} {err}")
 
         extension = filename[filename.rfind('.') + 1:]
-        html_controls = f'<{mediatype} controls><source src="{_escape_like_qt_html(relative_link)}'
+        html_controls = f'<{mediatype} controls><source src="{_html_src_value(relative_link)}'
         html_controls += f'#t={item["av0"]},{item["av1"]}" type="{mediatype}/{extension}"></{mediatype}>\n'
         coded_pos = html.find(item['av_marker'], start_pos)
         if coded_pos > -1:
@@ -2140,8 +2147,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             # Clamp to the document end, an out of range position does not move the cursor
             post_text_end = min(r['pos1'] + self.app.settings['report_text_context_characters'],
                                 doc_end_position(text_edit))
-            cursor.setPosition(post_text_end, QtGui.QTextCursor.MoveMode.KeepAnchor)
-            r['posttext'] = cursor.selectedText()
+            r['posttext'] = ""
+            if r['pos1'] < post_text_end:
+                cursor.setPosition(post_text_end, QtGui.QTextCursor.MoveMode.KeepAnchor)
+                r['posttext'] = cursor.selectedText()
 
         # OLD - ERROR WITH EMOJIs
         '''for r in self.results:
