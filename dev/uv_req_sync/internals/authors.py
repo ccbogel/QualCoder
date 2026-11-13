@@ -11,7 +11,7 @@ def authors_processing(author_list:list[dict])->list[dict]:
     it only exits when the user exits by "keeping the list as is"
     """
     test=input(f"""
-    The project currently has currently {author_list.__len__} authors
+    The project currently has currently {len(author_list)} authors
     {show_authors(author_list)}
     What would you like to do?
 

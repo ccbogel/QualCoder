@@ -1,6 +1,9 @@
 import re
 from pathlib import Path
-from re import Match
+
+from .toml_data_import import (
+  toml_module_dependencies_normalized as toml_deps_normalized,
+)
 
 
 def find_index(index_name:str, reqs_lines:list[str])->tuple[str,str]|tuple[str, None]|tuple[None,None]:
@@ -52,7 +55,7 @@ def search_for_comm_see(reqs_lines:list[str], comms:list[dict])->tuple[list[str]
   """Almost same logi as other functions but, for some reason, python did not liked when I putted
   this inside other functions"""
   for idx, line in enumerate(reqs_lines):
-    check:Match[str]|None=re.search(r"# ", line)
+    check:re.Match[str]|None=re.search(r"# ", line)
     if check is None:
         continue
     line, comm = line.split("# ")
@@ -76,28 +79,20 @@ def which_operator_am_i(str):
     case ">":
       return "lesser"
 
-def check_versionated(reqs_lines:list[str]):
+def check_versionated_or_new(reqs_lines:list[str], toml_deps_normalized:list[str]):
   """This one takes the whole list of deps and returns only the ones that
-  have versionated requirements"""
-  versionated=[]
-  for line  in reqs_lines:
-    search:Match[str]|None=re.search(r">=|<=|==|<|>",line)
-    if search is None:
+  have versionated or new requirements"""
+  versionated_or_new=[]
+  for line in reqs_lines:
+    search:re.Match[str]|None=re.search(r">=|<=|==|<|>",line)
+    line_mod_name = re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",line).strip()
+    if search is None and line_mod_name in toml_deps_normalized:
       continue
-  
-    print(line)
-  
-  versionated.append(line.strip())
+    versionated_or_new.append(line.strip())
 
-  return versionated
+  #add a check for NEW deps (new modules added to dep list)
 
-# new function on main file:
-# 1) Search versionated entries on toml
-# 2) compare toml with versionated
-# 3) If versionated > toml -> change the toml
-# value to versionated
-# return 
-
+  return versionated_or_new
 
 #Main
 
@@ -117,4 +112,4 @@ reqs_lines, comms = strip_comments_from_line_list(reqs_lines, comms)
 
 reqs_lines, comms = search_for_comm_see(reqs_lines, comms)
 
-versionated:list[str] = check_versionated(reqs_lines)
+versionated_or_new:list[str] = check_versionated_or_new(reqs_lines, toml_deps_normalized)    #print(line)
