@@ -60,7 +60,7 @@ def search_for_comm_see(reqs_lines:list[str], comms:list[dict])->tuple[list[str]
         continue
     line, comm = line.split("# ")
     line_entry = re.sub(r'(\.|>|=|[0-9]|<)',"",line)
-    comms.append({line_entry.strip:f"# {comm}"})
+    comms.append({line_entry.strip():f"# {comm}"})
     reqs_lines[idx]=line
       
   return reqs_lines, comms 
@@ -78,7 +78,6 @@ def check_versionated_or_new(reqs_lines:list[str], toml_deps_normalized:list[str
     # pdfminer.six 
     if search is None and line_mod_name in toml_deps_normalized:
       continue
-    
     
     versionated_or_new.append(line.strip().lower())
 

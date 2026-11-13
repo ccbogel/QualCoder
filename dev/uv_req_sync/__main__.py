@@ -1,15 +1,12 @@
+import os
 import shutil
-import subprocess
 import tomllib
 from hashlib import sha256
-from os import unlink as delete
 from pathlib import Path
-from sys import executable as python3
 from sys import exit
 from textwrap import dedent
 
 import tomli_w
-
 from uv_req_sync.internals.authors import authors_processing
 from uv_req_sync.internals.compare_n_dedup import compare_deps
 from uv_req_sync.internals.parse_reqs_txt import comms, versionated_or_new
@@ -60,6 +57,9 @@ def main() -> None:
     project["description"]=check_and_return(project, 'project',"description")
     project["readme"]=check_and_return(project, 'project',"readme")
     project["authors"]=authors_processing(project["authors"])
+    project["description"]=check_and_return(project, 'project',"description")
+    project["readme"]=check_and_return(project, 'project',"readme")
+    project["authors"]=authors_processing(project["authors"])
     project["requires-python"]=check_and_return(project, 'project',"requires-python")
     new_toml_deps:list[str]|None=compare_deps(dependencies_toml,versionated_or_new)
     project["dependencies"]=new_toml_deps
@@ -84,6 +84,12 @@ def main() -> None:
     # ruff=tool["ruff"]
     # Write file
     out_toml=root/"pyproject.toml"
+    
+    try:
+        os.unlink(out_toml)
+    except FileNotFoundError:
+        print("file not found")
+
     with open(out_toml,"wb") as f:
         tomli_w.dump(data, f)
 
@@ -111,23 +117,23 @@ def main() -> None:
     with open(out_toml,"w") as w:
         w.writelines(pyproject_lines)
     
+    #Insert coments
+
     print(comments)
-
-
 
 
 
 # -------------------------------------
 # Main
 # -------------------------------------
-try:
-    from uv_req_sync.hashmap import file_hash, hashmap
-    from uv_req_sync.hashmap import list_lines_hash as lines_hash
-except ImportError as e:
-    from uv_req_sync.internals.hash import __file__ as hash_dot_py
-    print(f"{e}:Hashmap does not exist")
-    subprocess.run([f'{python3}', f'{hash_dot_py}'], check=False)
-    
+
+from uv_req_sync.hashmap import file_hash
+from uv_req_sync.hashmap import list_lines_hash as lines_hash
+
+me=Path(__file__)
+hash_dot_py=str(root/"dev"/"uv_req_sync"/"internals"/"hash.py")
+print(hash_dot_py)
+
 h=sha256()
 with open(reqs_txt_file, "rb") as f:
             for chunk in iter(lambda: f.read(65536), b""):
@@ -140,13 +146,9 @@ for i, line in enumerate(lines):
     line = line.rstrip(b"\r\n")
     line_hash=sha256(line).hexdigest()
     hash_lines_totest.append({i:f"{line_hash}"})
-if filehash_totest.strip == file_hash.strip or hash_lines_totest == lines_hash:
+if filehash_totest.strip() == str(file_hash).strip() or hash_lines_totest == lines_hash:
     print("File's hashes for requirements.txt are the same\nNo need to check for versioning\n")
     exit(0)
 else:
-    delete(hashmap)
     main()
-
-if not Path.exists(Path(hashmap)):
-    subprocess.run([f'{python3}', f'{hash_dot_py}'], check=False)
-exit(0)
+    print("Done")
