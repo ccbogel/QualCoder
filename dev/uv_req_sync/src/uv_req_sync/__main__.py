@@ -29,7 +29,7 @@ reqs_txt_file = root/"requirements.txt"
 dev_slash_uv=Path(__file__).parent.parent.parent
 
 # Main
-def main() -> None:
+def process() -> None:
 
     #Read the base origin.toml
     template=dev_slash_uv/"template"/"pyproject.toml"
@@ -192,13 +192,10 @@ def main() -> None:
 # -------------------------------------
 # Runtime logic
 # -------------------------------------
-if __name__ ==  "__main__":
-    hashmap_file=dev_slash_uv/"src"/"uv_req_sync"/"hashmap.py"
-    if not hashmap_file.exists():
-        input("no hashmap found")
-        from uv_req_sync.internals.hash import main as make_hashmap
-        # This way hash map always exist
-        make_hashmap()
+def main():
+    from uv_req_sync.internals.hash import main as make_hashmap
+    # This way hash map always exist
+    make_hashmap()
 
     # It was easier to just copy the data from here then to change
     # internals/hash.py to hold both things
@@ -207,7 +204,6 @@ if __name__ ==  "__main__":
     from uv_req_sync.hashmap import file_hash
     from uv_req_sync.hashmap import list_lines_hash as lines_hash
     h=sha256()
-    
     with open(reqs_txt_file, "rb") as f:
                 for chunk in iter(lambda: f.read(65536), b""):
                     h.update(chunk)
@@ -223,10 +219,13 @@ if __name__ ==  "__main__":
         linha_hash=sha256(line).hexdigest()
         hash_lines_totest.append({i:f"{linha_hash}"})
     
-    if (filehash_totest.strip() == file_hash.strip() or hash_lines_totest == lines_hash) and (root/"pyproject.toml").exists():
+    if filehash_totest.strip() == file_hash.strip() or hash_lines_totest == lines_hash:
         print("File's hashes for requirements.txt are the same\nNo need to check for versioning\n")
         from sys import exit
         exit(0)
     else:
-        main()
+        process()
         print("Done")
+
+if __name__ ==  "__main__":
+    main()

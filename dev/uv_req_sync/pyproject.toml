@@ -1,7 +1,7 @@
 [project]
 name = "uv-req-sync"
 version = "0.1.0"
-description = "A simple tool for syncing pyproject.toml with requirements.txt"
+description = "A simple tool for syncing pyproject.toml with "
 readme = "README.md"
 authors = [
     { name = "BetoNetu", email = "beto.rebonatto.neto@gmail.com" }
@@ -13,6 +13,7 @@ dependencies = [
 
 [project.scripts]
 uv-req-sync = "uv_req_sync.__main__:main"
+force-req-sync = "uv_req_sync.__main__:process"
 
 [build-system]
 requires = ["uv_build>=0.12.21,<0.13.0"]
