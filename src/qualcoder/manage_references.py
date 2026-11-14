@@ -41,7 +41,7 @@ from .helpers import Message, extract_epub_fulltext, ExportDirectoryPathDialog
 from .pdf_preview import DialogPdfPreview
 from .manage_references_import import ATTACHMENT_EXTENSIONS, existing_reference_signatures, \
     reference_signature
-from .ris import Ris, RisImport
+from .ris import Ris, RisImport, ref_types
 from .select_items import DialogSelectItems
 from .view_av import DialogViewAV
 from .view_image import DialogViewImage
@@ -53,7 +53,6 @@ try:
 except Exception as e:
     print(e)
 
-path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 REF_ID = 0
@@ -124,6 +123,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.pushButton_auto_link.pressed.connect(self.auto_link_files_to_references)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.pressed.connect(self.export_references)
+        self.ui.pushButton_create.setIcon(qta.icon('mdi6.note-plus-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_create.pressed.connect(self.create_reference)
 
         self.get_data()
         self.ui.tableWidget_refs.setTabKeyNavigation(False)
@@ -254,8 +255,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         action_files_asc = menu.addAction(_("Ascending"))
         action_files_desc = menu.addAction(_("Descending"))
         action_url = None
-        row = self.ui.tableWidget_refs.currentRow()
-        ref_text = self.ui.tableWidget_refs.item(row, 0).text()
+        row = self.ui.tableWidget_files.currentRow()
+        ref_text = self.ui.tableWidget_files.item(row, 0).text()
         if ref_text is None:
             ref_text = ""
         # Regex HTTP HTTPS protocol
@@ -272,7 +273,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if action is None:  # Dismissed menu: None matches unbuilt actions
             return
         if action == action_url:
-            print("fggdgd")
+            print("URL To Do")
         if action == action_show_all_rows:
             for r in range(0, self.ui.tableWidget_files.rowCount()):
                 self.ui.tableWidget_files.setRowHidden(r, False)
@@ -324,10 +325,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if mediapath_ is not None and mediapath_.lower().endswith(".pdf") and \
                 (mediapath_[0:6] == '/docs/' or mediapath_[0:5] == 'docs:'):
             if mediapath_[0:6] == '/docs/':
-                pdf_filepath = os.path.join(self.app.project_path, "documents", mediapath_[6:])
+                pdf_filepath = Path(self.app.project_path) / "documents" / mediapath_[6:]
             else:
-                pdf_filepath = mediapath_[5:]
-            if not os.path.exists(pdf_filepath):
+                pdf_filepath = Path(mediapath_[5:])
+            if not pdf_filepath.exists():
                 self.parent_text_edit.append(_("Bad link or non-existent file ") + str(pdf_filepath))
                 return
             preview = DialogPdfPreview(self.app, pdf_filepath, self.files[row]['name'], self,
@@ -346,10 +347,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
             row  :  row number Integer
         """
 
+        # TODO review this as can use Qt Media Player
         if not vlc:
             msg = _("VLC not installed cannot play audio or video.")
             Message(self.app, _('View AV error'), msg, "warning").exec()
             return
+
         # Check media exists
         abs_path = ""
         if self.files[row]['mediapath'][0:6] in ('/audio', '/video'):
@@ -385,7 +388,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         else:
             abs_path = self.app.project_path + self.files[row]['mediapath']
         if not os.path.exists(abs_path):
-            self.parent_text_edit.append(_("Bad link or non-existent file ") + abs_path)
+            self.parent_text_edit.append(_("Bad link or non-existent file ") + str(abs_path))
             return
         ui = DialogViewImage(self.app, self.files[row])
         ui.ui.textEdit.setReadOnly(True)
@@ -453,6 +456,11 @@ class DialogReferenceManager(QtWidgets.QDialog):
                 type_of_ref = ref['TY']
             item = QtWidgets.QTableWidgetItem(type_of_ref)
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+            try:
+                detail = ref_types[type_of_ref]
+                item.setToolTip(detail)
+            except KeyError:
+                pass
             self.ui.tableWidget_refs.setItem(row, REF_TYPE, item)
             year_of_ref = ""
             if 'PY' in ref:
@@ -733,6 +741,70 @@ class DialogReferenceManager(QtWidgets.QDialog):
             return
         if action == action_add_field:
             self.add_fields()
+
+    def create_reference(self):
+        """ Create a reference manually. """
+
+        fields = []
+        selection_options = []
+        for tagkey in TAG_KEY_MAPPING:
+            #print(tagkey, TAG_KEY_MAPPING[tagkey])
+            if tagkey not in ["A4", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "ER",
+                                "ID", "JA", "JF", "L1", "L2", "L4", "UK"]:
+                fields.append({tagkey: TAG_KEY_MAPPING[tagkey]})
+                selection_options.append({"name": f"{tagkey}: {TAG_KEY_MAPPING[tagkey]}"})
+        ui = DialogSelectItems(self.app, selection_options, _("Select fields for reference"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        # Need these core items
+        if not any(item.get("name") == "TY: type_of_reference" for item in selection):
+            selection.append({"name": "TY: type_of_reference"})
+        if not any(item.get("name") == "TI: title" for item in selection):
+            selection.append({'name': "TI: title"})  # Also TI is title
+        if not any(item.get("name") == "A1: first_authors" for item in selection):
+            selection.append({"name": "A1: first_authors"})
+        if not any(item.get("name") == "PY: year" for item in selection):
+            selection.append({"name": "PY: year"})
+
+        ordered_list = []
+        for s in selection:
+            ordered_list.append(s['name'])
+        # Put these items first in this order: TY,TI,A1,PY
+        old_index = ordered_list.index("TY: type_of_reference")
+        ordered_list.insert(0, ordered_list.pop(old_index))
+        old_index = ordered_list.index("TI: title")
+        ordered_list.insert(1, ordered_list.pop(old_index))
+        old_index = ordered_list.index("A1: first_authors")
+        ordered_list.insert(2, ordered_list.pop(old_index))
+        old_index = ordered_list.index("PY: year")
+        ordered_list.insert(3, ordered_list.pop(old_index))
+
+        cur = self.app.conn.cursor()
+        cur.execute("select max(risid) from ris")
+        res = cur.fetchone()
+        max_risid = 0
+        if res is not None and res[0] is not None:
+            max_risid = res[0]
+        max_risid += 1
+        for item in ordered_list:
+            tag, longtag = item.split(": ")
+            value = ''
+            if tag == 'TY':
+                value = "JOUR"  # default
+            if tag in ('TI', "T1"):
+                value = "title"  # default
+            if tag == "PY":
+                value = str(datetime.datetime.now().year)  # default
+            cur.execute("insert into ris (risid,tag,longtag,value) values (?,?,?,?)",
+                        [max_risid, tag, longtag, value])
+        self.app.conn.commit()
+
+        self._emit_project_table_changes(['ris'])
+        self.get_data()
+        self.fill_table_refs()
+        self.edit_reference(max_risid)
 
     def add_fields(self):
         """ Add extra fields to RIS data. """
@@ -1209,14 +1281,18 @@ class DialogReferenceManager(QtWidgets.QDialog):
             self._emit_project_table_changes(['source', 'attribute'])
         self.get_data()
 
-    def edit_reference(self):
+    def edit_reference(self, ris_id=None):
         """ Edit selected reference.
-         Also, update source attributes for this reference. """
+         Also, update source attributes for this reference.
+         Args:
+             risid : None or an integer id for a new manually inserted reference
+        """
 
-        ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
-        if not ref_row_obj:
-            return
-        ris_id = int(ref_row_obj[0].data())  # Only One index returned. Column 0 data
+        if ris_id is None:
+            ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
+            if not ref_row_obj:
+                return
+            ris_id = int(ref_row_obj[0].data())  # Only One index returned. Column 0 data
         ref_data = None
         for r in self.refs:
             if r['risid'] == ris_id:
@@ -1246,8 +1322,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             value_item = QtWidgets.QTableWidgetItem(short_dict[key])
             ui_re.tableWidget.setItem(row, 1, value_item)
         ui_re.tableWidget.resizeColumnsToContents()
-        if ui_re.tableWidget.columnWidth(1) > 600:
-            ui_re.tableWidget.setColumnWidth(1, 600)
+        ui_re.tableWidget.horizontalHeader().setStretchLastSection(True)
         ui_re.tableWidget.resizeRowsToContents()
         ok = reference_editor.exec()
         if not ok:
@@ -1262,8 +1337,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
                 cur.execute("insert into ris (risid,tag,longtag,value) values(?,?,?,'')", [ris_id, key,tooltip_longtag])
                 self.app.conn.commit()
             if ui_re.tableWidget.item(row, 1).text() != short_dict[key]:
-                cur.execute("update ris set value=? where risid=? and tag=?",
-                            [ui_re.tableWidget.item(row, 1).text(), ris_id, key])
+                value = ui_re.tableWidget.item(row, 1).text()
+                if key == "TY":
+                    value = self.check_reference_type(value)
+                cur.execute("update ris set value=? where risid=? and tag=?", [value, ris_id, key])
                 self.app.conn.commit()
                 ref_edited = True
         # Update Reference attributes. unlink_files and link_reference_to_files emit
@@ -1284,9 +1361,24 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.get_data()
         self.fill_table_refs()
 
+    def check_reference_type(self, ref_type):
+        """ Ensure reference type is one of the available options for RIS. """
+        if ref_type in ref_types:
+            return ref_type
+        options = []
+        for key in ref_types:
+            options.append({'name': key + " " + ref_types[key]})
+        sorted_options = sorted(options, key=lambda x: x["name"])
+        ui = DialogSelectItems(self.app, sorted_options, _("Select reference type"), "single")
+        ok = ui.exec()
+        if not ok:
+            return 'JOUR'  # A default
+        selection = ui.get_selected()
+        return selection['name'].split()[0]
+
     def delete_reference(self):
         """ Delete the selected reference.
-        Remove reference risid from source tavble and remove source attribute values.
+        Remove reference risid from source table and remove source attribute values.
         """
 
         ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
