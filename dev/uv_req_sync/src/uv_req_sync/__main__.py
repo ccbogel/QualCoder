@@ -3,10 +3,11 @@ import os
 import re
 import tomllib
 from pathlib import Path
+from time import sleep
 
 from uv_req_sync.internals.authors import authors_processing
 from uv_req_sync.internals.compare_n_dedup import compare_deps
-from uv_req_sync.internals.parse_reqs_txt import comms, versionated_or_new
+from uv_req_sync.internals.parse_reqs_txt import comments, versionated_or_new
 from uv_req_sync.internals.toml_data_import import (
     module_dependencies as dependencies_toml,
 )
@@ -68,14 +69,15 @@ def main() -> None:
         line=re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",line).strip()
         reqs_lines_normalized[idx]=line
 
-    print(reqs_lines)
     poppers=[]
     for idx, dep in enumerate(new_toml_deps):
         dep_normalized=re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",dep)
         if dep_normalized not in reqs_lines_normalized and dep_normalized not in specially_indexed:
             poppers.append(idx)
+    
     for i in sorted(poppers, reverse=True):
         new_toml_deps.pop(i)
+    
     project["dependencies"]=new_toml_deps
     
     # Scripts is already configured, it depends on project's 
@@ -114,30 +116,62 @@ def main() -> None:
     with open(out_toml,"wb") as f:
         tomli_w.dump(data, f)
 
+    print("TOML data saved\nStarting comment adition")
+
     # ---------------
     # Comment adition
     # ---------------
     with open(out_toml,"r") as f:
         pyproject_lines=f.readlines()
+
+    # Rest of the comments
+    from uv_req_sync.internals.coms_logic import comment_logic
+    comment_poppers:list[int]=[]
+    while len(comments) > 0:
+        go_out=False
+        for idx, each in enumerate(comments):
+            pyproject_lines, comment_poppers = comment_logic(idx,each,pyproject_lines,comment_poppers)
+        
+        for i in sorted(comment_poppers, reverse=True):
+            try:
+                comments.pop(i)
+            except IndexError as e:
+                print(e)
+                go_out=True
+                if go_out == True:
+                    break
+        
+        with open(out_toml,"w") as w:
+            w.writelines(pyproject_lines)
+        
+        sleep(1)
+
+        with open(out_toml,"r") as r:
+            pyproject_lines=r.readlines()
+        
+        if comments and go_out == False:
+            print("remaining:")
+            print(comments)
+            print("going again")
+        if go_out == True:
+            print("Inline comments done\n")
+            break
+
     # Header comment
+    from datetime import UTC, datetime
     from textwrap import dedent
-    header_comment=dedent("""\
+    
+    header_comment=dedent(f"""\
     # ------
     # PyProject.toml - required for uv, ruff and ty
     # ------
     # This file is generated from dev/uv_req_sync/src/uv_req_sync/_init__.py.
+    # Generated on {datetime.now(UTC)}
     # It is used to sync pyproject.toml with requirements.txt. 
     # Please do not touch, unless you know what you are doing
 
     """)
     pyproject_lines.insert(0, header_comment)
-
-    # Rest of the comments
-    comments:list[dict]=comms
-    # To see which comment needs to have their logic appended, if any
-    print(comments)
-
-    #Insert coments
 
     with open(out_toml,"w") as w:
         w.writelines(pyproject_lines)
@@ -160,19 +194,18 @@ def main() -> None:
 # -------------------------------------
 if __name__ ==  "__main__":
     hashmap_file=dev_slash_uv/"src"/"uv_req_sync"/"hashmap.py"
-    
     if not hashmap_file.exists():
+        input("no hashmap found")
         from uv_req_sync.internals.hash import main as make_hashmap
+        # This way hash map always exist
         make_hashmap()
+
+    # It was easier to just copy the data from here then to change
+    # internals/hash.py to hold both things
+    from hashlib import sha256
 
     from uv_req_sync.hashmap import file_hash
     from uv_req_sync.hashmap import list_lines_hash as lines_hash
-
-    me=Path(__file__)
-    hash_dot_py=str(root/"dev"/"uv_req_sync"/"internals"/"hash.py")
-    print(hash_dot_py)
-
-    from hashlib import sha256
     h=sha256()
     
     with open(reqs_txt_file, "rb") as f:
@@ -183,14 +216,14 @@ if __name__ ==  "__main__":
     with open(reqs_txt_file, "rb") as f:
         lines=f.readlines()
     
-    hash_lines_totest:list[dict]=[]
+    hash_lines_totest:list[dict[int, str]]=[]
     
     for i, line in enumerate(lines):
         line = line.rstrip(b"\r\n")
-        line_hash=sha256(line).hexdigest()
-        hash_lines_totest.append({i:f"{line_hash}"})
+        linha_hash=sha256(line).hexdigest()
+        hash_lines_totest.append({i:f"{linha_hash}"})
     
-    if filehash_totest.strip() == file_hash.strip() or hash_lines_totest == lines_hash:
+    if (filehash_totest.strip() == file_hash.strip() or hash_lines_totest == lines_hash) and (root/"pyproject.toml").exists():
         print("File's hashes for requirements.txt are the same\nNo need to check for versioning\n")
         from sys import exit
         exit(0)

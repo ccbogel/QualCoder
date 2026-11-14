@@ -1,6 +1,8 @@
 """Creates hashmap.py"""
+
 def main() -> None:
     """Creates hashmap.py"""
+    from datetime import UTC, datetime
     from hashlib import sha256
     from pathlib import Path
 
@@ -31,6 +33,7 @@ def main() -> None:
 f"""\"\"\"Hashmap keeping the hash numbers from requirements.txt and it's lines\"\"\"
 # This file is generated from dev/uv_req_sync/internals/hash.py
 # It is used as to verify requirements.txt for changes. Please do not touch
+# Generated on {datetime.now(UTC)}
 file_hash=\"{reqs_txt_hash}\"
 list_lines_hash={hash_lines}
 """

@@ -1,13 +1,10 @@
 # ------
-# PyProject.toml - required for uv, ruff, ty and appimage
+# PyProject.toml - required for uv, ruff and ty
 # ------
-# This file is generated from dev/uv_req_sync/__init__.py.
+# This file is generated from dev/uv_req_sync/src/uv_req_sync/_init__.py.
+# Generated on 2026-11-14 18:48:02.701275+00:00
 # It is used to sync pyproject.toml with requirements.txt. 
-# Please do not touch
-# 
-# This one is just the "shell"/or base doc, it is this one
-# that the build_toml.py will edit
-
+# Please do not touch, unless you know what you are doing
 
 [project]
 name = "qualcoder"
@@ -42,7 +39,9 @@ dependencies = [
     "openpyxl>=3.1.5",
     "pandas>=3.1.0",
     "pdfminer-six>=20260107",
-    "pefile<2024.8.26",
+# The bootloader in the most recent version of pyinstaller is often falsely detected as malware
+# by anti virus software, so, it's safer to use a version that has been released a few months ago.
+    "pefile<2024.8.26", # see: https://github.com/pyinstaller/pyinstaller/issues/8832#issuecomment-2413203254
     "pillow>=13.0.0",
     "plotly>=7.1.0",
     "ply>=3.11",
@@ -58,10 +57,11 @@ dependencies = [
     "sentence-transformers>=5.7.0",
     "six>=1.17.0",
     "striprtf>=0.0.35",
+    "tomli-w",
     "torch",
     "torchaudio",
     "torchvision",
-    "transformers<=4.53.0",
+    "transformers<=4.53.0", # see https://github.com/huggingface/transformers/issues/38402
     "uvicorn>=0.30,<1",
     "wordcloud>=1.9.6",
 ]
@@ -84,6 +84,7 @@ dev = [
     "uv>=0.13.6",
 ]
 
+#  make sure that torch CPU is installed instead of CUDA, this saves space
 [tool.uv]
 index = [
     { name = "pytorch-cpu", url = "https://download.pytorch.org/whl/cpu", explicit = true },

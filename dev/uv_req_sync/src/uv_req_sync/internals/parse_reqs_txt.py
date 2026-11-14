@@ -7,16 +7,16 @@ from uv_req_sync.internals.toml_data_import import (
 )
 
 
-def find_index(index_name:str, reqs_lines:list[str])->tuple[str,str]|tuple[str, None]|tuple[None,None]:
+def _find_index(index_name:str, line_list:list[str])->tuple[str,str]|tuple[str, None]|tuple[None,None]:
   """Seacrh the list of lines for an expression and then returns 
   the url and a comment, if any"""
 
-  for idx, line in enumerate(reqs_lines):
-    pattern=f"--{index_name}"
-    found = re.match(fr"^({pattern})", line)
-    if found:
-      arg=found.group()
-      line_new=line.replace(arg,"")
+  for idx, line in enumerate(line_list):
+    _pattern=f"--{index_name}"
+    _found = re.match(fr"^({_pattern})", line)
+    if _found:
+      _arg=_found.group()
+      line_new=line.replace(_arg,"")
       line=line_new
       try:
         line, comm = line.split("#")
@@ -27,14 +27,14 @@ def find_index(index_name:str, reqs_lines:list[str])->tuple[str,str]|tuple[str, 
         line= line.replace(comm,"").strip()
 
       line=line.strip()
-      reqs_lines.pop(idx)
+      line_list.pop(idx)
       if comm != None:
         return line, comm.strip()  
       else: 
         return line, None
   return None, None
 
-def strip_comments_from_line_list(line_list:list[str],comms:list[dict])->tuple[list[str],list[dict]]:
+def _strip_comments_from_line_start(line_list:list[str],comments:list[dict])->tuple[list[str],list[dict]]:
   """Only removes if coments is in start of a line"""
   poppers=[]
   for idx, line in enumerate(line_list.copy()):
@@ -42,36 +42,57 @@ def strip_comments_from_line_list(line_list:list[str],comms:list[dict])->tuple[l
     if has_comment:
       comment_starts_line = re.match(r'^#.*$',line)
       # As off now only one dep has comments above it on the reqs lists: pefile.
-      # So it is (for now) not necessary to check for this
+      # So it is (for now) not necessary to add custom logic for this
       if comment_starts_line:
-        comms.append({"pefile_before":comment_starts_line.group()})
+        comments.append({"pefile_before":comment_starts_line.group()})
         poppers.append(idx)
         continue
         
   for idx in sorted(poppers, reverse=True):
-      reqs_lines.pop(idx)
-  return reqs_lines, comms
+      line_list.pop(idx)
+  return line_list, comments
 
-def search_for_comm_see(reqs_lines:list[str], comms:list[dict])->tuple[list[str],list[dict]]:
+def _strip_comment_in_the_middle_of_line(line_list:list[str], comments:list[dict[str,str]])->tuple[list[str],list[dict]]:
   """Almost same logic as other functions but, for some reason, python did not liked when I putted
   this inside other functions"""
-  for idx, line in enumerate(reqs_lines):
+  for idx, line in enumerate(line_list):
     check:re.Match[str]|None=re.search(r"# ", line)
     if check is None:
         continue
     line, comm = line.split("# ")
     line_key = re.sub(r'(\.|>|=|[0-9]|<)',"",line)
-    comms.append({line_key.strip():f"# {comm}"})
-    reqs_lines[idx]=line
+    comments.append({line_key.strip():f"# {comm}"})
+    line_list[idx]=line
       
-  return reqs_lines, comms
+  return line_list, comments
+
+def _dedup_comments(comment_list:list[dict[str,str]]) -> list[dict[str,str]]:
+  """Dedups comments based on the key"""
+  poppers:list[int]=[]
+  for idx, comment in enumerate(comment_list):
+    # k is the key for the comment
+    k_current:str=next(iter(comment.keys()))
+    # v is the comment
+    v_current:str=next(iter(comment.values()))
+    if idx-1 < 0:
+      continue
+    k_previous=next(iter(comment_list[idx-1].keys()))
+    v_previous=next(iter(comment_list[idx-1].values()))
+    if k_current.strip() != k_previous.strip():
+      continue
+    else:
+      comment_list[idx-1]={k_previous.strip():f"{v_previous}\n{v_current}"}
+      poppers.append(idx)
+      comment_list.pop(idx)
+  
+  return comment_list
 
 
-def check_versionated_or_new(reqs_lines:list[str], toml_deps_normalized:list[str])->tuple[list[str],list[str]]:
+def _check_versionated_or_new(line_list:list[str], toml_deps_normalized:list[str])->tuple[list[str],list[str]]:
   """This one takes the whole list of deps and returns only the ones that
   have versionated notes or new requirements"""
   versionated_or_new=[]
-  for line in reqs_lines:
+  for line in line_list:
     search:re.Match[str]|None=re.search(r">=|<=|==|<|>",line)
     line_mod_name = re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",line).replace("_","-")\
       .replace("pdfminer.six","pdfminer-six").strip().lower()
@@ -82,25 +103,22 @@ def check_versionated_or_new(reqs_lines:list[str], toml_deps_normalized:list[str
       continue
     versionated_or_new.append(line.strip().lower())
 
-  return versionated_or_new, reqs_lines
+  return versionated_or_new, line_list
 
 #Main
 
 root:Path=Path(__file__).parent.parent.parent.parent.parent.parent
 reqs_dot_txt:Path= root / "requirements.txt"
-
 with open(reqs_dot_txt,"r") as f:
-  reqs_lines:list[str]=f.readlines()
+  _reqs_lines:list[str]=f.readlines()
 
-comms = [] 
+_comments = []
+_index,_comment_index = _find_index("index-url",_reqs_lines)
+_comments.append({"index":_comment_index})
+_extra_index,_comment_extra_index = _find_index("extra-index-url",_reqs_lines)
+_reqs_lines, _comments = _strip_comments_from_line_start(_reqs_lines, _comments)
+_reqs_lines, _comments = _strip_comment_in_the_middle_of_line(_reqs_lines, _comments)
 
-index,comm_index = find_index("index-url",reqs_lines)
-comms.append({"index":comm_index})
-
-extra_index,comm_extra_index = find_index("extra-index-url",reqs_lines)
-
-reqs_lines, comms = strip_comments_from_line_list(reqs_lines, comms)
-
-reqs_lines, comms = search_for_comm_see(reqs_lines, comms)
-
-versionated_or_new, reqs_lines = check_versionated_or_new(reqs_lines, toml_deps_normalized)
+#Callable
+comments=_dedup_comments(_comments)
+versionated_or_new, reqs_lines = _check_versionated_or_new(_reqs_lines, toml_deps_normalized)

@@ -2,18 +2,18 @@
 from sys import exit
 
 
-def show_authors(author_list:list[dict]) ->None:
+def _show_authors(author_list:list[dict[str,str]]) ->None:
     for i in author_list:
         print(f"{i}) {i["name"]}")
 
-def authors_processing(author_list:list[dict])->list[dict]:
+def authors_processing(author_list:list[dict[str,str]])->list[dict]:
     """
     A recurring function that returns a list with the dict info of each developer
     it only exits when the user exits by "keeping the list as is"
     """
     test=input(f"""
     The project currently has currently {len(author_list)} authors
-    {show_authors(author_list)}
+    {_show_authors(author_list)}
     What would you like to do?
 
     1) Keep as is (default)
@@ -29,9 +29,9 @@ def authors_processing(author_list:list[dict])->list[dict]:
             print("Exiting programm")
             exit(0)
         case 3 | "3":
-            to_pop_i:str=input("Which one would you like to remove?\n")
+            to_pop_input:str=input("Which one would you like to remove?\n")
             try:
-                to_pop_int = int(to_pop_i)
+                to_pop_int = int(to_pop_input)
                 final_check=input(f"""
                 This action will delete {author_list[to_pop_int].get("name")} from the metadata. 
                 This cannot be undone and will require for you to recreate the entry.
@@ -43,7 +43,7 @@ def authors_processing(author_list:list[dict])->list[dict]:
                 authors_processing(author_list)
             except (TypeError, IndexError) as e:
                 if e == TypeError:
-                    print(f"{e}: {to_pop_i} is not an integer")
+                    print(f"{e}: {to_pop_input} is not an integer")
                 elif e == IndexError:
                     print(f"{e}: There is no author for index {to_pop_int}")
                 authors_processing(author_list)

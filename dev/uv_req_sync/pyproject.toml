@@ -1,7 +1,7 @@
 [project]
 name = "uv-req-sync"
 version = "0.1.0"
-description = "Add your description here"
+description = "A simple tool for syncing pyproject.toml with requirements.txt"
 readme = "README.md"
 authors = [
     { name = "BetoNetu", email = "beto.rebonatto.neto@gmail.com" }

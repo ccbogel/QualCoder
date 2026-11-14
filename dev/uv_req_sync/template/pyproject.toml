@@ -47,9 +47,9 @@ dependencies = [
   "pylatexenc>=2.10,<3",
   "pymupdf>=2.0",
   "pyqt6>=6.5",
-  "torch",        # Needed to be pinned
-  "torchvision", # Needed to be pinned
-  "torchaudio",   # Needed to be pinned
+  "torch",
+  "torchvision",
+  "torchaudio",
   "python-vlc>=3.0.21203",
   "pyyaml>=6.0.3",
   "qtawesome>=1.4.2",
