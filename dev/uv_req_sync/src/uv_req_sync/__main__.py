@@ -1,5 +1,6 @@
 "Main"
 import os
+import re
 import shutil
 import tomllib
 from hashlib import sha256
@@ -65,23 +66,29 @@ def main() -> None:
     # requirements.txt
     from uv_req_sync.internals.parse_reqs_txt import reqs_lines
 
+    reqs_lines_normalized:list[str]=reqs_lines.copy()
     for idx, line in enumerate(reqs_lines):
-        line=line.strip()
-        reqs_lines[idx]=line
+        line=re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",line).strip()
+        reqs_lines_normalized[idx]=line
 
     print(reqs_lines)
     poppers=[]
     for idx, dep in enumerate(new_toml_deps):
-        print(dep)
-        if dep not in reqs_lines:
+        dep_normalized=re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",dep)
+        if dep_normalized not in reqs_lines_normalized and dep_normalized not in ["torch", "torchaudio", "torchvision"]:
             poppers.append(idx)
     
     for i in sorted(poppers, reverse=True):
         new_toml_deps.pop(i)
     
     print(poppers)
-    project["dependencies"]=new_toml_deps
+    
+    # Add modules that were unnamed on the requirements.txt
+    # but need to be marked at uv
 
+    
+    project["dependencies"]=new_toml_deps
+    
     # Scripts is already configured, it depends on project's 
     # main entrypoint, so it is easier to "manually"config
     # 

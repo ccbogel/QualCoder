@@ -58,7 +58,6 @@ dependencies = [
     "sentence-transformers>=5.7.0",
     "six>=1.17.0",
     "striprtf>=0.0.35",
-    "tomli-w",
     "torch",
     "torchaudio",
     "torchvision",
