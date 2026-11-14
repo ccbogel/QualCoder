@@ -1,1 +1,1 @@
-"""Internal materials"""
+"""Internal scripts and logic"""

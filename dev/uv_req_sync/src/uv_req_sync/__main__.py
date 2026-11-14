@@ -1,14 +1,8 @@
 "Main"
 import os
 import re
-import shutil
 import tomllib
-from hashlib import sha256
 from pathlib import Path
-from sys import exit
-from textwrap import dedent
-
-import tomli_w
 
 from uv_req_sync.internals.authors import authors_processing
 from uv_req_sync.internals.compare_n_dedup import compare_deps
@@ -17,8 +11,6 @@ from uv_req_sync.internals.toml_data_import import (
     module_dependencies as dependencies_toml,
 )
 
-# Main needs to have a check when asking for the stored 
-# hash for the requirements.txt file
 
 def check_and_return(group:dict, toml_key:str, key:str) -> str:
     "Asks for user input for the key [str] on the group [dict]"
@@ -39,18 +31,17 @@ dev_slash_uv=Path(__file__).parent.parent.parent
 def main() -> None:
 
     #Read the base origin.toml
-    og_toml=dev_slash_uv / "origin.toml"
-    with open(og_toml,"rb") as toml_file:
-        og_toml_data= tomllib.load(toml_file,parse_float=str)
+    template=dev_slash_uv/"template"/"pyproject.toml"
+    with open(template,"rb") as toml_file:
+        template_data= tomllib.load(toml_file,parse_float=str)
 
-    # Backup in case bad things happen
-    og_toml_bkp=dev_slash_uv / "origin.toml.bak"
-    shutil.copy2(og_toml, og_toml_bkp)
+    # This ensures that the old file stays the same and it's data's
+    # copy is the one being modified
+    data=template_data.copy()
 
-    #This ensures that the old file stays the same, for now
-    data=og_toml_data.copy()
-
-    #Project tag
+    # -----------
+    # Project tag
+    # -----------
     project=data["project"]
     project["name"]=check_and_return(project, 'project',"name")
     project["version"]=check_and_return(project, 'project',"version")
@@ -59,12 +50,18 @@ def main() -> None:
     project["authors"]=authors_processing(project["authors"])
     project["requires-python"]=check_and_return(project, 'project',"requires-python")
     
+    # -----------------------
+    # [project.dependencies]
+    # -----------------------
     new_toml_deps:list[str]|None=compare_deps(dependencies_toml,versionated_or_new)
     
 
     # Checks weather any old dependency was removed from
-    # requirements.txt
+    # requirements.txt or needs a special index
     from uv_req_sync.internals.parse_reqs_txt import reqs_lines
+    from uv_req_sync.internals.specially_indexed import specially_indexed
+    # see internals/specially_index.py for a little bit more
+    # info
 
     reqs_lines_normalized:list[str]=reqs_lines.copy()
     for idx, line in enumerate(reqs_lines):
@@ -75,89 +72,97 @@ def main() -> None:
     poppers=[]
     for idx, dep in enumerate(new_toml_deps):
         dep_normalized=re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",dep)
-        if dep_normalized not in reqs_lines_normalized and dep_normalized not in ["torch", "torchaudio", "torchvision"]:
+        if dep_normalized not in reqs_lines_normalized and dep_normalized not in specially_indexed:
             poppers.append(idx)
-    
     for i in sorted(poppers, reverse=True):
         new_toml_deps.pop(i)
-    
-    print(poppers)
-    
-    # Add modules that were unnamed on the requirements.txt
-    # but need to be marked at uv
-
-    
     project["dependencies"]=new_toml_deps
     
     # Scripts is already configured, it depends on project's 
-    # main entrypoint, so it is easier to "manually"config
-    # 
+    # main entrypoint, so it is easier to "manually" config
     # If at some point these thing need to be edited manually
-    # 
-    # scripts=project["scripts"]
-    # main_script=scripts["qualcoder"]
+    #scripts=project["scripts"]
+    #main_script=scripts["qualcoder"]
 
 
-    #Tools
+    # -----------
+    # Tools tag
+    # -----------
     #tool=data["tool"]
 
-    # This block may take a while
-    #tool["uv"]=uv_parsing()
+    # Since the only modules that require index are already configured
+    # it is not needed to change the uv parsing logic
+    #uv= tool["uv"]
 
     # Ruff is already stabilized and does not require further parsing
     # or stabilizing for now
     # ruff=tool["ruff"]
-    # Write file
+    
+    
+    # -----------
+    # Toml Write
+    # -----------
     out_toml=root/"pyproject.toml"
     
     try:
         os.unlink(out_toml)
     except FileNotFoundError:
         print("file not found")
-
+    
+    # As tomllib is only RO, tomli_w is required
+    import tomli_w
     with open(out_toml,"wb") as f:
         tomli_w.dump(data, f)
 
+    # ---------------
     # Comment adition
-    comments:list[dict]=comms
-    header_comment=dedent("""\
-    # ------
-    # PyProject.toml - required for uv, ruff, ty and appimage
-    # ------
-    # This file is generated from dev/uv_req_sync/__init__.py.
-    # It is used to sync pyproject.toml with requirements.txt. 
-    # Please do not touch
-    # 
-    # This one is just the "shell"/or base doc, it is this one
-    # that the build_toml.py will edit
-
-
-    """)
-
+    # ---------------
     with open(out_toml,"r") as f:
         pyproject_lines=f.readlines()
+    # Header comment
+    from textwrap import dedent
+    header_comment=dedent("""\
+    # ------
+    # PyProject.toml - required for uv, ruff and ty
+    # ------
+    # This file is generated from dev/uv_req_sync/src/uv_req_sync/_init__.py.
+    # It is used to sync pyproject.toml with requirements.txt. 
+    # Please do not touch, unless you know what you are doing
 
+    """)
     pyproject_lines.insert(0, header_comment)
 
+    # Rest of the comments
+    comments:list[dict]=comms
+    # To see which comment needs to have their logic appended, if any
+    print(comments)
 
     #Insert coments
 
-    # To see which comment needs to be appended
-    print(comments)
-
     with open(out_toml,"w") as w:
         w.writelines(pyproject_lines)
-
+    
+    # ---------------
+    # Small Cleanup
+    # ---------------
+    # Removes uv locks so it don't locks a thing if
+    # it ever gets misconfigured. uv recreates when syncing
+    root_uvlock=root/"uv.lock"
+    uv_req_synq_uvlock=dev_slash_uv/"uv.lock"
+    if root_uvlock.exists():
+        os.unlink(root_uvlock)
+    if uv_req_synq_uvlock.exists():
+        os.unlink(uv_req_synq_uvlock)
 
 
 # -------------------------------------
-# Main
+# Runtime logic
 # -------------------------------------
 if __name__ ==  "__main__":
     hashmap_file=dev_slash_uv/"src"/"uv_req_sync"/"hashmap.py"
+    
     if not hashmap_file.exists():
         from uv_req_sync.internals.hash import main as make_hashmap
-        
         make_hashmap()
 
     from uv_req_sync.hashmap import file_hash
@@ -167,20 +172,27 @@ if __name__ ==  "__main__":
     hash_dot_py=str(root/"dev"/"uv_req_sync"/"internals"/"hash.py")
     print(hash_dot_py)
 
+    from hashlib import sha256
     h=sha256()
+    
     with open(reqs_txt_file, "rb") as f:
                 for chunk in iter(lambda: f.read(65536), b""):
                     h.update(chunk)
     filehash_totest = h.hexdigest()
+    
     with open(reqs_txt_file, "rb") as f:
         lines=f.readlines()
+    
     hash_lines_totest:list[dict]=[]
+    
     for i, line in enumerate(lines):
         line = line.rstrip(b"\r\n")
         line_hash=sha256(line).hexdigest()
         hash_lines_totest.append({i:f"{line_hash}"})
+    
     if filehash_totest.strip() == file_hash.strip() or hash_lines_totest == lines_hash:
         print("File's hashes for requirements.txt are the same\nNo need to check for versioning\n")
+        from sys import exit
         exit(0)
     else:
         main()
