@@ -2,7 +2,7 @@
 --extra-index-url https://pypi.org/simple
 charset-normalizer
 diff-match-patch
-EbookLib
+ebooklib
 emoji
 matplotlib
 markdown-it-py
@@ -10,12 +10,12 @@ networkx
 odfpy
 openpyxl
 pandas
-pdfminer.six
+pdfminer-six
 wordcloud
-Pillow
+pillow
 plotly
 ply
-PyQt6>=6.5
+pyqt6>=6.5
 qtawesome
 pymupdf
 python-vlc
@@ -30,9 +30,9 @@ langchain-text-splitters>=0.2.2
 faiss-cpu
 transformers<=4.53.0 # see https://github.com/huggingface/transformers/issues/38402
 sentence-transformers 
-Bio
-PyYAML 
-json_repair
+bio
+pyyaml 
+json-repair
 mcp>=2.2,<3
 uvicorn>=0.30,<1
 markdown-it-py

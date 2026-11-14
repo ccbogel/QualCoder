@@ -4262,6 +4262,8 @@ def gui():
     if sys.platform in ["linux", "bsd"]: 
         QtWidgets.QApplication.setDesktopFileName("QualCoder")
         
+    #if platform.system() in ("Windows", "Darwin") and settings.get('stylesheet') == "native":
+    #    # Select Fusion before QApplication initializes the platform's native style.
     # Prefer Fusion during initialization, then enforce it before applying colors.
     os.environ.setdefault("QT_STYLE_OVERRIDE", "Fusion")
     # Native video frame must not force sibling widgets native
