@@ -28,7 +28,9 @@ root=Path(__file__).parent.parent.parent.parent.parent
 reqs_txt_file = root/"requirements.txt"
 dev_slash_uv=Path(__file__).parent.parent.parent
 
-# Main
+# ---------------
+# Main processing
+# ---------------
 def process() -> None:
 
     #Read the base origin.toml
@@ -188,7 +190,7 @@ def process() -> None:
 
 
 # -------------------------------------
-# Runtime logic
+# Runtime logic - Actual main()
 # -------------------------------------
 def main():
     from uv_req_sync.internals.hash import main as make_hashmap
