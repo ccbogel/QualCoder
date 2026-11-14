@@ -18,7 +18,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install toml_li # required because python_stdlib_tomllib 
                     # is read only
-# if not at /dev cd /dev
+# if not at QualCoder/dev cd QualCoder/dev
 python uv_req_sync #Checks wheater the 
                    #requirements.txt was changes 
                    # and if so updates it
