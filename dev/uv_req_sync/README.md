@@ -19,7 +19,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install toml_li # required because python_stdlib_tomllib 
                     # is read only
-cd dev/uv_req_sync/src
+cd src
 # The uv way is kinda redundant, but follows qc
 # calling way
 
