@@ -1,3 +1,4 @@
+"""Author editing"""
 from sys import exit
 
 

@@ -1,3 +1,4 @@
+"""Dedups the reqs list"""
 import re
 
 _NAME_RE = re.compile(r'^\s*([A-Za-z0-9_.\-]+)')
@@ -7,7 +8,6 @@ def _mod_name(dep: str) -> str:
     if m is None:
         raise ValueError(f"invalid dependency spec: {dep!r}")
     return m.group(1).lower()
-    
 
 def compare_deps(deps: list[str], versionated: list[str]) -> list[str]:
     # start from deps, then overlay any versionated entries that are newer

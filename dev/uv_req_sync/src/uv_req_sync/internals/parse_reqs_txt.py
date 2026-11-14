@@ -1,3 +1,4 @@
+"""Parse requirements.txt"""
 import re
 from pathlib import Path
 
@@ -34,14 +35,14 @@ def find_index(index_name:str, reqs_lines:list[str])->tuple[str,str]|tuple[str, 
   return None, None
 
 def strip_comments_from_line_list(line_list:list[str],comms:list[dict])->tuple[list[str],list[dict]]:
-  """Only removes from start line"""
+  """Only removes if coments is in start of a line"""
   poppers=[]
   for idx, line in enumerate(line_list.copy()):
     has_comment = re.match(r'#',line)
     if has_comment:
       comment_starts_line = re.match(r'^#.*$',line)
       # As off now only one dep has comments above it on the reqs lists: pefile.
-      # So it is (for now) not necessary to check for this 
+      # So it is (for now) not necessary to check for this
       if comment_starts_line:
         comms.append({"pefile_before":comment_starts_line.group()})
         poppers.append(idx)
@@ -52,48 +53,47 @@ def strip_comments_from_line_list(line_list:list[str],comms:list[dict])->tuple[l
   return reqs_lines, comms
 
 def search_for_comm_see(reqs_lines:list[str], comms:list[dict])->tuple[list[str],list[dict]]:
-  """Almost same logi as other functions but, for some reason, python did not liked when I putted
+  """Almost same logic as other functions but, for some reason, python did not liked when I putted
   this inside other functions"""
   for idx, line in enumerate(reqs_lines):
     check:re.Match[str]|None=re.search(r"# ", line)
     if check is None:
         continue
     line, comm = line.split("# ")
-    line_entry = re.sub(r'(\.|>|=|[0-9]|<)',"",line)
-    comms.append({line_entry.strip():f"# {comm}"})
+    line_key = re.sub(r'(\.|>|=|[0-9]|<)',"",line)
+    comms.append({line_key.strip():f"# {comm}"})
     reqs_lines[idx]=line
       
-  return reqs_lines, comms 
+  return reqs_lines, comms
 
-def check_versionated_or_new(reqs_lines:list[str], toml_deps_normalized:list[str]):
+
+def check_versionated_or_new(reqs_lines:list[str], toml_deps_normalized:list[str])->tuple[list[str],list[str]]:
   """This one takes the whole list of deps and returns only the ones that
-  have versionated or new requirements"""
+  have versionated notes or new requirements"""
   versionated_or_new=[]
   for line in reqs_lines:
     search:re.Match[str]|None=re.search(r">=|<=|==|<|>",line)
     line_mod_name = re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",line).replace("_","-")\
       .replace("pdfminer.six","pdfminer-six").strip().lower()
-    # needed .lower() because requirements use, sometimes CamelCase (Pillow -> pillow; Bio -> bio)
+    # needed .lower() because requirements.txt use, sometimes CamelCase (Pillow -> pillow; Bio -> bio)
     # json-repair vs json_repair ->.replace
-    # pdfminer.six 
+    # pdfminer.six -> .replace
     if search is None and line_mod_name in toml_deps_normalized:
       continue
-    
     versionated_or_new.append(line.strip().lower())
 
-  #add a check for NEW deps (new modules added to dep list)
-
-  return versionated_or_new
+  return versionated_or_new, reqs_lines
 
 #Main
 
-root:Path=Path(__file__).parent.parent.parent.parent
+root:Path=Path(__file__).parent.parent.parent.parent.parent.parent
 reqs_dot_txt:Path= root / "requirements.txt"
 
 with open(reqs_dot_txt,"r") as f:
   reqs_lines:list[str]=f.readlines()
 
 comms = [] 
+
 index,comm_index = find_index("index-url",reqs_lines)
 comms.append({"index":comm_index})
 
@@ -103,4 +103,4 @@ reqs_lines, comms = strip_comments_from_line_list(reqs_lines, comms)
 
 reqs_lines, comms = search_for_comm_see(reqs_lines, comms)
 
-versionated_or_new:list[str] = check_versionated_or_new(reqs_lines, toml_deps_normalized)
+versionated_or_new, reqs_lines = check_versionated_or_new(reqs_lines, toml_deps_normalized)

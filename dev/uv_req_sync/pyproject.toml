@@ -1,0 +1,19 @@
+[project]
+name = "uv-req-sync"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "BetoNetu", email = "beto.rebonatto.neto@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "tomli-w>=1.2.0",
+]
+
+[project.scripts]
+uv-req-sync = "uv_req_sync.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.12.21,<0.13.0"]
+build-backend = "uv_build"
