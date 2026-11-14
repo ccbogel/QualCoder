@@ -167,8 +167,6 @@ def process() -> None:
     # ------
     # This file is generated from dev/uv_req_sync/src/uv_req_sync/_init__.py.
     # Generated on {datetime.now(UTC)}
-    # It is used to sync pyproject.toml with requirements.txt. 
-    # Please do not touch, unless you know what you are doing
 
     """)
     pyproject_lines.insert(0, header_comment)
