@@ -14,7 +14,7 @@ from uv_req_sync.internals.toml_data_import import (
 
 RE = re.compile(r'[<>=!~]=?\s*\d+(?:\.\d+)*')
 
-def argparser() -> None:
+def argparser() -> None|bool:
     print("This will be the argparser")
 
 def check_and_return(group:dict, toml_key:str, key:str) -> str:
