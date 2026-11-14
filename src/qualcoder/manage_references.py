@@ -347,20 +347,14 @@ class DialogReferenceManager(QtWidgets.QDialog):
             row  :  row number Integer
         """
 
-        # TODO review this as can use Qt Media Player
-        if not vlc:
-            msg = _("VLC not installed cannot play audio or video.")
-            Message(self.app, _('View AV error'), msg, "warning").exec()
-            return
-
         # Check media exists
         abs_path = ""
         if self.files[row]['mediapath'][0:6] in ('/audio', '/video'):
             abs_path = self.app.project_path + self.files[row]['mediapath']
         if self.files[row]['mediapath'][0:6] in ('audio:', 'video:'):
             abs_path = self.files[row]['mediapath'][6:]
-        if not os.path.exists(abs_path):
-            self.parent_text_edit.append(_("Bad link or non-existent file ") + abs_path)
+        if not Path(abs_path).exists():
+            self.parent_text_edit.append(_("Bad link or non-existent file ") + str(abs_path))
             return
         try:
             ui = DialogViewAV(self.app, self.files[row])
@@ -387,7 +381,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             abs_path = self.files[row]['mediapath'][7:]
         else:
             abs_path = self.app.project_path + self.files[row]['mediapath']
-        if not os.path.exists(abs_path):
+        if not Path(abs_path).exists():
             self.parent_text_edit.append(_("Bad link or non-existent file ") + str(abs_path))
             return
         ui = DialogViewImage(self.app, self.files[row])
