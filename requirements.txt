@@ -42,4 +42,3 @@ pylatexenc>=2.10,<3
 # by anti virus software, so, it's safer to use a version that has been released a few months ago.
 pefile<2024.8.26  # see: https://github.com/pyinstaller/pyinstaller/issues/8832#issuecomment-2413203254
 striprtf
-tomli-w
