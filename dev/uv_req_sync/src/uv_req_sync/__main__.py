@@ -12,6 +12,10 @@ from uv_req_sync.internals.toml_data_import import (
     module_dependencies as dependencies_toml,
 )
 
+RE = re.compile(r'[<>=!~]=?\s*\d+(?:\.\d+)*')
+
+def argparser() -> None:
+    print("This will be the argparser")
 
 def check_and_return(group:dict, toml_key:str, key:str) -> str:
     "Asks for user input for the key [str] on the group [dict]"
@@ -58,22 +62,21 @@ def process() -> None:
     # -----------------------
     new_toml_deps:list[str]|None=compare_deps(dependencies_toml,versionated_or_new)
     
-
+    
     # Checks weather any old dependency was removed from
     # requirements.txt or needs a special index
     from uv_req_sync.internals.parse_reqs_txt import reqs_lines
     from uv_req_sync.internals.specially_indexed import specially_indexed
-    # see internals/specially_index.py for a little bit more
-    # info
+    # see internals/specially_index.py for a little bit more info
 
     reqs_lines_normalized:list[str]=reqs_lines.copy()
     for idx, line in enumerate(reqs_lines):
-        line=re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",line).strip()
+        line=RE.sub("",line).strip()
         reqs_lines_normalized[idx]=line
 
     poppers=[]
     for idx, dep in enumerate(new_toml_deps):
-        dep_normalized=re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",dep)
+        dep_normalized=RE.sub("",dep)
         if dep_normalized not in reqs_lines_normalized and dep_normalized not in specially_indexed:
             poppers.append(idx)
     
@@ -130,7 +133,7 @@ def process() -> None:
     from uv_req_sync.internals.coms_logic import comment_logic
     comment_poppers:list[int]=[]
     while len(comments) > 0:
-        go_out=False
+        go_out:bool=False
         for idx, each in enumerate(comments):
             pyproject_lines, comment_poppers = comment_logic(idx,each,pyproject_lines,comment_poppers)
         
@@ -197,8 +200,8 @@ def main():
     # This way hash map always exist
     make_hashmap()
 
-    # It was easier to just copy the data from here then to change
-    # internals/hash.py to hold both things
+    # It was easier to just copy the code from internals/hash.py
+    # then to change it to hold variables and assign them dinamically
     from hashlib import sha256
 
     from uv_req_sync.hashmap import file_hash
