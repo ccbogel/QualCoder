@@ -67,9 +67,8 @@ REF_KEYWORDS = 8
 
 
 class DialogReferenceManager(QtWidgets.QDialog):
-    """ Dialog to manipulate files for a case.
-    Add files to case, add all text or text portions from a text file.
-    Remove file from a case. View file.
+    """ Dialog to create, import and edit references.
+    Link references to project files.
     """
 
     def __init__(self, app_, parent_text_edit):
@@ -736,70 +735,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if action == action_add_field:
             self.add_fields()
 
-    def create_reference(self):
-        """ Create a reference manually. """
-
-        fields = []
-        selection_options = []
-        for tagkey in TAG_KEY_MAPPING:
-            #print(tagkey, TAG_KEY_MAPPING[tagkey])
-            if tagkey not in ["A4", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "ER",
-                                "ID", "JA", "JF", "L1", "L2", "L4", "UK"]:
-                fields.append({tagkey: TAG_KEY_MAPPING[tagkey]})
-                selection_options.append({"name": f"{tagkey}: {TAG_KEY_MAPPING[tagkey]}"})
-        ui = DialogSelectItems(self.app, selection_options, _("Select fields for reference"), "multi")
-        ok = ui.exec()
-        if not ok:
-            return
-        selection = ui.get_selected()
-        # Need these core items
-        if not any(item.get("name") == "TY: type_of_reference" for item in selection):
-            selection.append({"name": "TY: type_of_reference"})
-        if not any(item.get("name") == "TI: title" for item in selection):
-            selection.append({'name': "TI: title"})  # Also TI is title
-        if not any(item.get("name") == "A1: first_authors" for item in selection):
-            selection.append({"name": "A1: first_authors"})
-        if not any(item.get("name") == "PY: year" for item in selection):
-            selection.append({"name": "PY: year"})
-
-        ordered_list = []
-        for s in selection:
-            ordered_list.append(s['name'])
-        # Put these items first in this order: TY,TI,A1,PY
-        old_index = ordered_list.index("TY: type_of_reference")
-        ordered_list.insert(0, ordered_list.pop(old_index))
-        old_index = ordered_list.index("TI: title")
-        ordered_list.insert(1, ordered_list.pop(old_index))
-        old_index = ordered_list.index("A1: first_authors")
-        ordered_list.insert(2, ordered_list.pop(old_index))
-        old_index = ordered_list.index("PY: year")
-        ordered_list.insert(3, ordered_list.pop(old_index))
-
-        cur = self.app.conn.cursor()
-        cur.execute("select max(risid) from ris")
-        res = cur.fetchone()
-        max_risid = 0
-        if res is not None and res[0] is not None:
-            max_risid = res[0]
-        max_risid += 1
-        for item in ordered_list:
-            tag, longtag = item.split(": ")
-            value = ''
-            if tag == 'TY':
-                value = "JOUR"  # default
-            if tag in ('TI', "T1"):
-                value = "title"  # default
-            if tag == "PY":
-                value = str(datetime.datetime.now().year)  # default
-            cur.execute("insert into ris (risid,tag,longtag,value) values (?,?,?,?)",
-                        [max_risid, tag, longtag, value])
-        self.app.conn.commit()
-
-        self._emit_project_table_changes(['ris'])
-        self.get_data()
-        self.fill_table_refs()
-        self.edit_reference(max_risid)
-
     def add_fields(self):
         """ Add extra fields to RIS data. """
 
@@ -1355,21 +1290,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.get_data()
         self.fill_table_refs()
 
-    def check_reference_type(self, ref_type):
-        """ Ensure reference type is one of the available options for RIS. """
-        if ref_type in ref_types:
-            return ref_type
-        options = []
-        for key in ref_types:
-            options.append({'name': key + " " + ref_types[key]})
-        sorted_options = sorted(options, key=lambda x: x["name"])
-        ui = DialogSelectItems(self.app, sorted_options, _("Select reference type"), "single")
-        ok = ui.exec()
-        if not ok:
-            return 'JOUR'  # A default
-        selection = ui.get_selected()
-        return selection['name'].split()[0]
-
     def delete_reference(self):
         """ Delete the selected reference.
         Remove reference risid from source table and remove source attribute values.
@@ -1406,3 +1326,131 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.fill_table_refs()
         self.fill_table_files()
         self.parent_text_edit.append(_("Reference deleted."))
+
+    def create_reference(self):
+        """ Create a reference manually. Need these core items: TY TI A1 PY. """
+
+        newref = DialogNewReference(self.app)
+        ok = newref.exec()
+        if not ok:
+            return
+        ref_data = []
+        ref_data.append(["TY", 'type_of_reference', newref.combo.currentText().split(' - ')[1]])
+        rows = newref.ui.tableWidget.rowCount()
+        for r in range (1, rows):
+            tag = newref.ui.tableWidget.item(r, 2).text()
+            try:
+                value = newref.ui.tableWidget.item(r, 1).text()
+            except AttributeError:
+                value = ''
+            for keytag in TAG_KEY_MAPPING:
+                if tag == keytag:
+                    longtag = TAG_KEY_MAPPING[tag]
+            ref_data.append([tag, longtag, value])
+
+        cur = self.app.conn.cursor()
+        cur.execute("select max(risid) from ris")
+        res = cur.fetchone()
+        max_risid = 0
+        if res is not None and res[0] is not None:
+            max_risid = res[0]
+        max_risid += 1
+
+        for item in ref_data:
+            cur.execute("insert into ris (risid,tag,longtag,value) values (?,?,?,?)",
+                        [max_risid, item[0], item[1], item[2]])
+        self.app.conn.commit()
+
+        self._emit_project_table_changes(['ris'])
+        self.get_data()
+        self.fill_table_refs()
+
+
+class DialogNewReference(QtWidgets.QDialog):
+    """ Dialog to enter a reference. """
+
+    def __init__(self, app):
+
+        self.app = app
+        QtWidgets.QDialog.__init__(self)
+        self.ui = Ui_DialogReferenceEditor()
+        self.ui.setupUi(self)
+        self.setWindowTitle(_("New Reference"))
+        self.ui.tableWidget.setStyleSheet(f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";')
+        self.ui.buttonBox.setStyleSheet(f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";')
+        self.ui.tableWidget.setColumnCount(3)
+        self.ui.tableWidget.hideColumn(2)
+        self.ui.tableWidget.setHorizontalHeaderLabels(["RIS", "Data", "Code"])
+
+        self.combo = QtWidgets.QComboBox()
+        display = []
+        for item in ref_types.keys():
+            #print(item, ref_types[item])
+            display.append(f"{ref_types[item]} - {item}")
+        self.combo.addItems(display)
+        self.ui.tableWidget.insertRow(0)
+        self.ui.tableWidget.setCellWidget(0, 1, self.combo)
+        item = QtWidgets.QTableWidgetItem(_("Reference type"))
+        self.ui.tableWidget.setItem(0, 0, item)
+        item = QtWidgets.QTableWidgetItem("TY")
+        self.ui.tableWidget.setItem(0, 2, item)
+
+        self.field_map = {}
+        for tagkey in TAG_KEY_MAPPING:
+            #print(tagkey, TAG_KEY_MAPPING[tagkey])
+            if tagkey not in ["A4", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "ER",
+                              "ID", "JA", "JF", "L1", "L2", "L4", "UK"]:
+                self.field_map[tagkey] = TAG_KEY_MAPPING[tagkey]
+        # Initial setup for JOUR
+        self.create_rows()
+        self.combo.currentTextChanged.connect(self.create_rows)
+        self.ui.tableWidget.resizeColumnsToContents()
+        self.ui.tableWidget.horizontalHeader().setStretchLastSection(True)
+
+    def create_rows(self):
+        self.ui.tableWidget.setRowCount(1)
+        ref_type = self.combo.currentText().split(" - ")[1]
+        if ref_type in ref_type_fields:
+            #print(ref_type_fields[ref_type])
+            fields = ref_type_fields[ref_type].split()
+        else:
+            fields = ref_type_fields['GEN'].split()
+        for row, key in enumerate(fields):
+            self.ui.tableWidget.insertRow(row + 1)
+            item = QtWidgets.QTableWidgetItem(self.field_map[key].replace('_', ' '))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(row + 1, 0, item)
+            item_code = QtWidgets.QTableWidgetItem(key)
+            item_code.setFlags(item_code.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(row + 1, 2, item_code)
+
+
+ref_type_fields = {
+    'ABST': 'TI AB A1 PY CY SP EP DO UR Y2 KW N1',
+    'ANCIENT': 'TI T2 TT TA A1 PY LA SN CY PB SP EP OP RP KW N1',
+    'ADVS': 'TI T2 A1 PY M3 CY PB OP RP DO KW KW N1',
+    'ART': 'TI T2 A1 PY M3 CY PB OP RP DO KW KW N1',
+    'BLOG': 'TI A1 PY CY AB SP EP UR Y2 KW N1',
+    'BOOK': 'TI T2 A1 PY VL NV IS SN CY PB SP EP OP RP KW N1',
+    'CHAP': 'TI T2 A1 PY VL NV IS SN CY PB SE SP EP OP RP KW N1',
+    'CPAPER': 'TI T2 A1 PY VL NV IS SN CY PB SE SP EP DO UR KW N1',
+    'EBOOK': 'TI T2 A1 PY VL NV IS SN CY PB SP EP OP RP DO KW KW N1',
+    'ECHAP': 'TI T2 A1 PY VL NV IS SE SN CY PB SP EP OP RP DO KW KW N1',
+    'EJOUR': 'TI A1 PY JO VL IS SP EP DO UR AB DO UR KW N1',
+    'ENCYC': 'TI T2 A1 PY VL NV IS SN CY PB SP EP OP RP KW N1',
+    'GEN': 'TI T2 A1 PY VL NV IS SN CY PB SP EP OP RP DO KW KW N1',
+    'INPR': 'TI A1 PY JO DO UR AB DO UR KW N1',
+    'JOUR': 'TI A1 PY JO VL IS SP EP DO UR AB DO UR KW N1',
+    'MULTI': 'TI T2 A1 PY M3 CY PB OP RP DO UR KW KW N1',
+    'NEWS': 'TI A1 A2 PY CY ET IS VL NV AB SE SP DO EP SN UR KW N1',
+    'RPRT': 'TI A1 A2 PY CY ET IS VL NV AB SP DO EP SN UR KW N1',
+    'SER': 'TI A1 A2 PY CY ET IS VL NV AB SP DO EP SN UR KW N1',
+    'SOUND': 'TI T2 A1 PY M3 CY PB OP RP DO KW KW N1',
+    'THES': 'TI A1 PY CY AB SP EP DO UR KW N1',
+    'VIDEO': 'TI T2 A1 PY M3 CY PB OP RP DO KW KW N1',
+    'WEB': 'TI A1 PY CY AB SP EP DO UR Y2 KW N1'
+}
+
+
+
+
