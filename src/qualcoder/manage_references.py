@@ -790,7 +790,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
             cur.execute("SELECT tag,value from ris where tag != 'TY' and risid=?", [ris_id[0]])
             res = cur.fetchall()
             for r in res:
-                lines.append(f"{r[0]}  - {r[1]}")
+                if r[0] == 'AU':
+                    authors = r[1].split(';')
+                    for author in authors:
+                        lines.append(f"AU  - {author.strip()}")
+                else:
+                    lines.append(f"{r[0]}  - {r[1]}")
             lines.append("ER  - ")  # End record
         with open(filepath, 'w', encoding='utf-8') as f:
             for line in lines:
@@ -1381,6 +1386,8 @@ class DialogNewReference(QtWidgets.QDialog):
         self.ui.tableWidget.setColumnCount(3)
         self.ui.tableWidget.hideColumn(2)
         self.ui.tableWidget.setHorizontalHeaderLabels(["RIS", "Data", "Code"])
+        label = QtWidgets.QLabel("Separate authors using ;")
+        self.ui.gridLayout.addWidget(label, 2, 0, 1, 1)
 
         self.combo = QtWidgets.QComboBox()
         display = []
@@ -1422,33 +1429,35 @@ class DialogNewReference(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(row + 1, 0, item)
             item_code = QtWidgets.QTableWidgetItem(key)
             item_code.setFlags(item_code.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            if key == "AU":
+                item_code.setToolTip(_("Separate authors using ;"))
             self.ui.tableWidget.setItem(row + 1, 2, item_code)
 
 
 ref_type_fields = {
-    'ABST': 'TI AB A1 PY CY SP EP DO UR Y2 KW N1',
-    'ANCIENT': 'TI T2 TT TA A1 PY LA SN CY PB SP EP OP RP KW N1',
-    'ADVS': 'TI T2 A1 PY M3 CY PB OP RP DO KW KW N1',
-    'ART': 'TI T2 A1 PY M3 CY PB OP RP DO KW KW N1',
-    'BLOG': 'TI A1 PY CY AB SP EP UR Y2 KW N1',
-    'BOOK': 'TI T2 A1 PY VL NV IS SN CY PB SP EP OP RP KW N1',
-    'CHAP': 'TI T2 A1 PY VL NV IS SN CY PB SE SP EP OP RP KW N1',
-    'CPAPER': 'TI T2 A1 PY VL NV IS SN CY PB SE SP EP DO UR KW N1',
-    'EBOOK': 'TI T2 A1 PY VL NV IS SN CY PB SP EP OP RP DO KW KW N1',
-    'ECHAP': 'TI T2 A1 PY VL NV IS SE SN CY PB SP EP OP RP DO KW KW N1',
-    'EJOUR': 'TI A1 PY JO VL IS SP EP DO UR AB DO UR KW N1',
-    'ENCYC': 'TI T2 A1 PY VL NV IS SN CY PB SP EP OP RP KW N1',
-    'GEN': 'TI T2 A1 PY VL NV IS SN CY PB SP EP OP RP DO KW KW N1',
-    'INPR': 'TI A1 PY JO DO UR AB DO UR KW N1',
-    'JOUR': 'TI A1 PY JO VL IS SP EP DO UR AB DO UR KW N1',
-    'MULTI': 'TI T2 A1 PY M3 CY PB OP RP DO UR KW KW N1',
-    'NEWS': 'TI A1 A2 PY CY ET IS VL NV AB SE SP DO EP SN UR KW N1',
-    'RPRT': 'TI A1 A2 PY CY ET IS VL NV AB SP DO EP SN UR KW N1',
-    'SER': 'TI A1 A2 PY CY ET IS VL NV AB SP DO EP SN UR KW N1',
-    'SOUND': 'TI T2 A1 PY M3 CY PB OP RP DO KW KW N1',
-    'THES': 'TI A1 PY CY AB SP EP DO UR KW N1',
-    'VIDEO': 'TI T2 A1 PY M3 CY PB OP RP DO KW KW N1',
-    'WEB': 'TI A1 PY CY AB SP EP DO UR Y2 KW N1'
+    'ABST': 'TI AB AU PY CY SP EP DO UR Y2 KW N1',
+    'ANCIENT': 'TI T2 TT TA AU PY LA SN CY PB SP EP OP RP KW N1',
+    'ADVS': 'TI T2 AU PY M3 CY PB OP RP DO KW KW N1',
+    'ART': 'TI T2 AU PY M3 CY PB OP RP DO KW KW N1',
+    'BLOG': 'TI AU PY CY AB SP EP UR Y2 KW N1',
+    'BOOK': 'TI T2 AU PY VL NV IS SN CY PB SP EP OP RP KW N1',
+    'CHAP': 'TI T2 AU PY VL NV IS SN CY PB SE SP EP OP RP KW N1',
+    'CPAPER': 'TI T2 AU PY VL NV IS SN CY PB SE SP EP DO UR KW N1',
+    'EBOOK': 'TI T2 AU PY VL NV IS SN CY PB SP EP OP RP DO KW KW N1',
+    'ECHAP': 'TI T2 AU PY VL NV IS SE SN CY PB SP EP OP RP DO KW KW N1',
+    'EJOUR': 'TI AU PY JO VL IS SP EP DO UR AB DO UR KW N1',
+    'ENCYC': 'TI T2 AU PY VL NV IS SN CY PB SP EP OP RP KW N1',
+    'GEN': 'TI T2 AU PY VL NV IS SN CY PB SP EP OP RP DO KW KW N1',
+    'INPR': 'TI AU PY JO DO UR AB DO UR KW N1',
+    'JOUR': 'TI AU PY JO VL IS SP EP DO UR AB DO UR KW N1',
+    'MULTI': 'TI T2 AU PY M3 CY PB OP RP DO UR KW KW N1',
+    'NEWS': 'TI AU PY CY ET IS VL NV AB SE SP DO EP SN UR KW N1',
+    'RPRT': 'TI AU PY CY ET IS VL NV AB SP DO EP SN UR KW N1',
+    'SER': 'TI AU PY CY ET IS VL NV AB SP DO EP SN UR KW N1',
+    'SOUND': 'TI T2 AU PY M3 CY PB OP RP DO KW KW N1',
+    'THES': 'TI AU PY CY AB SP EP DO UR KW N1',
+    'VIDEO': 'TI T2 AU PY M3 CY PB OP RP DO KW KW N1',
+    'WEB': 'TI AU PY CY AB SP EP DO UR Y2 KW N1'
 }
 
 
