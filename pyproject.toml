@@ -2,9 +2,7 @@
 # PyProject.toml - required for uv, ruff and ty
 # ------
 # This file is generated from dev/uv_req_sync/src/uv_req_sync/_init__.py.
-# Generated on 2026-11-14 19:04:12.044384+00:00
-# It is used to sync pyproject.toml with requirements.txt. 
-# Please do not touch, unless you know what you are doing
+# Generated on 2026-11-16 01:45:35.647816+00:00
 
 [project]
 name = "qualcoder"

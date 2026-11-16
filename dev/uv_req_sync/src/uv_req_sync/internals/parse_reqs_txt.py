@@ -11,6 +11,7 @@ def _find_index(index_name:str, line_list:list[str])->tuple[str,str]|tuple[str, 
   """Seacrh the list of lines for an expression and then returns 
   the url and a comment, if any"""
 
+  print(f"Finding index comment for {index_name}")
   for idx, line in enumerate(line_list):
     _pattern=f"--{index_name}"
     _found = re.match(fr"^({_pattern})", line)
@@ -29,8 +30,10 @@ def _find_index(index_name:str, line_list:list[str])->tuple[str,str]|tuple[str, 
       line=line.strip()
       line_list.pop(idx)
       if comm != None:
+        print(f"Comment {comm.strip()} found for {index_name}")
         return line, comm.strip()  
       else: 
+        print(f"No comment found for {index_name}")
         return line, None
   return None, None
 
@@ -39,20 +42,22 @@ def _strip_comments_from_line_start(line_list:list[str],comments:list[dict])->tu
   poppers=[]
   for idx, line in enumerate(line_list.copy()):
     has_comment = re.match(r'#',line)
-    if has_comment:
-      comment_starts_line = re.match(r'^#.*$',line)
+    comment_starts_line = re.match(r'^#.*$',line)
+    if has_comment and comment_starts_line:
+      print(f"Comment {line} found")
       # As off now only one dep has comments above it on the reqs lists: pefile.
       # So it is (for now) not necessary to add custom logic for this
-      if comment_starts_line:
-        comments.append({"pefile_before":comment_starts_line.group()})
-        poppers.append(idx)
-        continue
+      comments.append({"pefile_before":comment_starts_line.group()})
+      poppers.append(idx)
+      continue
         
   for idx in sorted(poppers, reverse=True):
       line_list.pop(idx)
+  print("Comments from single lines removed!")
   return line_list, comments
 
 def _strip_comment_in_the_middle_of_line(line_list:list[str], comments:list[dict[str,str]])->tuple[list[str],list[dict]]:
+  print("Removing comments from lines!")
   """Almost same logic as other functions but, for some reason, python did not liked when I putted
   this inside other functions"""
   for idx, line in enumerate(line_list):
@@ -60,15 +65,19 @@ def _strip_comment_in_the_middle_of_line(line_list:list[str], comments:list[dict
     if check is None:
         continue
     line, comm = line.split("# ")
+    print(f"{comm} found right beside {line}")
     line_key = re.sub(r'(\.|>|=|[0-9]|<)',"",line)
     comments.append({line_key.strip():f"# {comm}"})
     line_list[idx]=line
-      
+  
+  print("Comments removed from all lines!")
   return line_list, comments
 
 def _dedup_comments(comment_list:list[dict[str,str]]) -> list[dict[str,str]]:
   """Dedups comments based on the key"""
+  print("Comment deduping started\n")
   poppers:list[int]=[]
+  
   for idx, comment in enumerate(comment_list):
     # k is the key for the comment
     k_current:str=next(iter(comment.keys()))
@@ -81,10 +90,16 @@ def _dedup_comments(comment_list:list[dict[str,str]]) -> list[dict[str,str]]:
     if k_current.strip() != k_previous.strip():
       continue
     else:
+      print(f"{v_current}'s key:{k_current} is the same as {v_previous}\nMerging them...\n")
       comment_list[idx-1]={k_previous.strip():f"{v_previous}\n{v_current}"}
+      print("Comments merged")
       poppers.append(idx)
-      comment_list.pop(idx)
+      
+  for i in sorted(poppers, reverse=True):
+    print(f"Popping {next(iter(comment_list[i].values()))}")
+    comment_list.pop(i)
   
+  print("Comment deduping concluded\n")
   return comment_list
 
 
@@ -106,9 +121,10 @@ def _check_versionated_or_new(line_list:list[str], toml_deps_normalized:list[str
   return versionated_or_new, line_list
 
 #Main
-
+print("Parsing requirements.txt started" )
 root:Path=Path(__file__).parent.parent.parent.parent.parent.parent
 reqs_dot_txt:Path= root / "requirements.txt"
+print("Opening requirements.txt")
 with open(reqs_dot_txt,"r") as f:
   _reqs_lines:list[str]=f.readlines()
 

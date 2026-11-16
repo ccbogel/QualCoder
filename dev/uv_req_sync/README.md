@@ -21,9 +21,9 @@ pip install toml_li # required because python_stdlib_tomllib
                     # is read only
 cd src
 
-python uv_req_sync #Checks wheater the 
-                   #requirements.txt was changes 
-                   # and if so updates it
-python uv_req_sync -f # Forces the "sync"
-python uv_req_sync --force # Forces the "sync"
+python -m uv_req_sync #Checks wheater the 
+                      #requirements.txt was changes 
+                      # and if so updates it
+python -m uv_req_sync -f      # Forces the "sync"
+python -m uv_req_sync --force # Forces the "sync"
 ```

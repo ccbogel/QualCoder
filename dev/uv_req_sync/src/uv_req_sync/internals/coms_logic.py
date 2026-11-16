@@ -3,6 +3,7 @@ loop inside where this functions is called. However this was needed to be moved 
 pyproject_lines/lines_list comment_poppers/poppers"""
 import re
 from copy import copy
+from textwrap import dedent
 
 _RE=re.compile(r'([0-9]|\.|\,|<|>|=)')
 
@@ -11,6 +12,7 @@ def comment_logic(comment_index:int,comment:dict[str,str],lines_list:list[str],p
     loop inside where this functions is called. However this was needed to be moved to a function that reassigned the values of
     pyproject_lines/lines_list comment_poppers/poppers"""
     found_generic:bool=False
+    # Every comment is a dict[str:str] with one item
     # k is the key for the comment
     k:str=next(iter(comment.keys()))
     # v is the comment
@@ -21,12 +23,14 @@ def comment_logic(comment_index:int,comment:dict[str,str],lines_list:list[str],p
         linha_stripped=copy(linha).replace("'","").replace('"','').replace("\n","").strip()
         linha_expression=_RE.sub("",linha_stripped).strip()
         if re.search(r'_',k):
+            
             try:
                 part1, part2 = k.split("_")
             except ValueError as e:
                 print(e)
                 part1=None
                 part2=None
+            
             if linha_expression == part1 and part2 != None:
                 match part2:
                     case "before":
@@ -39,19 +43,22 @@ def comment_logic(comment_index:int,comment:dict[str,str],lines_list:list[str],p
                     #    new_line=f"{linha}\n{v}"    
                     #    lines_list[i]=new_line
                     #    poppers.append(idx)
+                print(f"Comment {v} added {part2} {part1}")
                 break # leaves internal loop
         elif k == "index" and linha.strip() == "[tool.uv]":
-                new_line=f"{v}\n{linha}"    
-                lines_list[i]=new_line
-                poppers.append(comment_index)
-                break # leaves internal loop
+            new_line=f"{v}\n{linha}"    
+            lines_list[i]=new_line
+            poppers.append(comment_index)
+            print(f"Comment {v} added before {linha.strip()}")
+            break # leaves internal loop
         elif k.strip() == linha_expression.strip():
             found_generic=True 
-            break # leaves internal loop -> goes to next of comment loop
+            break # leaves internal loop
         else: continue # go to next of the internal
     if found_generic == True:
         new_line=f"{linha.replace("\n","")} {v.replace("\n","")}\n"
         lines_list[i]=new_line
+        print(f"Adding {v.replace("\n","")} to the end of {dedent(linha.replace("\n",""))}")
         poppers.append(comment_index)
     
     return lines_list, poppers

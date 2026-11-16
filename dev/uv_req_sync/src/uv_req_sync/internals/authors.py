@@ -9,8 +9,11 @@ def _show_authors(author_list:list[dict[str,str]]) ->None:
 def authors_processing(author_list:list[dict[str,str]])->list[dict]:
     """
     A recurring function that returns a list with the dict info of each developer
-    it only exits when the user exits by "keeping the list as is"
+    it only exits when the user exits by "keeping the list as is" or just nothing
     """
+    print("----------------")
+    print("Author Wizard")
+    print("----------------")
     test=input(f"""
     The project currently has currently {len(author_list)} authors
     {_show_authors(author_list)}

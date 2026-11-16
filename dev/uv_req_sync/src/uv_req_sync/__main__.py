@@ -3,15 +3,13 @@ import os
 import re
 import tomllib
 from argparse import ArgumentParser, Namespace
+from copy import copy
 from pathlib import Path
 from time import sleep
 
 from uv_req_sync.internals.authors import authors_processing
 from uv_req_sync.internals.compare_n_dedup import compare_deps
 from uv_req_sync.internals.parse_reqs_txt import comments, versionated_or_new
-from uv_req_sync.internals.toml_data_import import (
-    module_dependencies as dependencies_toml,
-)
 
 RE = re.compile(r'[<>=!~]=?\s*\d+(?:\.\d+)*')
 
@@ -31,6 +29,9 @@ def argparser() -> Namespace:
 
 def check_and_return(group:dict, toml_key:str, key:str) -> str:
     "Asks for user input for the key [str] on the group [dict]"
+    print("------------------------")
+    print(f"Verify {key}")
+    print("------------------------")
     test=input(f"{toml_key}[\"{key}\"] is \"{group[key]}\"\nWould you like to change it?\n(Y)es (N)o\n(Default is no)\n")
     if test.lower() == "y":
         new_value:str = input("What value to put into {group}[\"{key}\"]")
@@ -48,7 +49,11 @@ dev_slash_uv=Path(__file__).parent.parent.parent
 # Main processing
 # ---------------
 def process() -> None:
-
+    print("------------------------")
+    print("Starting processing")
+    print("------------------------")
+    
+    print("Read TOML\n")
     #Read the base origin.toml
     template=dev_slash_uv/"template"/"pyproject.toml"
     with open(template,"rb") as toml_file:
@@ -56,23 +61,32 @@ def process() -> None:
 
     # This ensures that the old file stays the same and it's data's
     # copy is the one being modified
+    print("Copy the data\n")
     data=template_data.copy()
 
     # -----------
     # Project tag
     # -----------
+    print("------------------------")
+    print("Simple elements")
+    print("------------------------")
     project=data["project"]
     project["name"]=check_and_return(project, 'project',"name")
     project["version"]=check_and_return(project, 'project',"version")
     project["description"]=check_and_return(project, 'project',"description")
     project["readme"]=check_and_return(project, 'project',"readme")
-    project["authors"]=authors_processing(project["authors"])
     project["requires-python"]=check_and_return(project, 'project',"requires-python")
+    
+    project["authors"]=authors_processing(project["authors"])
     
     # -----------------------
     # [project.dependencies]
     # -----------------------
-    new_toml_deps:list[str]|None=compare_deps(dependencies_toml,versionated_or_new)
+    print("------------------------")
+    print("Dependencies")
+    print("------------------------")
+    print("Starting dependencies management")
+    new_toml_deps:list[str]=compare_deps(copy(project["dependencies"]),versionated_or_new)
     
     
     # Checks weather any old dependency was removed from
@@ -81,6 +95,7 @@ def process() -> None:
     from uv_req_sync.internals.specially_indexed import specially_indexed
     # see internals/specially_index.py for a little bit more info
 
+    print("Dependency cleaninig started")
     reqs_lines_normalized:list[str]=reqs_lines.copy()
     for idx, line in enumerate(reqs_lines):
         line=RE.sub("",line).strip()
@@ -93,10 +108,11 @@ def process() -> None:
             poppers.append(idx)
     
     for i in sorted(poppers, reverse=True):
+        print(f"popping \"{new_toml_deps[i]}\"")
         new_toml_deps.pop(i)
     
     project["dependencies"]=new_toml_deps
-    
+    print("Dependencies management ended")
     # Scripts is already configured, it depends on project's 
     # main entrypoint, so it is easier to "manually" config
     # If at some point these thing need to be edited manually
@@ -121,10 +137,14 @@ def process() -> None:
     # -----------
     # Toml Write
     # -----------
+    print("------------------------")
+    print("Finlazing")
+    print("------------------------")
     out_toml=root/"pyproject.toml"
-    
+    print("Deleting old TOML\n")
     try:
         os.unlink(out_toml)
+        print("Old TOML deleted")
     except FileNotFoundError:
         print("file not found")
     
@@ -138,11 +158,13 @@ def process() -> None:
     # ---------------
     # Comment adition
     # ---------------
+    print("TOML file reopened to add comments")
     with open(out_toml,"r") as f:
         pyproject_lines=f.readlines()
 
-    # Rest of the comments
     from uv_req_sync.internals.coms_logic import comment_logic
+    
+    print("Starting while loop to add inline comments")
     comment_poppers:list[int]=[]
     while len(comments) > 0:
         go_out:bool=False
@@ -152,29 +174,38 @@ def process() -> None:
         for i in sorted(comment_poppers, reverse=True):
             try:
                 comments.pop(i)
-            except IndexError as e:
-                print(e)
+            except IndexError:
+                print("""\
+Was not hable to pop comment due to an IndexError!\n\
+This means the of comment list was reached!\n
+Exiting while loop
+""")
                 go_out=True
                 if go_out == True:
                     break
-        
+        print("Saving changes to the TOML file\n")
         with open(out_toml,"w") as w:
             w.writelines(pyproject_lines)
         
+        #Just for safety
         sleep(1)
 
+        print("Reopenning TOML file\n")
         with open(out_toml,"r") as r:
             pyproject_lines=r.readlines()
         
         if comments and go_out == False:
-            print("remaining:")
-            print(comments)
-            print("going again")
+            print("Remaining comments:\n")
+            for comm in comments:
+                print(f"{next(iter(comm.values()))}\n")
+            print("Going to start iterrating again...\n")
         if go_out == True:
             print("Inline comments done\n")
             break
-
+    
+    print("While loop exited")
     # Header comment
+    # So simple it can be added here
     from datetime import UTC, datetime
     from textwrap import dedent
     
@@ -187,10 +218,13 @@ def process() -> None:
 
     """)
     pyproject_lines.insert(0, header_comment)
+    print("Header comment added")
 
+    print("Saving changes to the TOML file\n")
     with open(out_toml,"w") as w:
         w.writelines(pyproject_lines)
     
+    print("File sync is completed!\nStarting cleanup...\n")
     # ---------------
     # Small Cleanup
     # ---------------
@@ -200,8 +234,11 @@ def process() -> None:
     uv_req_synq_uvlock=dev_slash_uv/"uv.lock"
     if root_uvlock.exists():
         os.unlink(root_uvlock)
+        print(f"{root_uvlock} deleted!")
     if uv_req_synq_uvlock.exists():
         os.unlink(uv_req_synq_uvlock)
+        print(f"{uv_req_synq_uvlock} deleted!")
+
 
 def work_and_exit() -> None:
         from sys import exit
@@ -228,6 +265,7 @@ def main():
 
     from uv_req_sync.hashmap import file_hash
     from uv_req_sync.hashmap import list_lines_hash as lines_hash
+    
     h=sha256()
     with open(reqs_txt_file, "rb") as f:
                 for chunk in iter(lambda: f.read(65536), b""):
@@ -243,9 +281,10 @@ def main():
         line = line.rstrip(b"\r\n")
         linha_hash=sha256(line).hexdigest()
         hash_lines_totest.append({i:f"{linha_hash}"})
-    from sys import exit
+    
     if filehash_totest.strip() == file_hash.strip() or hash_lines_totest == lines_hash:
         print("File's hashes for requirements.txt are the same\nNo need to check for versioning\n")
+        from sys import exit
         exit(0)
     else:
         work_and_exit()
