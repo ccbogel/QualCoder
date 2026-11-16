@@ -2,6 +2,7 @@
 import os
 import re
 import tomllib
+from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from time import sleep
 
@@ -14,8 +15,19 @@ from uv_req_sync.internals.toml_data_import import (
 
 RE = re.compile(r'[<>=!~]=?\s*\d+(?:\.\d+)*')
 
-def argparser() -> None|bool:
-    print("This will be the argparser")
+def argparser() -> Namespace:
+    parser = ArgumentParser(
+                    prog='uv_req_sync',
+                    description='Syncs Uv\'s pyptoject.toml with requirements.txt.\n\
+                                 By Default it checks hashmap.py to see if requirements.txt\
+                                 wasn changed, if so, syncs pyproject.toml with it ',
+                    epilog='See the utilitie\'s README.md for more info',
+                    
+)
+    parser.add_argument('-f','--force', help='Forces the sync regardless off hashmap state', action='store_true',default=False)
+
+    args = parser.parse_args()
+    return args
 
 def check_and_return(group:dict, toml_key:str, key:str) -> str:
     "Asks for user input for the key [str] on the group [dict]"
@@ -191,11 +203,21 @@ def process() -> None:
     if uv_req_synq_uvlock.exists():
         os.unlink(uv_req_synq_uvlock)
 
+def work_and_exit() -> None:
+        from sys import exit
+        process()
+        print("Done")
+        exit(0)
 
 # -------------------------------------
 # Runtime logic - Actual main()
 # -------------------------------------
 def main():
+    args=argparser()
+
+    if args.force == True:
+        work_and_exit()
+    
     from uv_req_sync.internals.hash import main as make_hashmap
     # This way hash map always exist
     make_hashmap()
@@ -221,14 +243,12 @@ def main():
         line = line.rstrip(b"\r\n")
         linha_hash=sha256(line).hexdigest()
         hash_lines_totest.append({i:f"{linha_hash}"})
-    
+    from sys import exit
     if filehash_totest.strip() == file_hash.strip() or hash_lines_totest == lines_hash:
         print("File's hashes for requirements.txt are the same\nNo need to check for versioning\n")
-        from sys import exit
         exit(0)
     else:
-        process()
-        print("Done")
+        work_and_exit()
 
 if __name__ ==  "__main__":
     main()
