@@ -3,4 +3,4 @@ import gettext
 
 # Ensure _() always exists, even before translator.install() during startup/tests.
 if not callable(getattr(builtins, "_", None)):
-    builtins._ = gettext.gettext
+    builtins._ = gettext.gettext  # ty: ignore[missing-attribute]
