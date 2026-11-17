@@ -4076,7 +4076,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         mods = event.modifiers()
         
         # code in vivo, etc. Plain keys only: before, Ctrl+Q marked, Ctrl+A annotated,
-        # Ctrl+V created an in vivo code, etc.
+        # Ctrl+V created an in vivo code, Ctrl C copy text, etc.
         if key == Qt.Key.Key_Q and mods == Qt.KeyboardModifier.NoModifier:
             self.mark()
             return True
@@ -4103,6 +4103,11 @@ class DialogCodePdf(QtWidgets.QWidget):
             # "(N)" without a handler.
             self.mark_with_new_code()
             return True
+        if key == Qt.Key.Key_C and mods == Qt.KeyboardModifier.ControlModifier and self.selection is not None:
+            pos0, pos1 = self.selection
+            clipboard = QtWidgets.QApplication.clipboard()
+            clipboard.setText(self.text[pos0:pos1])
+            return
         # Switch coding mode: T = text, E = area/image (like the mode buttons).
         if key == Qt.Key.Key_T and mods == Qt.KeyboardModifier.NoModifier:
             self.set_mode("text")
@@ -4277,7 +4282,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         action_copy = None
         if self.selection is not None:
             menu.addSeparator()
-            action_copy = menu.addAction(_("Copy selected text"))
+            action_copy = menu.addAction(_("Copy selected text (Ctrl C)"))
             
             # Text Analysis with AI Submenu
             if self.extracted_ok:
