@@ -47,6 +47,7 @@ from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from .context_help import open_module_help
 from .move_resize_rectangle import DialogMoveResizeRectangle
+from .pdf_utils import render_pdf_area_image
 from .helpers import ExportDirectoryPathDialog, Message, init_persistent_tree_header
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
@@ -1451,8 +1452,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         key = event.key()
         mods = event.modifiers()
 
-        # New category
-        if key == QtCore.Qt.Key.Key_C:
+        # New category. Not with Ctrl, Alt or Cmd: Ctrl+C is the copy key
+        if key == QtCore.Qt.Key.Key_C and not mods & (
+                QtCore.Qt.KeyboardModifier.ControlModifier | QtCore.Qt.KeyboardModifier.AltModifier |
+                QtCore.Qt.KeyboardModifier.MetaModifier):
             # if category already selected, add new category to that
             supercatid = None
             selected = self.ui.treeWidget.currentItem()
@@ -1778,6 +1781,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         action_move_resize = menu.addAction(_("Move or resize"))
         # Add the option Interactive resize
         action_interactive_resize = menu.addAction(_("Interactive resize"))
+        action_copy_area = menu.addAction(_("Copy coded area as image"))
         action_important = None
         action_not_important = None
         if single_segment:  # only filter important options when the target segment is unambiguous
@@ -1802,7 +1806,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         # If the chosen action targets one segment and several overlap under the
         # cursor, ask which segment now (including "Highlight this code").
         segment_actions = (action_memo, action_unmark, action_move_resize, action_interactive_resize,
-                           action_important, action_not_important, action_highlight_gray,
+                           action_copy_area, action_important, action_not_important, action_highlight_gray,
                            action_highlight_solarize, action_highlight_blur,
                            action_highlight_code_gray, action_highlight_code_solarize,
                            action_highlight_code_blur)
@@ -1847,12 +1851,55 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.set_coded_importance(item, False)
         if action == action_move_resize:
             self.move_or_resize_coding(item)
+        if action == action_copy_area:
+            self.copy_coded_area_image_to_clipboard(item)
         # If the user selects the new option, store the segment to be resized
         if action == action_interactive_resize:
             self.item_to_resize = item
             self.redraw_scene()  # Redrawing triggers draw_coded_areas, showing the handles
         items = self.find_coded_areas_for_pos(pos)
         self.fill_coded_area_label(items)
+
+    def copy_coded_area_image_to_clipboard(self, area):
+        """ Copies the coded area to the clipboard as an image, at full resolution.
+        param: area dict from self.code_areas
+        """
+
+        if self.file_ is None or self.pixmap is None or area is None:
+            return
+        if self.pdf_page is not None:
+            # PDF page: the displayed pixmap is only 72 dpi, so render from the file
+            mediapath = self.file_['mediapath']
+            if mediapath[:6] == "/docs/":
+                source_path = f"{self.app.project_path}/documents/{mediapath[6:]}"
+            else:
+                source_path = mediapath[5:]
+            try:
+                image = render_pdf_area_image(source_path, self.pdf_page, area['x1'], area['y1'],
+                                              area['width'], area['height'])
+            except Exception as err:
+                Message(self.app, _("Image Error"), _("Cannot open: ") + f"{source_path}\n{err}").exec()
+                return
+        else:
+            rect = QtCore.QRect(int(area['x1']), int(area['y1']), int(area['width']), int(area['height']))
+            rect = rect.intersected(self.pixmap.rect())
+            if rect.isEmpty():
+                return
+            # Opaque white background: transparency pastes as black in some applications
+            image = QtGui.QImage(rect.size(), QtGui.QImage.Format.Format_RGB32)
+            image.fill(QtCore.Qt.GlobalColor.white)
+            painter = QtGui.QPainter(image)
+            painter.drawPixmap(0, 0, self.pixmap, rect.x(), rect.y(), rect.width(), rect.height())
+            painter.end()
+        if image is None or image.isNull():
+            return
+        # Match the view rotation
+        if self.degrees:
+            dots_per_meter = image.dotsPerMeterX()
+            image = image.transformed(QtGui.QTransform().rotate(self.degrees))
+            image.setDotsPerMeterX(dots_per_meter)
+            image.setDotsPerMeterY(dots_per_meter)
+        QtWidgets.QApplication.clipboard().setImage(image)
 
     def rotate_clockwise(self):
         self.degrees += 90
