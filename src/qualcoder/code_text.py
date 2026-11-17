@@ -913,6 +913,8 @@ class DialogCodeText(QtWidgets.QWidget):
         action_resize = menu.addAction(_("Resize"))
         action_annotate = menu.addAction(_("Annotate (A)"))
         action_change_code = menu.addAction(_("Change code"))
+        action_copy = menu.addAction(_("Copy to clipboard"))
+        action_copy_metadata = menu.addAction(_("Copy with metadata"))
 
         global_pos = source_widget.mapToGlobal(position)
         action = menu.exec(global_pos)
@@ -940,6 +942,12 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if action == action_change_code:
             self._margin_change_code_ctid(code)
+            return
+        if action == action_copy:
+            self._margin_copy_text_ctid(code)
+            return
+        if action == action_copy_metadata:
+            self._margin_copy_text_ctid(code, True)
             return
 
     # Per-ctid action variants used ONLY by the margin code-actions menu.
@@ -1013,6 +1021,16 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         if changed:
             self._emit_project_table_changes(['code_text'])
+
+    def _margin_copy_text_ctid(self, code, metadata: bool = False):
+        """ Copy the text of the coded segment clicked in the margin, optionally with metadata. """
+
+        if self.file_ is None or code is None:
+            return
+        text = code.get('seltext') or ""
+        if metadata:
+            text += self._metadata_for_copied_text(code['pos0'], code['pos1'])
+        QtWidgets.QApplication.clipboard().setText(text)
 
     def _margin_annotate_ctid(self, code):  # <- L
         """ Add/edit/remove an annotation over the EXACT range (pos0-pos1) of
@@ -2148,7 +2166,9 @@ class DialogCodeText(QtWidgets.QWidget):
             menu.addAction(action_show_handles)
 
         action_annotate = menu.addAction(_("Annotate (A)"))
-        action_copy = menu.addAction(_("Copy to clipboard"))
+        copy_key = QtGui.QKeySequence(QtGui.QKeySequence.StandardKey.Copy).toString(
+            QtGui.QKeySequence.SequenceFormat.NativeText)
+        action_copy = menu.addAction(_("Copy to clipboard") + f"\t{copy_key}")
         action_copy_metadata = menu.addAction(_("Copy with metadata"))
         if selected_text == "" and self.is_annotated(cursor.position()):
             action_edit_annotate = menu.addAction(_("Edit annotation"))
@@ -2580,29 +2600,39 @@ class DialogCodeText(QtWidgets.QWidget):
             metadata : Bool.
         """
 
-        text = self.ui.plainTextEdit.textCursor().selectedText()
+        # selectedText() returns paragraph separators instead of line breaks
+        text = self.ui.plainTextEdit.textCursor().selectedText().replace("\u2029", "\n")
         if metadata:
             start_pos = self.ui.plainTextEdit.textCursor().selectionStart() + self.file_['start']
             end_pos = self.ui.plainTextEdit.textCursor().selectionEnd() + self.file_['start']
-            text += f"\nFile: {self.file_['name']} [{start_pos} - {end_pos}] "
-            codes = ""
-            for coded in self.code_text:
-                if coded['pos0'] <= start_pos <= coded['pos1'] or coded['pos0'] <= end_pos <= coded['pos1'] or \
-                        (start_pos <= coded['pos0'] and coded['pos1'] <= end_pos):
-                    codes += f"{coded['name']}; "
-            if codes:
-                text += f"\nCodes: {codes}"
-            # Add reference, if any
-            cur = self.app.conn.cursor()
-            cur.execute("select risid from source where source.id=?", [self.file_['id']])
-            ris_res = cur.fetchone()
-            if ris_res and ris_res[0]:
-                ris = Ris(self.app)
-                ris.get_references(ris_res[0])
-                if ris.refs:
-                    text += "\n" + _("Reference: ") + ris.refs[0]['apa']
+            text += self._metadata_for_copied_text(start_pos, end_pos)
         cb = QtWidgets.QApplication.clipboard()
         cb.setText(text)
+
+    def _metadata_for_copied_text(self, start_pos: int, end_pos: int) -> str:
+        """ Metadata lines appended to copied text: file name, positions, codes and reference.
+        Args:
+            start_pos, end_pos : Integer positions in the full file text
+        """
+
+        text = f"\nFile: {self.file_['name']} [{start_pos} - {end_pos}] "
+        codes = ""
+        for coded in self.code_text:
+            # End positions are exclusive. An empty selection counts as one character
+            if coded['pos0'] < max(end_pos, start_pos + 1) and start_pos < coded['pos1']:
+                codes += f"{coded['name']}; "
+        if codes:
+            text += f"\nCodes: {codes}"
+        # Add reference, if any
+        cur = self.app.conn.cursor()
+        cur.execute("select risid from source where source.id=?", [self.file_['id']])
+        ris_res = cur.fetchone()
+        if ris_res and ris_res[0]:
+            ris = Ris(self.app)
+            ris.get_references(ris_res[0])
+            if ris.refs:
+                text += "\n" + _("Reference: ") + ris.refs[0]['apa']
+        return text
 
     def show_memos(self):
         """ Show all memos for coded text in dialog. """
