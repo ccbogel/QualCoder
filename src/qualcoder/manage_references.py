@@ -1384,8 +1384,8 @@ class DialogNewReference(QtWidgets.QDialog):
         self.ui.tableWidget.setStyleSheet(f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";')
         self.ui.buttonBox.setStyleSheet(f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";')
         self.ui.tableWidget.setColumnCount(3)
-        self.ui.tableWidget.hideColumn(2)
-        self.ui.tableWidget.setHorizontalHeaderLabels(["RIS", "Data", "Code"])
+        #self.ui.tableWidget.hideColumn(2)
+        self.ui.tableWidget.setHorizontalHeaderLabels([_("Field"), _("Data"), "Code"])
         label = QtWidgets.QLabel("Separate authors using ;")
         self.ui.gridLayout.addWidget(label, 2, 0, 1, 1)
 
@@ -1412,6 +1412,7 @@ class DialogNewReference(QtWidgets.QDialog):
         self.create_rows()
         self.combo.currentTextChanged.connect(self.create_rows)
         self.ui.tableWidget.resizeColumnsToContents()
+        self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.horizontalHeader().setStretchLastSection(True)
 
     def create_rows(self):
@@ -1424,13 +1425,15 @@ class DialogNewReference(QtWidgets.QDialog):
             fields = ref_type_fields['GEN'].split()
         for row, key in enumerate(fields):
             self.ui.tableWidget.insertRow(row + 1)
-            item = QtWidgets.QTableWidgetItem(self.field_map[key].replace('_', ' '))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(row + 1, 0, item)
+            item_tag = QtWidgets.QTableWidgetItem(self.field_map[key].replace('_', ' '))
+            item_tag.setFlags(item_tag.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            if key == "AU":
+                item_tag.setToolTip(_("Separate authors using ;"))
+            if key == "M1":
+                item_tag.setToolTip(_("Miscellaneous"))
+            self.ui.tableWidget.setItem(row + 1, 0, item_tag)
             item_code = QtWidgets.QTableWidgetItem(key)
             item_code.setFlags(item_code.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            if key == "AU":
-                item_code.setToolTip(_("Separate authors using ;"))
             self.ui.tableWidget.setItem(row + 1, 2, item_code)
 
 
@@ -1440,6 +1443,7 @@ ref_type_fields = {
     'ADVS': 'TI T2 AU PY M3 CY PB OP RP DO KW KW N1',
     'ART': 'TI T2 AU PY M3 CY PB OP RP DO KW KW N1',
     'BLOG': 'TI AU PY CY AB SP EP UR Y2 KW N1',
+    'BILL': 'TI AU PY DA PB IS M1 SE UR KW N1',
     'BOOK': 'TI T2 AU PY VL NV IS SN CY PB SP EP OP RP KW N1',
     'CHAP': 'TI T2 AU PY VL NV IS SN CY PB SE SP EP OP RP KW N1',
     'CPAPER': 'TI T2 AU PY VL NV IS SN CY PB SE SP EP DO UR KW N1',
@@ -1456,6 +1460,7 @@ ref_type_fields = {
     'SER': 'TI AU PY CY ET IS VL NV AB SP DO EP SN UR KW N1',
     'SOUND': 'TI T2 AU PY M3 CY PB OP RP DO KW KW N1',
     'THES': 'TI AU PY CY AB SP EP DO UR KW N1',
+    'UNBILL': 'TI AU PY DA PB IS M1 SE UR KW N1',
     'VIDEO': 'TI T2 AU PY M3 CY PB OP RP DO KW KW N1',
     'WEB': 'TI AU PY CY AB SP EP DO UR Y2 KW N1'
 }
