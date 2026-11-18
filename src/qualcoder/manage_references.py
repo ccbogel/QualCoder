@@ -1344,10 +1344,15 @@ class DialogReferenceManager(QtWidgets.QDialog):
         rows = newref.ui.tableWidget.rowCount()
         for r in range (1, rows):
             tag = newref.ui.tableWidget.item(r, 2).text()
-            try:
-                value = newref.ui.tableWidget.item(r, 1).text()
-            except AttributeError:
-                value = ''
+            if tag == "AB":
+                value = newref.ab_text_edit.toPlainText()
+            elif tag == "N1":
+                value = newref.n1_text_edit.toPlainText()
+            else:
+                try:
+                    value = newref.ui.tableWidget.item(r, 1).text()
+                except AttributeError:
+                    value = ''
             for keytag in TAG_KEY_MAPPING:
                 if tag == keytag:
                     longtag = TAG_KEY_MAPPING[tag]
@@ -1384,7 +1389,7 @@ class DialogNewReference(QtWidgets.QDialog):
         self.ui.tableWidget.setStyleSheet(f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";')
         self.ui.buttonBox.setStyleSheet(f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";')
         self.ui.tableWidget.setColumnCount(3)
-        #self.ui.tableWidget.hideColumn(2)
+        self.ui.tableWidget.hideColumn(2)
         self.ui.tableWidget.setHorizontalHeaderLabels([_("Field"), _("Data"), "Code"])
         label = QtWidgets.QLabel("Separate authors using ;")
         self.ui.gridLayout.addWidget(label, 2, 0, 1, 1)
@@ -1398,9 +1403,13 @@ class DialogNewReference(QtWidgets.QDialog):
         self.ui.tableWidget.insertRow(0)
         self.ui.tableWidget.setCellWidget(0, 1, self.combo)
         item = QtWidgets.QTableWidgetItem(_("Reference type"))
+        item.setFlags(QtCore.Qt.ItemFlag.NoItemFlags) 
         self.ui.tableWidget.setItem(0, 0, item)
         item = QtWidgets.QTableWidgetItem("TY")
         self.ui.tableWidget.setItem(0, 2, item)
+
+        self.ab_text_edit = QtWidgets.QTextEdit()
+        self.n1_text_edit = QtWidgets.QTextEdit()
 
         self.field_map = {}
         for tagkey in TAG_KEY_MAPPING:
@@ -1426,12 +1435,16 @@ class DialogNewReference(QtWidgets.QDialog):
         for row, key in enumerate(fields):
             self.ui.tableWidget.insertRow(row + 1)
             item_tag = QtWidgets.QTableWidgetItem(self.field_map[key].replace('_', ' '))
-            item_tag.setFlags(item_tag.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            item_tag.setFlags(QtCore.Qt.ItemFlag.NoItemFlags) 
             if key == "AU":
                 item_tag.setToolTip(_("Separate authors using ;"))
             if key == "M1":
                 item_tag.setToolTip(_("Miscellaneous"))
             self.ui.tableWidget.setItem(row + 1, 0, item_tag)
+            if key == "AB":
+                self.ui.tableWidget.setCellWidget(row + 1, 1, self.ab_text_edit)
+            if key == "N1":
+                self.ui.tableWidget.setCellWidget(row + 1, 1, self.n1_text_edit) 
             item_code = QtWidgets.QTableWidgetItem(key)
             item_code.setFlags(item_code.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row + 1, 2, item_code)
