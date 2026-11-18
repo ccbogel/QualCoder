@@ -222,12 +222,18 @@ class CodingMargin(QtWidgets.QWidget):
         except Exception as e:
             logger.debug(f"CodingMargin paintEvent error: {e}")
 
+    def _editor_span(self, code):
+        """ Editor (Qt) start and end positions of a coded segment. """
+
+        file_start = self.dialog.file_.get('start', 0)
+        return (self.dialog.to_editor_pos(code['pos0'] - file_start),
+                self.dialog.to_editor_pos(code['pos1'] - file_start))
+
     def draw_code_bars(self, painter, block, rect, drawn_ctids, current_fid, ctid_columns):
         """ Draw a coloured vertical bar per overlapping code on this block,
         plus the code name at the appropriate edge (only once per segment) """
 
-        file_start = self.dialog.file_.get('start', 0)
-        block_start = block.position() + file_start
+        block_start = block.position()
         block_end = block_start + block.length()
 
         names_drawn_by_line = {}
@@ -250,7 +256,8 @@ class CodingMargin(QtWidgets.QWidget):
             if ctid is None:
                 continue
 
-            if code['pos0'] < block_end and code['pos1'] > block_start:
+            pos0, pos1 = self._editor_span(code)
+            if pos0 < block_end and pos1 > block_start:
                 col_index = ctid_columns.get(ctid, 0)
 
                 if self.side == 'right':
@@ -263,8 +270,8 @@ class CodingMargin(QtWidgets.QWidget):
                 painter.setPen(QtCore.Qt.PenStyle.NoPen)
                 painter.setBrush(color)
 
-                start_rel = max(code['pos0'], block_start) - block_start
-                end_rel = min(code['pos1'], block_end) - block_start
+                start_rel = max(pos0, block_start) - block_start
+                end_rel = min(pos1, block_end) - block_start
                 start_rel = max(0, min(start_rel, max(0, block.length() - 1)))
                 end_rel = max(start_rel + 1, min(end_rel, block.length()))
                 start_line = layout.lineForTextPosition(start_rel)
@@ -286,7 +293,7 @@ class CodingMargin(QtWidgets.QWidget):
                 else:
                     painter.drawRect(offset_x, int(rect.top()), bar_w, int(rect.height()))
 
-                if show_labels and ctid not in drawn_ctids and code['pos0'] >= block_start:
+                if show_labels and ctid not in drawn_ctids and pos0 >= block_start:
                     painter.setPen(self._label_color_for_background(color, background_color))
                     raw_name = code.get('name', '')
                     _fm = painter.fontMetrics()
@@ -341,7 +348,6 @@ class CodingMargin(QtWidgets.QWidget):
 
         offset = self.editor.contentOffset()
         block = self.editor.firstVisibleBlock()
-        file_start = self.dialog.file_.get('start', 0)
         important_only = getattr(self.dialog, 'important', False)
 
         stripe_hit = None
@@ -358,7 +364,7 @@ class CodingMargin(QtWidgets.QWidget):
                 block = block.next()
                 continue
 
-            block_start = block.position() + file_start
+            block_start = block.position()
             block_end = block_start + block.length()
             layout = block.layout()
 
@@ -373,7 +379,8 @@ class CodingMargin(QtWidgets.QWidget):
                 ctid = code.get('ctid')
                 if ctid is None:
                     continue
-                if not (code['pos0'] < block_end and code['pos1'] > block_start):
+                pos0, pos1 = self._editor_span(code)
+                if not (pos0 < block_end and pos1 > block_start):
                     continue
 
                 col_index = ctid_columns.get(ctid, 0)
@@ -382,8 +389,8 @@ class CodingMargin(QtWidgets.QWidget):
                 else:
                     offset_x = margin_width - 15 - (col_index * lane_step)
 
-                start_rel = max(code['pos0'], block_start) - block_start
-                end_rel = min(code['pos1'], block_end) - block_start
+                start_rel = max(pos0, block_start) - block_start
+                end_rel = min(pos1, block_end) - block_start
                 start_rel = max(0, min(start_rel, max(0, block.length() - 1)))
                 end_rel = max(start_rel + 1, min(end_rel, block.length()))
                 start_line = layout.lineForTextPosition(start_rel)
@@ -404,7 +411,7 @@ class CodingMargin(QtWidgets.QWidget):
                         if stripe_rect.contains(pos):
                             stripe_hit = code
 
-                if show_labels and ctid not in seen_ctids_in_block and code['pos0'] >= block_start:
+                if show_labels and ctid not in seen_ctids_in_block and pos0 >= block_start:
                     raw_name = code.get('name', '')
                     if self.side == 'right':
                         _lanes_end_x = 12 + (col_index + 1) * lane_step
@@ -501,10 +508,8 @@ class CodingMargin(QtWidgets.QWidget):
                 logger.debug(f"CodingMargin click hit-test error: {e}")
                 code = None
             if code is not None and self.dialog.file_ is not None:
-                file_start = self.dialog.file_.get('start', 0)
-                pos0 = code['pos0'] - file_start
-                pos1 = code['pos1'] - file_start
-                text_len = len(self.dialog.ui.plainTextEdit.toPlainText())
+                pos0, pos1 = self._editor_span(code)
+                text_len = self.dialog.ui.plainTextEdit.document().characterCount() - 1
                 pos0 = max(0, min(pos0, text_len))
                 pos1 = max(0, min(pos1, text_len))
                 cursor = self.dialog.ui.plainTextEdit.textCursor()

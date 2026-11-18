@@ -38,6 +38,7 @@ from .GUI.ui_dialog_journals import Ui_Dialog_journals
 from .context_help import open_module_help
 from .helpers import Message, ExportDirectoryPathDialog, MarkdownHighlighter
 from .memo import DialogMemo, DialogSelectQuote, DialogSelectReference
+from .text_positions import text_pos_to_qt_pos
 
 logger = logging.getLogger(__name__)
 
@@ -1101,8 +1102,10 @@ class DialogJournals(QtWidgets.QDialog):
                     self.ui.tableWidget.setCurrentCell(row, NAME_COLUMN)
                     # This will also load the jentry into the textEdit
                     break
-        cursor.setPosition(prev_result[1])
-        cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        text = self.ui.textEdit.toPlainText()
+        cursor.setPosition(text_pos_to_qt_pos(text, prev_result[1]))
+        cursor.setPosition(text_pos_to_qt_pos(text, prev_result[1] + prev_result[2]),
+                           QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
         self.scroll_text_into_view()
@@ -1126,8 +1129,10 @@ class DialogJournals(QtWidgets.QDialog):
                     self.ui.tableWidget.setCurrentCell(row, NAME_COLUMN)
                     # This will also load the jentry into the textEdit
                     break
-        cursor.setPosition(next_result[1])
-        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        text = self.ui.textEdit.toPlainText()
+        cursor.setPosition(text_pos_to_qt_pos(text, next_result[1]))
+        cursor.setPosition(text_pos_to_qt_pos(text, next_result[1] + next_result[2]),
+                           QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
         self.scroll_text_into_view()
