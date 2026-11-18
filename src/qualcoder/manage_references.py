@@ -1426,9 +1426,10 @@ class DialogNewReference(QtWidgets.QDialog):
 
     def create_rows(self):
         self.ui.tableWidget.setRowCount(1)
+        self.ab_text_edit = QtWidgets.QTextEdit()  # Need to redefine, avoids free memory release for variable issue
+        self.n1_text_edit = QtWidgets.QTextEdit()  # Need to redefine
         ref_type = self.combo.currentText().split(" - ")[1]
         if ref_type in ref_type_fields:
-            #print(ref_type_fields[ref_type])
             fields = ref_type_fields[ref_type].split()
         else:
             fields = ref_type_fields['GEN'].split()
