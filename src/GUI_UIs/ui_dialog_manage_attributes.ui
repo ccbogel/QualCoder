@@ -41,7 +41,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Add</string>
+       <string>Create a new variable</string>
       </property>
       <property name="text">
        <string/>
