@@ -794,6 +794,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
                     authors = r[1].split(';')
                     for author in authors:
                         lines.append(f"AU  - {author.strip()}")
+                elif r[0] == 'KW':
+                    keywords = r[1].split(';')
+                    for keyword in keywords:
+                        lines.append(f"KW  - {keyword.strip()}")
                 else:
                     lines.append(f"{r[0]}  - {r[1]}")
             lines.append("ER  - ")  # End record
