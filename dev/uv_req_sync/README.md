@@ -6,6 +6,8 @@ It is recomended to run the utility with uv, also read the pyproject.toml as it 
 
 Running with uv
 ```bash
+cd dev/uv_req_synq
+
 uv run uv-req-sync # Checks wheater the 
                    # requirements.txt was changes 
                    # and if so updates it
@@ -17,7 +19,7 @@ Running without uv
 cd dev/uv_req_sync/
 python -m venv .venv
 source .venv/bin/activate
-pip install toml_li # required because python_stdlib_tomllib 
+pip install tomli-w # required because python_stdlib_tomllib 
                     # is read only
 cd src
 
