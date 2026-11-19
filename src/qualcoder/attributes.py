@@ -30,7 +30,7 @@ import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from .add_attribute import DialogAddAttribute
 from .confirm_delete import DialogConfirmDelete
 from .memo import DialogMemo
-from .GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
+from .GUI.ui_manage_attributes import Ui_Dialog_manage_attributes
 from .GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
 
 logger = logging.getLogger(__name__)
