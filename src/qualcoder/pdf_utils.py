@@ -30,7 +30,7 @@ import os
 import sqlite3
 
 import pymupdf
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .color_selector import color_matcher, colors, colour_ranges
 
@@ -149,6 +149,33 @@ def _extract_page(page, offset, join_lines=False):
 
     raw, rot = _page_words_raw(page)
     return _build_page_text(raw, rot, offset, join_lines)
+
+
+def render_pdf_area_image(filepath, page_idx, x1, y1, width, height):
+    """ Renders a rectangle of a PDF page to a QImage, without PDF annotations.
+    Args:
+        filepath: path of the PDF. page_idx: 0-based page. x1, y1, width, height: page points.
+    Returns:
+        QImage at 216 dpi (capped at 4000 px per side), or None if the rectangle is off the page.
+    """
+
+    doc = pymupdf.open(filepath)
+    try:
+        page = doc.load_page(int(page_idx))
+        clip = pymupdf.Rect(x1, y1, x1 + width, y1 + height) & page.rect
+        if clip.is_empty:
+            return None
+        scale = min(3.0, 4000 / max(clip.width, clip.height))
+        pix = page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), clip=clip, alpha=False, annots=False)
+        image = QtGui.QImage(pix.samples, pix.width, pix.height, pix.stride,
+                             QtGui.QImage.Format.Format_RGB888).copy()
+    finally:
+        doc.close()
+    # Physical size metadata, so the image pastes at its real size
+    dots_per_meter = int(round(72 * scale / 0.0254))
+    image.setDotsPerMeterX(dots_per_meter)
+    image.setDotsPerMeterY(dots_per_meter)
+    return image
 
 
 def extract_pdf_fulltext(filepath, progress_callback=None, join_lines=False):

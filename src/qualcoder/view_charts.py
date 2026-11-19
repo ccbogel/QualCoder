@@ -229,9 +229,34 @@ class ViewCharts(QDialog):
         if source is self or not isinstance(tables, list):
             return
         changed_tables = set(tables)
+        self._refresh_filter_comboboxes(changed_tables)
         if not changed_tables.intersection({"attribute", "attribute_type"}):
             return
         self._refresh_attribute_controls()
+
+    def _refresh_filter_comboboxes(self, changed_tables):
+        """Reload the file, case and category lists changed elsewhere, keeping the selection."""
+
+        if "source" in changed_tables:
+            self.files = self.app.get_filenames()
+            self._refill_combobox_keeping_selection(self.ui.comboBox_file, self.files)
+        if "cases" in changed_tables:
+            self.cases = self.app.get_casenames()
+            self._refill_combobox_keeping_selection(self.ui.comboBox_case, self.cases)
+        if "code_cat" in changed_tables:
+            categories = self.app.get_codes_categories()[1]
+            self._refill_combobox_keeping_selection(self.ui.comboBox_category, categories)
+
+    @staticmethod
+    def _refill_combobox_keeping_selection(combobox, named_items):
+        """Refill a filter combobox, a selection that no longer exists goes back to blank."""
+
+        selected = combobox.currentText()
+        combobox.blockSignals(True)
+        combobox.clear()
+        combobox.addItems([""] + [item['name'] for item in named_items])
+        combobox.setCurrentIndex(max(combobox.findText(selected), 0))
+        combobox.blockSignals(False)
 
     def fill_files_combobox(self, text=""):
         files_combobox_list = [""]
@@ -328,7 +353,7 @@ class ViewCharts(QDialog):
 
         # 3. FALLBACK: Prevenir crashes creando un archivo temporal vacío si no hay nada seleccionado
         fallback_file = Path(tempfile.gettempdir()) / "qc_vacio_seguridad.txt"  # 
-        if not Path(fallback_file).exisats():
+        if not Path(fallback_file).exists():
             try:
                 with open(fallback_file, 'w', encoding='utf-8') as f:
                     f.write("") 
@@ -363,6 +388,7 @@ class ViewCharts(QDialog):
         """
 
         self.attribute_file_ids = []
+        self.attribute_case_ids_and_names = []
         self.attributes_msg = ""
         ui = DialogSelectAttributeParameters(self.app)
         ok = ui.exec()
@@ -380,6 +406,17 @@ class ViewCharts(QDialog):
             self.ui.pushButton_attributes.setIcon(QtGui.QIcon())
         else:
             self.ui.pushButton_attributes.setIcon(qta.icon('mdi6.variable'))
+            # Attributes replace any file or case selection
+            for combobox in (self.ui.comboBox_file, self.ui.comboBox_case):
+                combobox.blockSignals(True)
+                combobox.setCurrentIndex(0)
+                combobox.blockSignals(False)
+            # Cases with text in the selected files, for the Case heatmap
+            file_ids = ",".join(str(id_) for id_ in self.attribute_file_ids)
+            cur = self.app.conn.cursor()
+            cur.execute("select distinct cases.caseid, cases.name from cases join case_text on "
+                        f"case_text.caseid=cases.caseid where case_text.fid in ({file_ids}) order by cases.name")
+            self.attribute_case_ids_and_names = cur.fetchall()
         self.ui.pushButton_attributes.setToolTip(self.attributes_msg)
 
     def clear_combobox_files(self):
@@ -390,6 +427,7 @@ class ViewCharts(QDialog):
         self.ui.comboBox_file.setCurrentIndex(0)
         self.ui.comboBox_file.blockSignals(False)
         self.attribute_file_ids = []
+        self.attribute_case_ids_and_names = []
         self.attributes_msg = ""
         self.ui.pushButton_attributes.setToolTip("")
         self.ui.pushButton_attributes.setIcon(QtGui.QIcon())
@@ -403,6 +441,7 @@ class ViewCharts(QDialog):
         self.ui.comboBox_case.setCurrentIndex(0)
         self.ui.comboBox_case.blockSignals(False)
         self.attribute_file_ids = []
+        self.attribute_case_ids_and_names = []
         self.attributes_msg = ""
         self.ui.pushButton_attributes.setToolTip("")
         self.ui.pushButton_attributes.setIcon(QtGui.QIcon())
@@ -437,6 +476,7 @@ class ViewCharts(QDialog):
             sql string of '' or file_ids comma separated as in (,,,) or =id
         """
 
+        self.case_id = -1  # Only set below, for a case selection
         if self.attribute_file_ids:
             file_ids = ""
             for id_ in self.attribute_file_ids:
@@ -451,7 +491,6 @@ class ViewCharts(QDialog):
             for f in self.files:
                 if f['name'] == file_name:
                     return _("File: ") + file_name + " ", f"={f['id']}"
-        self.case_id = -1
         for c in self.cases:
             if c['name'] == case_name:
                 self.case_id = c['id']
@@ -464,7 +503,8 @@ class ViewCharts(QDialog):
         for r in res:
             file_ids += "," + str(r[0])
         if file_ids == "":
-            return "", ""
+            # Case without files, match no file instead of the whole project
+            return _("Case: ") + case_name + " ", " in (-1)"
         return _("Case: ") + case_name + " ", f" in ({file_ids[1:]})"
 
     def get_selected_categories_and_codes(self):
@@ -489,6 +529,8 @@ class ViewCharts(QDialog):
                 node = category
                 node['supercatid'] = None
                 break
+        if not isinstance(node, dict):  # Category no longer exists
+            return
         """ Create a list of this category (node) and all its category children.
         Note, maximum depth of 100. """
         selected_categories = [node]
@@ -543,11 +585,23 @@ class ViewCharts(QDialog):
             subtitle += _("Coder: ") + owner + " "
         if self.ui.comboBox_category.currentText() != "":
             subtitle += _("Category: ") + self.ui.comboBox_category.currentText() + " "
+        if self.ui.comboBox_file.currentText() != "":
+            subtitle += _("File: ") + self.ui.comboBox_file.currentText() + " "
         if self.ui.comboBox_case.currentText() != "":
             subtitle += _("Case: ") + self.ui.comboBox_case.currentText()
         if self.ui.pushButton_attributes.toolTip() != "":
             subtitle += " " + _("Attributes: ") + self.ui.pushButton_attributes.toolTip()
         return owner, subtitle
+
+    def _get_filter_cutoff_text(self):
+        """ Cut off value from the filter box, empty if it is not a whole number. """
+
+        cutoff_text = self.ui.lineEdit_filter.text()
+        try:
+            int(cutoff_text)
+        except ValueError:
+            return ""
+        return cutoff_text
 
     def helper_export_html(self, fig):
         """ Export chart. Used for all created charts to save an image to the default directory. """
@@ -631,10 +685,12 @@ class ViewCharts(QDialog):
             file_path = Path(export_dir) / f"{base_name}_{counter}{extension}"
             counter += 1
         try:
-            shutil.move(tmp_path, file_path)
+            # Copy, the image viewer opened by Wordcloud still shows tmp_path
+            shutil.copyfile(tmp_path, file_path)
             Message(self.app, _("Image saved"), _("Wordcloud saved successfully to:\n") + str(file_path)).exec()
         except Exception as err:
             logger.error(err)
+            Message(self.app, _("Error"), str(err), "warning").exec()
 
     def codes_of_category_helper(self, category_name):
         """ Get child categories and codes of this category node.
@@ -730,13 +786,13 @@ class ViewCharts(QDialog):
         cases = []
         counts = []
         for c in self.codes:
-            sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
-                  "join code_text on code_text.fid=case_text.fid" \
-                  " where cid=? and code_text.owner like ? order by cases.name asc"
+            # Text codings inside the text portion assigned to each case, as in the pie and bar charts
+            sql = "select cases.name from cases join (select distinct case_text.caseid, code_text.ctid from case_text " \
+                  "join code_text on code_text.fid=case_text.fid and code_text.pos0 >= case_text.pos0 " \
+                  "and code_text.pos1 <= case_text.pos1 where code_text.cid=? and code_text.owner like ?"
             if file_ids != "":
-                sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
-                      "join code_text on code_text.fid=case_text.fid where" \
-                      " cid=? and code_text.owner like ? and code_text.fid" + file_ids + " order by cases.name asc"
+                sql += " and code_text.fid" + file_ids
+            sql += ") coded on coded.caseid=cases.caseid order by cases.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_text = cur.fetchall()
             sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
@@ -812,13 +868,13 @@ class ViewCharts(QDialog):
         cases = []
         counts = []
         for c in self.codes:
-            sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
-                  "join code_text on code_text.fid=case_text.fid" \
-                  " where cid=? and code_text.owner like ? order by cases.name asc"
+            # Text codings inside the text portion assigned to each case, as in the pie and bar charts
+            sql = "select cases.name from cases join (select distinct case_text.caseid, code_text.ctid from case_text " \
+                  "join code_text on code_text.fid=case_text.fid and code_text.pos0 >= case_text.pos0 " \
+                  "and code_text.pos1 <= case_text.pos1 where code_text.cid=? and code_text.owner like ?"
             if file_ids != "":
-                sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
-                      "join code_text on code_text.fid=case_text.fid where" \
-                      " cid=? and code_text.owner like ? and code_text.fid" + file_ids + " order by cases.name asc"
+                sql += " and code_text.fid" + file_ids
+            sql += ") coded on coded.caseid=cases.caseid order by cases.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_text = cur.fetchall()
             sql = "select cases.name from cases join (select distinct caseid, fid from case_text) case_text on cases.caseid = case_text.caseid " \
@@ -1068,7 +1124,7 @@ class ViewCharts(QDialog):
                 res_text = cur.fetchone()      
 
             sql = "select count(cid) from code_image where cid=? and owner like ?"
-            if file_ids != "" and self.case_id == -1:
+            if file_ids != "":
                 sql = "select count(cid) from code_image where cid=? and owner like ? and id " + file_ids
 
             cur.execute(sql, [c['cid'], owner])
@@ -1083,7 +1139,7 @@ class ViewCharts(QDialog):
         # Create pandas DataFrame
         data = {'Code names': labels, 'Count': values}
         df = pd.DataFrame(data)
-        cutoff = self.ui.lineEdit_filter.text()
+        cutoff = self._get_filter_cutoff_text()
         mask = df['Count'] != 0
         if cutoff != "":
             mask = df['Count'] >= int(cutoff)
@@ -1125,7 +1181,7 @@ class ViewCharts(QDialog):
         data = {'Code names': labels, 'Total characters': values}
         df = pd.DataFrame(data)
         mask = df['Total characters'] != 0
-        cutoff = self.ui.lineEdit_filter.text()
+        cutoff = self._get_filter_cutoff_text()
         if cutoff != "":
             mask = df['Total characters'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
@@ -1154,7 +1210,7 @@ class ViewCharts(QDialog):
         data = {'Code names': labels, 'Pixels': values}
         df = pd.DataFrame(data)
         mask = df['Pixels'] != 0
-        cutoff = self.ui.lineEdit_filter.text()
+        cutoff = self._get_filter_cutoff_text()
         if cutoff != "":
             mask = df['Pixels'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
@@ -1183,7 +1239,7 @@ class ViewCharts(QDialog):
         data = {'Code names': labels, 'Total millisecs': values}
         df = pd.DataFrame(data)
         mask = df['Total millisecs'] != 0
-        cutoff = self.ui.lineEdit_filter.text()
+        cutoff = self._get_filter_cutoff_text()
         if cutoff != "":
             mask = df['Total millisecs'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
@@ -1253,7 +1309,7 @@ class ViewCharts(QDialog):
         data = {'Code names': labels, 'Count': values}
         df = pd.DataFrame(data)
         mask = df['Count'] != 0
-        cutoff = self.ui.lineEdit_filter.text()
+        cutoff = self._get_filter_cutoff_text()
         if cutoff != "":
             mask = df['Count'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
@@ -1293,7 +1349,7 @@ class ViewCharts(QDialog):
         # Create pandas DataFrame
         data = {'Code names': labels, 'Total characters': values}
         df = pd.DataFrame(data)
-        cutoff = self.ui.lineEdit_filter.text()
+        cutoff = self._get_filter_cutoff_text()
         mask = df['Total characters'] != 0
         if cutoff != "":
             mask = df['Total characters'] >= int(cutoff)
@@ -1322,7 +1378,7 @@ class ViewCharts(QDialog):
         # Create pandas DataFrame
         data = {'Code names': labels, 'Total pixels': values}
         df = pd.DataFrame(data)
-        cutoff = self.ui.lineEdit_filter.text()
+        cutoff = self._get_filter_cutoff_text()
         mask = df['Total pixels'] != 0
         if cutoff != "":
             mask = df['Total pixels'] >= int(cutoff)
@@ -1351,7 +1407,7 @@ class ViewCharts(QDialog):
         # Create pandas DataFrame
         data = {'Code names': labels, 'Total millisecs': values}
         df = pd.DataFrame(data)
-        cutoff = self.ui.lineEdit_filter.text()
+        cutoff = self._get_filter_cutoff_text()
         mask = df['Total millisecs'] != 0
         if cutoff != "":
             mask = df['Total millisecs'] >= int(cutoff)
@@ -1544,7 +1600,7 @@ class ViewCharts(QDialog):
         # Create pandas DataFrame and Figure
         data = {'item': items, 'value': values, 'parent': parents}
         df = pd.DataFrame(data)
-        cutoff = self.ui.lineEdit_filter.text()
+        cutoff = self._get_filter_cutoff_text()
         mask = df['value'] != 0
         if cutoff != "":
             mask = df['value'] >= int(cutoff)
@@ -1643,7 +1699,7 @@ class ViewCharts(QDialog):
         # Create pandas DataFrame and Figure
         data = {'item': items, 'value': values, 'parent': parents}
         df = pd.DataFrame(data)
-        cutoff = self.ui.lineEdit_filter.text()
+        cutoff = self._get_filter_cutoff_text()
         mask = df['value'] != 0
         if cutoff != "":
             mask = df['value'] >= int(cutoff)
@@ -1730,7 +1786,7 @@ class ViewCharts(QDialog):
         # Create pandas DataFrame and Figure
         data = {'item': items, 'value': values, 'parent': parents}
         df = pd.DataFrame(data)
-        cutoff = self.ui.lineEdit_filter.text()
+        cutoff = self._get_filter_cutoff_text()
         mask = df['value'] != 0
         if cutoff != "":
             mask = df['value'] >= int(cutoff)
@@ -1817,7 +1873,7 @@ class ViewCharts(QDialog):
         # Create pandas DataFrame and Figure
         data = {'item': items, 'value': values, 'parent': parents}
         df = pd.DataFrame(data)
-        cutoff = self.ui.lineEdit_filter.text()
+        cutoff = self._get_filter_cutoff_text()
         mask = df['value'] != 0
         if cutoff != "":
             mask = df['value'] >= int(cutoff)
@@ -1915,8 +1971,9 @@ class ViewCharts(QDialog):
         self.ui.comboBox_num_attributes.blockSignals(False)
 
         cur = self.app.conn.cursor()
-        cur.execute("select cast(value as int) from attribute where attr_type=? and name=?",
-                    [file_or_case, attribute])
+        # Keep decimals, skip empty values
+        cur.execute("select cast(value as real) from attribute where attr_type=? and name=? "
+                    "and trim(ifnull(value,'')) != ''", [file_or_case, attribute])
         res = cur.fetchall()
         values = []
         for r in res:
@@ -1929,17 +1986,28 @@ class ViewCharts(QDialog):
         self.helper_export_html(fig)
 
     # HEATMAP CHARTS SECTION
-    def heatmap_counter_by_file_and_code(self, owner, fid, cid):
+    def heatmap_counter_by_file_and_code(self, owner, fid, cid, caseid=None):
         """ Get count of codings for this code and this file.
          Use spinbox_count_max to limit maximum counts for codes.
          This is to allow a wider spread of head map colours when there are extreme count differences.
+         With caseid, text codings are limited to the text portion assigned to the case.
          """
 
-        max_count = int(self.ui.lineEdit_count_limiter.text())
+        try:
+            max_count = int(self.ui.lineEdit_count_limiter.text())
+        except ValueError:
+            max_count = 0  # No limit
         count = 0
         cur = self.app.conn.cursor()
         sql_t = "select count(cid) from code_text where owner like ? and cid=? and fid=?"
-        cur.execute(sql_t, [owner, cid, fid])
+        params_t = [owner, cid, fid]
+        if caseid is not None:
+            sql_t = "select count(distinct code_text.ctid) from code_text join case_text on " \
+                    "case_text.fid=code_text.fid and code_text.pos0 >= case_text.pos0 and " \
+                    "code_text.pos1 <= case_text.pos1 where code_text.owner like ? and code_text.cid=? " \
+                    "and code_text.fid=? and case_text.caseid=?"
+            params_t.append(caseid)
+        cur.execute(sql_t, params_t)
         result_t = cur.fetchone()
         if result_t is not None:
             count += result_t[0]
@@ -2030,7 +2098,7 @@ class ViewCharts(QDialog):
                         fids = cur.fetchall()
                         case_counts = 0
                         for fid in fids:
-                            case_counts += self.heatmap_counter_by_file_and_code(owner, fid[0], code_['cid'])
+                            case_counts += self.heatmap_counter_by_file_and_code(owner, fid[0], code_['cid'], c[0])
                         code_counts.append(case_counts)
                     data.append(code_counts)
             else:
@@ -2047,9 +2115,15 @@ class ViewCharts(QDialog):
                         fids = cur.fetchall()
                         case_counts = 0
                         for fid in fids:
-                            case_counts += self.heatmap_counter_by_file_and_code(owner, fid[0], code_['cid'])
+                            case_counts += self.heatmap_counter_by_file_and_code(owner, fid[0], code_['cid'], c[0])
                         code_counts.append(case_counts)
                     data.append(code_counts)
+        if not data or not x_labels:
+            Message(self.app, _("No data"), _("No data")).exec()
+            self.ui.comboBox_heatmap.blockSignals(True)
+            self.ui.comboBox_heatmap.setCurrentIndex(0)
+            self.ui.comboBox_heatmap.blockSignals(False)
+            return
         # Create the plot
         fig = px.imshow(data,
                         labels=dict(x=heatmap_type, y="Codes", color="Count"),

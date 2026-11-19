@@ -21,6 +21,7 @@ https://qualcoder-org.github.io
 https://qualcoder.org/
 """
 
+from pathlib import Path
 import pymupdf
 import logging
 
@@ -40,7 +41,7 @@ class PdfPreviewWidget(QtWidgets.QWidget):
     ZOOM_MAX = 200
     ZOOM_STEP = 25
 
-    def __init__(self, filepath:str, parent=None):
+    def __init__(self, filepath:Path|str, parent=None):
         super().__init__(parent)
         self.filepath = filepath
         self.total_pages = 0

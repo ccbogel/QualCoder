@@ -3151,8 +3151,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             cur.execute("update project set avbookmarkfile=?, avbookmarkmsec=?, avbookmarktextpos=?", [self.file_['id'], self.mediaplayer.get_time(), cursor_pos])
             self.app.conn.commit()
             return
-        # New category
-        if key == QtCore.Qt.Key.Key_C:
+        # New category. Not with Ctrl, Alt or Cmd: Ctrl+C is the copy key
+        if key == QtCore.Qt.Key.Key_C and not mods & (
+                QtCore.Qt.KeyboardModifier.ControlModifier | QtCore.Qt.KeyboardModifier.AltModifier |
+                QtCore.Qt.KeyboardModifier.MetaModifier):
             # if category already selected, add new category to that
             supercatid = None
             selected = self.ui.treeWidget.currentItem()
@@ -3967,7 +3969,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             menu.addAction(action_show_handles)
         if selected_text != "":
             action_annotate = menu.addAction(_("Annotate (A)"))
-            action_copy = menu.addAction(_("Copy to clipboard"))
+            copy_key = QtGui.QKeySequence(QtGui.QKeySequence.StandardKey.Copy).toString(
+                QtGui.QKeySequence.SequenceFormat.NativeText)
+            action_copy = menu.addAction(_("Copy to clipboard") + f"\t{copy_key}")
             action_copy_metadata = menu.addAction(_("Copy with metadata"))
             # AI text analysis submenu, as in code_text.
             submenu_ai_text_analysis = menu.addMenu(_("AI Text Analysis"))
@@ -4293,7 +4297,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Copy text to clipboard, optionally with metadata (file, positions, codes
         and reference), as code_text does; the file here is the transcript."""
 
-        text = self.ui.plainTextEdit.textCursor().selectedText()
+        # selectedText() returns paragraph separators instead of line breaks
+        text = self.ui.plainTextEdit.textCursor().selectedText().replace("\u2029", "\n")
         if metadata and self.transcription is not None:
             start_pos = self.ui.plainTextEdit.textCursor().selectionStart()
             end_pos = self.ui.plainTextEdit.textCursor().selectionEnd()
@@ -4301,8 +4306,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             code_names = {c['cid']: c['name'] for c in self.codes}
             codes = ""
             for coded in self.code_text:
-                if coded['pos0'] <= start_pos <= coded['pos1'] or coded['pos0'] <= end_pos <= coded['pos1'] or \
-                        (start_pos <= coded['pos0'] and coded['pos1'] <= end_pos):
+                # End positions are exclusive. An empty selection counts as one character
+                if coded['pos0'] < max(end_pos, start_pos + 1) and start_pos < coded['pos1']:
                     codes += f"{code_names.get(coded['cid'], '')}; "
             if codes:
                 text += f"\nCodes: {codes}"

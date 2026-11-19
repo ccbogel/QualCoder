@@ -113,6 +113,37 @@ class CodeTreeController(QtCore.QObject):
 
     # tree fill
 
+    def _sort_tree_by_totals(self, descending=True):
+        """ Order every tree level by total, then by name. """
+
+        tree = self.tree
+        total_col = tree.columnCount() - 1
+
+        def sort_key(item):
+            text = item.text(total_col)
+            # Codes with sub-codes show 'own (branch total)': sort by the branch total
+            if "(" in text:
+                text = text.split("(")[1].rstrip(")")
+            try:
+                total = int(text)
+            except ValueError:
+                total = 0
+            name = item.toolTip(0) if item.toolTip(0) != "" else item.text(0)
+            return -total if descending else total, name.lower()
+
+        def sort_children(parent):
+            children = parent.takeChildren()
+            children.sort(key=sort_key)
+            parent.addChildren(children)
+            for child in children:
+                sort_children(child)
+
+        top_items = [tree.takeTopLevelItem(0) for _i in range(tree.topLevelItemCount())]
+        top_items.sort(key=sort_key)
+        tree.addTopLevelItems(top_items)
+        for item in top_items:
+            sort_children(item)
+
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
         The Count column is filled by the host through fill_counts_callback.
@@ -353,6 +384,7 @@ class CodeTreeController(QtCore.QObject):
         action_all_asc = sort_menu.addAction(_("Sort ascending F11"))
         action_all_desc = sort_menu.addAction(_("Sort descending F12"))
         action_cat_then_code_asc = sort_menu.addAction(_("Sort category then code ascending"))
+        action_sort_frequency_desc = sort_menu.addAction(_("Sort by code frequency descending"))
 
         # Let the host dialog add its own entries before the menu is shown.
         self.menu_requested.emit(menu, selected)
@@ -371,6 +403,9 @@ class CodeTreeController(QtCore.QObject):
         if action == action_cat_then_code_asc:
             self.tree_sort_option = "cat and code asc"
             self.fill_tree()
+            return
+        if action == action_sort_frequency_desc:
+            self._sort_tree_by_totals()
             return
         if action == action_show_codes_like:
             self.show_codes_like_callback()
