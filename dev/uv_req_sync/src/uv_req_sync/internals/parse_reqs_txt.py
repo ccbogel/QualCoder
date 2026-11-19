@@ -1,18 +1,27 @@
 """Parse requirements.txt"""
 import re
-from pathlib import Path
 
 from uv_req_sync.internals.toml_data_import import (
-  toml_module_dependencies_normalized as toml_deps_normalized,
+  module_dependencies as toml_deps,
 )
 
 
+def _remove_blank_lines(line_list:list[str]) -> list[str]|None:
+  line_list_out=[]
+  for line in line_list:
+    line=line.strip()
+    if line == "" or line == "\n":
+      continue
+    line_list_out.append(line)
+  return line_list_out
+
+
 def _find_index(index_name:str, line_list:list[str])->tuple[str,str]|tuple[str, None]|tuple[None,None]:
-  """Seacrh the list of lines for an expression and then returns 
-  the url and a comment, if any"""
+  """Seacrh the list of lines for an expression and then returns the url and a comment, if any"""
 
   print(f"Finding index comment for {index_name}")
   for idx, line in enumerate(line_list):
+    
     _pattern=f"--{index_name}"
     _found = re.match(fr"^({_pattern})", line)
     if _found:
@@ -59,7 +68,7 @@ def _strip_comments_from_line_start(line_list:list[str],comments:list[dict])->tu
 def _strip_comment_in_the_middle_of_line(line_list:list[str], comments:list[dict[str,str]])->tuple[list[str],list[dict]]:
   print("Removing comments from lines!")
   """Almost same logic as other functions but, for some reason, python did not liked when I putted
-  this inside other functions"""
+  this inside other functions. This removes comments at the end of the lines"""
   for idx, line in enumerate(line_list):
     check:re.Match[str]|None=re.search(r"# ", line)
     if check is None:
@@ -103,38 +112,38 @@ def _dedup_comments(comment_list:list[dict[str,str]]) -> list[dict[str,str]]:
   return comment_list
 
 
-def _check_versionated_or_new(line_list:list[str], toml_deps_normalized:list[str])->tuple[list[str],list[str]]:
+def _check_versionated_or_new(line_list:list[str], toml_deps:list[str])->tuple[list[str],list[str]]:
   """This one takes the whole list of deps and returns only the ones that
-  have versionated notes or new requirements"""
+  have versionated notes or are different then what was on the toml template"""
   versionated_or_new=[]
   for line in line_list:
-    search:re.Match[str]|None=re.search(r">=|<=|==|<|>",line)
-    line_mod_name = re.sub(r'[<>=!~]=?\s*\d+(?:\.\d+)*',"",line).replace("_","-")\
-      .replace("pdfminer.six","pdfminer-six").strip().lower()
+    line = line.replace("_","-").replace("pdfminer.six","pdfminer-six").strip().lower()
     # needed .lower() because requirements.txt use, sometimes CamelCase (Pillow -> pillow; Bio -> bio)
     # json-repair vs json_repair ->.replace
     # pdfminer.six -> .replace
-    if search is None and line_mod_name in toml_deps_normalized:
+    if line in toml_deps:
       continue
     versionated_or_new.append(line.strip().lower())
 
   return versionated_or_new, line_list
 
-#Main
-print("Parsing requirements.txt started" )
-root:Path=Path(__file__).parent.parent.parent.parent.parent.parent
-reqs_dot_txt:Path= root / "requirements.txt"
-print("Opening requirements.txt")
-with open(reqs_dot_txt,"r") as f:
-  _reqs_lines:list[str]=f.readlines()
+def parsing_reqs_dot_txt(reqs_dot_txt) -> tuple[list[dict[str, str]],list[str],list[str]]:
+  """Congrates the logic of this internal module. Being responsible for separating the comments from the bulk of the lines, stripping """
+  print("Parsing requirements.txt started" )
+  print("Opening requirements.txt")
+  with open(reqs_dot_txt,"r") as f:
+    _reqs_lines:list[str]|None=f.readlines()
 
-_comments = []
-_index,_comment_index = _find_index("index-url",_reqs_lines)
-_comments.append({"index":_comment_index})
-_extra_index,_comment_extra_index = _find_index("extra-index-url",_reqs_lines)
-_reqs_lines, _comments = _strip_comments_from_line_start(_reqs_lines, _comments)
-_reqs_lines, _comments = _strip_comment_in_the_middle_of_line(_reqs_lines, _comments)
+  _reqs_lines=_remove_blank_lines(_reqs_lines)
+  _comments = []
+  _index,_comment_index = _find_index("index-url",_reqs_lines)  # ty: ignore[invalid-argument-type]
+  _comments.append({"index":_comment_index})
+  _extra_index,_comment_extra_index = _find_index("extra-index-url",_reqs_lines)  # ty: ignore[invalid-argument-type]
+  _reqs_lines, _comments = _strip_comments_from_line_start(_reqs_lines, _comments)  # ty: ignore[invalid-argument-type]
+  _reqs_lines, _comments = _strip_comment_in_the_middle_of_line(_reqs_lines, _comments)
 
-#Callable
-comments=_dedup_comments(_comments)
-versionated_or_new, reqs_lines = _check_versionated_or_new(_reqs_lines, toml_deps_normalized)
+  #Callable
+  comments=_dedup_comments(_comments)
+  versionated_or_new, reqs_lines = _check_versionated_or_new(_reqs_lines, toml_deps)
+
+  return comments, versionated_or_new, reqs_lines

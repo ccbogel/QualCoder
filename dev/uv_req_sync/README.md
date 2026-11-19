@@ -16,9 +16,9 @@ uv run force-req-sync # Forces the "sync"
 
 Running without uv
 ```bash
-cd dev/uv_req_sync/
-python -m venv .venv
-source .venv/bin/activate
+cd dev
+python -m venv uv_req_sync/.venv
+source uv_req_sync/.venv/bin/activate
 pip install tomli-w # required because python_stdlib_tomllib 
                     # is read only
 cd src

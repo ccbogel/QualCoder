@@ -41,5 +41,3 @@ striprtf
 transformers<=4.53.0 # see https://github.com/huggingface/transformers/issues/38402
 uvicorn>=0.30,<1
 wordcloud
-
-

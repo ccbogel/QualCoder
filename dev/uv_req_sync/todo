@@ -1,15 +1,2 @@
-- Remove the Outdated Commands - done
-
-
-1. The normal command skips generation even when requirements change. 
-2. main() regenerates hashmap.py before comparing the hashes, so it compares the current requirements against themselves. 
-3. Adding a dependency does not update pyproject.toml, and deleting the TOML does not trigger regeneration either. 
-4. Could you save the hash only after successful generation, or simply regenerate whenever the command is called?
-
-5. The template introduces dependency restrictions absent from requirements.txt. For example, it adds pandas>=3.1.0, although the requirements file only specifies pandas. Removing >=6.5 from the PyQt6 requirement also leaves that restriction in the generated TOML. To avoid maintaining two dependency lists, please rebuild the dependencies from requirements.txt each time, keeping the metadata and CPU-only PyTorch configuration separately in the template.
-
-3. A blank line in requirements.txt crashes forced generation, with ValueError: invalid dependency spec: ''. Please skip blank lines during parsing.
-
-4. The README specifies pip install toml_li, but the dependency is tomli-w. Also, please remove tomli-w from the main requirements.txt, as it is only needed by this optional development utility and is already declared in its own pyproject.toml. QualCoder itself does not require it.
-
-5. In the README, please also include the working directory for the uv commands and document only the command-line options that are implemented.
+3. Removing >=6.5 from the PyQt6 requirement also leaves that restriction in the generated TOML. To avoid maintaining two dependency lists, please rebuild the dependencies from requirements.txt each time, keeping the metadata and CPU-only PyTorch configuration separately in the template.
+7. In the README, please also include the working directory for the uv commands and document only the command-line options that are implemented.
