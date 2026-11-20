@@ -181,9 +181,8 @@ def process() -> None:
             try:
                 comments.pop(i)
             except IndexError:
-                print(dedent(f"""
-                Was not able to pop a comment ({comments[i]})
-                due to an IndexError!
+                print(dedent("""
+                Was not able to pop a comment due to an IndexError!
                 This means the of comment list was reached!
                 Exiting while loop
                 """))

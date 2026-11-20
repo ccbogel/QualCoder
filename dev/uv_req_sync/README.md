@@ -2,7 +2,10 @@
 ### The custom QC utility for syncing pyproject.toml based on requirements.txt. 
 #### It checks for all the requirements and only adds those which were changed in some way.
 ---
-It is recomended to run the utility with uv, also read the pyproject.toml as it can help understand how to make this work
+This script builds a new `pyproject.toml` based on the contents of `requirements.txt`, effectively, "synchying" both documents, making so that only one dependency list (`requirements.txt`) needs to be maintained.
+It is recomended that if you use uv on your workflow to always give the utility a quick run (preferably with force) before each work session to check the Qualcoder Team has updated any dependency on `requirements.txt` the utility. 
+
+It is also recomended take quick look at `pyproject.toml` and `requirements` as to understand how they work
 
 Running with uv
 ```bash
@@ -29,3 +32,5 @@ python -m uv_req_sync #Checks wheater the
 python -m uv_req_sync -f      # Forces the "sync"
 python -m uv_req_sync --force # Forces the "sync"
 ```
+
+> uv also can deal with argparse `uv run uv-req-sync -f`

@@ -1,2 +1,0 @@
-3. Removing >=6.5 from the PyQt6 requirement also leaves that restriction in the generated TOML. To avoid maintaining two dependency lists, please rebuild the dependencies from requirements.txt each time, keeping the metadata and CPU-only PyTorch configuration separately in the template.
-7. In the README, please also include the working directory for the uv commands and document only the command-line options that are implemented.
