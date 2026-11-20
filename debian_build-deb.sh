@@ -9,13 +9,15 @@ fi
 VERSION="$1"
 NEW_DIR="qualcoder-${VERSION}"
 
-if [ -d "dist" ]; then
+# A more robust check, it checks for the presence of the binaries,
+# the venv and the dist folder
+if [ -d dist ] && [ -d .venv ] && [ -n "$(ls -A dist 2>/dev/null)" ]; then
     echo "Binary exist"
 else
     echo "Compile QualCoder"
     # Compile QualCoder
-    python3 -m venv ".env"
-    source .env/bin/activate
+    python3 -m venv ".venv"
+    source .venv/bin/activate
     python3 -m pip install --upgrade pip
     pip install -r requirements.txt
     pyinstaller qualcoder_onefile.spec
