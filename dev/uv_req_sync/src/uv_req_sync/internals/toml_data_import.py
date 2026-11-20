@@ -1,4 +1,4 @@
-"""Import some data from toml so it don't do circular imports"""
+"""Import some data from toml template so the script don't makes circular imports by importing them from main"""
 import tomllib
 from pathlib import Path
 

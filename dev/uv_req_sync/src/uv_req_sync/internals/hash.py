@@ -1,4 +1,4 @@
-"""Creates hashmap.py"""
+"""Creates `hashmap.py` which is checked for deciding if the pyproject.toml needs to be"""
 
 def main() -> None:
     """Creates hashmap.py"""

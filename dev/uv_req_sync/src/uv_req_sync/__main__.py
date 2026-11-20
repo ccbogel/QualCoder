@@ -15,19 +15,39 @@ from uv_req_sync.internals.compare_n_dedup import compare_deps
 RE = re.compile(r'[<>=!~]=?\s*\d+(?:\.\d+)*')
 
 def argparser() -> Namespace:
+    """Argparser
+    ---
+    Implemented:
+    - -h | --help (built-in)
+    - -f | --force -> Generates `pyrpoject.toml` regardless of `hashmap.py`
+    - -m | --metadatav -> Allows edition to template `pyrpoject.toml` and overrides it
+    after a sucessfull generation
+    """
     parser = ArgumentParser(
                     prog='uv_req_sync',
                     description='Syncs Uv\'s pyptoject.toml with requirements.txt.\n\
                                  By Default it checks hashmap.py to see if requirements.txt\
                                  wasn changed, if so, syncs pyproject.toml with it ',
-                    epilog='See the utilitie\'s README.md for more info',
+                    epilog='See the utilitiy\'s README.md for more info',
     )
-    parser.add_argument('-f','--force', help='Forces the sync regardless off hashmap state', action='store_true',default=False)
+    parser.add_argument(
+        '-f',
+        '--force', 
+        help='force TOML generation regardless off hashmap state', 
+        action='store_true',
+        default=False
+    )
+    parser.add_argument(
+        '-m','--metadata',
+        help='enable edition for the metadata of pyproject.toml and generate a new template at the end of TOML generation', 
+        action='store_true',
+        default=False
+    )
     args = parser.parse_args()
     return args
 
 def check_and_return(group:dict, toml_key:str, key:str) -> str:
-    "Asks for user input for the key [str] on the group [dict]"
+    "Modifies most part of `pyproject.toml` elements by asking for user input for the key [str] on the group [dict]"
     print("------------------------")
     print(f"Verify {key}")
     print("------------------------")
@@ -47,7 +67,7 @@ HASHMAPS=DEV_SLASH_UV/"src"/"uv_req_sync"/"hashmap.py"
 # ---------------
 # Main processing
 # ---------------
-def process() -> None:
+def process(metadata:bool) -> None:
     print("------------------------")
     print("Starting processing")
     print("------------------------")
@@ -66,17 +86,22 @@ def process() -> None:
     # -----------
     # Project tag
     # -----------
-    print("------------------------")
-    print("Simple elements")
-    print("------------------------")
+
     project=data["project"]
-    project["name"]=check_and_return(project, 'project',"name")
-    project["version"]=check_and_return(project, 'project',"version")
-    project["description"]=check_and_return(project, 'project',"description")
-    project["readme"]=check_and_return(project, 'project',"readme")
-    project["requires-python"]=check_and_return(project, 'project',"requires-python")
     
-    project["authors"]=authors_processing(project["authors"])
+    if metadata == True:
+        print("------------------------")
+        print("Metadata elements")
+        print("------------------------")
+        print("Metadata flag (-m|--metadata) was passed.\nAllowing metada edition")
+        
+        project["name"]=check_and_return(project, 'project',"name")
+        project["version"]=check_and_return(project, 'project',"version")
+        project["description"]=check_and_return(project, 'project',"description")
+        project["readme"]=check_and_return(project, 'project',"readme")
+        project["requires-python"]=check_and_return(project, 'project',"requires-python")
+
+        project["authors"]=authors_processing(project["authors"])
     
     # -----------------------
     # [project.dependencies]
@@ -155,9 +180,13 @@ def process() -> None:
         pass
     
     # As tomllib is read only, tomli_w is required
-    import tomli_w
-    with open(OUT_TOML,"wb") as f:
-        tomli_w.dump(data, f)
+    try:
+        import tomli_w
+        with open(OUT_TOML,"wb") as f:
+            tomli_w.dump(data, f)
+    except (ImportError, ModuleNotFoundError) as e:
+        print(f"{e}: Please verify if tomli-w is properly installed on your virtual enviroment (venv)\n")
+        exit(1)
 
     print("TOML data saved\nStarting comment adition")
 
@@ -261,8 +290,23 @@ def process() -> None:
     from uv_req_sync.internals.hash import main as make_hashmap
     make_hashmap()
 
-def work_and_exit() -> None:
-        process()
+
+    # ----------------------------------
+    # Final process: make a new hashmap
+    # ----------------------------------
+    if metadata==True:
+        print("Metadata flag (-m|--metadata) was passed.\nAllowing template substitution")
+        print("Opening pyproject.toml so you can to extract new lines")
+        with open(OUT_TOML,"r") as f:
+            new_template_lines=f.readlines()
+        
+        print("Writing new lines to template")
+        with open(template, "w") as w:
+            w.writelines(new_template_lines) 
+
+
+def work_and_exit(metadata:bool) -> None:
+        process(metadata)
         from sys import exit
         print("Done")
         exit(0)
@@ -273,19 +317,29 @@ def work_and_exit() -> None:
 def main():
     args=argparser()
 
+    # Metadata is always False by default
+    # Following project maintainers instructions
+    metadata=False
+
+    if args.metadata == True:
+        metadata=True
+    
     # Forcing uses the same logic as pyproject.toml not existing
     # i.e. they both do not want to check the hashmap. So they can
     # Share the same conditional block 
     if args.force == True or not OUT_TOML.exists():
         if not OUT_TOML.exists():
-            print("\"pyproject.toml\" not found in project ROOT. Generating ")
-        work_and_exit()
+            # Then the warnings are dealt accordingly
+            print("\"pyproject.toml\" not found in project root. Generating...\n")
+        elif args.force == True:
+             print("Force flag (-f|--force) was passed.\nForcing pyproject.toml generation!")
+        work_and_exit(metadata)
     
     if not HASHMAPS.exists():
         print("hashmap.py does not exist, generating pyproject.toml (which builds hashmap.py at the end)")
         file_hash=None
         lines_hash=None
-        work_and_exit()
+        work_and_exit(metadata)
 
     else:
         # It was easier to just copy the code from internals/hash.py
@@ -313,13 +367,13 @@ def main():
             hash_lines_totest.append({i:f"{linha_hash}"})
     
     if filehash_totest.strip() == file_hash or hash_lines_totest == lines_hash:
-        print("File's hashes for requirements.txt are the same\nNo need to check for versioning\n")
+        print("File's hashes for requirements.txt are the same\nNo need to check for versioning\nExiting\n")
         exit(0)
     else:
         print("requirements.txt' hashes are different between stored hashmap and freshly generated!")
         print("requirements.txt' was probably changed!")
         print("Regenerating pyproject.toml")
-        process()
+        process(metadata)
         
 
 if __name__ ==  "__main__":

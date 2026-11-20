@@ -1,4 +1,5 @@
-"""Dedups the reqs list"""
+"""Dedups the requirements list. Since the logic of the comparison on `parse_reqs.txt` adds the "new" lines at the end of `req_list`
+it is important to dedup that list giving priority for the newer/latter items of the list"""
 import re
 
 _NAME_RE = re.compile(r'^\s*([A-Za-z0-9_.\-]+)')
@@ -10,6 +11,8 @@ def _mod_name(dep: str) -> str:
     return m.group(1).lower()
 
 def compare_deps(deps: list[str], versionated: list[str]) -> list[str]:
+    """Dedups the requirements list. Since the logic of the comparison on `parse_reqs.txt` adds the "new" lines at the end of `req_list`
+    it is important to dedup that list giving priority for the newer/latter items of the list"""
     poppers=[]
     print("Starting dependencies comparison")
     # start from deps, then overlay any versionated entries that are newer

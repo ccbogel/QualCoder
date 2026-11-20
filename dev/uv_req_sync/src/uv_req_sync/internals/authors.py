@@ -1,4 +1,4 @@
-"""Author editing"""
+"""Author editing: a simple helper for adding author data to pyproject.toml on the fly"""
 from sys import exit
 
 
