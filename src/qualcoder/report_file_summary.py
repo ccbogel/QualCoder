@@ -31,7 +31,7 @@ from PyQt6 import QtCore, QtWidgets, QtGui
 import re
 
 from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
-from .helpers import file_typer, msecs_to_hours_mins_secs, Message
+from .helpers import file_typer, msecs_to_hours_mins_secs, Message, doc_end_position, doc_position_from_index
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 from .stopwords import *
@@ -701,7 +701,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             return
         if self.ui.textEdit.toPlainText() == "":
             return
-        if self.ui.textEdit.textCursor().position() >= len(self.ui.textEdit.toPlainText()):
+        if self.ui.textEdit.textCursor().position() >= doc_end_position(self.ui.textEdit):
             cursor = self.ui.textEdit.textCursor()
             cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
             self.ui.textEdit.setTextCursor(cursor)
@@ -715,9 +715,11 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         if pattern is None:
             return
         for match in pattern.finditer(te_text):
-            if match.start() > self.ui.textEdit.textCursor().position():
+            start = doc_position_from_index(te_text, match.start())
+            if start > self.ui.textEdit.textCursor().position():
                 cursor = self.ui.textEdit.textCursor()
-                cursor.setPosition(match.start(), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(match.start() + len(search_text), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(start, QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(doc_position_from_index(te_text, match.end()),
+                                   QtGui.QTextCursor.MoveMode.KeepAnchor)
                 self.ui.textEdit.setTextCursor(cursor)
                 break

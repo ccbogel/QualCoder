@@ -35,7 +35,8 @@ from PyQt6.QtCore import Qt
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
-from .helpers import init_persistent_tree_header, restore_persistent_tree_widths
+from .helpers import init_persistent_tree_header, restore_persistent_tree_widths, doc_end_position, \
+    doc_position_from_index
 from .stopwords import *
 
 # If VLC not installed, it will not crash
@@ -721,7 +722,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             return
         if self.ui.textEdit.toPlainText() == "":
             return
-        if self.ui.textEdit.textCursor().position() >= len(self.ui.textEdit.toPlainText()):
+        if self.ui.textEdit.textCursor().position() >= doc_end_position(self.ui.textEdit):
             cursor = self.ui.textEdit.textCursor()
             cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
             self.ui.textEdit.setTextCursor(cursor)
@@ -735,9 +736,11 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         if pattern is None:
             return
         for match in pattern.finditer(te_text):
-            if match.start() > self.ui.textEdit.textCursor().position():
+            start = doc_position_from_index(te_text, match.start())
+            if start > self.ui.textEdit.textCursor().position():
                 cursor = self.ui.textEdit.textCursor()
-                cursor.setPosition(match.start(), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(match.start() + len(search_text), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                cursor.setPosition(start, QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(doc_position_from_index(te_text, match.end()),
+                                   QtGui.QTextCursor.MoveMode.KeepAnchor)
                 self.ui.textEdit.setTextCursor(cursor)
                 break
