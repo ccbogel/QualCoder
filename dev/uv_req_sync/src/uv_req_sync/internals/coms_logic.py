@@ -39,8 +39,9 @@ def comment_logic(comment_index:int,comment:dict[str,str],lines_list:list[str],p
     else
         continiue
     ```
-    Originally this was a nested loop inside where this functions is called. However it needed to be moved
-    to a function that reassigned the values of pyproject_lines/lines_list comment_poppers/poppers"""
+    Originally this was a nested loop inside another loop(located where this functions is called). 
+    However it needed to be moved to a function that reassigned the values of pyproject_lines/lines_list 
+    and comment_poppers/poppers"""
     
     # "generic" means any regular comment that does
     # not have any particular distinct key (e.g. index,

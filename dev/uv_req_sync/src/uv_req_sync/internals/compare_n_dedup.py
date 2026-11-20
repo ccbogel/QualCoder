@@ -15,7 +15,7 @@ def compare_deps(deps: list[str], versionated: list[str]) -> list[str]:
     it is important to dedup that list giving priority for the newer/latter items of the list"""
     poppers=[]
     print("Starting dependencies comparison")
-    # start from deps, then overlay any versionated entries that are newer
+# Start from deps, then overlay any versionated entries that are newer
     try:
         by_name: dict[str, str] = {}
         for i, d in enumerate( deps):
@@ -24,7 +24,7 @@ def compare_deps(deps: list[str], versionated: list[str]) -> list[str]:
             print(f"{v} is newer then {d}.\nAdding {v}")
             by_name[_mod_name(v)] = v          # newer wins
     
-    #Dealing with blank lines
+#Dealing with blank lines
     except ValueError:
         print("A blank line was detetcted")
         print("Marking it for removal")

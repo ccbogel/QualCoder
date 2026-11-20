@@ -9,7 +9,8 @@ def _show_authors(author_list:list[dict[str,str]]) ->None:
 def authors_processing(author_list:list[dict[str,str]])->list[dict]:
     """
     A recurring function that returns a list with the dict info of each developer
-    it only exits when the user exits by "keeping the list as is" or just nothing
+    it only exits when the user exits by "keeping the list as is" or just pressing
+    Enter (inputing None)
     """
     print("----------------")
     print("Author Wizard")
@@ -68,7 +69,7 @@ def authors_processing(author_list:list[dict[str,str]])->list[dict]:
             if email_check.lower() == "y":
                 dict={
                 "name": author_name,
-                "email": input("What it the authors email?")
+                "email": input("What is the authors email?")
                 }  
             
             if add_mode in [1, "1"]:
@@ -76,7 +77,7 @@ def authors_processing(author_list:list[dict[str,str]])->list[dict]:
             elif add_mode in [2, "2"]:
                 
                 try:
-                    pos_to_add=input("In what position would you like to add the entry?\n(Index is 0 based)")
+                    pos_to_add=input("In what position would you like to add the entry?\n(Index is 0 based)\n")
                     author_list.insert(int(pos_to_add),dict)
                 except (TypeError, IndexError) as e:
                     if e == TypeError:

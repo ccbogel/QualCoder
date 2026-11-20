@@ -1,6 +1,6 @@
-"""Parse requirements.txt by removing arguments from lines and returning them to __main__.py.
-The removed arguments are then passed as a list[dict[str,str]] in which each dir is of size 1
-and contains a key descripting it's location relative to it's"""
+"""Parse requirements.txt by removing comments from lines and returning them to __main__.py.
+The removed comments are then passed as a list[dict[str,str]] in which each dir is of size 1
+and contains a key descripting it's location relative to it's line and context"""
 
 import re
 
@@ -20,7 +20,7 @@ def _remove_blank_lines(line_list:list[str]) -> list[str]:
 
 
 def _find_index(index_name:str, line_list:list[str])->tuple[str,str]|tuple[str, None]|tuple[None,None]:
-  """Seacrh the list of lines for an expression and then returns the url and a comment, if any"""
+  """Seacrh the list of lines for an expression and then returns the url and a comment (if any)"""
 
   print(f"Finding index comment for {index_name}")
   for idx, line in enumerate(line_list):
@@ -50,7 +50,8 @@ def _find_index(index_name:str, line_list:list[str])->tuple[str,str]|tuple[str, 
   return None, None
 
 def _strip_comments_from_line_start(line_list:list[str],comments:list[dict[str,str]])->tuple[list[str],list[dict[str,str]]]:
-  """Only removes comments if they start a line. The removed comment is then added to a dict with a key that """
+  """Only removes comments if they start a line. The removed comment is then added to a dict with a key that explains it's 
+  relation/position (i.e. adds a mark to be parsed later)"""
   poppers=[]
   for idx, line in enumerate(line_list.copy()):
     has_comment = re.match(r'#',line)
@@ -116,8 +117,12 @@ def _dedup_comments(comment_list:list[dict[str,str]]) -> list[dict[str,str]]:
   return comment_list
 
 def _check_versionated_or_new(line_list:list[str], toml_deps:list[str])->tuple[list[str],list[str]]:
-  """Takes the whole list of deps and returns only the ones that
-  have versionated notes or are different then what was on the toml template"""
+  """
+  Takes the whole list of deps and returns a list with the ones that have
+  versionated notes or are different then what was on the TOML template.
+  Also pass in the current version (decommented and without indexes) of 
+  `requirements.txt`'s items
+  """
   versionated_or_new=[]
   for line in line_list:
     line = line.replace("_","-").replace("pdfminer.six","pdfminer-six").strip().lower()
@@ -131,8 +136,9 @@ def _check_versionated_or_new(line_list:list[str], toml_deps:list[str])->tuple[l
   return versionated_or_new, line_list
 
 def parsing_reqs_dot_txt(reqs_dot_txt) -> tuple[list[dict[str, str]],list[str],list[str]]:
-  """Congrates the logic of this internal module. Being responsible for separating the comments from the 
-  bulk of the lines, stripping blank lines and organizing the """
+  """Congregtes the logic of this internal module. Being responsible for separating the comments from the 
+  bulk of the lines, stripping blank lines and organizing the versionated/new depencies list, comment list 
+  and `requirements.txt` lines"""
   print("Parsing requirements.txt started" )
   print("Opening requirements.txt")
   with open(reqs_dot_txt,"r") as f:
@@ -147,8 +153,8 @@ def parsing_reqs_dot_txt(reqs_dot_txt) -> tuple[list[dict[str, str]],list[str],l
     _comments.append(_comment_index_dict)
   _extra_index,_comment_extra_index = _find_index("extra-index-url",_reqs_lines)
   # _comment_index is manually added because uv defaults to PyPi and only sources specific packages 
-  # when configured. Also and _extra_index are _comment_extra_index "generated" so the line is removed
-  # from the line list
+  # when configured (it can handle multiple indexes, but is safer doing this way). 
+  # Also _comment_extra_index and _extra_index are "generated" so the line is removed from the line list
   _reqs_lines, _comments = _strip_comments_from_line_start(_reqs_lines, _comments)  
   _reqs_lines, _comments = _strip_comment_in_the_middle_of_line(_reqs_lines, _comments)
   comments=_dedup_comments(_comments)

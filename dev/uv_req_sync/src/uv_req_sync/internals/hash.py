@@ -1,7 +1,7 @@
 """Creates `hashmap.py` which is checked for deciding if the pyproject.toml needs to be"""
 
 def main() -> None:
-    """Creates hashmap.py"""
+    """Creates hashmap.py by sha256 the file and each line"""
     from datetime import UTC, datetime
     from hashlib import sha256
     from pathlib import Path

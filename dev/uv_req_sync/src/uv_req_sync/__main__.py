@@ -14,6 +14,10 @@ from uv_req_sync.internals.compare_n_dedup import compare_deps
 
 RE = re.compile(r'[<>=!~]=?\s*\d+(?:\.\d+)*')
 
+# ---------------
+# Functions
+# ---------------
+
 def argparser() -> Namespace:
     """Argparser
     ---
@@ -47,7 +51,7 @@ def argparser() -> Namespace:
     return args
 
 def check_and_return(group:dict, toml_key:str, key:str) -> str:
-    "Modifies most part of `pyproject.toml` elements by asking for user input for the key [str] on the group [dict]"
+    "Modifies most part of `pyproject.toml` metadata by asking for user input for the key [str] on the group [dict]"
     print("------------------------")
     print(f"Verify {key}")
     print("------------------------")
@@ -59,11 +63,16 @@ def check_and_return(group:dict, toml_key:str, key:str) -> str:
     else:
         return group[key]
 
+# ---------------
+# Setup
+# ---------------
+# Contants/elements needed in many places early initialized
 ROOT=Path(__file__).parent.parent.parent.parent.parent
 REQS_DOT_TXT = ROOT/"requirements.txt"
 DEV_SLASH_UV=Path(__file__).parent.parent.parent
 OUT_TOML=ROOT/"pyproject.toml"
 HASHMAPS=DEV_SLASH_UV/"src"/"uv_req_sync"/"hashmap.py"
+
 # ---------------
 # Main processing
 # ---------------
@@ -78,8 +87,8 @@ def process(metadata:bool) -> None:
     with open(template,"rb") as toml_file:
         template_data= tomllib.load(toml_file,parse_float=str)
 
-    # This ensures that the old file stays the same and it's data's
-    # copy is the one being modified
+# Ensures that the old file stays the same and 
+# it's data's copy is the thing being mutated
     print("Copy the data\n")
     data=template_data.copy()
 
@@ -103,9 +112,19 @@ def process(metadata:bool) -> None:
 
         project["authors"]=authors_processing(project["authors"])
     
-    # -----------------------
-    # [project.dependencies]
-    # -----------------------
+    # Scripts is already configured, it depends on project's 
+    # main entrypoint, so it is easier to "manually" config
+    
+    # If at some point these thing need to be edited manually
+    # via the script they can be acessed with
+        
+        #scripts=project["scripts"]
+        #main_script=scripts["qualcoder"]
+
+
+# -----------------------
+# [project.dependencies]
+# -----------------------
     print("------------------------")
     print("Dependencies")
     print("------------------------")
@@ -118,10 +137,10 @@ def process(metadata:bool) -> None:
     new_toml_deps:list[str]=compare_deps(copy(project["dependencies"]),versionated_or_new)
     
     
-    # Checks weather any old dependency was removed from
-    # requirements.txt or needs a special index
+# Checks weather any old dependency was removed from
+# requirements.txt or needs a special index.
     from uv_req_sync.internals.specially_indexed import specially_indexed
-    # see internals/specially_index.py for a little bit more info
+    
 
     print("Dependency cleaninig started")
     reqs_lines_normalized:list[str]=reqs_lines.copy()
@@ -141,34 +160,25 @@ def process(metadata:bool) -> None:
     
     project["dependencies"]=new_toml_deps
     print("Dependencies management ended")
-    
-    # Scripts is already configured, it depends on project's 
-    # main entrypoint, so it is easier to "manually" config
-    
-    # If at some point these thing need to be edited manually
-    # they can be acessed with
-    
-    #scripts=project["scripts"]
-    #main_script=scripts["qualcoder"]
 
-
-    # -----------
-    # Tools tag
-    # -----------
-    #tool=data["tool"]
-
+# -----------
+# Tools tag
+# -----------
+    
     # Since the only modules that require index are already configured
     # it is not needed to change the uv parsing logic
-    #uv= tool["uv"]
+    
+    # tool=data["tool"]
 
-    # Ruff is already stabilized and does not require further parsing
-    # or stabilizing for now
+    # uv= tool["uv"]
+
+    # Ruff is already stabilized and does not require further parsing/stabilizing for now
+    
     # ruff=tool["ruff"]
     
-    
-    # -----------
-    # Toml Write
-    # -----------
+# -----------
+# Toml Write
+# -----------
     print("------------------------")
     print("Finlazing")
     print("------------------------")
@@ -179,9 +189,12 @@ def process(metadata:bool) -> None:
     except FileNotFoundError:
         pass
     
-    # As tomllib is read only, tomli_w is required
+    
     try:
-        import tomli_w
+        # As tomllib is read only, tomli_w is required
+        import tomli_w  # ty: ignore[import-not-found]
+        # Since this module is not part of QC and the main venv is QC's venv
+        # ty kinda hates it and lints an unecessary error
         with open(OUT_TOML,"wb") as f:
             tomli_w.dump(data, f)
     except (ImportError, ModuleNotFoundError) as e:
@@ -190,9 +203,9 @@ def process(metadata:bool) -> None:
 
     print("TOML data saved\nStarting comment adition")
 
-    # ---------------
-    # Comment adition
-    # ---------------
+# ---------------
+# Comment adition
+# ---------------
     print("TOML file reopened to add comments")
     with open(OUT_TOML,"r") as f:
         pyproject_lines=f.readlines()
@@ -260,9 +273,9 @@ def process(metadata:bool) -> None:
     
     print("File sync is completed!\nStarting cleanup...\n")
     
-    # ---------------
-    # Small Cleanup
-    # ---------------
+# ---------------
+# .lock Cleanup
+# ---------------
     # Removes uv locks so it don't locks a thing if
     # it ever gets misconfigured. uv recreates when syncing
     # uv sync
@@ -275,9 +288,9 @@ def process(metadata:bool) -> None:
         os.unlink(uv_req_synq_uvlock)
         print(f"{uv_req_synq_uvlock} deleted!")
 
-    # ----------------------------------
-    # Final process: make a new hashmap
-    # ----------------------------------
+# ----------------------------------
+# Make a new hashmap
+# ----------------------------------
     if not OUT_TOML.exists():
             print(f"{OUT_TOML} was not generated sucessfully.")
             print("Please verify your paths, permissions and module instalation.")
@@ -290,10 +303,9 @@ def process(metadata:bool) -> None:
     from uv_req_sync.internals.hash import main as make_hashmap
     make_hashmap()
 
-
-    # ----------------------------------
-    # Final process: make a new hashmap
-    # ----------------------------------
+# -----------------------------------------------
+# Creates new template if metadata flag is passed
+# -----------------------------------------------
     if metadata==True:
         print("Metadata flag (-m|--metadata) was passed.\nAllowing template substitution")
         print("Opening pyproject.toml so you can to extract new lines")
@@ -312,24 +324,23 @@ def work_and_exit(metadata:bool) -> None:
         exit(0)
 
 # -------------------------------------
-# Runtime logic - Actual main()
+# Runtime logic/Main
 # -------------------------------------
 def main():
     args=argparser()
 
-    # Metadata is always False by default
-    # Following project maintainers instructions
+# Metadata is False by default
     metadata=False
 
     if args.metadata == True:
         metadata=True
     
-    # Forcing uses the same logic as pyproject.toml not existing
-    # i.e. they both do not want to check the hashmap. So they can
-    # Share the same conditional block 
+# Forcing uses the same logic as pyproject.toml not existing;
+# i.e. they both do not want to check the hashmap. So they can
+# Share the same conditional block 
     if args.force == True or not OUT_TOML.exists():
+    # Then the warnings are dealt accordingly
         if not OUT_TOML.exists():
-            # Then the warnings are dealt accordingly
             print("\"pyproject.toml\" not found in project root. Generating...\n")
         elif args.force == True:
              print("Force flag (-f|--force) was passed.\nForcing pyproject.toml generation!")
@@ -342,8 +353,8 @@ def main():
         work_and_exit(metadata)
 
     else:
-        # It was easier to just copy the code from internals/hash.py
-        # then to change it to hold variables and assign them dinamically
+    # It is easier to just copy the code from internals/hash.py
+    # then to change it to hold variables and assign them dinamically
         from hashlib import sha256
 
         from uv_req_sync.hashmap import file_hash
@@ -367,7 +378,7 @@ def main():
             hash_lines_totest.append({i:f"{linha_hash}"})
     
     if filehash_totest.strip() == file_hash or hash_lines_totest == lines_hash:
-        print("File's hashes for requirements.txt are the same\nNo need to check for versioning\nExiting\n")
+        print("File's hashes for requirements.txt are the same\nNo need to check for versioning\nExiting!\n")
         exit(0)
     else:
         print("requirements.txt' hashes are different between stored hashmap and freshly generated!")
@@ -377,4 +388,12 @@ def main():
         
 
 if __name__ ==  "__main__":
-    main()
+# Added Ctrl+C as Exit
+# It already is but, in this,
+# way it is handled gracefully
+# instead of "crashing"
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Ctrl+C was pressed\nAborting!")
+        exit(0)
