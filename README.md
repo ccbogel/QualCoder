@@ -258,6 +258,15 @@ If you want to use the AI-enhanced features in QualCoder, additional setup is ne
 2) On the first start of the AI, QualCoder will automatically download some additional components which are needed to analyze your documents locally (this model: https://huggingface.co/intfloat/multilingual-e5-large). This will take a while, please be patient.
 - If you want to enable/disable the AI functionality later or change settings, click on AI > Settings.
 
+## Textual statistics (IRaMuTeQ methods)
+The Reports menu contains a "Text statistics (IRaMuTeQ methods)" submenu. It builds an analysable corpus from the project (coded segments, or whole documents, with codes, cases and file/case attributes as analysis variables), with tokenisation, stopwords (built-in FR/EN/... lists plus an editable custom file) and optional light stemming, and a sparse forms x segments lexical table with active vs supplementary forms. Available analyses, all computed by the pure-Python `irastats` package (unit-tested without a GUI):
+- Text statistics (IRaMuTeQ descending report): total occurrences, active/supplementary forms, decreasing frequency table, hapax, breakdown by partition variable; CSV and HTML export.
+- Specificities (chi-square): per form and per modality of a partition variable, signed chi-square and two-sided p-value (scipy.stats.chi2), configurable probability threshold (default 0.05); CSV/HTML export with over/under-representation highlighting.
+- Correspondence analysis (CA): SVD of the standardized residuals (numpy only), eigenvalues, form and modality coordinates, factor map on axes 1x2 (matplotlib, non-blocking window), coordinates CSV, PNG export.
+- Similarity graph: co-occurrences of forms within segments (networkx), association measure configurable (Jaccard by default, or chi2/phi-squared), adjustable edge threshold, force-directed matplotlib graph, PNG export.
+- Reinert classification (CHD): UCI segmentation (~40 occurrences, bounded by punctuation), forms x UCI matrix of active forms (frequency >= 3), top-down binary splits maximizing the chi-square between classes (Reinert 1983/1990, iterative reassignment, up to ~10 classes), class profiles with signed specificities, most representative UCI per class, CA of forms x classes, CSV export. Defaults follow IRaMuTeQ and are adjustable.
+- IRaMuTeQ export: writes the corpus in the IRaMuTeQ text format (one "**** *code=... *cas=... *doc=..." block per segment) so results can be checked in the original IRaMuTeQ software.
+
 ## License
 QualCoder is distributed under the LGPLv3 LICENSE.
 
