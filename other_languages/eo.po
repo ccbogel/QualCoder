@@ -19980,3 +19980,88 @@ msgstr ""
 msgid "axes"
 msgstr ""
 
+#: src/qualcoder/dialog_text_stats.py:730
+msgid "CA forms x classes"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:743
+#: src/qualcoder/dialog_text_stats.py:843
+msgid "Characteristic forms"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:743
+#: src/qualcoder/dialog_text_stats.py:843
+#: src/qualcoder/dialog_text_stats.py:848
+#: src/qualcoder/dialog_text_stats.py:854
+msgid "Class"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:839
+msgid "Classes"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:800
+msgid "Classes: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:712
+msgid "Max classes:"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:717
+msgid "Min UCI per class:"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:707
+msgid "Min frequency of active forms:"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:756
+msgid "Most representative UCI:"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:762
+msgid "Reinert classification"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:858
+msgid "Reinert classification exported to: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:804
+msgid "Reinert classification: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:871
+msgid "Reinert classification: CA forms x classes"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:854
+msgid "Representative UCI"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:743
+#: src/qualcoder/dialog_text_stats.py:843
+msgid "UCI"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:702
+msgid "UCI size (occurrences):"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:801
+msgid "UCI: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:841
+msgid "chi2/df ratio"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:803
+msgid "chi2/df ratio: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:804
+msgid "classes"
+msgstr ""
+

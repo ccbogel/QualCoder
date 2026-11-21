@@ -17644,3 +17644,88 @@ msgstr "Inertie totale : "
 msgid "axes"
 msgstr "axes"
 
+#: src/qualcoder/dialog_text_stats.py:730
+msgid "CA forms x classes"
+msgstr "AFC formes x classes"
+
+#: src/qualcoder/dialog_text_stats.py:743
+#: src/qualcoder/dialog_text_stats.py:843
+msgid "Characteristic forms"
+msgstr "Formes caractéristiques"
+
+#: src/qualcoder/dialog_text_stats.py:743
+#: src/qualcoder/dialog_text_stats.py:843
+#: src/qualcoder/dialog_text_stats.py:848
+#: src/qualcoder/dialog_text_stats.py:854
+msgid "Class"
+msgstr "Classe"
+
+#: src/qualcoder/dialog_text_stats.py:839
+msgid "Classes"
+msgstr "Classes"
+
+#: src/qualcoder/dialog_text_stats.py:800
+msgid "Classes: "
+msgstr "Classes : "
+
+#: src/qualcoder/dialog_text_stats.py:712
+msgid "Max classes:"
+msgstr "Nb max de classes :"
+
+#: src/qualcoder/dialog_text_stats.py:717
+msgid "Min UCI per class:"
+msgstr "Nb min d'UCI par classe :"
+
+#: src/qualcoder/dialog_text_stats.py:707
+msgid "Min frequency of active forms:"
+msgstr "Fréquence min. des formes actives :"
+
+#: src/qualcoder/dialog_text_stats.py:756
+msgid "Most representative UCI:"
+msgstr "UCI les plus représentatives :"
+
+#: src/qualcoder/dialog_text_stats.py:762
+msgid "Reinert classification"
+msgstr "Classification de Reinert"
+
+#: src/qualcoder/dialog_text_stats.py:858
+msgid "Reinert classification exported to: "
+msgstr "Classification de Reinert exportée vers : "
+
+#: src/qualcoder/dialog_text_stats.py:804
+msgid "Reinert classification: "
+msgstr "Classification de Reinert : "
+
+#: src/qualcoder/dialog_text_stats.py:871
+msgid "Reinert classification: CA forms x classes"
+msgstr "Classification de Reinert : AFC formes x classes"
+
+#: src/qualcoder/dialog_text_stats.py:854
+msgid "Representative UCI"
+msgstr "UCI représentative"
+
+#: src/qualcoder/dialog_text_stats.py:743
+#: src/qualcoder/dialog_text_stats.py:843
+msgid "UCI"
+msgstr "UCI"
+
+#: src/qualcoder/dialog_text_stats.py:702
+msgid "UCI size (occurrences):"
+msgstr "Taille des UCI (occurrences) :"
+
+#: src/qualcoder/dialog_text_stats.py:801
+msgid "UCI: "
+msgstr "UCI : "
+
+#: src/qualcoder/dialog_text_stats.py:841
+msgid "chi2/df ratio"
+msgstr "ratio chi2/ddl"
+
+#: src/qualcoder/dialog_text_stats.py:803
+msgid "chi2/df ratio: "
+msgstr "ratio chi2/ddl : "
+
+#: src/qualcoder/dialog_text_stats.py:804
+msgid "classes"
+msgstr "classes"
+

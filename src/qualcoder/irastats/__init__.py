@@ -55,6 +55,15 @@ from .descstats import descendant_statistics, frequency_rows, hapax_rows, variab
 from .specificites import chi2_statistic, modalities_of, specificities, specificity_rows
 from .similarity import cooccurrence, similarity_matrix, build_graph, draw_similarity_graph
 from .ca import correspondence_analysis, lexical_table_by_variable, plot_ca, ca_coordinate_rows
+from .reinert import (
+    split_sentences,
+    split_uci,
+    build_uci_segments,
+    chi2_contingency,
+    best_binary_split,
+    reinert_classification,
+    reinert_from_segments,
+)
 
 __all__ = [
     "build_segments",
@@ -89,4 +98,11 @@ __all__ = [
     "lexical_table_by_variable",
     "plot_ca",
     "ca_coordinate_rows",
+    "split_sentences",
+    "split_uci",
+    "build_uci_segments",
+    "chi2_contingency",
+    "best_binary_split",
+    "reinert_classification",
+    "reinert_from_segments",
 ]

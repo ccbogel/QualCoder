@@ -43,6 +43,7 @@ from .irastats import (
 )
 from .irastats.similarity import build_graph, cooccurrence, draw_similarity_graph, similarity_matrix
 from .irastats.ca import ca_coordinate_rows, correspondence_analysis, lexical_table_by_variable, plot_ca
+from .irastats.reinert import reinert_from_segments
 from .irastats.report_html import descstats_html, specificites_html
 from .select_items import DialogSelectItems
 
@@ -84,6 +85,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self._build_specificites_tab()
         self._build_similarity_tab()
         self._build_ca_tab()
+        self._build_reinert_tab()
         layout.addWidget(self.tabWidget)
 
     # --- Selection (same helpers as the other Reports dialogs) ---
@@ -688,6 +690,188 @@ class DialogTextStats(QtWidgets.QDialog):
         msg = _("CA factor map exported to: ") + filepath
         Message(self.app, _("PNG export"), msg).exec()
         self.parent_textEdit.append(msg)
+
+
+    # --- Reinert classification (CHD) tab ---
+
+    def _build_reinert_tab(self):
+        self.tab_reinert = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(self.tab_reinert)
+
+        params = QtWidgets.QHBoxLayout()
+        params.addWidget(QtWidgets.QLabel(_("UCI size (occurrences):")))
+        self.spinBox_reinert_size = QtWidgets.QSpinBox()
+        self.spinBox_reinert_size.setRange(10, 500)
+        self.spinBox_reinert_size.setValue(40)
+        params.addWidget(self.spinBox_reinert_size)
+        params.addWidget(QtWidgets.QLabel(_("Min frequency of active forms:")))
+        self.spinBox_reinert_min_freq = QtWidgets.QSpinBox()
+        self.spinBox_reinert_min_freq.setRange(1, 999)
+        self.spinBox_reinert_min_freq.setValue(3)
+        params.addWidget(self.spinBox_reinert_min_freq)
+        params.addWidget(QtWidgets.QLabel(_("Max classes:")))
+        self.spinBox_reinert_max_classes = QtWidgets.QSpinBox()
+        self.spinBox_reinert_max_classes.setRange(2, 50)
+        self.spinBox_reinert_max_classes.setValue(10)
+        params.addWidget(self.spinBox_reinert_max_classes)
+        params.addWidget(QtWidgets.QLabel(_("Min UCI per class:")))
+        self.spinBox_reinert_min_size = QtWidgets.QSpinBox()
+        self.spinBox_reinert_min_size.setRange(1, 200)
+        self.spinBox_reinert_min_size.setValue(3)
+        params.addWidget(self.spinBox_reinert_min_size)
+        self.pushButton_reinert_run = QtWidgets.QPushButton(_("Calculate"))
+        self.pushButton_reinert_run.setIcon(qta.icon("mdi6.play"))
+        self.pushButton_reinert_run.clicked.connect(self.run_reinert)
+        params.addWidget(self.pushButton_reinert_run)
+        self.pushButton_reinert_csv = QtWidgets.QPushButton(_("Export CSV"))
+        self.pushButton_reinert_csv.setIcon(qta.icon("mdi6.file-delimited-outline"))
+        self.pushButton_reinert_csv.clicked.connect(self.export_reinert_csv)
+        params.addWidget(self.pushButton_reinert_csv)
+        self.pushButton_reinert_ca = QtWidgets.QPushButton(_("CA forms x classes"))
+        self.pushButton_reinert_ca.setIcon(qta.icon("mdi6.chart-scatter-plot"))
+        self.pushButton_reinert_ca.clicked.connect(self.show_reinert_ca)
+        params.addWidget(self.pushButton_reinert_ca)
+        layout.addLayout(params)
+
+        self.label_reinert_info = QtWidgets.QLabel("")
+        self.label_reinert_info.setWordWrap(True)
+        layout.addWidget(self.label_reinert_info)
+
+        splitter = QtWidgets.QSplitter()
+        self.treeWidget_reinert = QtWidgets.QTreeWidget()
+        self.treeWidget_reinert.setColumnCount(4)
+        self.treeWidget_reinert.setHeaderLabels([_("Class"), _("UCI"), "chi2", _("Characteristic forms")])
+        self.treeWidget_reinert.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.treeWidget_reinert.itemClicked.connect(self.reinert_class_selected)
+        splitter.addWidget(self.treeWidget_reinert)
+        right = QtWidgets.QWidget()
+        right_layout = QtWidgets.QVBoxLayout(right)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        self.tableWidget_reinert_profile = QtWidgets.QTableWidget()
+        self.tableWidget_reinert_profile.setColumnCount(4)
+        self.tableWidget_reinert_profile.setHorizontalHeaderLabels(
+            [_("Form"), _("Frequency"), "chi2", _("Signed value")])
+        self.tableWidget_reinert_profile.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        right_layout.addWidget(self.tableWidget_reinert_profile)
+        right_layout.addWidget(QtWidgets.QLabel(_("Most representative UCI:")))
+        self.textBrowser_reinert_uci = QtWidgets.QTextBrowser()
+        right_layout.addWidget(self.textBrowser_reinert_uci)
+        splitter.addWidget(right)
+        splitter.setSizes([350, 550])
+        layout.addWidget(splitter)
+        self.tabWidget.addTab(self.tab_reinert, _("Reinert classification"))
+        self.reinert_result = None
+
+    def run_reinert(self):
+        """ Reinert CHD on the corpus: UCI segmentation, forms x UCI matrix of the
+        active forms, then top-down dichotomic classification maximizing the
+        chi-square between classes. """
+
+        if not self.segments and not self.get_segments():
+            return
+        if not self.segments:
+            Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
+            return
+        try:
+            self.reinert_result = reinert_from_segments(
+                self.segments,
+                size=self.spinBox_reinert_size.value(),
+                min_freq=self.spinBox_reinert_min_freq.value(),
+                max_classes=self.spinBox_reinert_max_classes.value(),
+                min_class_size=self.spinBox_reinert_min_size.value(),
+                language=self.comboBox_language.currentText(),
+                stem=self.checkBox_stem.isChecked(),
+                custom_stopwords_path=self.lineEdit_stopwords.text() or None,
+            )
+        except Exception as err:
+            logger.error(err)
+            Message(self.app, _("Error"), str(err), "warning").exec()
+            return
+        result = self.reinert_result
+        self.treeWidget_reinert.clear()
+        for cls in result["classes"]:
+            top_forms = ", ".join(p["forme"] for p in cls["profile"][:5])
+            item = QtWidgets.QTreeWidgetItem([f"class {cls['id']}", str(cls["size"]),
+                                              f"{cls['split_chi2']:.2f}", top_forms])
+            item.setData(0, QtCore.Qt.ItemDataRole.UserRole, cls["id"])
+            self.treeWidget_reinert.addTopLevelItem(item)
+        self.treeWidget_reinert.resizeColumnToContents(0)
+        self.label_reinert_info.setText(
+            _("Classes: ") + str(result["n_classes"])
+            + " | " + _("UCI: ") + str(len(result["uci_texts"]))
+            + " | chi2 = " + f"{result['chi2']:.2f}" + " (df = " + str(result["df"])
+            + ", " + _("chi2/df ratio: ") + f"{result['chi2_ratio']:.3f}" + ")")
+        msg = _("Reinert classification: ") + str(result["n_classes"]) + " " + _("classes")
+        self.parent_textEdit.append(msg)
+
+    def reinert_class_selected(self, item, _column):
+        class_id = item.data(0, QtCore.Qt.ItemDataRole.UserRole)
+        if self.reinert_result is None or class_id is None:
+            return
+        cls = next((c for c in self.reinert_result["classes"] if c["id"] == class_id), None)
+        if cls is None:
+            return
+        self.tableWidget_reinert_profile.setRowCount(len(cls["profile"]))
+        for row, p in enumerate(cls["profile"]):
+            values = [p["forme"], p["frequence"], round(p["chi2"], 4), round(p["valeur"], 4)]
+            for col, value in enumerate(values):
+                cell = QtWidgets.QTableWidgetItem(str(value))
+                cell.setFlags(cell.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                if col == 3 and p["valeur"] != 0:
+                    cell.setForeground(QtGui.QBrush(QtGui.QColor("#0a7d00" if p["valeur"] > 0 else "#b00000")))
+                self.tableWidget_reinert_profile.setItem(row, col, cell)
+        self.tableWidget_reinert_profile.resizeColumnsToContents()
+        self.textBrowser_reinert_uci.setPlainText(
+            "\n\n".join(rep["text"] for rep in cls["representative_ucis"]))
+
+    def export_reinert_csv(self):
+        if self.reinert_result is None:
+            self.run_reinert()
+        if self.reinert_result is None:
+            return
+        e = ExportDirectoryPathDialog(self.app, "Reinert_classification.csv")
+        filepath = e.filepath
+        if filepath is None:
+            return
+        result = self.reinert_result
+        with open(filepath, "w", encoding="utf-8-sig", newline="") as file_:
+            writer = csv.writer(file_)
+            writer.writerow([_("Classes"), result["n_classes"]])
+            writer.writerow(["chi2", round(result["chi2"], 6), "df", result["df"],
+                             _("chi2/df ratio"), round(result["chi2_ratio"], 6)])
+            writer.writerow([])
+            writer.writerow([_("Class"), _("UCI"), "chi2", _("Characteristic forms")])
+            for cls in result["classes"]:
+                writer.writerow([f"class {cls['id']}", cls["size"], round(cls["split_chi2"], 6),
+                                 " | ".join(f"{p['forme']} ({p['valeur']:.2f})" for p in cls["profile"][:20])])
+            writer.writerow([])
+            writer.writerow([_("Class"), _("Form"), _("Frequency"), "chi2", _("Signed value")])
+            for cls in result["classes"]:
+                for p in cls["profile"]:
+                    writer.writerow([f"class {cls['id']}", p["forme"], p["frequence"],
+                                     round(p["chi2"], 6), round(p["valeur"], 6)])
+            writer.writerow([])
+            writer.writerow([_("Class"), _("Representative UCI")])
+            for cls in result["classes"]:
+                for rep in cls["representative_ucis"]:
+                    writer.writerow([f"class {cls['id']}", rep["text"]])
+        msg = _("Reinert classification exported to: ") + filepath
+        Message(self.app, _("CSV export"), msg).exec()
+        self.parent_textEdit.append(msg)
+
+    def show_reinert_ca(self):
+        """ Show the correspondence analysis of forms x classes in a non-blocking
+        matplotlib window, with PNG export. """
+
+        if self.reinert_result is None:
+            self.run_reinert()
+        if self.reinert_result is None:
+            return
+        figure = plot_ca(self.reinert_result["ca"], axes=(0, 1))
+        dialog = DialogFigure(self.app, figure, _("Reinert classification: CA forms x classes"))
+        dialog.show()
+        self._reinert_ca_dialog = dialog
+        self._reinert_ca_figure = figure
 
 
     # --- Similarity graph tab ---
