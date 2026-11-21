@@ -48,6 +48,7 @@ from .corpus import (
 from .text import tokenize, load_stopwords, light_stem, normalize_tokens, segment_tokens
 from .lexicon import LexicalTable, build_lexical_table
 from .descstats import descendant_statistics, frequency_rows, hapax_rows, variable_rows
+from .specificites import chi2_statistic, modalities_of, specificities, specificity_rows
 
 __all__ = [
     "build_segments",
@@ -66,4 +67,8 @@ __all__ = [
     "frequency_rows",
     "hapax_rows",
     "variable_rows",
+    "chi2_statistic",
+    "modalities_of",
+    "specificities",
+    "specificity_rows",
 ]

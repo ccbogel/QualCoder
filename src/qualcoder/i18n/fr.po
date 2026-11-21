@@ -17445,3 +17445,64 @@ msgstr "Occurrences totales"
 msgid "Value"
 msgstr "Valeur"
 
+#: src/qualcoder/dialog_text_stats.py:450
+#: src/qualcoder/dialog_text_stats.py:506
+#: src/qualcoder/irastats/report_html.py:114
+msgid "Expected count"
+msgstr "Effectif attendu"
+
+#: src/qualcoder/dialog_text_stats.py:420
+msgid "Minimum frequency:"
+msgstr "Fréquence minimale :"
+
+#: src/qualcoder/dialog_text_stats.py:465
+msgid "No variable"
+msgstr "Aucune variable"
+
+#: src/qualcoder/irastats/report_html.py:110
+msgid "Partition variable"
+msgstr "Variable de partition"
+
+#: src/qualcoder/dialog_text_stats.py:425
+msgid "Probability threshold:"
+msgstr "Seuil de probabilité :"
+
+#: src/qualcoder/dialog_text_stats.py:465
+msgid "Select a partition variable"
+msgstr "Sélectionnez une variable de partition"
+
+#: src/qualcoder/dialog_text_stats.py:450
+#: src/qualcoder/dialog_text_stats.py:507
+#: src/qualcoder/irastats/report_html.py:115
+msgid "Signed value"
+msgstr "Valeur signée"
+
+#: src/qualcoder/dialog_text_stats.py:457
+#: src/qualcoder/irastats/report_html.py:116
+msgid "Specificities"
+msgstr "Spécificités"
+
+#: src/qualcoder/irastats/report_html.py:108
+msgid "Specificities (chi-square)"
+msgstr "Spécificités (chi²)"
+
+#: src/qualcoder/dialog_text_stats.py:509
+msgid "Specificities CSV exported to: "
+msgstr "Spécificités exportées en CSV vers : "
+
+#: src/qualcoder/dialog_text_stats.py:526
+msgid "Specificities HTML exported to: "
+msgstr "Spécificités exportées en HTML vers : "
+
+#: src/qualcoder/dialog_text_stats.py:492
+msgid "Specificities: "
+msgstr "Spécificités : "
+
+#: src/qualcoder/irastats/report_html.py:111
+msgid "probability threshold"
+msgstr "seuil de probabilité"
+
+#: src/qualcoder/dialog_text_stats.py:492
+msgid "rows for variable "
+msgstr "lignes pour la variable "
+

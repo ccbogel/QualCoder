@@ -96,3 +96,21 @@ def descstats_html(stats: dict, variable: str = None) -> str:
         parts.append(table_html([_("Modality"), _("Segments"), _("Occurrences"), _("Distinct forms")],
                                 variable_rows(stats)))
     return html_page(_("Text statistics"), "\n".join(parts))
+
+
+def specificites_html(results: list, variable: str = None, p_threshold: float = 0.05) -> str:
+    """HTML report of the chi-square specificities, highlighting over-represented
+    (positive, .pos) and under-represented (negative, .neg) forms. """
+
+    from .specificites import specificity_rows
+
+    parts = [f"<h1>{escape(_('Text statistics'))}</h1>",
+             f"<h2>{escape(_('Specificities (chi-square)'))}</h2>"]
+    if variable:
+        parts.append(f"<p>{escape(_('Partition variable'))}: {escape(variable)} - "
+                     f"{escape(_('probability threshold'))}: {p_threshold}</p>")
+    rows = specificity_rows(results)
+    classes = ["pos" if r["signe"] > 0 else ("neg" if r["signe"] < 0 else "") for r in results]
+    parts.append(table_html([_("Form"), _("Modality"), _("Count"), _("Expected count"),
+                             "chi2", _("Signed value"), "p"], rows, row_classes=classes))
+    return html_page(_("Specificities"), "\n".join(parts))

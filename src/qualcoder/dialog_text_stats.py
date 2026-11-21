@@ -24,7 +24,7 @@ import csv
 import logging
 
 import qtawesome as qta
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .helpers import ExportDirectoryPathDialog, Message
 from .irastats import (
@@ -34,9 +34,12 @@ from .irastats import (
     descendant_statistics,
     frequency_rows,
     hapax_rows,
+    modalities_of,
+    specificities,
+    specificity_rows,
     variable_rows,
 )
-from .irastats.report_html import descstats_html
+from .irastats.report_html import descstats_html, specificites_html
 from .select_items import DialogSelectItems
 
 logger = logging.getLogger(__name__)
@@ -74,6 +77,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self.tabWidget = QtWidgets.QTabWidget()
         self._build_corpus_tab()
         self._build_descstats_tab()
+        self._build_specificites_tab()
         layout.addWidget(self.tabWidget)
 
     # --- Selection (same helpers as the other Reports dialogs) ---
@@ -399,5 +403,126 @@ class DialogTextStats(QtWidgets.QDialog):
         with open(filepath, "w", encoding="utf-8") as file_:
             file_.write(descstats_html(self.descstats, variable=variable))
         msg = _("Text statistics HTML exported to: ") + filepath
+        Message(self.app, _("HTML export"), msg).exec()
+        self.parent_textEdit.append(msg)
+
+    # --- Specificities (chi-square) tab ---
+
+    def _build_specificites_tab(self):
+        self.tab_specificites = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(self.tab_specificites)
+
+        params = QtWidgets.QHBoxLayout()
+        params.addWidget(QtWidgets.QLabel(_("Partition variable:")))
+        self.comboBox_spec_variable = QtWidgets.QComboBox()
+        self._fill_variable_combo(self.comboBox_spec_variable)
+        params.addWidget(self.comboBox_spec_variable, 1)
+        params.addWidget(QtWidgets.QLabel(_("Minimum frequency:")))
+        self.spinBox_spec_min_freq = QtWidgets.QSpinBox()
+        self.spinBox_spec_min_freq.setRange(1, 9999)
+        self.spinBox_spec_min_freq.setValue(1)
+        params.addWidget(self.spinBox_spec_min_freq)
+        params.addWidget(QtWidgets.QLabel(_("Probability threshold:")))
+        self.doubleSpinBox_spec_p = QtWidgets.QDoubleSpinBox()
+        self.doubleSpinBox_spec_p.setRange(0.0001, 1.0)
+        self.doubleSpinBox_spec_p.setSingleStep(0.01)
+        self.doubleSpinBox_spec_p.setDecimals(4)
+        self.doubleSpinBox_spec_p.setValue(0.05)
+        params.addWidget(self.doubleSpinBox_spec_p)
+        self.pushButton_spec_run = QtWidgets.QPushButton(_("Calculate"))
+        self.pushButton_spec_run.setIcon(qta.icon("mdi6.play"))
+        self.pushButton_spec_run.clicked.connect(self.run_specificites)
+        params.addWidget(self.pushButton_spec_run)
+        self.pushButton_spec_csv = QtWidgets.QPushButton(_("Export CSV"))
+        self.pushButton_spec_csv.setIcon(qta.icon("mdi6.file-delimited-outline"))
+        self.pushButton_spec_csv.clicked.connect(self.export_specificites_csv)
+        params.addWidget(self.pushButton_spec_csv)
+        self.pushButton_spec_html = QtWidgets.QPushButton(_("Export HTML"))
+        self.pushButton_spec_html.setIcon(qta.icon("mdi6.file-code-outline"))
+        self.pushButton_spec_html.clicked.connect(self.export_specificites_html)
+        params.addWidget(self.pushButton_spec_html)
+        layout.addLayout(params)
+
+        splitter = QtWidgets.QSplitter()
+        self.tableWidget_spec = QtWidgets.QTableWidget()
+        self.tableWidget_spec.setColumnCount(7)
+        self.tableWidget_spec.setHorizontalHeaderLabels(
+            [_("Form"), _("Modality"), _("Count"), _("Expected count"), "chi2", _("Signed value"), "p"])
+        self.tableWidget_spec.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        splitter.addWidget(self.tableWidget_spec)
+        self.textBrowser_spec = QtWidgets.QTextBrowser()
+        splitter.addWidget(self.textBrowser_spec)
+        splitter.setSizes([400, 400])
+        layout.addWidget(splitter)
+        self.tabWidget.addTab(self.tab_specificites, _("Specificities"))
+        self.specificites_results = None
+
+    def run_specificites(self):
+        """ Compute the chi-square specificities for the selected variable. """
+
+        variable = self.comboBox_spec_variable.currentData()
+        if not variable:
+            Message(self.app, _("No variable"), _("Select a partition variable")).exec()
+            return
+        table = self.get_lexical_table(min_freq=1)
+        if table is None:
+            return
+        try:
+            self.specificites_results = specificities(
+                table, variable,
+                min_freq=self.spinBox_spec_min_freq.value(),
+                p_threshold=self.doubleSpinBox_spec_p.value())
+        except Exception as err:
+            logger.error(err)
+            Message(self.app, _("Error"), str(err), "warning").exec()
+            return
+        rows = specificity_rows(self.specificites_results)
+        self.tableWidget_spec.setRowCount(len(rows))
+        for row, values in enumerate(rows):
+            signe = self.specificites_results[row]["signe"]
+            for col, value in enumerate(values):
+                item = QtWidgets.QTableWidgetItem(str(value))
+                item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                if col == 5 and signe != 0:
+                    item.setForeground(QtGui.QBrush(QtGui.QColor("#0a7d00" if signe > 0 else "#b00000")))
+                self.tableWidget_spec.setItem(row, col, item)
+        self.tableWidget_spec.resizeColumnsToContents()
+        self.textBrowser_spec.setHtml(specificites_html(
+            self.specificites_results, variable=variable, p_threshold=self.doubleSpinBox_spec_p.value()))
+        msg = _("Specificities: ") + str(len(self.specificites_results)) + " " + _("rows for variable ") + variable
+        self.parent_textEdit.append(msg)
+
+    def export_specificites_csv(self):
+        if self.specificites_results is None:
+            self.run_specificites()
+        if self.specificites_results is None:
+            return
+        e = ExportDirectoryPathDialog(self.app, "Specificities.csv")
+        filepath = e.filepath
+        if filepath is None:
+            return
+        with open(filepath, "w", encoding="utf-8-sig", newline="") as file_:
+            writer = csv.writer(file_)
+            writer.writerow([_("Form"), _("Modality"), _("Count"), _("Expected count"), "chi2",
+                             _("Signed value"), "p"])
+            writer.writerows(specificity_rows(self.specificites_results))
+        msg = _("Specificities CSV exported to: ") + filepath
+        Message(self.app, _("CSV export"), msg).exec()
+        self.parent_textEdit.append(msg)
+
+    def export_specificites_html(self):
+        if self.specificites_results is None:
+            self.run_specificites()
+        if self.specificites_results is None:
+            return
+        variable = self.comboBox_spec_variable.currentData()
+        e = ExportDirectoryPathDialog(self.app, "Specificities.html")
+        filepath = e.filepath
+        if filepath is None:
+            return
+        with open(filepath, "w", encoding="utf-8") as file_:
+            file_.write(specificites_html(self.specificites_results, variable=variable,
+                                          p_threshold=self.doubleSpinBox_spec_p.value()))
+        msg = _("Specificities HTML exported to: ") + filepath
         Message(self.app, _("HTML export"), msg).exec()
         self.parent_textEdit.append(msg)

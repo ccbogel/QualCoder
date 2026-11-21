@@ -20026,3 +20026,64 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
+#: src/qualcoder/dialog_text_stats.py:450
+#: src/qualcoder/dialog_text_stats.py:506
+#: src/qualcoder/irastats/report_html.py:114
+msgid "Expected count"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:420
+msgid "Minimum frequency:"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:465
+msgid "No variable"
+msgstr ""
+
+#: src/qualcoder/irastats/report_html.py:110
+msgid "Partition variable"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:425
+msgid "Probability threshold:"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:465
+msgid "Select a partition variable"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:450
+#: src/qualcoder/dialog_text_stats.py:507
+#: src/qualcoder/irastats/report_html.py:115
+msgid "Signed value"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:457
+#: src/qualcoder/irastats/report_html.py:116
+msgid "Specificities"
+msgstr ""
+
+#: src/qualcoder/irastats/report_html.py:108
+msgid "Specificities (chi-square)"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:509
+msgid "Specificities CSV exported to: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:526
+msgid "Specificities HTML exported to: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:492
+msgid "Specificities: "
+msgstr ""
+
+#: src/qualcoder/irastats/report_html.py:111
+msgid "probability threshold"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:492
+msgid "rows for variable "
+msgstr ""
+
