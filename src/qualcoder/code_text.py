@@ -96,7 +96,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.undo_deleted_codes = []  # To restore recently deleted codes
         self.attributes = []  # Show selected files using these attributes in list widget
         self.show_codes_like_filter = ""  # gets filled when text strings are used to show specific code names
-        self.show_codes_colour_filter = ""  # gets filled when a code colur is selected
+        self.show_codes_colour_filter = ""  # gets filled when a code colour is selected
+        self.show_codes_branch_filter = ""  # gets filled when a category or code branch is selected
 
         # Get data
         self.annotations = self.app.get_annotations()
@@ -362,6 +363,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.code_tree.find_code_callback = self.find_code_in_tree
         self.code_tree.show_codes_like_callback = self.show_codes_like
         self.code_tree.show_codes_of_colour_callback = self.show_codes_of_color
+        self.code_tree.show_codes_branch_callback = self.show_codes_branch
         self.code_tree.codes_changed.connect(self.update_dialog_codes_and_categories)
 
         self.ui.treeWidget.itemPressed.connect(self.fill_code_label_with_selected_code)
@@ -1589,6 +1591,8 @@ class DialogCodeText(QtWidgets.QWidget):
                 tooltip = _("Filtered: ") + self.show_codes_like_filter
             if self.show_codes_colour_filter:
                 tooltip = _("Filtered: ") + self.show_codes_colour_filter
+            if self.show_codes_branch_filter:
+                tooltip = _("Filtered: ") + self.show_codes_branch_filter
             self.ui.label_code.setToolTip(tooltip)
             return
         # Set background colour of label to code color, and store current code for underlining
@@ -1605,6 +1609,8 @@ class DialogCodeText(QtWidgets.QWidget):
                     tooltip += "\n" + _("Filtered: ") + self.show_codes_like_filter
                 if self.show_codes_colour_filter:
                     tooltip += "\n" + _("Filtered: ") + self.show_codes_colour_filter
+                if self.show_codes_branch_filter:
+                    tooltip += "\n" + _("Filtered: ") + self.show_codes_branch_filter
                 self.ui.label_code.setToolTip(tooltip)
                 break
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
@@ -2693,12 +2699,60 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline'))
         self.get_coded_text_update_eventfilter_tooltips()
 
+    def show_codes_branch(self):
+        """  Show categoreis and codes of selected branch. """
+
+        target_item = self.ui.treeWidget.currentItem()
+        codename= target_item.text(0)
+        self.show_codes_branch_filter = target_item.text(1)
+
+        # Hide all items initially
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            iterator.value().setHidden(True)
+            iterator += 1
+        # Show target item and decendents
+        sub_iterator = QtWidgets.QTreeWidgetItemIterator(target_item)
+        while sub_iterator.value():
+            item = sub_iterator.value()
+            # QTreeWidgetItemIterator on a subtree continues to siblings after finishing
+            # the subtree, so stop once we leave the target_item's hierarchy
+            if item is not target_item and not self.is_descendant(target_item, item):
+                break
+            item.setHidden(False)
+            sub_iterator += 1
+        # Walk up the tree to ensure all parent branches are visible
+        parent = target_item.parent()
+        while parent is not None:
+            parent.setHidden(False)
+            parent = parent.parent()
+
+        if self.show_codes_branch_filter == "":
+            self.ui.label_code.setPixmap(QtGui.QPixmap())
+            self.ui.label_code.setToolTip("")
+            self.ui.pushButton_clear_filter_code.setVisible(False)
+            self.ui.pushButton_clear_filter_code.setStyleSheet("")
+        else:
+            self.ui.label_code.setPixmap(qta.icon('mdi6.filter-outline').pixmap(22, 22))
+            self.ui.label_code.setToolTip(_("Filtered: ") + codename)
+            self.ui.pushButton_clear_filter_code.setVisible(True)
+            self.ui.pushButton_clear_filter_code.setStyleSheet("background-color: #1e90ff; color: white;")
+
+    def is_descendant(self, ancestor: QtWidgets.QTreeWidgetItem, item: QtWidgets.QTreeWidgetItem) -> bool:
+        """ Used for show codes branch """
+        parent = item.parent()
+        while parent is not None:
+            if parent is ancestor:
+                return True
+            parent = parent.parent()
+        return False
+
     def show_codes_like(self, preset:str|None=None):
         """ Show all codes if text is empty.
          Show selected codes that contain entered text.
          The input dialog is too narrow, so it is re-created.
          Args:
-             preset: None of called from tree_menu, or a string value if called from filer_code_text line edit
+             preset: None if called from tree_menu, or a string value if called from filer_code_text line edit
         """
 
         case_sensitive = True
@@ -2728,6 +2782,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if not ok:
                 return
             self.show_codes_colour_filter = ""
+            self.show_codes_branch_filter = ""
             case_sensitive = chkbox.isChecked()
             self.show_codes_like_filter = line.text()
         else:
@@ -2764,6 +2819,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.show_codes_colour_filter = ""
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.show_codes_like_filter = ""
+        self.show_codes_branch_filter = ""
         if self.show_codes_colour_filter == "":
             self.ui.label_code.setPixmap(QtGui.QPixmap())
             self.ui.label_code.setToolTip("")
@@ -2781,6 +2837,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.show_codes_like_filter = ""
         self.show_codes_colour_filter = ""
+        self.show_codes_branch_filter = ""
         self.ui.lineEdit_code_filter.setText("")
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")  # Show all codes
