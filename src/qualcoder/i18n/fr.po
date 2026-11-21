@@ -17530,3 +17530,68 @@ msgstr "Enregistrer le fichier IRaMuTeQ"
 msgid "segments"
 msgstr "segments"
 
+#: src/qualcoder/dialog_text_stats.py:573
+msgid "Association measure:"
+msgstr "Mesure d'association :"
+
+#: src/qualcoder/dialog_text_stats.py:583
+msgid "Edge threshold:"
+msgstr "Seuil d'arête :"
+
+#: src/qualcoder/dialog_text_stats.py:634
+msgid "Edges: "
+msgstr "Arêtes : "
+
+#: src/qualcoder/dialog_text_stats.py:594
+msgid "Export PNG"
+msgstr "Exporter en PNG"
+
+#: src/qualcoder/dialog_text_stats.py:683
+msgid "Figure saved"
+msgstr "Figure enregistrée"
+
+#: src/qualcoder/dialog_text_stats.py:683
+msgid "Figure saved to: "
+msgstr "Figure enregistrée vers : "
+
+#: src/qualcoder/dialog_text_stats.py:575
+msgid "Jaccard index (default)"
+msgstr "Indice de Jaccard (défaut)"
+
+#: src/qualcoder/dialog_text_stats.py:634
+msgid "Nodes: "
+msgstr "Nœuds : "
+
+#: src/qualcoder/dialog_text_stats.py:654
+msgid "PNG export"
+msgstr "Export PNG"
+
+#: src/qualcoder/dialog_text_stats.py:670
+msgid "Save PNG"
+msgstr "Enregistrer en PNG"
+
+#: src/qualcoder/dialog_text_stats.py:680
+msgid "Save figure"
+msgstr "Enregistrer la figure"
+
+#: src/qualcoder/dialog_text_stats.py:605
+#: src/qualcoder/dialog_text_stats.py:638
+msgid "Similarity graph"
+msgstr "Graphe de similitude"
+
+#: src/qualcoder/dialog_text_stats.py:653
+msgid "Similarity graph exported to: "
+msgstr "Graphe de similitude exporté vers : "
+
+#: src/qualcoder/dialog_text_stats.py:635
+msgid "Similarity graph: "
+msgstr "Graphe de similitude : "
+
+#: src/qualcoder/dialog_text_stats.py:636
+msgid "edges"
+msgstr "arêtes"
+
+#: src/qualcoder/dialog_text_stats.py:635
+msgid "nodes"
+msgstr "nœuds"
+

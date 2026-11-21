@@ -24,6 +24,7 @@ import csv
 import logging
 
 import qtawesome as qta
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .helpers import ExportDirectoryPathDialog, Message
@@ -40,6 +41,7 @@ from .irastats import (
     specificity_rows,
     variable_rows,
 )
+from .irastats.similarity import build_graph, cooccurrence, draw_similarity_graph, similarity_matrix
 from .irastats.report_html import descstats_html, specificites_html
 from .select_items import DialogSelectItems
 
@@ -79,6 +81,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self._build_corpus_tab()
         self._build_descstats_tab()
         self._build_specificites_tab()
+        self._build_similarity_tab()
         layout.addWidget(self.tabWidget)
 
     # --- Selection (same helpers as the other Reports dialogs) ---
@@ -558,3 +561,123 @@ class DialogTextStats(QtWidgets.QDialog):
         msg = _("Corpus exported in IRaMuTeQ format: ") + f"{filepath} ({count} " + _("segments") + ")"
         Message(self.app, _("IRaMuTeQ export"), msg).exec()
         self.parent_textEdit.append(msg)
+
+
+    # --- Similarity graph tab ---
+
+    def _build_similarity_tab(self):
+        self.tab_similarity = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(self.tab_similarity)
+
+        params = QtWidgets.QHBoxLayout()
+        params.addWidget(QtWidgets.QLabel(_("Association measure:")))
+        self.comboBox_sim_method = QtWidgets.QComboBox()
+        self.comboBox_sim_method.addItem(_("Jaccard index (default)"), "jaccard")
+        self.comboBox_sim_method.addItem("chi2 (phi-squared)", "chi2")
+        params.addWidget(self.comboBox_sim_method)
+        params.addWidget(QtWidgets.QLabel(_("Minimum frequency:")))
+        self.spinBox_sim_min_freq = QtWidgets.QSpinBox()
+        self.spinBox_sim_min_freq.setRange(1, 9999)
+        self.spinBox_sim_min_freq.setValue(1)
+        params.addWidget(self.spinBox_sim_min_freq)
+        params.addWidget(QtWidgets.QLabel(_("Edge threshold:")))
+        self.doubleSpinBox_sim_threshold = QtWidgets.QDoubleSpinBox()
+        self.doubleSpinBox_sim_threshold.setRange(0.0, 1.0)
+        self.doubleSpinBox_sim_threshold.setSingleStep(0.05)
+        self.doubleSpinBox_sim_threshold.setDecimals(3)
+        self.doubleSpinBox_sim_threshold.setValue(0.2)
+        params.addWidget(self.doubleSpinBox_sim_threshold)
+        self.pushButton_sim_run = QtWidgets.QPushButton(_("Calculate"))
+        self.pushButton_sim_run.setIcon(qta.icon("mdi6.play"))
+        self.pushButton_sim_run.clicked.connect(self.run_similarity)
+        params.addWidget(self.pushButton_sim_run)
+        self.pushButton_sim_png = QtWidgets.QPushButton(_("Export PNG"))
+        self.pushButton_sim_png.setIcon(qta.icon("mdi6.image-outline"))
+        self.pushButton_sim_png.clicked.connect(self.export_similarity_png)
+        params.addWidget(self.pushButton_sim_png)
+        layout.addLayout(params)
+
+        self.label_sim_info = QtWidgets.QLabel("")
+        self.label_sim_info.setWordWrap(True)
+        layout.addWidget(self.label_sim_info)
+        self.textBrowser_sim = QtWidgets.QTextBrowser()
+        layout.addWidget(self.textBrowser_sim)
+        self.tabWidget.addTab(self.tab_similarity, _("Similarity graph"))
+        self.similarity_graph = None
+        self.similarity_figure = None
+
+
+    def run_similarity(self):
+        """ Build the co-occurrence similarity graph and show it in a non-blocking
+        matplotlib window. """
+
+        table = self.get_lexical_table(min_freq=1)
+        if table is None:
+            return
+        try:
+            labels, cooc, doc_freq, freq = cooccurrence(
+                table, min_freq=self.spinBox_sim_min_freq.value())
+            sim = similarity_matrix(labels, cooc, doc_freq, len(table.segment_texts),
+                                    method=self.comboBox_sim_method.currentData())
+            self.similarity_graph = build_graph(labels, sim, freq,
+                                                threshold=self.doubleSpinBox_sim_threshold.value())
+            self.similarity_figure = draw_similarity_graph(self.similarity_graph)
+        except Exception as err:
+            logger.error(err)
+            Message(self.app, _("Error"), str(err), "warning").exec()
+            return
+        graph = self.similarity_graph
+        edges = sorted(graph.edges(data=True), key=lambda e: -e[2]["weight"])[:20]
+        lines = [f"{u} - {v}: {data['weight']:.3f}" for u, v, data in edges]
+        self.textBrowser_sim.setPlainText("\n".join(lines))
+        self.label_sim_info.setText(
+            _("Nodes: ") + str(graph.number_of_nodes()) + " | " + _("Edges: ") + str(graph.number_of_edges()))
+        msg = _("Similarity graph: ") + str(graph.number_of_nodes()) + " " + _("nodes") + ", " \
+            + str(graph.number_of_edges()) + " " + _("edges")
+        self.parent_textEdit.append(msg)
+        dialog = DialogFigure(self.app, self.similarity_figure, _("Similarity graph"))
+        dialog.show()
+        self._similarity_dialog = dialog  # keep a reference
+
+
+    def export_similarity_png(self):
+        if self.similarity_figure is None:
+            self.run_similarity()
+        if self.similarity_figure is None:
+            return
+        e = ExportDirectoryPathDialog(self.app, "Similarity_graph.png")
+        filepath = e.filepath
+        if filepath is None:
+            return
+        self.similarity_figure.savefig(filepath, dpi=150)
+        msg = _("Similarity graph exported to: ") + filepath
+        Message(self.app, _("PNG export"), msg).exec()
+        self.parent_textEdit.append(msg)
+
+class DialogFigure(QtWidgets.QDialog):
+    """ Non-blocking dialog showing a matplotlib Figure (canvas + Save PNG button). """
+
+    def __init__(self, app, figure, title=""):
+        QtWidgets.QDialog.__init__(self)
+        self.app = app
+        self.figure = figure
+        self.setWindowTitle(title)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        layout = QtWidgets.QVBoxLayout(self)
+        self.canvas = FigureCanvas(figure)
+        layout.addWidget(self.canvas)
+        buttons = QtWidgets.QHBoxLayout()
+        self.pushButton_save = QtWidgets.QPushButton(_("Save PNG"))
+        self.pushButton_save.setIcon(qta.icon("mdi6.image-outline"))
+        self.pushButton_save.clicked.connect(self.save_png)
+        buttons.addWidget(self.pushButton_save)
+        buttons.addStretch(1)
+        layout.addLayout(buttons)
+        self.resize(900, 700)
+
+    def save_png(self):
+        filepath, _selected_filter = QtWidgets.QFileDialog.getSaveFileName(
+            self, _("Save figure"), self.app.settings.get("directory", ""), "PNG (*.png)")
+        if filepath:
+            self.figure.savefig(filepath, dpi=150)
+            Message(self.app, _("Figure saved"), _("Figure saved to: ") + filepath).exec()

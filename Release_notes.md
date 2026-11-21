@@ -192,6 +192,7 @@ New "Text statistics (IRaMuTeQ methods)" submenu in the Reports menu: builds an 
 First analysis tab: descending text statistics (total occurrences, active/supplementary forms, decreasing frequency table, hapax, breakdown by partition variable), with CSV and HTML export.
 New 'Specificities' tab: chi-square specificities per form and per modality of a partition variable (signed value, two-sided p-value via scipy.stats.chi2, configurable probability threshold, default 0.05), sorted from most to least specific, with CSV/HTML export and over/under-representation highlighting.
 New 'Export IRaMuTeQ' button in the Corpus tab: writes the corpus (coded segments, plus whole documents when the checkbox is set) in the IRaMuTeQ text format, one '**** *code=... *cas=... *doc=...' block per segment. The existing IRaMuTeQ export of the Report Codes dialog now shares the same token helper (irastats.corpus.iramuteq_token).
+New 'Similarity graph' tab: co-occurrence graph of forms within segments (networkx), association measure configurable (Jaccard by default, or chi2/phi-squared), adjustable edge threshold, drawn in a non-blocking matplotlib window (node size proportional to frequency, edge width to similarity), with PNG export.
 
 ## Bug fixes
 

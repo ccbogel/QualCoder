@@ -53,6 +53,7 @@ from .text import tokenize, load_stopwords, light_stem, normalize_tokens, segmen
 from .lexicon import LexicalTable, build_lexical_table
 from .descstats import descendant_statistics, frequency_rows, hapax_rows, variable_rows
 from .specificites import chi2_statistic, modalities_of, specificities, specificity_rows
+from .similarity import cooccurrence, similarity_matrix, build_graph, draw_similarity_graph
 
 __all__ = [
     "build_segments",
@@ -79,4 +80,8 @@ __all__ = [
     "modalities_of",
     "specificities",
     "specificity_rows",
+    "cooccurrence",
+    "similarity_matrix",
+    "build_graph",
+    "draw_similarity_graph",
 ]

@@ -20111,3 +20111,68 @@ msgstr ""
 msgid "segments"
 msgstr ""
 
+#: src/qualcoder/dialog_text_stats.py:573
+msgid "Association measure:"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:583
+msgid "Edge threshold:"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:634
+msgid "Edges: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:594
+msgid "Export PNG"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:683
+msgid "Figure saved"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:683
+msgid "Figure saved to: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:575
+msgid "Jaccard index (default)"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:634
+msgid "Nodes: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:654
+msgid "PNG export"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:670
+msgid "Save PNG"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:680
+msgid "Save figure"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:605
+#: src/qualcoder/dialog_text_stats.py:638
+msgid "Similarity graph"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:653
+msgid "Similarity graph exported to: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:635
+msgid "Similarity graph: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:636
+msgid "edges"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:635
+msgid "nodes"
+msgstr ""
+
