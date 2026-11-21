@@ -1826,6 +1826,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.code_tree.find_code_callback = self.find_code_in_tree
         self.code_tree.show_codes_like_callback = self.show_codes_like
         self.code_tree.show_codes_of_colour_callback = self.show_codes_of_color
+        self.code_tree.show_codes_branch_callback = self.show_codes_branch
         self.code_tree.codes_changed.connect(self.update_dialog_codes_and_categories)
         self.ui.treeWidget.itemClicked.connect(self.tree_item_clicked)
         self.ui.treeWidget.itemSelectionChanged.connect(self.fill_code_label)
@@ -1861,6 +1862,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         # para show codes like
         self.show_codes_like_filter = ""
         self.show_codes_colour_filter = ""
+        self.show_codes_branch_filter = ""
         if getattr(self.app, "project_events", None) is not None:
             self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
@@ -4840,6 +4842,50 @@ class DialogCodePdf(QtWidgets.QWidget):
             return True
         return super().eventFilter(object_, event)
 
+    def show_codes_branch(self):
+        """  Show categories and codes of selected branch. """
+
+        target_item = self.ui.treeWidget.currentItem()
+        codename= target_item.text(0)
+        self.show_codes_branch_filter = target_item.text(1)
+
+        # Hide all items initially
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            iterator.value().setHidden(True)
+            iterator += 1
+        # Show target item and decendents
+        sub_iterator = QtWidgets.QTreeWidgetItemIterator(target_item)
+        while sub_iterator.value():
+            item = sub_iterator.value()
+            # QTreeWidgetItemIterator on a subtree continues to siblings after finishing
+            # the subtree, so stop once we leave the target_item's hierarchy
+            if item is not target_item and not self.is_descendant(target_item, item):
+                break
+            item.setHidden(False)
+            sub_iterator += 1
+        # Walk up the tree to ensure all parent branches are visible
+        parent = target_item.parent()
+        while parent is not None:
+            parent.setHidden(False)
+            parent = parent.parent()
+
+        if self.show_codes_branch_filter == "":
+            self.ui.pushButton_clear_filter_code.setVisible(False)
+            self.ui.pushButton_clear_filter_code.setStyleSheet("")
+        else:
+            self.ui.pushButton_clear_filter_code.setVisible(True)
+            self.ui.pushButton_clear_filter_code.setStyleSheet("background-color: #1e90ff; color: white;")
+
+    def is_descendant(self, ancestor: QtWidgets.QTreeWidgetItem, item: QtWidgets.QTreeWidgetItem) -> bool:
+        """ Used for show codes branch """
+        parent = item.parent()
+        while parent is not None:
+            if parent is ancestor:
+                return True
+            parent = parent.parent()
+        return False
+
     # Filter unification (dialog and real-time in a single method)
     def show_codes_like(self, filter_text=None):
         """        Filters the code tree by name.
@@ -4854,6 +4900,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             if not dialog.exec():
                 return
             text_ = str(dialog.textValue())
+            self.show_codes_branch_filter = ""
             
             # Synchronize the lineEdit for visual consistency.
             self.ui.lineEdit_code_filter.blockSignals(True)
@@ -4884,6 +4931,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         selected = ui.get_selected()
         if not selected:
             return
+        self.show_codes_branch_filter = ""
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.ui.pushButton_clear_filter_code.setVisible(True)
         self.ui.pushButton_clear_filter_code.setStyleSheet("background-color: #1e90ff; color: white;")
@@ -4891,6 +4939,8 @@ class DialogCodePdf(QtWidgets.QWidget):
     # Implementación centralizada. Centralized implementation
     def clear_code_filter(self):
         """ Clears the filter and shows the entire tree. """
+
+        self.show_codes_branch_filter = ""
         self.ui.lineEdit_code_filter.setText("")
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")
