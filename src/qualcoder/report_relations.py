@@ -104,14 +104,17 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
 
         # Default to select all files
+        self.all_files_selected = True
+        self.files = self._get_coded_text_files()
+        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
+
+    def _get_coded_text_files(self):
+        """ Get all text files that have codings. """
+
         cur = self.app.conn.cursor()
         sql = "select distinct name, id from source where id in (select fid from code_text) order by name"
         cur.execute(sql)
-        res = cur.fetchall()
-        self.files = []
-        for r in res:
-            self.files.append({'name': r[0], 'fid': r[1]})
-        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
+        return [{'name': r[0], 'fid': r[1]} for r in cur.fetchall()]
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """Keep unhandled Escape presses from closing the workspace."""
@@ -140,12 +143,14 @@ class DialogReportRelations(QtWidgets.QDialog):
         for s in selected:
             if s['fid'] == -1:
                 self.files = all_files[1:]
+                self.all_files_selected = True
                 self.ui.pushButton_select_files.setToolTip(_("All files selected"))
                 self.ui.pushButton_file_attributes.setToolTip(_("Select files by attributes"))
                 self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
                 self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file', options=[{'scale_factor': 1.4}]))
                 self.attributes = []
                 return
+        self.all_files_selected = False
         tt = _("Files selected: ")
         for s in selected:
             self.files.append(s)
@@ -200,6 +205,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         # Limit to text files
         text_files = self.app.get_text_filenames()
         self.files = []
+        self.all_files_selected = False
         msg = ui.tooltip_msg
         for i, file_ in enumerate(text_files):
             if file_['id'] in ui.result_file_ids:
@@ -234,6 +240,9 @@ class DialogReportRelations(QtWidgets.QDialog):
         if source is self or not isinstance(tables, list):
             return
         tables = set(tables)
+        # Keep the default file list current with newly coded, renamed or deleted files
+        if self.all_files_selected and not tables.isdisjoint({"source", "code_text"}):
+            self.files = self._get_coded_text_files()
         watched_tables = {"code_cat", "code_name", "code_text"}
         if watched_tables.isdisjoint(tables):
             return
@@ -425,14 +434,15 @@ class DialogReportRelations(QtWidgets.QDialog):
             return result
 
         # Check for Proximity
-        if c0[pos1] < c1[pos0]:
+        # <= so touching segments (0 shared chars) are not counted as Overlap
+        if c0[pos1] <= c1[pos0]:
             result['relation'] = "P"
             result['distance'] = c1[pos0] - c0[pos1]
             result['text_overlap'] = ""
             result['text_before'] = ""
             result['text_after'] = ""
             return result
-        if c0[pos0] > c1[pos1]:
+        if c0[pos0] >= c1[pos1]:  # >= as above
             result['relation'] = "P"
             result['distance'] = c0[pos0] - c1[pos1]
             result['text_overlap'] = ""
@@ -602,14 +612,12 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
-        cell_value = ""
-        try:
-            row = self.ui.tableWidget.currentRow()
-            col = self.ui.tableWidget.currentColumn()
-            cell_value = self.ui.tableWidget.item(row, col).text()
-        except AttributeError:
+        row = self.ui.tableWidget.currentRow()
+        col = self.ui.tableWidget.currentColumn()
+        if row < 0 or col < 0:
             # No table for table menu
             return
+        cell_value = self._table_cell_text(row, col)
         action_show_context = menu.addAction(_("View in context"))
         action_sort_ascending = menu.addAction(_("Sort ascending"))
         action_sort_descending = menu.addAction(_("Sort descending"))
@@ -629,35 +637,52 @@ class DialogReportRelations(QtWidgets.QDialog):
                 self.ui.tableWidget.setRowHidden(r, False)
         if action == action_filter_equals:
             for r in range(0, self.ui.tableWidget.rowCount()):
-                self.ui.tableWidget.setRowHidden(r, False)
-                if self.ui.tableWidget.item(r, col).text() != cell_value:
-                    self.ui.tableWidget.setRowHidden(r, True)
+                self.ui.tableWidget.setRowHidden(r, self._table_cell_text(r, col) != cell_value)
         if action == action_filter_greater:
-            val_type = "str"
-            if col in (0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 15, 16):
-                val_type = "int"
-            for r in range(0, self.ui.tableWidget.rowCount()):
-                self.ui.tableWidget.setRowHidden(r, False)
-                if val_type == "str" and self.ui.tableWidget.item(r, col).text() < cell_value:
-                    self.ui.tableWidget.setRowHidden(r, True)
-                if val_type == "int" and int(self.ui.tableWidget.item(r, col).text()) < int(cell_value):
-                    self.ui.tableWidget.setRowHidden(r, True)
+            self._filter_table_rows_by_comparison(col, cell_value, keep_greater=True)
         if action == action_filter_lower:
-            val_type = "str"
-            if col in (0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 15, 16):
-                val_type = "int"
-            for r in range(0, self.ui.tableWidget.rowCount()):
-                self.ui.tableWidget.setRowHidden(r, False)
-                if val_type == "str" and self.ui.tableWidget.item(r, col).text() > cell_value:
+            self._filter_table_rows_by_comparison(col, cell_value, keep_greater=False)
+
+    def _table_cell_text(self, row, col):
+        """ Text of a results table cell, empty when the cell has no item. """
+
+        item = self.ui.tableWidget.item(row, col)
+        if item is None:
+            return ""
+        return item.text()
+
+    def _filter_table_rows_by_comparison(self, col, cell_value, keep_greater):
+        """ Hide rows below (keep_greater) or above the cell value.
+        Number columns compare as integers, rows with an empty cell are hidden. """
+
+        numeric = col in (0, 4, 5, 6, 7, 8, 9, 10, 15, 16)  # Code 0 and Code 1 show names
+        if numeric:
+            try:
+                cell_value = int(cell_value)
+            except ValueError:
+                return
+        for r in range(0, self.ui.tableWidget.rowCount()):
+            value = self._table_cell_text(r, col)
+            if numeric:
+                try:
+                    value = int(value)
+                except ValueError:
                     self.ui.tableWidget.setRowHidden(r, True)
-                if val_type == "int" and int(self.ui.tableWidget.item(r, col).text()) > int(cell_value):
-                    self.ui.tableWidget.setRowHidden(r, True)
+                    continue
+            if keep_greater:
+                self.ui.tableWidget.setRowHidden(r, value < cell_value)
+            else:
+                self.ui.tableWidget.setRowHidden(r, value > cell_value)
 
     def show_context(self):
         """ Show context of coding in dialog. Called by table_menu. """
 
         row = self.ui.tableWidget.currentRow()
-        d = self.result_relations[row]
+        row_item = self.ui.tableWidget.item(row, 0)
+        if row_item is None:
+            return
+        # Sorting moves table rows, the item keeps its result_relations index
+        d = self.result_relations[row_item.data(QtCore.Qt.ItemDataRole.UserRole)]
         codename0 = ""
         codename1 = ""
         color0 = ""
@@ -720,6 +745,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             self.ui.tableWidget.insertRow(r)
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['fid'])
+            item.setData(QtCore.Qt.ItemDataRole.UserRole, r)  # result_relations index
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             item.setToolTip(i['file_name'])
             self.ui.tableWidget.setItem(r, fid, item)
@@ -866,7 +892,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
-        if filepath[-4:] != ".xlsx":
+        if filepath[-5:] != ".xlsx":
             filepath += ".xlsx"
         wb.save(filepath)
         msg = _("Report of exact matches for text codings by file and code") + "\n"
