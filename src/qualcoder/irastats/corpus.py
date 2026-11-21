@@ -43,6 +43,7 @@ All database access goes through the sqlite connection of the App object
 """
 
 import logging
+import re
 from typing import Iterable, Optional
 
 logger = logging.getLogger(__name__)
@@ -241,3 +242,46 @@ def available_variables(segments: list) -> list:
     for segment in segments:
         keys.update(segment["variables"].keys())
     return sorted(keys)
+
+
+def iramuteq_token(text) -> str:
+    """ IRaMuTeQ separates starred variables by spaces, so none can contain whitespace. """
+
+    return re.sub(r"\s+", "_", str(text).strip())
+
+
+def segment_to_iramuteq(segment: dict) -> str:
+    """One corpus segment in the IRaMuTeQ text format: a "****" line followed by
+    the starred variables (*code=..., *cas=..., *doc=..., and one *<attr>=...
+    per file/case attribute), then the segment text.
+    """
+
+    parts = [f"*code={iramuteq_token(code)}" for code in sorted(set(segment.get("codes") or []))]
+    if segment.get("case"):
+        parts.append(f"*cas={iramuteq_token(segment['case'])}")
+    if segment.get("document"):
+        parts.append(f"*doc={iramuteq_token(segment['document'])}")
+    for key, value in sorted(segment.get("variables", {}).items()):
+        if key in ("code", "case", "document"):
+            continue
+        parts.append(f"*{iramuteq_token(key)}={iramuteq_token(value)}")
+    header = "**** " + " ".join(parts) if parts else "****"
+    return header + "\n" + segment.get("text", "") + "\n"
+
+
+def format_iramuteq(segments: list) -> str:
+    """Whole corpus as IRaMuTeQ-formatted text (one "****" block per segment). """
+
+    return "\n".join(segment_to_iramuteq(segment) for segment in segments)
+
+
+def export_iramuteq(segments: list, filepath: str) -> int:
+    """Write the corpus to filepath in the IRaMuTeQ text format.
+
+    Returns:
+        The number of segments written.
+    """
+
+    with open(filepath, "w", encoding="utf-8") as file_:
+        file_.write(format_iramuteq(segments))
+    return len(segments)

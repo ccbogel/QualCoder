@@ -17506,3 +17506,27 @@ msgstr "seuil de probabilité"
 msgid "rows for variable "
 msgstr "lignes pour la variable "
 
+#: src/qualcoder/dialog_text_stats.py:558
+msgid "Corpus exported in IRaMuTeQ format: "
+msgstr "Corpus exporté au format IRaMuTeQ : "
+
+#: src/qualcoder/dialog_text_stats.py:201
+msgid "Export IRaMuTeQ"
+msgstr "Exporter IRaMuTeQ"
+
+#: src/qualcoder/dialog_text_stats.py:204
+msgid "Export the corpus (coded segments, plus whole documents if checked) in the IRaMuTeQ text format"
+msgstr "Exporter le corpus (segments codés, plus documents complets si coché) au format texte IRaMuTeQ"
+
+#: src/qualcoder/dialog_text_stats.py:559
+msgid "IRaMuTeQ export"
+msgstr "Export IRaMuTeQ"
+
+#: src/qualcoder/dialog_text_stats.py:549
+msgid "Save IRaMuTeQ file"
+msgstr "Enregistrer le fichier IRaMuTeQ"
+
+#: src/qualcoder/dialog_text_stats.py:558
+msgid "segments"
+msgstr "segments"
+

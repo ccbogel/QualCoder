@@ -44,6 +44,10 @@ from .corpus import (
     build_document_segments,
     variable_values,
     available_variables,
+    iramuteq_token,
+    segment_to_iramuteq,
+    format_iramuteq,
+    export_iramuteq,
 )
 from .text import tokenize, load_stopwords, light_stem, normalize_tokens, segment_tokens
 from .lexicon import LexicalTable, build_lexical_table
@@ -56,6 +60,10 @@ __all__ = [
     "build_document_segments",
     "variable_values",
     "available_variables",
+    "iramuteq_token",
+    "segment_to_iramuteq",
+    "format_iramuteq",
+    "export_iramuteq",
     "tokenize",
     "load_stopwords",
     "light_stem",

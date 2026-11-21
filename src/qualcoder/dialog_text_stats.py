@@ -32,6 +32,7 @@ from .irastats import (
     build_lexical_table,
     build_segments,
     descendant_statistics,
+    export_iramuteq,
     frequency_rows,
     hapax_rows,
     modalities_of,
@@ -197,6 +198,12 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_build_corpus.setIcon(qta.icon("mdi6.play"))
         self.pushButton_build_corpus.clicked.connect(self.build_corpus)
         buttons.addWidget(self.pushButton_build_corpus)
+        self.pushButton_export_iramuteq = QtWidgets.QPushButton(_("Export IRaMuTeQ"))
+        self.pushButton_export_iramuteq.setIcon(qta.icon("mdi6.export"))
+        self.pushButton_export_iramuteq.setToolTip(
+            _("Export the corpus (coded segments, plus whole documents if checked) in the IRaMuTeQ text format"))
+        self.pushButton_export_iramuteq.clicked.connect(self.export_iramuteq_dialog)
+        buttons.addWidget(self.pushButton_export_iramuteq)
         self.label_corpus_info = QtWidgets.QLabel("")
         buttons.addWidget(self.label_corpus_info, 1)
         layout.addLayout(buttons)
@@ -525,4 +532,29 @@ class DialogTextStats(QtWidgets.QDialog):
                                           p_threshold=self.doubleSpinBox_spec_p.value()))
         msg = _("Specificities HTML exported to: ") + filepath
         Message(self.app, _("HTML export"), msg).exec()
+        self.parent_textEdit.append(msg)
+
+    def export_iramuteq_dialog(self):
+        """ Export the current corpus (coded segments, plus whole documents when
+        the checkbox is set) in the IRaMuTeQ text format: each segment is preceded
+        by a "****" line with the starred variables (*code=..., *cas=..., *doc=...,
+        and one *<attribute>=... per file/case attribute). """
+
+        if not self.segments and not self.get_segments():
+            return
+        if not self.segments:
+            Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
+            return
+        filepath, _selected_filter = QtWidgets.QFileDialog.getSaveFileName(
+            self, _("Save IRaMuTeQ file"), self.app.settings.get("directory", ""), "Text Files (*.txt)")
+        if not filepath:
+            return
+        try:
+            count = export_iramuteq(self.segments, filepath)
+        except Exception as err:
+            logger.error(err)
+            Message(self.app, _("Error"), str(err), "warning").exec()
+            return
+        msg = _("Corpus exported in IRaMuTeQ format: ") + f"{filepath} ({count} " + _("segments") + ")"
+        Message(self.app, _("IRaMuTeQ export"), msg).exec()
         self.parent_textEdit.append(msg)
