@@ -1,0 +1,117 @@
+# ------
+# PyProject.toml - required for uv, ruff, ty and appimage
+# ------
+# This one is just the "shell"/or base doc, it is this one
+# that the build_toml.py will edit 
+
+[project]
+name = "qualcoder"
+version = "4.0"
+description = "The free, open source desktop software for qualitative data analysis"
+readme = "README.md"
+authors = [
+  { name = "Colin Curtain", email = "ccbogel@hotmail.com" },
+  { name = "Kai Dröge" },
+  { name = "Justin Missaghieh-Poncet" },
+  { name = "Lorenzo Salomón Cárdenas" },
+]
+requires-python = ">=3.12"
+dependencies = [
+  "bio",
+  "charset-normalizer",
+  "diff-match-patch",
+  "ebooklib",
+  "emoji",
+  "faiss-cpu",
+  "json-repair",
+  "langchain>=0.2.8",
+  "langchain-community>=0.2.7",
+  "langchain-core>=0.2.19",
+  "langchain-openai>=1.3.1",
+  "langchain-text-splitters>=0.2.2",
+  "markdown-it-py",
+  "matplotlib",
+  "mcp>=2.2,<3",
+  "networkx",
+  "odfpy",
+  "openpyxl",
+  "pandas",
+  "pdfminer-six",
+  # The bootloader in the most recent version of pyinstaller is often falsely detected as malware
+  # by anti virus software, so, it's safer to use a version that has been released a few months ago.
+  "pefile<2024.8.26", # see: https://github.com/pyinstaller/pyinstaller/issues/8832#issuecomment-2413203254
+  "pillow",
+  "plotly",
+  "ply",
+  "pyinstaller<=6.15",
+  "pylatexenc>=2.10,<3",
+  "pymupdf",
+  "pyqt6>=6.5",
+  "torch",
+  "torchvision",
+  "torchaudio",
+  "python-vlc",
+  "pyyaml",
+  "qtawesome",
+  "requests",
+  "rispy",
+  "sentence-transformers",
+  "six",
+  "striprtf",
+  "transformers<=4.53.0", # see https://github.com/huggingface/transformers/issues/38402 
+  "uvicorn>=0.30,<1",
+  "wordcloud",
+]
+
+[project.scripts]
+qualcoder = "qualcoder.__main__:gui"
+
+[build-system]
+requires = ["uv_build>=0.12.21,<13"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "appimage>=4.1.0",
+    "pytest>=9.2.0",
+    "ruff>=0.17.3",
+    "ty>=0.0.96",
+    "uv>=0.13.6",
+]
+
+[tool.uv]
+index = [
+    { name = "pytorch-cpu", url = "https://download.pytorch.org/whl/cpu", explicit = true },
+]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu" },
+]
+torchvision = [
+    { index = "pytorch-cpu" },
+]
+torchaudio = [
+    { index = "pytorch-cpu" },
+]
+
+# So ruff stops flaging gettetx syntax as a problemm
+[tool.ruff]
+builtins = [
+  "_",
+  "gettext",
+  "ngettext",
+  "ugettext",
+  "pgettext",
+  "my_gettext",
+]
+
+[tool.ruff.lint.flake8-gettext]
+function-names = [
+  "_",
+  "gettext",
+  "ngettext",
+  "ugettext",
+  "pgettext",
+  "my_gettext",
+]

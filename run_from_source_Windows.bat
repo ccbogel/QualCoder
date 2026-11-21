@@ -2,8 +2,8 @@
 echo Starting %TIME%
 
 :: 1. Create venv if not exists
-if not exist .env (
-    python -m venv .env
+if not exist .venv (
+    python -m venv .venv
     echo Virtual environment created.
 ) else (
     echo Using existing virtual environment.
@@ -12,7 +12,7 @@ if not exist .env (
 :: 2. Activate environment
 :: 'call' is necessary to keep the script running after activation
 echo Activating virtual environment.
-call .env\Scripts\activate.bat
+call .venv\Scripts\activate.bat
 
 :: 3. Install requirements
 python -m pip install --upgrade pip
