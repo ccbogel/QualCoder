@@ -20,17 +20,23 @@ https://qualcoder.wordpress.com/
 https://qualcoder.org/
 """
 
+import csv
 import logging
 
 import qtawesome as qta
 from PyQt6 import QtCore, QtWidgets
 
-from .helpers import Message
+from .helpers import ExportDirectoryPathDialog, Message
 from .irastats import (
     available_variables,
     build_lexical_table,
     build_segments,
+    descendant_statistics,
+    frequency_rows,
+    hapax_rows,
+    variable_rows,
 )
+from .irastats.report_html import descstats_html
 from .select_items import DialogSelectItems
 
 logger = logging.getLogger(__name__)
@@ -67,6 +73,7 @@ class DialogTextStats(QtWidgets.QDialog):
         layout.addWidget(self._build_selection_group())
         self.tabWidget = QtWidgets.QTabWidget()
         self._build_corpus_tab()
+        self._build_descstats_tab()
         layout.addWidget(self.tabWidget)
 
     # --- Selection (same helpers as the other Reports dialogs) ---
@@ -273,3 +280,124 @@ class DialogTextStats(QtWidgets.QDialog):
         if not self.segments and not self.get_segments():
             return []
         return available_variables(self.segments)
+
+    # --- Descending statistics tab (IRaMuTeQ "rapport descendant") ---
+
+    def _build_descstats_tab(self):
+        self.tab_descstats = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(self.tab_descstats)
+
+        params = QtWidgets.QHBoxLayout()
+        params.addWidget(QtWidgets.QLabel(_("Minimum frequency of active forms:")))
+        self.spinBox_descstats_min_freq = QtWidgets.QSpinBox()
+        self.spinBox_descstats_min_freq.setRange(1, 9999)
+        self.spinBox_descstats_min_freq.setValue(1)
+        params.addWidget(self.spinBox_descstats_min_freq)
+        params.addWidget(QtWidgets.QLabel(_("Partition variable:")))
+        self.comboBox_descstats_variable = QtWidgets.QComboBox()
+        self._fill_variable_combo(self.comboBox_descstats_variable)
+        params.addWidget(self.comboBox_descstats_variable, 1)
+        self.pushButton_descstats_run = QtWidgets.QPushButton(_("Calculate"))
+        self.pushButton_descstats_run.setIcon(qta.icon("mdi6.play"))
+        self.pushButton_descstats_run.clicked.connect(self.run_descstats)
+        params.addWidget(self.pushButton_descstats_run)
+        self.pushButton_descstats_csv = QtWidgets.QPushButton(_("Export CSV"))
+        self.pushButton_descstats_csv.setIcon(qta.icon("mdi6.file-delimited-outline"))
+        self.pushButton_descstats_csv.clicked.connect(self.export_descstats_csv)
+        params.addWidget(self.pushButton_descstats_csv)
+        self.pushButton_descstats_html = QtWidgets.QPushButton(_("Export HTML"))
+        self.pushButton_descstats_html.setIcon(qta.icon("mdi6.file-code-outline"))
+        self.pushButton_descstats_html.clicked.connect(self.export_descstats_html)
+        params.addWidget(self.pushButton_descstats_html)
+        layout.addLayout(params)
+
+        splitter = QtWidgets.QSplitter()
+        self.tableWidget_descstats = QtWidgets.QTableWidget()
+        self.tableWidget_descstats.setColumnCount(3)
+        self.tableWidget_descstats.setHorizontalHeaderLabels([_("Form"), _("Frequency"), _("%")])
+        self.tableWidget_descstats.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        splitter.addWidget(self.tableWidget_descstats)
+        self.textBrowser_descstats = QtWidgets.QTextBrowser()
+        splitter.addWidget(self.textBrowser_descstats)
+        splitter.setSizes([400, 400])
+        layout.addWidget(splitter)
+        self.tabWidget.addTab(self.tab_descstats, _("Text statistics"))
+        self.descstats = None
+
+    def _fill_variable_combo(self, combo: QtWidgets.QComboBox):
+        """ Fill a partition variable combo: "none" plus the corpus variables. """
+
+        combo.clear()
+        combo.addItem(_("None"), "")
+        for variable in self.available_variables():
+            combo.addItem(variable, variable)
+
+    def run_descstats(self):
+        """ Compute the descending statistics and show them. """
+
+        table = self.get_lexical_table(min_freq=self.spinBox_descstats_min_freq.value())
+        if table is None:
+            return
+        variable = self.comboBox_descstats_variable.currentData() or None
+        try:
+            self.descstats = descendant_statistics(table, variable=variable)
+        except Exception as err:
+            logger.error(err)
+            Message(self.app, _("Error"), str(err), "warning").exec()
+            return
+        rows = frequency_rows(self.descstats)
+        self.tableWidget_descstats.setRowCount(len(rows))
+        for row, values in enumerate(rows):
+            for col, value in enumerate(values):
+                item = QtWidgets.QTableWidgetItem(str(value))
+                item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                self.tableWidget_descstats.setItem(row, col, item)
+        self.tableWidget_descstats.resizeColumnsToContents()
+        self.textBrowser_descstats.setHtml(descstats_html(self.descstats, variable=variable))
+        msg = (_("Text statistics: ") + _("Segments: ") + str(len(table.segment_texts))
+               + " | " + _("Occurrences: ") + str(self.descstats["total_occurrences"])
+               + " | " + _("Forms: ") + str(self.descstats["distinct_forms"]))
+        self.parent_textEdit.append(msg)
+
+    def _descstats_csv_rows(self):
+        rows = [[_("Form"), _("Frequency"), _("%")]]
+        rows += frequency_rows(self.descstats)
+        rows.append([])
+        rows.append([_("Hapax")])
+        rows += hapax_rows(self.descstats)
+        if self.descstats["by_variable"]:
+            rows.append([])
+            rows.append([_("Modality"), _("Segments"), _("Occurrences"), _("Distinct forms")])
+            rows += variable_rows(self.descstats)
+        return rows
+
+    def export_descstats_csv(self):
+        if self.descstats is None:
+            self.run_descstats()
+        if self.descstats is None:
+            return
+        e = ExportDirectoryPathDialog(self.app, "Text_statistics.csv")
+        filepath = e.filepath
+        if filepath is None:
+            return
+        with open(filepath, "w", encoding="utf-8-sig", newline="") as file_:
+            csv.writer(file_).writerows(self._descstats_csv_rows())
+        msg = _("Text statistics CSV exported to: ") + filepath
+        Message(self.app, _("CSV export"), msg).exec()
+        self.parent_textEdit.append(msg)
+
+    def export_descstats_html(self):
+        if self.descstats is None:
+            self.run_descstats()
+        if self.descstats is None:
+            return
+        variable = self.comboBox_descstats_variable.currentData() or None
+        e = ExportDirectoryPathDialog(self.app, "Text_statistics.html")
+        filepath = e.filepath
+        if filepath is None:
+            return
+        with open(filepath, "w", encoding="utf-8") as file_:
+            file_.write(descstats_html(self.descstats, variable=variable))
+        msg = _("Text statistics HTML exported to: ") + filepath
+        Message(self.app, _("HTML export"), msg).exec()
+        self.parent_textEdit.append(msg)

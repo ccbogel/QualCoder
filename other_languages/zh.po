@@ -18588,3 +18588,116 @@ msgstr ""
 msgid "all"
 msgstr ""
 
+#: src/qualcoder/dialog_text_stats.py:317
+#: src/qualcoder/dialog_text_stats.py:363
+#: src/qualcoder/irastats/report_html.py:89
+msgid "%"
+msgstr ""
+
+#: src/qualcoder/irastats/report_html.py:83
+msgid "Active forms"
+msgstr ""
+
+#: src/qualcoder/irastats/report_html.py:95
+msgid "Breakdown by variable"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:386
+msgid "CSV export"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:300
+msgid "Calculate"
+msgstr ""
+
+#: src/qualcoder/irastats/report_html.py:79
+msgid "Descending statistics"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:370
+#: src/qualcoder/irastats/report_html.py:82
+#: src/qualcoder/irastats/report_html.py:96
+msgid "Distinct forms"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:304
+msgid "Export CSV"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:308
+msgid "Export HTML"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:317
+#: src/qualcoder/dialog_text_stats.py:363
+#: src/qualcoder/irastats/report_html.py:89
+#: src/qualcoder/irastats/report_html.py:93
+msgid "Form"
+msgstr ""
+
+#: src/qualcoder/irastats/report_html.py:88
+msgid "Frequencies (decreasing)"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:402
+msgid "HTML export"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:366
+#: src/qualcoder/irastats/report_html.py:85
+#: src/qualcoder/irastats/report_html.py:92
+msgid "Hapax"
+msgstr ""
+
+#: src/qualcoder/irastats/report_html.py:87
+msgid "Measure"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:291
+msgid "Minimum frequency of active forms:"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:370
+#: src/qualcoder/irastats/report_html.py:96
+msgid "Modality"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:370
+#: src/qualcoder/irastats/report_html.py:96
+msgid "Occurrences"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:296
+msgid "Partition variable:"
+msgstr ""
+
+#: src/qualcoder/irastats/report_html.py:84
+msgid "Supplementary forms"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:324
+#: src/qualcoder/irastats/report_html.py:98
+#: src/qualcoder/irastats/report_html.py:79
+msgid "Text statistics"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:385
+msgid "Text statistics CSV exported to: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:401
+msgid "Text statistics HTML exported to: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:357
+msgid "Text statistics: "
+msgstr ""
+
+#: src/qualcoder/irastats/report_html.py:81
+msgid "Total occurrences"
+msgstr ""
+
+#: src/qualcoder/irastats/report_html.py:87
+msgid "Value"
+msgstr ""
+

@@ -189,6 +189,7 @@ Option to manually add a new reference.
 ## Text statistics (IRaMuTeQ methods)
 
 New "Text statistics (IRaMuTeQ methods)" submenu in the Reports menu: builds an analysable corpus (coded segments or whole documents, with codes, cases and attributes as variables) from the project, with tokenisation, stopwords (built-in FR/EN lists plus an editable custom file) and optional light stemming, and a sparse forms x segments lexical table (active vs supplementary forms). Computation engines live in the pure-Python `irastats` package and are unit-tested without a GUI.
+First analysis tab: descending text statistics (total occurrences, active/supplementary forms, decreasing frequency table, hapax, breakdown by partition variable), with CSV and HTML export.
 
 ## Bug fixes
 
