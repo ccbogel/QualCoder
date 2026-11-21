@@ -20,6 +20,7 @@ qtawesome
 pymupdf
 python-vlc
 requests
+scipy  # explicit: used by irastats (already pulled in via scikit-learn, and in the PyInstaller specs)
 rispy
 six
 langchain>=0.2.8 

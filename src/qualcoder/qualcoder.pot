@@ -16016,3 +16016,82 @@ msgstr ""
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:54
 msgid "Uncaught Exception"
 msgstr ""
+#: src/qualcoder/dialog_text_stats.py:264
+msgid "Active forms: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:86
+msgid "All files, cases and codes"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:174
+msgid "Browse"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:185
+msgid "Build corpus"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:198
+msgid "Corpus"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:267
+msgid "Corpus built: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:202
+msgid "Custom stopwords file"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:171
+msgid "Custom stopwords file:"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:263
+msgid "Forms: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:180
+msgid "Include whole documents"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:164
+msgid "Language:"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:178
+msgid "Light stemming"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:249
+msgid "No coded segments or documents found"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:265
+msgid "Occurrences: "
+msgstr ""
+
+#: src/qualcoder/__main__.py:984
+msgid "Open text statistics"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:173
+msgid "Optional text file, one word per line"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:261
+msgid "Segments: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:55
+#: src/qualcoder/__main__.py:983
+msgid "Text statistics (IRaMuTeQ methods)"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:152
+#: src/qualcoder/dialog_text_stats.py:153
+#: src/qualcoder/dialog_text_stats.py:154
+msgid "all"
+msgstr ""
+

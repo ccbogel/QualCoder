@@ -17253,3 +17253,82 @@ msgstr "Uncaught Exception"
 
 #~ msgid "Cannot open file"
 #~ msgstr "Ne peut pas ouvrir le fichier"
+#: src/qualcoder/dialog_text_stats.py:264
+msgid "Active forms: "
+msgstr "Formes actives : "
+
+#: src/qualcoder/dialog_text_stats.py:86
+msgid "All files, cases and codes"
+msgstr "Tous les fichiers, cas et codes"
+
+#: src/qualcoder/dialog_text_stats.py:174
+msgid "Browse"
+msgstr "Parcourir"
+
+#: src/qualcoder/dialog_text_stats.py:185
+msgid "Build corpus"
+msgstr "Construire le corpus"
+
+#: src/qualcoder/dialog_text_stats.py:198
+msgid "Corpus"
+msgstr "Corpus"
+
+#: src/qualcoder/dialog_text_stats.py:267
+msgid "Corpus built: "
+msgstr "Corpus construit : "
+
+#: src/qualcoder/dialog_text_stats.py:202
+msgid "Custom stopwords file"
+msgstr "Fichier de stopwords personnalisé"
+
+#: src/qualcoder/dialog_text_stats.py:171
+msgid "Custom stopwords file:"
+msgstr "Fichier de stopwords personnalisé :"
+
+#: src/qualcoder/dialog_text_stats.py:263
+msgid "Forms: "
+msgstr "Formes : "
+
+#: src/qualcoder/dialog_text_stats.py:180
+msgid "Include whole documents"
+msgstr "Inclure les documents complets"
+
+#: src/qualcoder/dialog_text_stats.py:164
+msgid "Language:"
+msgstr "Langue :"
+
+#: src/qualcoder/dialog_text_stats.py:178
+msgid "Light stemming"
+msgstr "Stemming léger"
+
+#: src/qualcoder/dialog_text_stats.py:249
+msgid "No coded segments or documents found"
+msgstr "Aucun segment codé ni document trouvé"
+
+#: src/qualcoder/dialog_text_stats.py:265
+msgid "Occurrences: "
+msgstr "Occurrences : "
+
+#: src/qualcoder/__main__.py:984
+msgid "Open text statistics"
+msgstr "Ouvrir les statistiques textuelles"
+
+#: src/qualcoder/dialog_text_stats.py:173
+msgid "Optional text file, one word per line"
+msgstr "Fichier texte optionnel, un mot par ligne"
+
+#: src/qualcoder/dialog_text_stats.py:261
+msgid "Segments: "
+msgstr "Segments : "
+
+#: src/qualcoder/dialog_text_stats.py:55
+#: src/qualcoder/__main__.py:983
+msgid "Text statistics (IRaMuTeQ methods)"
+msgstr "Statistiques textuelles (méthodes IRaMuTeQ)"
+
+#: src/qualcoder/dialog_text_stats.py:152
+#: src/qualcoder/dialog_text_stats.py:153
+#: src/qualcoder/dialog_text_stats.py:154
+msgid "all"
+msgstr "tous"
+

@@ -111,6 +111,7 @@ from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_exact_matches import DialogReportExactTextMatches
 from qualcoder.report_relations import DialogReportRelations
 from qualcoder.report_sql import DialogSQL
+from qualcoder.dialog_text_stats import DialogTextStats
 from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
@@ -978,6 +979,10 @@ Click "Yes" to start now.')
         self.ui.actionCharts.triggered.connect(self.view_charts)
         self.ui.actionSQL_statements.setShortcut('Alt+D')
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
+        # Text statistics (IRaMuTeQ methods) submenu of the Reports menu
+        self.menu_text_stats = self.ui.menuReports.addMenu(_("Text statistics (IRaMuTeQ methods)"))
+        self.action_text_stats = self.menu_text_stats.addAction(_("Open text statistics"))
+        self.action_text_stats.triggered.connect(self.text_stats)
         # AI menu
         self.ui.actionAI_Setup_wizard.triggered.connect(self.ai_setup_wizard)
         self.ui.actionAI_Configuration.triggered.connect(self.ai_settings)
@@ -2085,6 +2090,15 @@ Click "Yes" to start now.')
 
         self.ui.textBrowser_reports.hide()
         ui = DialogSQL(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
+
+    def text_stats(self):
+        """ Text statistics in the style of IRaMuTeQ (corpus, descending statistics,
+        specificities, correspondence analysis, similarity graph, Reinert classification,
+        IRaMuTeQ export) on the coded segments or whole documents of the project. """
+
+        self.ui.textBrowser_reports.hide()
+        ui = DialogTextStats(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_coding_comparison(self):
