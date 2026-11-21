@@ -42,6 +42,7 @@ from .irastats import (
     variable_rows,
 )
 from .irastats.similarity import build_graph, cooccurrence, draw_similarity_graph, similarity_matrix
+from .irastats.ca import ca_coordinate_rows, correspondence_analysis, lexical_table_by_variable, plot_ca
 from .irastats.report_html import descstats_html, specificites_html
 from .select_items import DialogSelectItems
 
@@ -82,6 +83,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self._build_descstats_tab()
         self._build_specificites_tab()
         self._build_similarity_tab()
+        self._build_ca_tab()
         layout.addWidget(self.tabWidget)
 
     # --- Selection (same helpers as the other Reports dialogs) ---
@@ -560,6 +562,131 @@ class DialogTextStats(QtWidgets.QDialog):
             return
         msg = _("Corpus exported in IRaMuTeQ format: ") + f"{filepath} ({count} " + _("segments") + ")"
         Message(self.app, _("IRaMuTeQ export"), msg).exec()
+        self.parent_textEdit.append(msg)
+
+
+    # --- Correspondence analysis (CA) tab ---
+
+    def _build_ca_tab(self):
+        self.tab_ca = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(self.tab_ca)
+
+        params = QtWidgets.QHBoxLayout()
+        params.addWidget(QtWidgets.QLabel(_("Columns:")))
+        self.comboBox_ca_variable = QtWidgets.QComboBox()
+        self.comboBox_ca_variable.addItem(_("Segments"), "__segments__")
+        self._fill_variable_combo(self.comboBox_ca_variable)
+        params.addWidget(self.comboBox_ca_variable, 1)
+        self.pushButton_ca_run = QtWidgets.QPushButton(_("Calculate"))
+        self.pushButton_ca_run.setIcon(qta.icon("mdi6.play"))
+        self.pushButton_ca_run.clicked.connect(self.run_ca)
+        params.addWidget(self.pushButton_ca_run)
+        self.pushButton_ca_csv = QtWidgets.QPushButton(_("Export coordinates CSV"))
+        self.pushButton_ca_csv.setIcon(qta.icon("mdi6.file-delimited-outline"))
+        self.pushButton_ca_csv.clicked.connect(self.export_ca_csv)
+        params.addWidget(self.pushButton_ca_csv)
+        self.pushButton_ca_png = QtWidgets.QPushButton(_("Export PNG"))
+        self.pushButton_ca_png.setIcon(qta.icon("mdi6.image-outline"))
+        self.pushButton_ca_png.clicked.connect(self.export_ca_png)
+        params.addWidget(self.pushButton_ca_png)
+        layout.addLayout(params)
+
+        splitter = QtWidgets.QSplitter()
+        self.tableWidget_ca = QtWidgets.QTableWidget()
+        self.tableWidget_ca.setColumnCount(4)
+        self.tableWidget_ca.setHorizontalHeaderLabels([_("Axis"), _("Eigenvalue"), _("% inertia"), _("Cumulative %")])
+        self.tableWidget_ca.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        splitter.addWidget(self.tableWidget_ca)
+        self.label_ca_info = QtWidgets.QLabel("")
+        self.label_ca_info.setWordWrap(True)
+        splitter.addWidget(self.label_ca_info)
+        splitter.setSizes([300, 500])
+        layout.addWidget(splitter)
+        self.tabWidget.addTab(self.tab_ca, _("Correspondence analysis"))
+        self.ca_result = None
+        self.ca_figure = None
+
+    def run_ca(self):
+        """ Correspondence analysis of the lexical table (forms x variable
+        modalities, or forms x segments) and display of the factor map. """
+
+        table = self.get_lexical_table(min_freq=1)
+        if table is None:
+            return
+        variable = self.comboBox_ca_variable.currentData()
+        try:
+            if variable == "__segments__":
+                matrix = table.active_matrix
+                row_labels = list(table.active_forms)
+                col_labels = [f"seg{i + 1}" for i in range(matrix.shape[1])]
+            else:
+                if not variable:
+                    Message(self.app, _("No variable"), _("Select a partition variable")).exec()
+                    return
+                row_labels, col_labels, matrix = lexical_table_by_variable(table, variable)
+            self.ca_result = correspondence_analysis(matrix, row_labels=row_labels, col_labels=col_labels)
+            self.ca_figure = plot_ca(self.ca_result, axes=(0, 1))
+        except Exception as err:
+            logger.error(err)
+            Message(self.app, _("Error"), str(err), "warning").exec()
+            return
+        result = self.ca_result
+        n_axes = len(result["eigenvalues"])
+        self.tableWidget_ca.setRowCount(n_axes)
+        for axis in range(n_axes):
+            values = [axis + 1, round(float(result["eigenvalues"][axis]), 6),
+                      round(float(result["percent"][axis]), 2), round(float(result["cumulative"][axis]), 2)]
+            for col, value in enumerate(values):
+                item = QtWidgets.QTableWidgetItem(str(value))
+                item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                self.tableWidget_ca.setItem(axis, col, item)
+        self.tableWidget_ca.resizeColumnsToContents()
+        self.label_ca_info.setText(
+            _("Total inertia: ") + f"{result['inertia']:.6f} | " + _("Forms: ") + str(len(result["row_labels"]))
+            + " | " + _("Columns: ") + str(len(result["col_labels"])))
+        msg = _("Correspondence analysis: ") + str(n_axes) + " " + _("axes")
+        self.parent_textEdit.append(msg)
+        dialog = DialogFigure(self.app, self.ca_figure, _("Correspondence analysis"))
+        dialog.show()
+        self._ca_dialog = dialog
+
+    def export_ca_csv(self):
+        if self.ca_result is None:
+            self.run_ca()
+        if self.ca_result is None:
+            return
+        e = ExportDirectoryPathDialog(self.app, "CA_coordinates.csv")
+        filepath = e.filepath
+        if filepath is None:
+            return
+        result = self.ca_result
+        n_axes = len(result["eigenvalues"])
+        with open(filepath, "w", encoding="utf-8-sig", newline="") as file_:
+            writer = csv.writer(file_)
+            header = [_("Form"), _("Frequency")] + [f"F{a + 1}" for a in range(n_axes)]                 + [f"contrib{a + 1}" for a in range(n_axes)] + [f"cos2_{a + 1}" for a in range(n_axes)]
+            writer.writerow(header)
+            writer.writerows(ca_coordinate_rows(result, n_axes=n_axes))
+            writer.writerow([])
+            writer.writerow([_("Modality"), _("Frequency")] + [f"G{a + 1}" for a in range(n_axes)])
+            for k, label in enumerate(result["col_labels"]):
+                writer.writerow([label, int(result["col_freq"][k])]
+                                + [round(float(result["col_coords"][k, a]), 6) for a in range(n_axes)])
+        msg = _("CA coordinates exported to: ") + filepath
+        Message(self.app, _("CSV export"), msg).exec()
+        self.parent_textEdit.append(msg)
+
+    def export_ca_png(self):
+        if self.ca_figure is None:
+            self.run_ca()
+        if self.ca_figure is None:
+            return
+        e = ExportDirectoryPathDialog(self.app, "CA_factor_map.png")
+        filepath = e.filepath
+        if filepath is None:
+            return
+        self.ca_figure.savefig(filepath, dpi=150)
+        msg = _("CA factor map exported to: ") + filepath
+        Message(self.app, _("PNG export"), msg).exec()
         self.parent_textEdit.append(msg)
 
 

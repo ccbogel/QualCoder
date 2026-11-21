@@ -54,6 +54,7 @@ from .lexicon import LexicalTable, build_lexical_table
 from .descstats import descendant_statistics, frequency_rows, hapax_rows, variable_rows
 from .specificites import chi2_statistic, modalities_of, specificities, specificity_rows
 from .similarity import cooccurrence, similarity_matrix, build_graph, draw_similarity_graph
+from .ca import correspondence_analysis, lexical_table_by_variable, plot_ca, ca_coordinate_rows
 
 __all__ = [
     "build_segments",
@@ -84,4 +85,8 @@ __all__ = [
     "similarity_matrix",
     "build_graph",
     "draw_similarity_graph",
+    "correspondence_analysis",
+    "lexical_table_by_variable",
+    "plot_ca",
+    "ca_coordinate_rows",
 ]

@@ -17804,3 +17804,52 @@ msgstr ""
 msgid "nodes"
 msgstr ""
 
+#: src/qualcoder/dialog_text_stats.py:597
+msgid "% inertia"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:597
+msgid "Axis"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:674
+msgid "CA coordinates exported to: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:688
+msgid "CA factor map exported to: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:646
+msgid "Columns: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:605
+#: src/qualcoder/dialog_text_stats.py:649
+msgid "Correspondence analysis"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:647
+msgid "Correspondence analysis: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:597
+msgid "Cumulative %"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:597
+msgid "Eigenvalue"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:584
+msgid "Export coordinates CSV"
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:645
+msgid "Total inertia: "
+msgstr ""
+
+#: src/qualcoder/dialog_text_stats.py:647
+msgid "axes"
+msgstr ""
+

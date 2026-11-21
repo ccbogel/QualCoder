@@ -17595,3 +17595,52 @@ msgstr "arêtes"
 msgid "nodes"
 msgstr "nœuds"
 
+#: src/qualcoder/dialog_text_stats.py:597
+msgid "% inertia"
+msgstr "% d'inertie"
+
+#: src/qualcoder/dialog_text_stats.py:597
+msgid "Axis"
+msgstr "Axe"
+
+#: src/qualcoder/dialog_text_stats.py:674
+msgid "CA coordinates exported to: "
+msgstr "Coordonnées de l'AFC exportées vers : "
+
+#: src/qualcoder/dialog_text_stats.py:688
+msgid "CA factor map exported to: "
+msgstr "Plan factoriel de l'AFC exporté vers : "
+
+#: src/qualcoder/dialog_text_stats.py:646
+msgid "Columns: "
+msgstr "Colonnes : "
+
+#: src/qualcoder/dialog_text_stats.py:605
+#: src/qualcoder/dialog_text_stats.py:649
+msgid "Correspondence analysis"
+msgstr "Analyse factorielle des correspondances"
+
+#: src/qualcoder/dialog_text_stats.py:647
+msgid "Correspondence analysis: "
+msgstr "AFC : "
+
+#: src/qualcoder/dialog_text_stats.py:597
+msgid "Cumulative %"
+msgstr "% cumulé"
+
+#: src/qualcoder/dialog_text_stats.py:597
+msgid "Eigenvalue"
+msgstr "Valeur propre"
+
+#: src/qualcoder/dialog_text_stats.py:584
+msgid "Export coordinates CSV"
+msgstr "Exporter les coordonnées en CSV"
+
+#: src/qualcoder/dialog_text_stats.py:645
+msgid "Total inertia: "
+msgstr "Inertie totale : "
+
+#: src/qualcoder/dialog_text_stats.py:647
+msgid "axes"
+msgstr "axes"
+
