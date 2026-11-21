@@ -174,6 +174,8 @@ Using AI identify hard to see bugs, with solutions to resolve them.
 
 Added option to select multiple coded text segments and resize them, providing they are all in the exact same positions. Marker options now are: underline, marker (a strong coloured highlight of the coded text), marker light (a light coloured highlight of the coded text).
 
+Added Code Branch Filter to reduce tree clutter by showing only the select branch.
+
 ## Graph (Mind map)
 
 Radial option, now displays multiple radial graphs where there are multiple root nodes (root categories or codes).
