@@ -1557,11 +1557,17 @@ class RefiImport:
 
         # Read the text and enter into sqlite source table
         try:
-            with open(source_path, encoding='utf-8', errors='replace') as f:
+            # utf-8-sig drops a BOM if present, so a BOM never shifts position 0 (#1727).
+            # A file without a BOM reads exactly as with utf-8.
+            with open(source_path, encoding='utf-8-sig', errors='replace') as f:
                 fulltext = f.read()
                 # Replace fixes mismatched coding with line endings on import from Windows text files.
                 # Due to 2 character line endings
-                if fulltext is not None and add_ending:
+                # QualCoder stores coding positions against \n text (one character per line
+                # break), even when the exported file itself uses \r\n (old Windows exports,
+                # or the MaxQDA line-endings option), so the extra space must not be added
+                # for QualCoder-origin files (#1727). Other software keeps the old behaviour.
+                if fulltext is not None and add_ending and "QualCoder" not in self.software_name:
                     fulltext = fulltext.replace('\n', '\n ')
                 source['fulltext'] = fulltext
                 # Adding split()- DOnt know why ?? - Removed
