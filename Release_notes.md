@@ -184,6 +184,10 @@ Radial option, now displays multiple radial graphs where there are multiple root
 
 More sort options: Image by filename / pdf page / y value ; Audio video timeline, by filename then start time value.
 
+## REFI export / import
+
+Improvements to REFI QDPX Project export and import.
+
 ## References
 
 Option to manually add a new reference.
