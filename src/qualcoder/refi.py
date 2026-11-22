@@ -2136,12 +2136,12 @@ class RefiExport(QtWidgets.QDialog):
                     shutil.copyfile(os.path.join(self.app.project_path, 'documents', s['name']),
                                     prep_path + destination)
                 except FileNotFoundError:
-                    with open(prep_path + destination, 'w', encoding="utf-8") as f:  # was: utf-8-sig
+                    with open(prep_path + destination, 'w', encoding="utf-8", newline="\n") as f:  # was: utf-8-sig
                         f.write(s['fulltext'])
             # Also need to export a plain text file as a source
             # plaintext has different guid from richtext, and also might be associated with media - eg transcripts
             if s['plaintext_filename'] is not None:
-                with open(os.path.join(prep_path, 'sources', s['plaintext_filename']), "w", encoding="utf-8") as f:  # was utf-8-sig
+                with open(os.path.join(prep_path, 'sources', s['plaintext_filename']), "w", encoding="utf-8", newline='\n') as f:  # was utf-8-sig
                     try:
                         if add_line_ending_for_maxqda:
                             f.write(s['fulltext'].replace("\n", "\r\n"))
@@ -2152,7 +2152,7 @@ class RefiExport(QtWidgets.QDialog):
                         print(err)
 
         for notefile in self.note_files:
-            with open(os.path.join(prep_path, 'sources', notefile[0]), "w", encoding="utf-8") as f:  # was utf-8-sig
+            with open(os.path.join(prep_path, 'sources', notefile[0]), "w", encoding="utf-8", newline='\n') as f:  # was utf-8-sig
                 f.write(notefile[1])
         options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
