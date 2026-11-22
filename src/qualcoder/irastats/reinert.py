@@ -217,40 +217,47 @@ def reinert_classification(table: LexicalTable, uci_texts: list = None, max_clas
         if len(indices) >= 2 * min_class_size and leaf_count[0] + 1 < max_classes:
             sub = matrix[:, indices]
             labels, chi2 = best_binary_split(sub, max_iter=max_iter)
-            if labels is not None and 0 < labels.sum() < len(indices):
+            if labels is not None and chi2 > 0:
                 left = [indices[k] for k in range(len(indices)) if labels[k] == 0]
                 right = [indices[k] for k in range(len(indices)) if labels[k] == 1]
-                node["chi2"] = chi2
-                leaf_count[0] += 1
-                node["children"] = [recurse(left), recurse(right)]
+                # accept the split only if both classes reach min_class_size and
+                # the split is a real separation (positive chi-square)
+                if min(len(left), len(right)) >= min_class_size:
+                    node["chi2"] = chi2
+                    leaf_count[0] += 1
+                    node["children"] = [recurse(left), recurse(right)]
         return node
 
     tree = recurse(list(range(n)))
 
-    # collect leaves (classes) in traversal order
+    # collect leaves (classes) in traversal order, keeping the parent split chi2
     leaves = []
 
-    def collect(node):
+    def collect(node, parent_chi2=0.0):
         if node["children"] is None:
-            leaves.append(node)
+            leaves.append((node, parent_chi2))
         else:
             for child in node["children"]:
-                collect(child)
+                collect(child, node["chi2"])
 
     collect(tree)
     # order classes by decreasing size, then renumber
-    leaves.sort(key=lambda node: -len(node["indices"]))
+    leaves.sort(key=lambda item: -len(item[0]["indices"]))
     class_of_uci = [0] * n
-    classes = []
-    for class_id, node in enumerate(leaves, start=1):
+    for class_id, (node, _parent_chi2) in enumerate(leaves, start=1):
         for idx in node["indices"]:
             class_of_uci[idx] = class_id
+    classes = []
+    for class_id, (node, parent_chi2) in enumerate(leaves, start=1):
+        # chi2 of the class against the rest of the corpus (2 x n_forms table)
+        in_counts = np.asarray(matrix[:, node["indices"]].sum(axis=1)).ravel()
+        cls_chi2 = chi2_contingency(np.vstack([in_counts, matrix.sum(axis=1) - in_counts]))
         classes.append({"id": class_id, "uci_indices": list(node["indices"]),
-                        "size": len(node["indices"]), "split_chi2": node["chi2"]})
+                        "size": len(node["indices"]), "chi2": cls_chi2, "split_chi2": parent_chi2})
 
     # classification chi-square: k classes x forms table
     counts = np.zeros((len(leaves), matrix.shape[0]))
-    for cls, node in enumerate(leaves):
+    for cls, (node, _parent_chi2) in enumerate(leaves):
         counts[cls] = np.asarray(matrix[:, node["indices"]].sum(axis=1)).ravel()
     chi2 = chi2_contingency(counts)
     df = max((len(leaves) - 1) * (matrix.shape[0] - 1), 1)

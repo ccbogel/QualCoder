@@ -35,10 +35,11 @@ def make_conn():
         INSERT INTO code_text VALUES (1, 1, 1, 'le chat mange', 0, 14, 'bob'),
                                 (2, 2, 1, 'le chat mange', 0, 14, 'bob'),
                                 (3, 1, 2, 'le poisson', 0, 10, 'bob');
-        INSERT INTO cases VALUES (1, 'caseA');
-        INSERT INTO case_text VALUES (1, 1, 1, 0, 20);
+        INSERT INTO cases VALUES (1, 'caseA'), (2, 'caseB');
+        INSERT INTO case_text VALUES (1, 1, 1, 0, 20), (2, 2, 1, 0, 20);
         INSERT INTO attribute VALUES (1, 'lang', 'file', 'fr', 1);
         INSERT INTO attribute VALUES (2, 'sexe', 'case', 'F', 1);
+        INSERT INTO attribute VALUES (3, 'sexe', 'case', 'M', 2);
     """)
     return conn
 
@@ -88,6 +89,18 @@ class TestBuildCodedSegments(unittest.TestCase):
         segments = build_coded_segments(self.conn, case_ids=[1])
         self.assertEqual(len(segments), 1)
         self.assertEqual(segments[0]["document"], "doc1.txt")
+
+    def test_case_filter_picks_the_selected_case_attributes(self):
+        # doc1 belongs to both caseA and caseB: selecting only caseB must attach
+        # caseB and its attributes, not caseA's
+        segments = build_coded_segments(self.conn, case_ids=[2])
+        self.assertEqual(segments[0]["case"], "caseB")
+        self.assertEqual(segments[0]["variables"]["case:sexe"], "M")
+        self.assertNotIn("caseA", str(segments[0]["variables"]))
+        # without a filter, the first case by caseid wins (caseA)
+        segments = build_coded_segments(self.conn)
+        self.assertEqual(segments[0]["case"], "caseA")
+        self.assertEqual(segments[0]["variables"]["case:sexe"], "F")
 
     def test_owner_filter(self):
         segments = build_coded_segments(self.conn, owner="nobody")

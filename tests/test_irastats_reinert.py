@@ -148,6 +148,29 @@ class TestReinertClassification(unittest.TestCase):
         self.assertEqual(again["class_of_uci"], self.result["class_of_uci"])
         self.assertAlmostEqual(again["chi2"], self.result["chi2"])
 
+    def test_class_chi2_is_computed(self):
+        # per-class chi2 (class vs rest) must be positive, not the zero leaf default
+        for cls in self.result["classes"]:
+            self.assertGreater(cls["chi2"], 0)
+            self.assertGreaterEqual(cls["split_chi2"], 0)
+
+    def test_min_class_size_enforced_on_split(self):
+        # 7 animal + 1 vehicle segment: a split would give classes of sizes 7 and 1,
+        # below min_class_size=3 -> no split accepted
+        segments = [{"text": "chat chien os patte", "variables": {"code": "a"}} for _ in range(7)]
+        segments.append({"text": "voiture route moteur roue", "variables": {"code": "v"}})
+        result = reinert_from_segments(segments, size=5, min_freq=3, max_classes=10, min_class_size=3)
+        self.assertEqual(result["n_classes"], 1)
+        for cls in result["classes"]:
+            self.assertGreaterEqual(cls["size"], 3)
+
+    def test_identical_segments_single_class(self):
+        # identical UCI: chi2 of any split is 0 -> no separation, one class
+        segments = [{"text": "chat chien os patte", "variables": {"code": "a"}} for _ in range(10)]
+        result = reinert_from_segments(segments, size=5, min_freq=1, max_classes=10, min_class_size=1)
+        self.assertEqual(result["n_classes"], 1)
+        self.assertEqual(result["chi2"], 0.0)
+
     def test_max_classes_respected(self):
         result = reinert_from_segments(self.segments, size=5, min_freq=3,
                                        max_classes=3, min_class_size=1)

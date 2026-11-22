@@ -62,15 +62,20 @@ def _attributes_for(conn, attr_type: str, id_: int) -> dict:
     return {row[0]: row[1] for row in cur.fetchall()}
 
 
-def _case_for_segment(conn, fid: int, pos0: int, pos1: int) -> tuple:
-    """Case (caseid, name) containing the segment [pos0, pos1] of file fid, or (None, ""). """
+def _case_for_segment(conn, fid: int, pos0: int, pos1: int, case_ids: Optional[list] = None) -> tuple:
+    """Case (caseid, name) containing the segment [pos0, pos1] of file fid, or (None, "").
+    When case_ids is given, only those cases are considered (a segment can belong to
+    several cases; without a filter the first case by caseid wins). """
 
     cur = conn.cursor()
-    cur.execute(
-        "select case_text.caseid, cases.name from case_text join cases on cases.caseid = case_text.caseid "
-        "where case_text.fid=? and ? >= case_text.pos0 and ? <= case_text.pos1 order by case_text.caseid limit 1",
-        [fid, pos0, pos1],
-    )
+    sql = ("select case_text.caseid, cases.name from case_text join cases on cases.caseid = case_text.caseid "
+           "where case_text.fid=? and ? >= case_text.pos0 and ? <= case_text.pos1 ")
+    params = [fid, pos0, pos1]
+    if case_ids:
+        sql += f" and case_text.caseid in ({_in_clause(case_ids)}) "
+        params += list(case_ids)
+    sql += " order by case_text.caseid limit 1"
+    cur.execute(sql, params)
     row = cur.fetchone()
     if row is None:
         return None, ""
@@ -154,7 +159,8 @@ def build_coded_segments(conn, file_ids: Optional[list] = None, case_ids: Option
         by_location[key]["codes"].append(codename)
 
     for segment in segments:
-        caseid, casename = _case_for_segment(conn, segment["fid"], segment["pos0"], segment["pos1"])
+        caseid, casename = _case_for_segment(conn, segment["fid"], segment["pos0"], segment["pos1"],
+                                             case_ids=case_ids)
         segment["caseid"] = caseid
         segment["case"] = casename
         file_attributes = _attributes_for(conn, "file", segment["fid"])
@@ -250,21 +256,33 @@ def iramuteq_token(text) -> str:
     return re.sub(r"\s+", "_", str(text).strip())
 
 
+IRAMUTEQ_VAR_RE = re.compile(r"[^0-9A-Za-z_\-]+")
+
+
+def _iramuteq_var_token(text) -> str:
+    """ Token for the IRaMuTeQ native variable format (*variable_modality):
+    no whitespace and no special characters (official documentation restricts
+    the charset of variable names and values). """
+
+    return IRAMUTEQ_VAR_RE.sub("_", iramuteq_token(text))
+
+
 def segment_to_iramuteq(segment: dict) -> str:
-    """One corpus segment in the IRaMuTeQ text format: a "****" line followed by
-    the starred variables (*code=..., *cas=..., *doc=..., and one *<attr>=...
-    per file/case attribute), then the segment text.
+    """One corpus segment in the IRaMuTeQ native text format: a "****" line
+    followed by the starred variables (*code_<modality>, *cas_<modality>,
+    *doc_<modality>, and one *<attribute>_<modality> per file/case attribute),
+    then the segment text.
     """
 
-    parts = [f"*code={iramuteq_token(code)}" for code in sorted(set(segment.get("codes") or []))]
+    parts = [f"*code_{_iramuteq_var_token(code)}" for code in sorted(set(segment.get("codes") or []))]
     if segment.get("case"):
-        parts.append(f"*cas={iramuteq_token(segment['case'])}")
+        parts.append(f"*cas_{_iramuteq_var_token(segment['case'])}")
     if segment.get("document"):
-        parts.append(f"*doc={iramuteq_token(segment['document'])}")
+        parts.append(f"*doc_{_iramuteq_var_token(segment['document'])}")
     for key, value in sorted(segment.get("variables", {}).items()):
         if key in ("code", "case", "document"):
             continue
-        parts.append(f"*{iramuteq_token(key)}={iramuteq_token(value)}")
+        parts.append(f"*{_iramuteq_var_token(key)}_{_iramuteq_var_token(value)}")
     header = "**** " + " ".join(parts) if parts else "****"
     return header + "\n" + segment.get("text", "") + "\n"
 

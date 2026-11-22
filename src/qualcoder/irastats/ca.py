@@ -134,7 +134,11 @@ def plot_ca(result: dict, axes=(0, 1), top_forms: int = 40, figsize=(10, 8)) -> 
 
     fig = Figure(figsize=figsize)
     ax = fig.add_subplot(111)
-    i, j = axes
+    # clamp the requested axes to the available ones (a 1-column or 1-class
+    # table has a single axis)
+    n_axes = result["row_coords"].shape[1]
+    i = min(axes[0], n_axes - 1)
+    j = min(axes[1], n_axes - 1)
     F = result["row_coords"]
     G = result["col_coords"]
     row_freq = result["row_freq"]

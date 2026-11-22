@@ -565,10 +565,10 @@ class DialogTextStats(QtWidgets.QDialog):
     def export_iramuteq_dialog(self):
         """ Export the current corpus (coded segments, plus whole documents when
         the checkbox is set) in the IRaMuTeQ text format: each segment is preceded
-        by a "****" line with the starred variables (*code=..., *cas=..., *doc=...,
-        and one *<attribute>=... per file/case attribute). """
+        by a "****" line with the starred variables (*code_<modality>, *cas_<modality>,
+        *doc_<modality>, and one *<attribute>_<modality> per file/case attribute). """
 
-        if not self.segments and not self.get_segments():
+        if not self.get_segments():  # always rebuild: the selection may have changed
             return
         if not self.segments:
             Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
@@ -811,7 +811,7 @@ class DialogTextStats(QtWidgets.QDialog):
         active forms, then top-down dichotomic classification maximizing the
         chi-square between classes. """
 
-        if not self.segments and not self.get_segments():
+        if not self.get_segments():  # always rebuild: the selection may have changed
             return
         if not self.segments:
             Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
@@ -836,7 +836,7 @@ class DialogTextStats(QtWidgets.QDialog):
         for cls in result["classes"]:
             top_forms = ", ".join(p["forme"] for p in cls["profile"][:5])
             item = QtWidgets.QTreeWidgetItem([f"class {cls['id']}", str(cls["size"]),
-                                              f"{cls['split_chi2']:.2f}", top_forms])
+                                              f"{cls['chi2']:.2f}", top_forms])
             item.setData(0, QtCore.Qt.ItemDataRole.UserRole, cls["id"])
             self.treeWidget_reinert.addTopLevelItem(item)
         self.treeWidget_reinert.resizeColumnToContents(0)
@@ -886,7 +886,7 @@ class DialogTextStats(QtWidgets.QDialog):
             writer.writerow([])
             writer.writerow([_("Class"), _("UCI"), "chi2", _("Characteristic forms")])
             for cls in result["classes"]:
-                writer.writerow([f"class {cls['id']}", cls["size"], round(cls["split_chi2"], 6),
+                writer.writerow([f"class {cls['id']}", cls["size"], round(cls["chi2"], 6),
                                  " | ".join(f"{p['forme']} ({p['valeur']:.2f})" for p in cls["profile"][:20])])
             writer.writerow([])
             writer.writerow([_("Class"), _("Form"), _("Frequency"), "chi2", _("Signed value")])

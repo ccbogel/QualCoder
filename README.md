@@ -265,7 +265,7 @@ The Reports menu contains a "Text statistics (IRaMuTeQ methods)" submenu. It bui
 - Correspondence analysis (CA): SVD of the standardized residuals (numpy only), eigenvalues, form and modality coordinates, factor map on axes 1x2 (matplotlib, non-blocking window), coordinates CSV, PNG export.
 - Similarity graph: co-occurrences of forms within segments (networkx), association measure configurable (Jaccard by default, or chi2/phi-squared), adjustable edge threshold, Louvain community detection and halo of a selected form, force-directed matplotlib graph, PNG export.
 - Reinert classification (CHD): UCI segmentation (~40 occurrences, bounded by punctuation), forms x UCI matrix of active forms (frequency >= 3), top-down binary splits maximizing the chi-square between classes (Reinert 1983/1990, iterative reassignment, up to ~10 classes), class profiles with signed specificities, most representative UCI per class, dendrogram of the classification tree (one color per class, most representative forms listed under each class) and CA of forms x classes (non-blocking matplotlib windows, PNG export), CSV export. Defaults follow IRaMuTeQ and are adjustable.
-- IRaMuTeQ export: writes the corpus in the IRaMuTeQ text format (one "**** *code=... *cas=... *doc=..." block per segment) so results can be checked in the original IRaMuTeQ software.
+- IRaMuTeQ export: writes the corpus in the IRaMuTeQ text format (one "**** *code_<modality> *cas_<modality> *doc_<modality> ..." block per segment (native IRaMuTeQ variable format)) so results can be checked in the original IRaMuTeQ software.
 
 ## License
 QualCoder is distributed under the LGPLv3 LICENSE.

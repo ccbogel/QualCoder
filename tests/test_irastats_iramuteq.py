@@ -38,20 +38,22 @@ class TestSegmentFormat(unittest.TestCase):
         text = segment_to_iramuteq(segments[0])
         lines = text.split("\n")
         self.assertTrue(lines[0].startswith("**** "))
-        self.assertIn("*code=alpha", lines[0])
-        self.assertIn("*code=beta", lines[0])
-        self.assertIn("*cas=caseA", lines[0])
-        self.assertIn("*doc=doc1.txt", lines[0])
-        self.assertIn("*file:lang=fr", lines[0])
-        self.assertIn("*case:sexe=F", lines[0])
+        # native IRaMuTeQ variable format: *variable_modality, restricted charset
+        self.assertIn("*code_alpha", lines[0])
+        self.assertIn("*code_beta", lines[0])
+        self.assertIn("*cas_caseA", lines[0])
+        self.assertIn("*doc_doc1_txt", lines[0])
+        self.assertIn("*file_lang_fr", lines[0])
+        self.assertIn("*case_sexe_F", lines[0])
+        self.assertNotIn("=", lines[0])
         self.assertEqual(lines[1], "le chat mange")
 
     def test_document_segment(self):
         segments = build_segments(self.conn, include_documents=True)
         doc = [s for s in segments if s["kind"] == "document"][0]
         text = segment_to_iramuteq(doc)
-        self.assertIn("**** *doc=doc1.txt", text.split("\n")[0])
-        self.assertNotIn("*code=", text.split("\n")[0])
+        self.assertIn("**** *doc_doc1_txt", text.split("\n")[0])
+        self.assertNotIn("*code_", text.split("\n")[0])
         self.assertIn("le chat mange. le chien dort.", text)
 
     def test_format_and_export(self):

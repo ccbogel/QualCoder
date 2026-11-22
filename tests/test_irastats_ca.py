@@ -58,6 +58,13 @@ class TestCorrespondenceAnalysis(unittest.TestCase):
         self.assertEqual(rows[0][0], "r1")
         self.assertEqual(rows[0][1], 15)
 
+    def test_plot_single_column_no_indexerror(self):
+        # a 1-column table has a single axis; plotting axes (0, 1) must not raise
+        result = correspondence_analysis(np.array([[5], [3], [1]]), row_labels=["a", "b", "c"],
+                                         col_labels=["only"])
+        fig = plot_ca(result, axes=(0, 1))
+        self.assertEqual(len(fig.axes), 1)
+
     def test_plot(self):
         result = correspondence_analysis(np.array([[10, 5], [5, 10]]), row_labels=["r1", "r2"],
                                          col_labels=["c1", "c2"])
