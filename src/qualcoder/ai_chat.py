@@ -55,6 +55,13 @@ from .ai_agent_prompts import (
     prompt_name_key,
 )
 from .ai_llm import extract_ai_memo, ai_quote_search, llm_content_to_text, strip_think_blocks, AICancelled
+from .ai_mcp_schema import (
+    MCP_CONTROL_FORMAT_INSTRUCTIONS,
+    MCP_CONTROL_SCHEMA_NAMES,
+    mcp_call_json_schema,
+    mcp_control_json_schema,
+    parse_mcp_control_response,
+)
 from .ai_runtime import (
     ensure_ai_ready,
     runtime_status_bar_text,
@@ -7381,286 +7388,32 @@ data collected. This information will accompany every prompt sent to the AI, res
         ai.discard_empty_ai_change_set(set_id)
 
     def _mcp_allowed_call_json_schema(self) -> Dict[str, Any]:
-        """JSON schema for allowed MCP calls in planner/reflection outputs."""
-
-        list_params = {
-            "type": "object",
-            "properties": {
-                "cursor": {"type": "string"},
-            },
-            "additionalProperties": False,
-        }
-        empty_params = {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": False,
-        }
-        read_params = {
-            "type": "object",
-            "properties": {
-                "uri": {"type": "string"},
-                "start": {"type": ["integer", "number", "string"]},
-                "length": {"type": ["integer", "number", "string"]},
-            },
-            "required": ["uri"],
-            "additionalProperties": False,
-        }
-        tool_list_params = {
-            "type": "object",
-            "properties": {
-                "cursor": {"type": "string"},
-            },
-            "additionalProperties": False,
-        }
-        tool_call_params = {
-            "type": "object",
-            "properties": {
-                "name": {"type": "string"},
-                "arguments": {
-                    "type": "object",
-                    "properties": {},
-                    "additionalProperties": True,
-                },
-                "_ai_change_set_id": {"type": "string"},
-            },
-            "required": ["name", "arguments"],
-            "additionalProperties": False,
-        }
-        return {
-            "type": "object",
-            "oneOf": [
-                {
-                    "type": "object",
-                    "properties": {
-                        "method": {"const": "initialize"},
-                        "params": empty_params,
-                    },
-                    "required": ["method", "params"],
-                    "additionalProperties": False,
-                },
-                {
-                    "type": "object",
-                    "properties": {
-                        "method": {"const": "resources/list"},
-                        "params": list_params,
-                    },
-                    "required": ["method", "params"],
-                    "additionalProperties": False,
-                },
-                {
-                    "type": "object",
-                    "properties": {
-                        "method": {"const": "resources/templates/list"},
-                        "params": list_params,
-                    },
-                    "required": ["method", "params"],
-                    "additionalProperties": False,
-                },
-                {
-                    "type": "object",
-                    "properties": {
-                        "method": {"const": "resources/read"},
-                        "params": read_params,
-                    },
-                    "required": ["method", "params"],
-                    "additionalProperties": False,
-                },
-                {
-                    "type": "object",
-                    "properties": {
-                        "method": {"const": "tools/list"},
-                        "params": tool_list_params,
-                    },
-                    "required": ["method", "params"],
-                    "additionalProperties": False,
-                },
-                {
-                    "type": "object",
-                    "properties": {
-                        "method": {"const": "tools/call"},
-                        "params": tool_call_params,
-                    },
-                    "required": ["method", "params"],
-                    "additionalProperties": False,
-                },
-            ],
-        }
+        """Return the strict API schema for allowed MCP calls."""
+        return mcp_call_json_schema()
 
     def _mcp_planner_json_schema(self) -> Dict[str, Any]:
-        """JSON schema for the MCP planner control response."""
-
-        call_schema = self._mcp_allowed_call_json_schema()
-        return {
-            "type": "object",
-            "properties": {
-                "action": {
-                    "type": "string",
-                    "enum": ["call_mcp", "final_answer", "ask_user"],
-                },
-                "plan_summary": {"type": "string"},
-                "methodology_decision": {
-                    "type": "string",
-                    "enum": ["allow", "allow_with_caveat", "reframe_and_ask", "refuse"],
-                },
-                "methodology_note": {"type": "string"},
-                "user_decision_required": {"type": "boolean"},
-                "decision_question": {"type": "string"},
-                "decision_context": {"type": "string"},
-                "proposed_next_calls": {"type": "array", "items": call_schema},
-                "calls": {"type": "array", "items": call_schema},
-                "answer_brief": {"type": "string"},
-            },
-            "required": [
-                "action",
-                "plan_summary",
-                "methodology_decision",
-                "methodology_note",
-                "user_decision_required",
-                "decision_question",
-                "decision_context",
-                "proposed_next_calls",
-                "calls",
-                "answer_brief",
-            ],
-            "allOf": [
-                {
-                    "if": {"properties": {"action": {"const": "call_mcp"}}},
-                    "then": {
-                        "properties": {
-                            "methodology_decision": {
-                                "enum": ["allow", "allow_with_caveat"],
-                            },
-                            "user_decision_required": {"const": False},
-                            "decision_question": {"const": ""},
-                            "decision_context": {"const": ""},
-                            "calls": {"type": "array", "items": call_schema, "minItems": 1},
-                        },
-                    },
-                },
-                {
-                    "if": {"properties": {"action": {"const": "final_answer"}}},
-                    "then": {
-                        "properties": {
-                            "user_decision_required": {"const": False},
-                            "decision_question": {"const": ""},
-                            "decision_context": {"const": ""},
-                            "proposed_next_calls": {"type": "array", "items": call_schema, "maxItems": 0},
-                            "calls": {"type": "array", "items": call_schema, "maxItems": 0},
-                        },
-                    },
-                },
-                {
-                    "if": {"properties": {"action": {"const": "ask_user"}}},
-                    "then": {
-                        "properties": {
-                            "methodology_decision": {
-                                "enum": ["allow", "allow_with_caveat"],
-                            },
-                            "user_decision_required": {"const": True},
-                            "decision_question": {"type": "string", "minLength": 1},
-                            "calls": {"type": "array", "items": call_schema, "maxItems": 0},
-                        },
-                    },
-                },
-            ],
-            "additionalProperties": False,
-        }
+        """Return the strict API schema for MCP planning and replanning."""
+        return mcp_control_json_schema()
 
     def _mcp_reflection_json_schema(self) -> Dict[str, Any]:
-        """JSON schema for the MCP reflection control response."""
-
-        call_schema = self._mcp_allowed_call_json_schema()
-        return {
-            "type": "object",
-            "properties": {
-                "action": {
-                    "type": "string",
-                    "enum": ["call_mcp", "final_answer", "ask_user"],
-                },
-                "reflection_summary": {"type": "string"},
-                "next_step_note": {"type": "string"},
-                "methodology_decision": {
-                    "type": "string",
-                    "enum": ["allow", "allow_with_caveat", "reframe_and_ask", "refuse"],
-                },
-                "methodology_note": {"type": "string"},
-                "continue_deferred_calls": {"type": "boolean"},
-                "user_decision_required": {"type": "boolean"},
-                "decision_question": {"type": "string"},
-                "decision_context": {"type": "string"},
-                "proposed_next_calls": {"type": "array", "items": call_schema},
-                "revised_calls": {"type": "array", "items": call_schema},
-                "answer_brief": {"type": "string"},
-            },
-            "required": [
-                "action",
-                "reflection_summary",
-                "next_step_note",
-                "methodology_decision",
-                "methodology_note",
-                "continue_deferred_calls",
-                "user_decision_required",
-                "decision_question",
-                "decision_context",
-                "proposed_next_calls",
-                "revised_calls",
-                "answer_brief",
-            ],
-            "allOf": [
-                {
-                    "if": {"properties": {"action": {"const": "call_mcp"}}},
-                    "then": {
-                        "anyOf": [
-                            {"properties": {"revised_calls": {"type": "array", "items": call_schema, "minItems": 1}}},
-                            {"properties": {"continue_deferred_calls": {"const": True}}},
-                        ],
-                        "properties": {
-                            "methodology_decision": {
-                                "enum": ["allow", "allow_with_caveat"],
-                            },
-                            "user_decision_required": {"const": False},
-                            "decision_question": {"const": ""},
-                            "decision_context": {"const": ""},
-                        },
-                    },
-                },
-                {
-                    "if": {"properties": {"action": {"const": "final_answer"}}},
-                    "then": {
-                        "properties": {
-                            "user_decision_required": {"const": False},
-                            "decision_question": {"const": ""},
-                            "decision_context": {"const": ""},
-                            "continue_deferred_calls": {"const": False},
-                            "proposed_next_calls": {"type": "array", "items": call_schema, "maxItems": 0},
-                            "revised_calls": {"type": "array", "items": call_schema, "maxItems": 0},
-                        },
-                    },
-                },
-                {
-                    "if": {"properties": {"action": {"const": "ask_user"}}},
-                    "then": {
-                        "properties": {
-                            "methodology_decision": {
-                                "enum": ["allow", "allow_with_caveat"],
-                            },
-                            "continue_deferred_calls": {"const": False},
-                            "user_decision_required": {"const": True},
-                            "decision_question": {"type": "string", "minLength": 1},
-                            "revised_calls": {"type": "array", "items": call_schema, "maxItems": 0},
-                        },
-                    },
-                },
-            ],
-            "additionalProperties": False,
-        }
+        """Return the strict API schema for MCP reflection."""
+        return mcp_control_json_schema(reflection=True)
 
     def _invoke_json_llm(self, messages: List[Any], schema_name: str = '',
                          response_schema: Optional[Dict[str, Any]] = None,
                          context: str = 'mcp_json_control',
                          model_kind: str = 'large',
                          run_context=None) -> Dict[str, Any]:
-        """Invoke model and parse one JSON object response."""
+        """Invoke a JSON response and validate MCP decisions before returning.
+
+        Args:
+            messages: Conversation and phase instructions to send to the model.
+            schema_name: Response format name; MCP controller names enable local validation.
+            response_schema: Optional strict API response schema.
+            context: Label for request logging.
+            model_kind: Configured model profile to invoke.
+            run_context: Existing run context for cancellation and request tracking.
+        """
 
         response_format = None
         if response_schema is not None:
@@ -7668,25 +7421,46 @@ data collected. This information will accompany every prompt sent to the AI, res
             if name != "":
                 response_format = self.app.ai.get_response_format_json_schema(name, response_schema)
 
-        llm_response = self.app.ai.invoke_with_logging(
-            messages,
-            response_format=response_format,
-            context=context,
-            fallback_without_response_format=True,
-            model_kind=model_kind,
-            run_context=run_context,
-        )
-        raw = strip_think_blocks(llm_content_to_text(getattr(llm_response, 'content', ''))).strip()
-        raw = self._extract_first_json_object(raw)
-        if raw == "":
-            return {}
-        try:
-            data = json.loads(raw)
-        except Exception:
-            return {}
-        if not isinstance(data, dict):
-            return {}
-        return data
+        control_response = schema_name in MCP_CONTROL_SCHEMA_NAMES
+        request_messages = list(messages)
+        if control_response:
+            request_messages.append(HumanMessage(content=MCP_CONTROL_FORMAT_INSTRUCTIONS))
+        for attempt in range(2 if control_response else 1):
+            llm_response = self.app.ai.invoke_with_logging(
+                request_messages,
+                response_format=response_format,
+                context=context,
+                fallback_without_response_format=True,
+                model_kind=model_kind,
+                run_context=run_context,
+            )
+            raw = strip_think_blocks(llm_content_to_text(getattr(llm_response, 'content', ''))).strip()
+            raw = self._extract_first_json_object(raw)
+            try:
+                data = json.loads(raw)
+                if control_response:
+                    return parse_mcp_control_response(
+                        data, reflection=schema_name == 'mcp_reflection_control',
+                    )
+                return data if isinstance(data, dict) else {}
+            except ValueError as err:
+                if not control_response:
+                    return {}
+                if attempt == 1:
+                    raise ValueError(f'Invalid MCP controller response after correction: {err}') from err
+                request_messages.extend([
+                    AIMessage(content=raw),
+                    HumanMessage(content=(
+                        'Your controller response is invalid: ' + str(err)[:2000]
+                        + '\nReturn one corrected JSON object using the response schema and phase rules. '
+                        'Use nonempty executable calls for call_mcp; for ask_user provide a question, '
+                        'set user_decision_required=true and leave executable calls empty; '
+                        'for final_answer clear all calls and decision fields. '
+                        'A blocking methodology decision requires final_answer. '
+                        + MCP_CONTROL_FORMAT_INSTRUCTIONS
+                    )),
+                ])
+        return {}
 
     def _internal_json_step_timeouts(self) -> Tuple[float, float]:
         """Return soft/hard wall-clock timeouts for planner-like JSON steps."""
