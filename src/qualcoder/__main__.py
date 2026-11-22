@@ -979,8 +979,8 @@ Click "Yes" to start now.')
         self.ui.actionCharts.triggered.connect(self.view_charts)
         self.ui.actionSQL_statements.setShortcut('Alt+D')
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
-        # Text statistics (IRaMuTeQ methods) submenu of the Reports menu
-        self.menu_text_stats = self.ui.menuReports.addMenu(_("Text statistics (IRaMuTeQ methods)"))
+        # Lexicometry (text statistics) submenu of the Reports menu
+        self.menu_text_stats = self.ui.menuReports.addMenu(_("Lexicometry (text statistics)"))
         self.action_text_stats = self.menu_text_stats.addAction(_("Open text statistics"))
         self.action_text_stats.triggered.connect(self.text_stats)
         # AI menu

@@ -66,7 +66,7 @@ class DialogTextStats(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.app = app
         self.parent_textEdit = parent_textedit
-        self.setWindowTitle(_("Text statistics (IRaMuTeQ methods)"))
+        self.setWindowTitle(_("Lexicometry (text statistics)"))
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
