@@ -150,10 +150,17 @@ def best_binary_split(matrix: sparse.csr_matrix, max_iter: int = 100):
     n = matrix.shape[1]
     if n < 2:
         return None, 0.0
+    labels = np.zeros(n, dtype=int)
     try:
-        ca = correspondence_analysis(matrix)
-        axis = ca["col_coords"][:, 0]
-        labels = (axis >= np.median(axis)).astype(int)
+        # CA drops zero-mass columns (UCI whose forms are all supplementary),
+        # so realign its first axis on the kept columns before labelling
+        kept = np.where(np.asarray(matrix.sum(axis=0)).ravel() > 0)[0]
+        if len(kept) >= 2:
+            ca = correspondence_analysis(matrix)
+            axis = ca["col_coords"][:, 0]
+            labels[kept] = (axis >= np.median(axis)).astype(int)
+        else:
+            labels = np.arange(n) % 2
     except Exception:
         labels = np.arange(n) % 2
     if labels.sum() == 0 or labels.sum() == n:

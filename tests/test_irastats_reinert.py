@@ -157,6 +157,20 @@ class TestReinertClassification(unittest.TestCase):
         with self.assertRaises(ValueError):
             reinert_from_segments([], size=5)
 
+    def test_zero_count_uci_columns(self):
+        # regression: UCI whose forms are all supplementary (zero column in the
+        # active matrix) made best_binary_split index out of bounds, because the
+        # CA initialisation drops zero-mass columns
+        from scipy import sparse
+        # 2 active forms in columns 0-1; column 2 is all-zero in the active matrix
+        matrix = sparse.csr_matrix(np.array([[3, 2, 0], [0, 4, 0]], dtype=np.int64))
+        labels, chi2 = best_binary_split(matrix)
+        self.assertIsNotNone(labels)
+        self.assertEqual(len(labels), 3)  # no IndexError despite the zero column
+        self.assertIn(labels[2], (0, 1))
+        self.assertGreater(chi2, 0)
+        self.assertTrue(0 < labels.sum() < 3)
+
     def test_draw_dendrogram(self):
         fig = draw_dendrogram(self.result)
         self.assertEqual(len(fig.axes), 1)

@@ -247,9 +247,12 @@ class DialogTextStats(QtWidgets.QDialog):
 
     def get_lexical_table(self, min_freq: int = 1):
         """ Build (or rebuild) the lexical table from the current corpus and
-        normalisation parameters. Sets self.lexical_table. """
+        normalisation parameters. Sets self.lexical_table. The segments are
+        rebuilt from the database on every call, so that changing the corpus
+        parameters (language, stopwords, stemming, whole documents, selection)
+        and pressing Calculate is always taken into account. """
 
-        if not self.segments and not self.get_segments():
+        if not self.get_segments():
             return None
         try:
             self.lexical_table = build_lexical_table(
@@ -263,7 +266,25 @@ class DialogTextStats(QtWidgets.QDialog):
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()
             return None
+        self._refresh_variable_combos()
         return self.lexical_table
+
+    def _refresh_variable_combos(self):
+        """ Refill the partition variable combos after a corpus rebuild, keeping
+        the current selection when it still exists. """
+
+        for name in ("comboBox_descstats_variable", "comboBox_spec_variable", "comboBox_ca_variable"):
+            combo = getattr(self, name, None)
+            if combo is None:
+                continue
+            current = combo.currentData()
+            self._fill_variable_combo(combo)
+            if name == "comboBox_ca_variable":
+                combo.insertItem(0, _("Segments"), "__segments__")
+            if current:
+                index = combo.findData(current)
+                if index >= 0:
+                    combo.setCurrentIndex(index)
 
     def build_corpus(self):
         """ Build the corpus, show a preview and the corpus size. """
@@ -556,6 +577,8 @@ class DialogTextStats(QtWidgets.QDialog):
             self, _("Save IRaMuTeQ file"), self.app.settings.get("directory", ""), "Text Files (*.txt)")
         if not filepath:
             return
+        if not filepath.lower().endswith(".txt"):
+            filepath += ".txt"
         try:
             count = export_iramuteq(self.segments, filepath)
         except Exception as err:
@@ -576,8 +599,8 @@ class DialogTextStats(QtWidgets.QDialog):
         params = QtWidgets.QHBoxLayout()
         params.addWidget(QtWidgets.QLabel(_("Columns:")))
         self.comboBox_ca_variable = QtWidgets.QComboBox()
-        self.comboBox_ca_variable.addItem(_("Segments"), "__segments__")
         self._fill_variable_combo(self.comboBox_ca_variable)
+        self.comboBox_ca_variable.insertItem(0, _("Segments"), "__segments__")
         params.addWidget(self.comboBox_ca_variable, 1)
         self.pushButton_ca_run = QtWidgets.QPushButton(_("Calculate"))
         self.pushButton_ca_run.setIcon(qta.icon("mdi6.play"))
@@ -608,30 +631,42 @@ class DialogTextStats(QtWidgets.QDialog):
         self.ca_result = None
         self.ca_figure = None
 
-    def run_ca(self):
-        """ Correspondence analysis of the lexical table (forms x variable
-        modalities, or forms x segments) and display of the factor map. """
+    def _compute_ca(self):
+        """ Compute the correspondence analysis and a fresh factor-map Figure.
+        Returns (result, figure) or None on error. A fresh Figure is returned each
+        time because the Figure shown in a DialogFigure cannot be saved once its
+        Qt canvas has been closed/deleted. """
 
         table = self.get_lexical_table(min_freq=1)
         if table is None:
-            return
+            return None
         variable = self.comboBox_ca_variable.currentData()
+        if not variable:
+            Message(self.app, _("No variable"), _("Select a partition variable")).exec()
+            return None
         try:
             if variable == "__segments__":
                 matrix = table.active_matrix
                 row_labels = list(table.active_forms)
                 col_labels = [f"seg{i + 1}" for i in range(matrix.shape[1])]
             else:
-                if not variable:
-                    Message(self.app, _("No variable"), _("Select a partition variable")).exec()
-                    return
                 row_labels, col_labels, matrix = lexical_table_by_variable(table, variable)
-            self.ca_result = correspondence_analysis(matrix, row_labels=row_labels, col_labels=col_labels)
-            self.ca_figure = plot_ca(self.ca_result, axes=(0, 1))
+            result = correspondence_analysis(matrix, row_labels=row_labels, col_labels=col_labels)
+            figure = plot_ca(result, axes=(0, 1))
         except Exception as err:
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()
+            return None
+        return result, figure
+
+    def run_ca(self):
+        """ Correspondence analysis of the lexical table (forms x variable
+        modalities, or forms x segments) and display of the factor map. """
+
+        computed = self._compute_ca()
+        if computed is None:
             return
+        self.ca_result, self.ca_figure = computed
         result = self.ca_result
         n_axes = len(result["eigenvalues"])
         self.tableWidget_ca.setRowCount(n_axes)
@@ -654,7 +689,10 @@ class DialogTextStats(QtWidgets.QDialog):
 
     def export_ca_csv(self):
         if self.ca_result is None:
-            self.run_ca()
+            computed = self._compute_ca()
+            if computed is None:
+                return
+            self.ca_result, self.ca_figure = computed
         if self.ca_result is None:
             return
         e = ExportDirectoryPathDialog(self.app, "CA_coordinates.csv")
@@ -678,15 +716,17 @@ class DialogTextStats(QtWidgets.QDialog):
         self.parent_textEdit.append(msg)
 
     def export_ca_png(self):
-        if self.ca_figure is None:
-            self.run_ca()
-        if self.ca_figure is None:
+        # recompute a fresh figure: the one shown in a closed DialogFigure has a
+        # deleted Qt canvas and cannot be saved again
+        computed = self._compute_ca()
+        if computed is None:
             return
+        figure = computed[1]
         e = ExportDirectoryPathDialog(self.app, "CA_factor_map.png")
         filepath = e.filepath
         if filepath is None:
             return
-        self.ca_figure.savefig(filepath, dpi=150)
+        figure.savefig(filepath, dpi=150)
         msg = _("CA factor map exported to: ") + filepath
         Message(self.app, _("PNG export"), msg).exec()
         self.parent_textEdit.append(msg)
@@ -943,29 +983,41 @@ class DialogTextStats(QtWidgets.QDialog):
         self.similarity_communities = []
 
 
-    def run_similarity(self):
-        """ Build the co-occurrence similarity graph and show it in a non-blocking
-        matplotlib window. """
+    def _compute_similarity(self):
+        """ Compute the similarity graph, communities and a fresh Figure.
+        Returns (graph, communities, figure) or None on error. A fresh Figure is
+        returned each time because the Figure shown in a DialogFigure cannot be
+        saved once its Qt canvas has been closed/deleted. """
 
         table = self.get_lexical_table(min_freq=1)
         if table is None:
-            return
+            return None
         try:
             labels, cooc, doc_freq, freq = cooccurrence(
                 table, min_freq=self.spinBox_sim_min_freq.value())
             sim = similarity_matrix(labels, cooc, doc_freq, len(table.segment_texts),
                                     method=self.comboBox_sim_method.currentData())
-            self.similarity_graph = build_graph(labels, sim, freq,
-                                                threshold=self.doubleSpinBox_sim_threshold.value())
-            self.similarity_communities = []
+            graph = build_graph(labels, sim, freq,
+                                threshold=self.doubleSpinBox_sim_threshold.value())
+            communities = []
             if self.checkBox_sim_communities.isChecked():
-                self.similarity_communities = detect_communities(self.similarity_graph, seed=42)
+                communities = detect_communities(graph, seed=42)
             halo = self.comboBox_sim_halo.currentText() or None
-            self.similarity_figure = draw_similarity_graph(self.similarity_graph, halo=halo)
+            figure = draw_similarity_graph(graph, halo=halo)
         except Exception as err:
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()
+            return None
+        return graph, communities, figure
+
+    def run_similarity(self):
+        """ Build the co-occurrence similarity graph and show it in a non-blocking
+        matplotlib window. """
+
+        computed = self._compute_similarity()
+        if computed is None:
             return
+        self.similarity_graph, self.similarity_communities, self.similarity_figure = computed
         graph = self.similarity_graph
         edges = sorted(graph.edges(data=True), key=lambda e: -e[2]["weight"])[:20]
         lines = [f"{u} - {v}: {data['weight']:.3f}" for u, v, data in edges]
@@ -996,15 +1048,17 @@ class DialogTextStats(QtWidgets.QDialog):
 
 
     def export_similarity_png(self):
-        if self.similarity_figure is None:
-            self.run_similarity()
-        if self.similarity_figure is None:
+        # recompute a fresh figure: the one shown in a closed DialogFigure has a
+        # deleted Qt canvas and cannot be saved again
+        computed = self._compute_similarity()
+        if computed is None:
             return
+        figure = computed[2]
         e = ExportDirectoryPathDialog(self.app, "Similarity_graph.png")
         filepath = e.filepath
         if filepath is None:
             return
-        self.similarity_figure.savefig(filepath, dpi=150)
+        figure.savefig(filepath, dpi=150)
         msg = _("Similarity graph exported to: ") + filepath
         Message(self.app, _("PNG export"), msg).exec()
         self.parent_textEdit.append(msg)

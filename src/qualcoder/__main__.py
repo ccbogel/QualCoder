@@ -979,10 +979,10 @@ Click "Yes" to start now.')
         self.ui.actionCharts.triggered.connect(self.view_charts)
         self.ui.actionSQL_statements.setShortcut('Alt+D')
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
-        # Lexicometry (text statistics) submenu of the Reports menu
-        self.menu_text_stats = self.ui.menuReports.addMenu(_("Lexicometry (text statistics)"))
-        self.action_text_stats = self.menu_text_stats.addAction(_("Open text statistics"))
+        # Reports menu: lexicometry entry directly below Charts (no submenu)
+        self.action_text_stats = QtGui.QAction(_("Lexicometry (text statistics)"), self)
         self.action_text_stats.triggered.connect(self.text_stats)
+        self.ui.menuReports.insertAction(self.ui.actionSQL_statements, self.action_text_stats)
         # AI menu
         self.ui.actionAI_Setup_wizard.triggered.connect(self.ai_setup_wizard)
         self.ui.actionAI_Configuration.triggered.connect(self.ai_settings)
