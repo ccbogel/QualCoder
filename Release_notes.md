@@ -192,6 +192,18 @@ Improvements to REFI QDPX Project export and import.
 
 Option to manually add a new reference.
 
+## Text statistics (IRaMuTeQ methods)
+
+New "Text statistics (IRaMuTeQ methods)" submenu in the Reports menu: builds an analysable corpus (coded segments or whole documents, with codes, cases and attributes as variables) from the project, with tokenisation, stopwords (built-in FR/EN lists plus an editable custom file) and optional light stemming, and a sparse forms x segments lexical table (active vs supplementary forms). Computation engines live in the pure-Python `irastats` package and are unit-tested without a GUI.
+First analysis tab: descending text statistics (total occurrences, active/supplementary forms, decreasing frequency table, hapax, breakdown by partition variable), with CSV and HTML export.
+New 'Specificities' tab: chi-square specificities per form and per modality of a partition variable (signed value, two-sided p-value via scipy.stats.chi2, configurable probability threshold, default 0.05), sorted from most to least specific, with CSV/HTML export and over/under-representation highlighting.
+New 'Export IRaMuTeQ' button in the Corpus tab: writes the corpus (coded segments, plus whole documents when the checkbox is set) in the IRaMuTeQ text format, one '**** *code_<modality> *cas_<modality> *doc_<modality> ...' block per segment (native IRaMuTeQ variable format, restricted charset). The existing IRaMuTeQ export of the Report Codes dialog now shares the same token helper (irastats.corpus.iramuteq_token).
+New 'Similarity graph' tab: co-occurrence graph of forms within segments (networkx), association measure configurable (Jaccard by default, or chi2/phi-squared), adjustable edge threshold, Louvain community detection (nodes colored by community, communities listed), halo of a selected form, drawn in a non-blocking matplotlib window (node size proportional to frequency, edge width to similarity), with PNG export.
+New 'Correspondence analysis' tab: CA of the lexical table (forms x modalities of a partition variable, or forms x segments) by SVD of the standardized residuals (numpy only), eigenvalues/inertia table, factor map on axes 1x2 in a non-blocking matplotlib window (point size proportional to frequency, most contributive forms annotated), coordinates exported to CSV, PNG export.
+New 'BERTopic' tab in the lexicometry dialog (proposal): BERT-based topic modeling of the corpus - sentence-transformers embeddings, clustering (HDBSCAN when available, else KMeans), c-TF-IDF topic words; unit of analysis selectable (coded segments / whole documents / UCI ~40 occurrences); topic table with representative segments, topic-size chart, distribution of topics by variable (code/case/document/attribute: table + stacked bar chart + CSV), and CSV export. Uses only dependencies already required by the AI features (scikit-learn is now declared explicitly).
+
+New 'Reinert classification' tab: descending hierarchical classification (CHD, Reinert 1983/1990) of the corpus - UCI segmentation (~40 occurrences, bounded by punctuation), forms x UCI matrix of active forms (frequency >= 3), top-down binary splits maximizing the chi-square between classes (initialised from the first CA axis, refined by iterative reassignment, up to ~10 classes), with class profiles (signed chi-square specificities), most representative UCI per class, chi2/df summary, dendrogram of the classification tree (one color per class, most representative forms listed under each class) and CA of forms x classes (non-blocking matplotlib windows, PNG export), and CSV export. Defaults follow IRaMuTeQ and are adjustable in the dialog.
+
 ## Bug fixes
 
 - macOS merge projects failed in 4.0. Fixed.

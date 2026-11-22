@@ -111,6 +111,7 @@ from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_exact_matches import DialogReportExactTextMatches
 from qualcoder.report_relations import DialogReportRelations
 from qualcoder.report_sql import DialogSQL
+from qualcoder.dialog_text_stats import DialogTextStats
 from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
@@ -978,6 +979,10 @@ Click "Yes" to start now.')
         self.ui.actionCharts.triggered.connect(self.view_charts)
         self.ui.actionSQL_statements.setShortcut('Alt+D')
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
+        # Analysis menu: lexicometry entry directly before View Graph (no submenu)
+        self.action_text_stats = QtGui.QAction(_("Lexicometry (text statistics)"), self)
+        self.action_text_stats.triggered.connect(self.text_stats)
+        self.ui.menuAnalysis.insertAction(self.ui.actionView_Graph, self.action_text_stats)
         # AI menu
         self.ui.actionAI_Setup_wizard.triggered.connect(self.ai_setup_wizard)
         self.ui.actionAI_Configuration.triggered.connect(self.ai_settings)
@@ -1976,6 +1981,9 @@ Click "Yes" to start now.')
         self.ui.actionCode_summary.setEnabled(False)
         self.ui.actionCategories.setEnabled(False)
         self.ui.actionCharts.setEnabled(False)
+        # action_text_stats is created later in init_ui(); hide_menu_options() runs before that
+        if hasattr(self, "action_text_stats"):
+            self.action_text_stats.setEnabled(False)
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(False)
         self.update_ai_menu_options()
@@ -2026,6 +2034,8 @@ Click "Yes" to start now.')
         self.ui.actionCode_summary.setEnabled(True)
         self.ui.actionCategories.setEnabled(True)
         self.ui.actionCharts.setEnabled(True)
+        if hasattr(self, "action_text_stats"):
+            self.action_text_stats.setEnabled(True)
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(True)
         self.update_ai_menu_options()
@@ -2085,6 +2095,15 @@ Click "Yes" to start now.')
 
         self.ui.textBrowser_reports.hide()
         ui = DialogSQL(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
+
+    def text_stats(self):
+        """ Text statistics in the style of IRaMuTeQ (corpus, descending statistics,
+        specificities, correspondence analysis, similarity graph, Reinert classification,
+        IRaMuTeQ export) on the coded segments or whole documents of the project. """
+
+        self.ui.textBrowser_reports.hide()
+        ui = DialogTextStats(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_coding_comparison(self):
