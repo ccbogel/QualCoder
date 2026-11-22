@@ -11,6 +11,7 @@ from qualcoder.irastats.reinert import (
     best_binary_split,
     build_uci_segments,
     chi2_contingency,
+    draw_dendrogram,
     reinert_classification,
     reinert_from_segments,
     split_sentences,
@@ -155,6 +156,18 @@ class TestReinertClassification(unittest.TestCase):
     def test_empty_raises(self):
         with self.assertRaises(ValueError):
             reinert_from_segments([], size=5)
+
+    def test_draw_dendrogram(self):
+        fig = draw_dendrogram(self.result)
+        self.assertEqual(len(fig.axes), 1)
+        ax = fig.axes[0]
+        k = self.result["n_classes"]
+        # binary tree with k leaves: k-1 internal nodes, 2 segments per edge
+        self.assertEqual(len(ax.lines), 4 * (k - 1))
+        texts = [t.get_text() for t in ax.texts]
+        self.assertTrue(any(t.startswith("class 1") for t in texts))
+        self.assertTrue(any(t.startswith("class 2") for t in texts))
+        self.assertIn("chi2", ax.get_ylabel())
 
 
 if __name__ == "__main__":

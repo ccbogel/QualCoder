@@ -309,6 +309,59 @@ def reinert_classification(table: LexicalTable, uci_texts: list = None, max_clas
     }
 
 
+def draw_dendrogram(result: dict, figsize=(10, 6)):
+    """Dendrogram of the CHD binary tree: leaves are the classes (labelled with
+    class id and number of UCI), internal nodes are the dichotomic splits at
+    height = their chi-square. Returns a matplotlib Figure (no backend needed).
+    """
+
+    from matplotlib.figure import Figure
+
+    tree = result["tree"]
+    fig = Figure(figsize=figsize)
+    ax = fig.add_subplot(111)
+    positions = {}
+    leaves = []
+    counter = [0.0]
+
+    def layout(node):
+        if node["children"] is None:
+            x = counter[0]
+            counter[0] += 1.0
+            positions[id(node)] = (x, 0.0)
+            leaves.append(node)
+            return x
+        xs = [layout(child) for child in node["children"]]
+        x = sum(xs) / len(xs)
+        positions[id(node)] = (x, float(node["chi2"]))
+        return x
+
+    def draw(node):
+        if node["children"] is None:
+            return
+        x, y = positions[id(node)]
+        for child in node["children"]:
+            cx, cy = positions[id(child)]
+            ax.plot([cx, cx], [cy, y], color="#555555", linewidth=1.2)
+            ax.plot([cx, x], [y, y], color="#555555", linewidth=1.2)
+            draw(child)
+        ax.annotate(f"{y:.1f}", (x, y), fontsize=7, ha="center", va="bottom")
+
+    layout(tree)
+    draw(tree)
+    class_by_indices = {frozenset(c["uci_indices"]): c for c in result["classes"]}
+    for leaf in leaves:
+        cls = class_by_indices[frozenset(leaf["indices"])]
+        x, _y = positions[id(leaf)]
+        ax.annotate(f"class {cls['id']} ({cls['size']} UCI)", (x, 0.0), fontsize=8,
+                    rotation=45, ha="left", va="top", annotation_clip=False)
+    ax.set_ylabel("chi2")
+    ax.set_xticks([])
+    ax.set_title(_("Reinert classification dendrogram"))
+    fig.tight_layout()
+    return fig
+
+
 def reinert_from_segments(segments: list, size: int = 40, min_freq: int = 3, max_classes: int = 10,
                           min_class_size: int = 3, max_iter: int = 100, language: str = "fr",
                           stem: bool = False, stopwords: set = None,

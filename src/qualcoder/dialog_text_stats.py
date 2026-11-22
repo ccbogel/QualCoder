@@ -43,7 +43,7 @@ from .irastats import (
 )
 from .irastats.similarity import build_graph, cooccurrence, draw_similarity_graph, similarity_matrix
 from .irastats.ca import ca_coordinate_rows, correspondence_analysis, lexical_table_by_variable, plot_ca
-from .irastats.reinert import reinert_from_segments
+from .irastats.reinert import draw_dendrogram, reinert_from_segments
 from .irastats.report_html import descstats_html, specificites_html
 from .select_items import DialogSelectItems
 
@@ -731,6 +731,10 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_reinert_ca.setIcon(qta.icon("mdi6.chart-scatter-plot"))
         self.pushButton_reinert_ca.clicked.connect(self.show_reinert_ca)
         params.addWidget(self.pushButton_reinert_ca)
+        self.pushButton_reinert_dendro = QtWidgets.QPushButton(_("Dendrogram"))
+        self.pushButton_reinert_dendro.setIcon(qta.icon("mdi6.chart-tree"))
+        self.pushButton_reinert_dendro.clicked.connect(self.show_reinert_dendrogram)
+        params.addWidget(self.pushButton_reinert_dendro)
         layout.addLayout(params)
 
         self.label_reinert_info = QtWidgets.QLabel("")
@@ -858,6 +862,19 @@ class DialogTextStats(QtWidgets.QDialog):
         msg = _("Reinert classification exported to: ") + filepath
         Message(self.app, _("CSV export"), msg).exec()
         self.parent_textEdit.append(msg)
+
+    def show_reinert_dendrogram(self):
+        """ Show the dendrogram of the CHD binary tree (leaves = classes, internal
+        nodes at height = chi2 of the split) in a non-blocking matplotlib window. """
+
+        if self.reinert_result is None:
+            self.run_reinert()
+        if self.reinert_result is None:
+            return
+        figure = draw_dendrogram(self.reinert_result)
+        dialog = DialogFigure(self.app, figure, _("Reinert classification dendrogram"))
+        dialog.show()
+        self._reinert_dendro_dialog = dialog
 
     def show_reinert_ca(self):
         """ Show the correspondence analysis of forms x classes in a non-blocking

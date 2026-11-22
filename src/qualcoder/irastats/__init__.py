@@ -63,6 +63,7 @@ from .reinert import (
     best_binary_split,
     reinert_classification,
     reinert_from_segments,
+    draw_dendrogram,
 )
 
 __all__ = [
@@ -105,4 +106,5 @@ __all__ = [
     "best_binary_split",
     "reinert_classification",
     "reinert_from_segments",
+    "draw_dendrogram",
 ]
