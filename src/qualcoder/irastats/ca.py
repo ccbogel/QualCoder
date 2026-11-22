@@ -149,9 +149,9 @@ def plot_ca(result: dict, axes=(0, 1), top_forms: int = 40, figsize=(10, 8)) -> 
     contrib = result["row_contrib"][:, i] + result["row_contrib"][:, j]
     order = np.argsort(-contrib)[:top_forms]
     for k in order:
-        ax.annotate(result["row_labels"][k], (F[k, i], F[k, j]), fontsize=7, zorder=4)
+        ax.annotate(str(result["row_labels"][k])[:30], (F[k, i], F[k, j]), fontsize=7, zorder=4)
     for k in range(G.shape[0]):
-        ax.annotate(result["col_labels"][k], (G[k, i], G[k, j]), fontsize=9, color="#e14b31", zorder=4)
+        ax.annotate(str(result["col_labels"][k])[:30], (G[k, i], G[k, j]), fontsize=9, color="#e14b31", zorder=4)
     ax.axhline(0, color="#cccccc", linewidth=0.8)
     ax.axvline(0, color="#cccccc", linewidth=0.8)
     ax.set_xlabel(f"axis {i + 1} ({result['percent'][i]:.1f}%)")

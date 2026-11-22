@@ -21,6 +21,7 @@ pymupdf
 python-vlc
 requests
 scipy  # explicit: used by irastats (already pulled in via scikit-learn, and in the PyInstaller specs)
+scikit-learn  # explicit: used by topic_model (BERTopic tab); already pulled in via sentence-transformers
 rispy
 six
 langchain>=0.2.8 

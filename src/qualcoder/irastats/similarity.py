@@ -198,7 +198,7 @@ def draw_similarity_graph(graph: nx.Graph, seed: int = 42, top_labels: int = 40,
                             edgecolor="#b00000", alpha=0.8))
     nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=sizes, node_color=node_colors,
                            edgecolors=edgecolors, linewidths=1.2)
-    labels = {node: node for node in sorted(graph.nodes, key=lambda n: -freqs.get(n, 0))[:top_labels]}
+    labels = {node: str(node)[:30] for node in sorted(graph.nodes, key=lambda n: -freqs.get(n, 0))[:top_labels]}
     nx.draw_networkx_labels(graph, pos, labels=labels, ax=ax, font_size=8)
     ax.set_title("Similarity graph")
     ax.axis("off")
