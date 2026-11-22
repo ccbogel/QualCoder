@@ -32,7 +32,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .color_selector import TextColor
 from .helpers import msecs_to_mins_and_secs, DialogCodeInAV, DialogCodeInImage, DialogCodeInText, \
-    ExportDirectoryPathDialog, Message
+    ExportDirectoryPathDialog, Message, doc_end_position
 from .memo import DialogMemo
 from .select_items import DialogSelectItems
 
@@ -154,9 +154,9 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             self.te.insertHtml(hmsg)
         for row in self.text_results:
             row['file_or_case'] = self.case_or_file
-            row['textedit_start'] = len(self.te.toPlainText())
+            row['textedit_start'] = doc_end_position(self.te)
             self.insert_title(row)
-            row['textedit_end'] = len(self.te.toPlainText())
+            row['textedit_end'] = doc_end_position(self.te)
             self.te.append(f"{row['text']}\n")
             if row['memo']:
                 self.te.append(_("Memo: ") + row['memo'] + "\n")
@@ -195,9 +195,9 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             self.te.insertHtml(hmsg)
         for counter, row in enumerate(self.image_results):
             row['file_or_case'] = self.case_or_file
-            row['textedit_start'] = len(self.te.toPlainText())
+            row['textedit_start'] = doc_end_position(self.te)
             self.insert_title(row)
-            row['textedit_end'] = len(self.te.toPlainText())
+            row['textedit_end'] = doc_end_position(self.te)
             img = {'mediapath': row['mediapath'], 'x1': row['x1'], 'y1': row['y1'], 'width': row['width'],
                    'height': row['height'], 'pdf_page': row['pdf_page']}
             self.put_image_into_textedit(img, counter, self.te)
@@ -238,12 +238,12 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             self.te.insertHtml(hmsg)
         for row in self.av_results:
             row['file_or_case'] = self.case_or_file
-            row['textedit_start'] = len(self.te.toPlainText())
+            row['textedit_start'] = doc_end_position(self.te)
             self.insert_title(row)
             start = msecs_to_mins_and_secs(row['pos0'])
             end = msecs_to_mins_and_secs(row['pos1'])
             self.te.insertHtml(f'<br />Time: [{start} - {end}] ')
-            row['textedit_end'] = len(self.te.toPlainText())
+            row['textedit_end'] = doc_end_position(self.te)
             if row['memo'] != "":
                 self.te.append(_("Memo: ") + row['memo'] + "\n")
             else:
@@ -652,9 +652,9 @@ class DialogCodedIds(QtWidgets.QDialog):
                 self.text_results.append(res_dict)
             # Text insertion into textEdit
             for row in self.text_results:
-                row['textedit_start'] = len(self.te.toPlainText())
+                row['textedit_start'] = doc_end_position(self.te)
                 self.insert_title(row)
-                row['textedit_end'] = len(self.te.toPlainText())
+                row['textedit_end'] = doc_end_position(self.te)
                 self.te.append(f"{row['text']}\n")
                 if row['memo']:
                     self.te.append(_("Memo: ") + row['memo'] + "\n")
@@ -675,9 +675,9 @@ class DialogCodedIds(QtWidgets.QDialog):
                     self.image_results.append(res_dict)
             # Image - textEdit insertion
             for counter, row in enumerate(self.image_results):
-                row['textedit_start'] = len(self.te.toPlainText())
+                row['textedit_start'] = doc_end_position(self.te)
                 self.insert_title(row)
-                row['textedit_end'] = len(self.te.toPlainText())
+                row['textedit_end'] = doc_end_position(self.te)
                 img = {'mediapath': row['mediapath'], 'x1': row['x1'], 'y1': row['y1'], 'width': row['width'],
                        'height': row['height'], 'pdf_page': row['pdf_page']}
                 self.put_image_into_textedit(img, counter, self.te)
@@ -703,12 +703,12 @@ class DialogCodedIds(QtWidgets.QDialog):
                     self.av_results.append(res_dict)
             # A/V - textEdit insertion
             for row in self.av_results:
-                row['textedit_start'] = len(self.te.toPlainText())
+                row['textedit_start'] = doc_end_position(self.te)
                 self.insert_title(row)
                 start = msecs_to_mins_and_secs(row['pos0'])
                 end = msecs_to_mins_and_secs(row['pos1'])
                 self.te.insertHtml(f'<br />Time: [{start} - {end}] ')
-                row['textedit_end'] = len(self.te.toPlainText())
+                row['textedit_end'] = doc_end_position(self.te)
                 if row['memo'] != "":
                     self.te.append(_("Memo: ") + row['memo'] + "\n")
                 else:
