@@ -1981,7 +1981,9 @@ Click "Yes" to start now.')
         self.ui.actionCode_summary.setEnabled(False)
         self.ui.actionCategories.setEnabled(False)
         self.ui.actionCharts.setEnabled(False)
-        self.action_text_stats.setEnabled(False)
+        # action_text_stats is created later in init_ui(); hide_menu_options() runs before that
+        if hasattr(self, "action_text_stats"):
+            self.action_text_stats.setEnabled(False)
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(False)
         self.update_ai_menu_options()
@@ -2032,7 +2034,8 @@ Click "Yes" to start now.')
         self.ui.actionCode_summary.setEnabled(True)
         self.ui.actionCategories.setEnabled(True)
         self.ui.actionCharts.setEnabled(True)
-        self.action_text_stats.setEnabled(True)
+        if hasattr(self, "action_text_stats"):
+            self.action_text_stats.setEnabled(True)
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(True)
         self.update_ai_menu_options()
