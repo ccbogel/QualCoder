@@ -168,7 +168,11 @@ Create a .Desktop file for launch, enter this command (adapt it according to the
 
 Overall, improved the user interface styling to give a modern look. Reduced the number of style options to three only, to make maintenance easier: native, original, dark.
 
-Using AI identify hard to see bugs, with solutions to resolve them.
+Using AI to identify hard to see bugs, with solutions to resolve them.
+
+## AI 
+
+Improve AI model access.
 
 ## Code Text, Code A/V
 
