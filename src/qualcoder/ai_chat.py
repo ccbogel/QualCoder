@@ -96,7 +96,6 @@ AI_CONTEXT_ESTIMATE_MESSAGE_OVERHEAD_TOKENS = 10
 AI_CONTEXT_ESTIMATE_SAFETY_RATIO = 1.12
 AI_AGENT_MAX_CALLS_PER_ROUND = 12
 AI_AGENT_MAX_REFLECTION_ROUNDS = 8
-AI_AGENT_MAX_TOTAL_TOOL_CALLS_BASE = 40
 AI_AGENT_MAX_QUEUED_CALLS = 100
 
 MARKDOWN_RENDERER = MarkdownIt(
@@ -3313,9 +3312,7 @@ class DialogAIChat(QtWidgets.QDialog):
         reflection_json_schema = self._mcp_reflection_json_schema()
         max_calls_per_round = AI_AGENT_MAX_CALLS_PER_ROUND
         max_reflection_rounds = AI_AGENT_MAX_REFLECTION_ROUNDS
-        max_total_tool_calls = AI_AGENT_MAX_TOTAL_TOOL_CALLS_BASE + len(bootstrap_calls)
         max_queued_calls = AI_AGENT_MAX_QUEUED_CALLS
-        total_tool_calls = 0
         stop_reason = ""
         latest_plan_summary = _("Prepared the initial topic exploration evidence.")
         latest_reflection_summary = ""
@@ -3412,7 +3409,6 @@ class DialogAIChat(QtWidgets.QDialog):
                 status_text = self.ai_mcp_server.describe_status_event(method, request_params)
                 self._emit_mcp_status(signals, chat_idx, status_text)
                 _request, response = self._run_mcp_request(method, request_params)
-                total_tool_calls += 1
                 append_tool_exchange(method, display_params, response)
 
             planner_system_prompt = self._build_mcp_combined_system_prompt(
@@ -3628,9 +3624,6 @@ class DialogAIChat(QtWidgets.QDialog):
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
                         return result
-                    if total_tool_calls >= max_total_tool_calls:
-                        stop_reason = "max_total_tool_calls_reached"
-                        break
                     method = str(call.get("method", "")).strip()
                     params = call.get("params", {})
                     if not isinstance(params, dict):
@@ -3644,14 +3637,11 @@ class DialogAIChat(QtWidgets.QDialog):
                         chat_idx,
                     )
                     if executed_remotely:
-                        total_tool_calls += 1
                         executed_any_call = True
                     append_tool_exchange(method, display_params, response)
                     failure_summary = self._summarize_mcp_failure(method, display_params, response)
                     if failure_summary is not None:
                         round_failures.append(failure_summary)
-                if stop_reason == "max_total_tool_calls_reached":
-                    break
 
                 current_reflection_prompt = reflection_prompt
                 if len(deferred_calls) > 0:
@@ -4264,9 +4254,7 @@ class DialogAIChat(QtWidgets.QDialog):
         reflection_json_schema = self._mcp_reflection_json_schema()
         max_calls_per_round = AI_AGENT_MAX_CALLS_PER_ROUND
         max_reflection_rounds = AI_AGENT_MAX_REFLECTION_ROUNDS
-        max_total_tool_calls = AI_AGENT_MAX_TOTAL_TOOL_CALLS_BASE + len(bootstrap_calls)
         max_queued_calls = AI_AGENT_MAX_QUEUED_CALLS
-        total_tool_calls = 0
         stop_reason = ""
         latest_plan_summary = _("Prepared the selected coded segments for analysis.")
         latest_reflection_summary = ""
@@ -4388,7 +4376,6 @@ class DialogAIChat(QtWidgets.QDialog):
                 status_text = self.ai_mcp_server.describe_status_event(method, request_params)
                 self._emit_mcp_status(signals, chat_idx, status_text)
                 _request, response = self._run_mcp_request(method, request_params)
-                total_tool_calls += 1
                 append_tool_exchange(method, display_params, response)
                 if method == "resources/read":
                     accumulate_code_segment_coverage(response)
@@ -4554,9 +4541,6 @@ class DialogAIChat(QtWidgets.QDialog):
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
                         return result
-                    if total_tool_calls >= max_total_tool_calls:
-                        stop_reason = "max_total_tool_calls_reached"
-                        break
                     method = str(call.get("method", "")).strip()
                     params = call.get("params", {})
                     if not isinstance(params, dict):
@@ -4569,15 +4553,11 @@ class DialogAIChat(QtWidgets.QDialog):
                         signals,
                         chat_idx,
                     )
-                    if executed_remotely:
-                        total_tool_calls += 1
                     append_tool_exchange(method, display_params, response)
                     failure_summary = self._summarize_mcp_failure(method, display_params, response)
                     if failure_summary is not None:
                         current_round_failures.append(failure_summary)
                 previous_round_failures = current_round_failures
-                if stop_reason == "max_total_tool_calls_reached":
-                    break
             else:
                 if stop_reason == "":
                     stop_reason = "max_reflection_rounds_reached"
@@ -5151,9 +5131,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         reflection_json_schema = self._mcp_reflection_json_schema()
         max_calls_per_round = AI_AGENT_MAX_CALLS_PER_ROUND
         max_reflection_rounds = AI_AGENT_MAX_REFLECTION_ROUNDS
-        max_total_tool_calls = AI_AGENT_MAX_TOTAL_TOOL_CALLS_BASE + len(bootstrap_calls)
         max_queued_calls = AI_AGENT_MAX_QUEUED_CALLS
-        total_tool_calls = 0
         stop_reason = ""
         latest_plan_summary = _("Prepared the selected text passage for analysis.")
         latest_reflection_summary = ""
@@ -5223,7 +5201,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                 status_text = self.ai_mcp_server.describe_status_event(method, request_params)
                 self._emit_mcp_status(signals, chat_idx, status_text)
                 _request, response = self._run_mcp_request(method, request_params)
-                total_tool_calls += 1
                 append_tool_exchange(method, display_params, response)
 
             reflection_system_prompt = self._build_mcp_combined_system_prompt(
@@ -5364,9 +5341,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
                         return result
-                    if total_tool_calls >= max_total_tool_calls:
-                        stop_reason = "max_total_tool_calls_reached"
-                        break
                     method = str(call.get("method", "")).strip()
                     params = call.get("params", {})
                     if not isinstance(params, dict):
@@ -5379,15 +5353,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                         signals,
                         chat_idx,
                     )
-                    if executed_remotely:
-                        total_tool_calls += 1
                     append_tool_exchange(method, display_params, response)
                     failure_summary = self._summarize_mcp_failure(method, display_params, response)
                     if failure_summary is not None:
                         current_round_failures.append(failure_summary)
                 previous_round_failures = current_round_failures
-                if stop_reason == "max_total_tool_calls_reached":
-                    break
             else:
                 if stop_reason == "":
                     stop_reason = "max_reflection_rounds_reached"
@@ -8462,9 +8432,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             reflection_json_schema = self._mcp_reflection_json_schema()
             max_calls_per_round = AI_AGENT_MAX_CALLS_PER_ROUND
             max_reflection_rounds = AI_AGENT_MAX_REFLECTION_ROUNDS
-            max_total_tool_calls = AI_AGENT_MAX_TOTAL_TOOL_CALLS_BASE + len(bootstrap_calls)
             max_queued_calls = AI_AGENT_MAX_QUEUED_CALLS
-            total_tool_calls = 0
             stop_reason = ""
             methodology_gate = self._empty_methodology_gate()
             def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
@@ -8544,7 +8512,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                 status_text = self.ai_mcp_server.describe_status_event(method, request_params)
                 self._emit_mcp_status(signals, chat_idx, status_text)
                 _request, response = self._run_mcp_request(method, request_params)
-                total_tool_calls += 1
                 append_tool_exchange(method, display_params, response)
 
             planner_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_planner_system_prompt())
@@ -8749,9 +8716,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                     if self.app.ai.is_current_run_canceled():
                         result["canceled"] = True
                         return result
-                    if total_tool_calls >= max_total_tool_calls:
-                        stop_reason = "max_total_tool_calls_reached"
-                        break
                     method = str(call.get("method", "")).strip()
                     params = call.get("params", {})
                     if not isinstance(params, dict):
@@ -8765,7 +8729,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                         chat_idx,
                     )
                     if executed_remotely:
-                        total_tool_calls += 1
                         executed_any_call = True
                     append_tool_exchange(method, display_params if method in allowed_methods else params, response)
                     failure_summary = self._summarize_mcp_failure(
