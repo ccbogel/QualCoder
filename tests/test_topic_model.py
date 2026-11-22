@@ -144,5 +144,31 @@ class TestTopicByVariable(unittest.TestCase):
         self.assertEqual(len(fig.axes), 1)
 
 
+class TestBertopicEndToEnd(unittest.TestCase):
+    """Full pipeline with mocked embeddings (no sentence-transformers needed)."""
+
+    def test_end_to_end_two_topics(self):
+        from unittest.mock import patch
+        import qualcoder.topic_model as tm
+        segments = ([{"text": "chat chien os patte", "variables": {"code": "animal"}}] * 5
+                    + [{"text": "voiture route moteur roue", "variables": {"code": "vehicule"}}] * 5)
+        rng = np.random.default_rng(0)
+        emb = np.vstack([rng.normal([1.0, 0.0], 0.05, size=(5, 2)),
+                         rng.normal([0.0, 1.0], 0.05, size=(5, 2))])
+        with patch.object(tm, "compute_embeddings", return_value=emb):
+            result = tm.bertopic_analysis(segments, n_clusters=2, min_cluster_size=2, top_n=4,
+                                          language="xx")  # unknown language -> no stopwords
+        self.assertEqual(result["n_docs"], 10)
+        self.assertEqual(result["n_topics"], 2)
+        words = {w for topic in result["topics"] for w, _ in topic["top_words"]}
+        self.assertIn("chat", words)
+        self.assertIn("voiture", words)
+        # distribution by code separates the two topics
+        modalities, topic_ids, counts = tm.topic_by_variable(
+            result["labels"], [s["variables"] for s in segments], "code")
+        self.assertEqual(modalities, ["animal", "vehicule"])
+        self.assertEqual(counts.sum(), 10)
+
+
 if __name__ == "__main__":
     unittest.main()

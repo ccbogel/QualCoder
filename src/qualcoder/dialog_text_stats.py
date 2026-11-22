@@ -948,6 +948,12 @@ class DialogTextStats(QtWidgets.QDialog):
         layout = QtWidgets.QVBoxLayout(self.tab_bertopic)
 
         params = QtWidgets.QHBoxLayout()
+        params.addWidget(QtWidgets.QLabel(_("Unit of analysis:")))
+        self.comboBox_bertopic_unit = QtWidgets.QComboBox()
+        self.comboBox_bertopic_unit.addItem(_("Coded segments"), "segments")
+        self.comboBox_bertopic_unit.addItem(_("Whole documents"), "documents")
+        self.comboBox_bertopic_unit.addItem(_("UCI (~40 occurrences)"), "uci")
+        params.addWidget(self.comboBox_bertopic_unit)
         params.addWidget(QtWidgets.QLabel(_("Embedding model:")))
         self.comboBox_bertopic_model = QtWidgets.QComboBox()
         self.comboBox_bertopic_model.setEditable(True)
@@ -1017,9 +1023,21 @@ class DialogTextStats(QtWidgets.QDialog):
             Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
             return
         model_name = self.comboBox_bertopic_model.currentText().strip() or DEFAULT_MODEL
+        unit = self.comboBox_bertopic_unit.currentData()
+        if unit == "documents":
+            from .irastats.corpus import build_document_segments
+            segments = build_document_segments(self.app.conn, file_ids=self.file_ids or None)
+        elif unit == "uci":
+            from .irastats.reinert import build_uci_segments
+            segments = build_uci_segments(self.segments, size=40)
+        else:
+            segments = self.segments
+        if not segments:
+            Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
+            return
         try:
             self.bertopic_result = bertopic_analysis(
-                self.segments,
+                segments,
                 model_name=model_name,
                 min_cluster_size=self.spinBox_bertopic_min_size.value(),
                 top_n=self.spinBox_bertopic_top_words.value(),
@@ -1047,12 +1065,13 @@ class DialogTextStats(QtWidgets.QDialog):
         self.tableWidget_bertopic.resizeColumnsToContents()
         self.label_bertopic_info.setText(
             _("Documents: ") + str(result["n_docs"]) + " | " + _("Topics: ") + str(result["n_topics"])
-            + " | " + _("Noise documents: ") + str(result["n_noise"]) + " | " + _("Model: ") + result["model"])
+            + " | " + _("Noise documents: ") + str(result["n_noise"]) + " | " + _("Unit: ")
+            + self.comboBox_bertopic_unit.currentText() + " | " + _("Model: ") + result["model"])
         variable = self.comboBox_bertopic_variable.currentData()
         self.bertopic_distribution = None
         if variable:
             self.bertopic_distribution = topic_by_variable(
-                result["labels"], [s["variables"] for s in self.segments], variable)
+                result["labels"], [s["variables"] for s in segments], variable)
             modalities, topic_ids, counts = self.bertopic_distribution
             self.tableWidget_bertopic_dist.setColumnCount(1 + len(topic_ids))
             self.tableWidget_bertopic_dist.setHorizontalHeaderLabels(
@@ -1110,6 +1129,7 @@ class DialogTextStats(QtWidgets.QDialog):
         with open(filepath, "w", encoding="utf-8-sig", newline="") as file_:
             writer = csv.writer(file_)
             writer.writerow([_("Model"), result["model"]])
+            writer.writerow([_("Unit of analysis"), self.comboBox_bertopic_unit.currentText()])
             writer.writerow([_("Documents"), result["n_docs"], _("Topics"), result["n_topics"],
                              _("Noise documents"), result["n_noise"]])
             writer.writerow([])
