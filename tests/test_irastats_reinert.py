@@ -182,6 +182,14 @@ class TestReinertClassification(unittest.TestCase):
         self.assertTrue(any(t.startswith("class 1") for t in texts))
         self.assertTrue(any(t.startswith("class 2") for t in texts))
         self.assertIn("chi2", ax.get_ylabel())
+        # each class is labelled with its most representative forms
+        self.assertTrue(any("chat" in t for t in texts))
+        self.assertTrue(any("voiture" in t for t in texts))
+        # leaf branches are colored per class (not gray), labels too
+        leaf_colors = {ln.get_color() for ln in ax.lines if ln.get_color() != "#555555"}
+        self.assertGreaterEqual(len(leaf_colors), 2)
+        text_colors = {t.get_color() for t in ax.texts if t.get_text().startswith("class")}
+        self.assertGreaterEqual(len(text_colors), 2)
 
 
 if __name__ == "__main__":

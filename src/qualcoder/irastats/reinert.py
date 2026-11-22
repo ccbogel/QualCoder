@@ -279,7 +279,8 @@ def reinert_classification(table: LexicalTable, uci_texts: list = None, max_clas
             if signe != 0:
                 profile.append({"forme": form, "frequence": total_form, "chi2": value,
                                 "valeur": signe * value})
-        profile.sort(key=lambda r: -r["chi2"])
+        # over-represented forms (valeur > 0) first, then by decreasing chi2
+        profile.sort(key=lambda r: (r["valeur"] <= 0, -r["chi2"]))
         cls["profile"] = profile[:50]
         # representative UCI: highest sum of the class's signed specificities of
         # the forms present in the UCI
@@ -316,15 +317,30 @@ def reinert_classification(table: LexicalTable, uci_texts: list = None, max_clas
     }
 
 
-def draw_dendrogram(result: dict, figsize=(10, 6)):
-    """Dendrogram of the CHD binary tree: leaves are the classes (labelled with
-    class id and number of UCI), internal nodes are the dichotomic splits at
-    height = their chi-square. Returns a matplotlib Figure (no backend needed).
+CLASS_PALETTE = ["#e14b31", "#22a7f0", "#26CC00", "#ab3da9", "#FFA600", "#009C1A",
+                 "#0091ea", "#c2185b", "#5d4037", "#00897b"]
+
+
+def draw_dendrogram(result: dict, figsize=(10, 7), top_forms: int = 5):
+    """Dendrogram of the CHD binary tree (IRaMuTeQ style): leaves are the classes,
+    each with its own color and labelled with its id, UCI count and most
+    representative forms (top of the class profile); internal nodes are the
+    dichotomic splits at height = their chi-square. Returns a matplotlib Figure
+    (no backend needed).
     """
 
     from matplotlib.figure import Figure
 
     tree = result["tree"]
+    class_by_indices = {frozenset(c["uci_indices"]): c for c in result["classes"]}
+
+    def class_of(node):
+        return class_by_indices[frozenset(node["indices"])]
+
+    def color_of(node):
+        cls = class_of(node)
+        return CLASS_PALETTE[(cls["id"] - 1) % len(CLASS_PALETTE)]
+
     fig = Figure(figsize=figsize)
     ax = fig.add_subplot(111)
     positions = {}
@@ -349,19 +365,26 @@ def draw_dendrogram(result: dict, figsize=(10, 6)):
         x, y = positions[id(node)]
         for child in node["children"]:
             cx, cy = positions[id(child)]
-            ax.plot([cx, cx], [cy, y], color="#555555", linewidth=1.2)
-            ax.plot([cx, x], [y, y], color="#555555", linewidth=1.2)
+            # leaf branches take the color of their class, internal branches stay gray
+            color = color_of(child) if child["children"] is None else "#555555"
+            width = 1.8 if child["children"] is None else 1.2
+            ax.plot([cx, cx], [cy, y], color=color, linewidth=width)
+            ax.plot([cx, x], [y, y], color=color, linewidth=width)
             draw(child)
         ax.annotate(f"{y:.1f}", (x, y), fontsize=7, ha="center", va="bottom")
 
     layout(tree)
     draw(tree)
-    class_by_indices = {frozenset(c["uci_indices"]): c for c in result["classes"]}
     for leaf in leaves:
-        cls = class_by_indices[frozenset(leaf["indices"])]
+        cls = class_of(leaf)
         x, _y = positions[id(leaf)]
-        ax.annotate(f"class {cls['id']} ({cls['size']} UCI)", (x, 0.0), fontsize=8,
-                    rotation=45, ha="left", va="top", annotation_clip=False)
+        # most representative = over-represented forms first (valeur > 0)
+        positive = [p for p in cls["profile"] if p["valeur"] > 0]
+        shown = positive[:top_forms] if positive else cls["profile"][:top_forms]
+        forms = ", ".join(p["forme"] for p in shown)
+        label = f"class {cls['id']} ({cls['size']} UCI)\n{forms}"
+        ax.annotate(label, (x, 0.0), fontsize=8, rotation=45, ha="left", va="top",
+                    color=color_of(leaf), annotation_clip=False)
     ax.set_ylabel("chi2")
     ax.set_xticks([])
     ax.set_title(_("Reinert classification dendrogram"))
