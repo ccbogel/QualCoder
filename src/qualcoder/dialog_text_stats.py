@@ -44,6 +44,7 @@ from .irastats import (
 from .irastats.similarity import build_graph, cooccurrence, detect_communities, draw_similarity_graph, similarity_matrix
 from .irastats.ca import ca_coordinate_rows, correspondence_analysis, lexical_table_by_variable, plot_ca
 from .irastats.reinert import draw_dendrogram, reinert_from_segments
+from .topic_model import AI_MODEL, DEFAULT_MODEL, bertopic_analysis, plot_topic_sizes
 from .irastats.report_html import descstats_html, specificites_html
 from .select_items import DialogSelectItems
 
@@ -86,6 +87,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self._build_similarity_tab()
         self._build_ca_tab()
         self._build_reinert_tab()
+        self._build_bertopic_tab()
         layout.addWidget(self.tabWidget)
 
     # --- Selection (same helpers as the other Reports dialogs) ---
@@ -929,6 +931,136 @@ class DialogTextStats(QtWidgets.QDialog):
         dialog.show()
         self._reinert_ca_dialog = dialog
         self._reinert_ca_figure = figure
+
+
+    # --- BERTopic tab (BERT-based topic modeling) ---
+
+    def _build_bertopic_tab(self):
+        self.tab_bertopic = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(self.tab_bertopic)
+
+        params = QtWidgets.QHBoxLayout()
+        params.addWidget(QtWidgets.QLabel(_("Embedding model:")))
+        self.comboBox_bertopic_model = QtWidgets.QComboBox()
+        self.comboBox_bertopic_model.setEditable(True)
+        self.comboBox_bertopic_model.addItems([DEFAULT_MODEL, AI_MODEL])
+        params.addWidget(self.comboBox_bertopic_model, 1)
+        params.addWidget(QtWidgets.QLabel(_("Min documents per topic:")))
+        self.spinBox_bertopic_min_size = QtWidgets.QSpinBox()
+        self.spinBox_bertopic_min_size.setRange(2, 500)
+        self.spinBox_bertopic_min_size.setValue(5)
+        params.addWidget(self.spinBox_bertopic_min_size)
+        params.addWidget(QtWidgets.QLabel(_("Top words per topic:")))
+        self.spinBox_bertopic_top_words = QtWidgets.QSpinBox()
+        self.spinBox_bertopic_top_words.setRange(3, 50)
+        self.spinBox_bertopic_top_words.setValue(10)
+        params.addWidget(self.spinBox_bertopic_top_words)
+        self.pushButton_bertopic_run = QtWidgets.QPushButton(_("Calculate"))
+        self.pushButton_bertopic_run.setIcon(qta.icon("mdi6.play"))
+        self.pushButton_bertopic_run.clicked.connect(self.run_bertopic)
+        params.addWidget(self.pushButton_bertopic_run)
+        self.pushButton_bertopic_chart = QtWidgets.QPushButton(_("Topic sizes"))
+        self.pushButton_bertopic_chart.setIcon(qta.icon("mdi6.chart-bar"))
+        self.pushButton_bertopic_chart.clicked.connect(self.show_bertopic_chart)
+        params.addWidget(self.pushButton_bertopic_chart)
+        self.pushButton_bertopic_csv = QtWidgets.QPushButton(_("Export CSV"))
+        self.pushButton_bertopic_csv.setIcon(qta.icon("mdi6.file-delimited-outline"))
+        self.pushButton_bertopic_csv.clicked.connect(self.export_bertopic_csv)
+        params.addWidget(self.pushButton_bertopic_csv)
+        layout.addLayout(params)
+
+        self.label_bertopic_info = QtWidgets.QLabel("")
+        self.label_bertopic_info.setWordWrap(True)
+        layout.addWidget(self.label_bertopic_info)
+        self.tableWidget_bertopic = QtWidgets.QTableWidget()
+        self.tableWidget_bertopic.setColumnCount(4)
+        self.tableWidget_bertopic.setHorizontalHeaderLabels(
+            [_("Topic"), _("Size"), _("Top words"), _("Representative segment")])
+        self.tableWidget_bertopic.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        layout.addWidget(self.tableWidget_bertopic)
+        self.tabWidget.addTab(self.tab_bertopic, "BERTopic")
+        self.bertopic_result = None
+
+    def run_bertopic(self):
+        """ BERTopic-style analysis of the corpus: BERT embeddings
+        (sentence-transformers), clustering, c-TF-IDF topic words. """
+
+        if not self.get_segments():  # always rebuild: the selection may have changed
+            return
+        if not self.segments:
+            Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
+            return
+        model_name = self.comboBox_bertopic_model.currentText().strip() or DEFAULT_MODEL
+        try:
+            self.bertopic_result = bertopic_analysis(
+                self.segments,
+                model_name=model_name,
+                min_cluster_size=self.spinBox_bertopic_min_size.value(),
+                top_n=self.spinBox_bertopic_top_words.value(),
+                language=self.comboBox_language.currentText(),
+                stem=self.checkBox_stem.isChecked(),
+                custom_stopwords_path=self.lineEdit_stopwords.text() or None,
+            )
+        except ImportError as err:
+            Message(self.app, _("BERT embeddings unavailable"), str(err), "warning").exec()
+            return
+        except Exception as err:
+            logger.error(err)
+            Message(self.app, _("Error"), str(err), "warning").exec()
+            return
+        result = self.bertopic_result
+        self.tableWidget_bertopic.setRowCount(len(result["topics"]))
+        for row, topic in enumerate(result["topics"]):
+            words = ", ".join(f"{w} ({s:.3f})" for w, s in topic["top_words"])
+            rep = topic["representative_texts"][0][:120] if topic["representative_texts"] else ""
+            values = [f"topic {topic['topic']}", topic["size"], words, rep]
+            for col, value in enumerate(values):
+                item = QtWidgets.QTableWidgetItem(str(value))
+                item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                self.tableWidget_bertopic.setItem(row, col, item)
+        self.tableWidget_bertopic.resizeColumnsToContents()
+        self.label_bertopic_info.setText(
+            _("Documents: ") + str(result["n_docs"]) + " | " + _("Topics: ") + str(result["n_topics"])
+            + " | " + _("Noise documents: ") + str(result["n_noise"]) + " | " + _("Model: ") + result["model"])
+        msg = "BERTopic: " + str(result["n_topics"]) + " " + _("topics") + " (" + model_name + ")"
+        self.parent_textEdit.append(msg)
+
+    def show_bertopic_chart(self):
+        """ Bar chart of the topic sizes in a non-blocking matplotlib window. """
+
+        if self.bertopic_result is None:
+            self.run_bertopic()
+        if self.bertopic_result is None:
+            return
+        figure = plot_topic_sizes(self.bertopic_result)
+        dialog = DialogFigure(self.app, figure, "BERTopic: " + _("topic sizes"))
+        dialog.show()
+        self._bertopic_chart_dialog = dialog
+
+    def export_bertopic_csv(self):
+        if self.bertopic_result is None:
+            self.run_bertopic()
+        if self.bertopic_result is None:
+            return
+        e = ExportDirectoryPathDialog(self.app, "BERTopic_topics.csv")
+        filepath = e.filepath
+        if filepath is None:
+            return
+        result = self.bertopic_result
+        with open(filepath, "w", encoding="utf-8-sig", newline="") as file_:
+            writer = csv.writer(file_)
+            writer.writerow([_("Model"), result["model"]])
+            writer.writerow([_("Documents"), result["n_docs"], _("Topics"), result["n_topics"],
+                             _("Noise documents"), result["n_noise"]])
+            writer.writerow([])
+            writer.writerow([_("Topic"), _("Size"), _("Top words"), _("Representative segment")])
+            for topic in result["topics"]:
+                words = " | ".join(f"{w} ({s:.4f})" for w, s in topic["top_words"])
+                rep = topic["representative_texts"][0] if topic["representative_texts"] else ""
+                writer.writerow([f"topic {topic['topic']}", topic["size"], words, rep])
+        msg = _("BERTopic topics exported to: ") + filepath
+        Message(self.app, _("CSV export"), msg).exec()
+        self.parent_textEdit.append(msg)
 
 
     # --- Similarity graph tab ---
