@@ -37,7 +37,6 @@ from .irastats import (
     export_iramuteq,
     frequency_rows,
     hapax_rows,
-    modalities_of,
     specificities,
     specificity_rows,
     variable_rows,
