@@ -381,12 +381,16 @@ def draw_dendrogram(result: dict, figsize=(10, 7), top_forms: int = 5):
         # most representative = over-represented forms first (valeur > 0)
         positive = [p for p in cls["profile"] if p["valeur"] > 0]
         shown = positive[:top_forms] if positive else cls["profile"][:top_forms]
-        forms = ", ".join(p["forme"] for p in shown)
-        label = f"class {cls['id']} ({cls['size']} UCI)\n{forms}"
-        ax.annotate(label, (x, 0.0), fontsize=8, rotation=45, ha="left", va="top",
+        # horizontal block under the class label, as in the IRaMuTeQ dendrogram
+        label = f"class {cls['id']} ({cls['size']} UCI)\n" + "\n".join(p["forme"] for p in shown)
+        ax.annotate(label, (x, 0.0), fontsize=8, rotation=0, ha="center", va="top",
                     color=color_of(leaf), annotation_clip=False)
     ax.set_ylabel("chi2")
     ax.set_xticks([])
+    # leave room below the axis for the horizontal word blocks
+    ymax = max([pos[1] for pos in positions.values()] + [1.0])
+    n_lines = top_forms + 1
+    ax.set_ylim(-0.09 * n_lines * ymax, ymax * 1.05)
     ax.set_title(_("Reinert classification dendrogram"))
     fig.tight_layout()
     return fig
