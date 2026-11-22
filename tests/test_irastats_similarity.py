@@ -11,7 +11,9 @@ from qualcoder.irastats.lexicon import build_lexical_table
 from qualcoder.irastats.similarity import (
     build_graph,
     cooccurrence,
+    detect_communities,
     draw_similarity_graph,
+    halo_neighbors,
     similarity_matrix,
 )
 
@@ -95,6 +97,57 @@ class TestGraph(unittest.TestCase):
         fig2 = draw_similarity_graph(graph, seed=1)
         self.assertEqual(len(fig2.axes), 1)
         self.assertEqual(pos1.keys(), graph.nodes.keys())
+
+
+class TestCommunitiesAndHalos(unittest.TestCase):
+
+    def make_two_cluster_graph(self):
+        # two strong pairs, no cross edges
+        labels = ["chat", "chien", "poisson", "requin"]
+        sim = np.array([
+            [0.0, 0.9, 0.0, 0.0],
+            [0.9, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.8],
+            [0.0, 0.0, 0.8, 0.0],
+        ])
+        freq = np.array([5, 4, 3, 2])
+        return build_graph(labels, sim, freq, threshold=0.5)
+
+    def test_detect_communities(self):
+        graph = self.make_two_cluster_graph()
+        communities = detect_communities(graph, seed=42)
+        self.assertEqual(len(communities), 2)
+        self.assertEqual({frozenset(c) for c in communities},
+                         {frozenset({"chat", "chien"}), frozenset({"poisson", "requin"})})
+        self.assertEqual(graph.nodes["chat"]["community"], graph.nodes["chien"]["community"])
+        self.assertNotEqual(graph.nodes["chat"]["community"], graph.nodes["poisson"]["community"])
+
+    def test_detect_communities_empty(self):
+        import networkx as nx
+        self.assertEqual(detect_communities(nx.Graph()), [])
+
+    def test_halo_neighbors(self):
+        graph = self.make_two_cluster_graph()
+        self.assertEqual(halo_neighbors(graph, "chat", radius=1), {"chat", "chien"})
+        self.assertEqual(halo_neighbors(graph, "unknown", radius=1), set())
+        # path graph for radius 2
+        path = nx.path_graph(["a", "b", "c", "d"])
+        self.assertEqual(halo_neighbors(path, "a", radius=1), {"a", "b"})
+        self.assertEqual(halo_neighbors(path, "a", radius=2), {"a", "b", "c"})
+
+    def test_draw_with_communities_and_halo(self):
+        graph = self.make_two_cluster_graph()
+        detect_communities(graph, seed=42)
+        fig = draw_similarity_graph(graph, seed=1, halo="chat")
+        ax = fig.axes[0]
+        # one halo circle
+        self.assertEqual(len(ax.patches), 1)
+        # two distinct node colors (two communities): the nodes are the PathCollection
+        from matplotlib.collections import PathCollection
+        scatters = [c for c in ax.collections if isinstance(c, PathCollection)]
+        self.assertEqual(len(scatters), 1)
+        colors = {tuple(c) for c in scatters[0].get_facecolor()}
+        self.assertGreaterEqual(len(colors), 2)
 
 
 if __name__ == "__main__":

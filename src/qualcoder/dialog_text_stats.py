@@ -23,6 +23,7 @@ https://qualcoder.org/
 import csv
 import logging
 
+import networkx as nx
 import qtawesome as qta
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -41,7 +42,7 @@ from .irastats import (
     specificity_rows,
     variable_rows,
 )
-from .irastats.similarity import build_graph, cooccurrence, draw_similarity_graph, similarity_matrix
+from .irastats.similarity import build_graph, cooccurrence, detect_communities, draw_similarity_graph, similarity_matrix
 from .irastats.ca import ca_coordinate_rows, correspondence_analysis, lexical_table_by_variable, plot_ca
 from .irastats.reinert import draw_dendrogram, reinert_from_segments
 from .irastats.report_html import descstats_html, specificites_html
@@ -915,6 +916,13 @@ class DialogTextStats(QtWidgets.QDialog):
         self.doubleSpinBox_sim_threshold.setDecimals(3)
         self.doubleSpinBox_sim_threshold.setValue(0.2)
         params.addWidget(self.doubleSpinBox_sim_threshold)
+        self.checkBox_sim_communities = QtWidgets.QCheckBox(_("Detect communities (Louvain)"))
+        self.checkBox_sim_communities.setChecked(True)
+        params.addWidget(self.checkBox_sim_communities)
+        params.addWidget(QtWidgets.QLabel(_("Halo:")))
+        self.comboBox_sim_halo = QtWidgets.QComboBox()
+        self.comboBox_sim_halo.addItem("")
+        params.addWidget(self.comboBox_sim_halo)
         self.pushButton_sim_run = QtWidgets.QPushButton(_("Calculate"))
         self.pushButton_sim_run.setIcon(qta.icon("mdi6.play"))
         self.pushButton_sim_run.clicked.connect(self.run_similarity)
@@ -933,6 +941,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self.tabWidget.addTab(self.tab_similarity, _("Similarity graph"))
         self.similarity_graph = None
         self.similarity_figure = None
+        self.similarity_communities = []
 
 
     def run_similarity(self):
@@ -949,7 +958,11 @@ class DialogTextStats(QtWidgets.QDialog):
                                     method=self.comboBox_sim_method.currentData())
             self.similarity_graph = build_graph(labels, sim, freq,
                                                 threshold=self.doubleSpinBox_sim_threshold.value())
-            self.similarity_figure = draw_similarity_graph(self.similarity_graph)
+            self.similarity_communities = []
+            if self.checkBox_sim_communities.isChecked():
+                self.similarity_communities = detect_communities(self.similarity_graph, seed=42)
+            halo = self.comboBox_sim_halo.currentText() or None
+            self.similarity_figure = draw_similarity_graph(self.similarity_graph, halo=halo)
         except Exception as err:
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()
@@ -957,9 +970,24 @@ class DialogTextStats(QtWidgets.QDialog):
         graph = self.similarity_graph
         edges = sorted(graph.edges(data=True), key=lambda e: -e[2]["weight"])[:20]
         lines = [f"{u} - {v}: {data['weight']:.3f}" for u, v, data in edges]
+        info = _("Nodes: ") + str(graph.number_of_nodes()) + " | " + _("Edges: ") + str(graph.number_of_edges())
+        if self.similarity_communities:
+            info += " | " + _("Communities: ") + str(len(self.similarity_communities))
+            for i, community in enumerate(self.similarity_communities):
+                lines.append(f"community {i + 1}: " + ", ".join(sorted(community)))
         self.textBrowser_sim.setPlainText("\n".join(lines))
-        self.label_sim_info.setText(
-            _("Nodes: ") + str(graph.number_of_nodes()) + " | " + _("Edges: ") + str(graph.number_of_edges()))
+        self.label_sim_info.setText(info)
+        # refill the halo combo with the graph forms, keeping the current selection if possible
+        current_halo = self.comboBox_sim_halo.currentText()
+        freqs = nx.get_node_attributes(graph, "freq")
+        self.comboBox_sim_halo.clear()
+        self.comboBox_sim_halo.addItem("")
+        for node in sorted(graph.nodes, key=lambda n: -freqs.get(n, 0)):
+            self.comboBox_sim_halo.addItem(node)
+        if current_halo:
+            index = self.comboBox_sim_halo.findText(current_halo)
+            if index >= 0:
+                self.comboBox_sim_halo.setCurrentIndex(index)
         msg = _("Similarity graph: ") + str(graph.number_of_nodes()) + " " + _("nodes") + ", " \
             + str(graph.number_of_edges()) + " " + _("edges")
         self.parent_textEdit.append(msg)

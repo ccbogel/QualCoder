@@ -40,6 +40,8 @@ import logging
 import networkx as nx
 import numpy as np
 from matplotlib.figure import Figure
+from matplotlib.patches import Circle
+from networkx.algorithms.community import louvain_communities
 
 from .lexicon import LexicalTable
 
@@ -126,11 +128,44 @@ def build_graph(labels, sim, freq, threshold: float = 0.2) -> nx.Graph:
     return graph
 
 
+def detect_communities(graph: nx.Graph, seed: int = 42) -> list:
+    """Louvain communities on the weighted similarity graph (as in IRaMuTeQ).
+
+    Sets the node attribute "community" (int, communities ordered by decreasing
+    size). Returns the list of communities (sets of node labels).
+    """
+
+    if graph.number_of_nodes() == 0:
+        return []
+    communities = louvain_communities(graph, weight="weight", seed=seed)
+    communities = sorted(communities, key=lambda comm: (-len(comm), sorted(comm)[0]))
+    for i, community in enumerate(communities):
+        for node in community:
+            graph.nodes[node]["community"] = i
+    return communities
+
+
+def halo_neighbors(graph: nx.Graph, node: str, radius: int = 1) -> set:
+    """Halo of a form: the node itself plus its neighbors up to `radius` hops
+    in the similarity graph (IRaMuTeQ "halo"). """
+
+    if node not in graph:
+        return set()
+    return set(nx.bfs_tree(graph, node, depth_limit=radius).nodes)
+
+
+COMMUNITY_PALETTE = ["#22a7f0", "#e14b31", "#26CC00", "#ab3da9", "#F95D6A", "#FFA600",
+                     "#009C1A", "#0091ea", "#c2185b", "#5d4037"]
+
+
 def draw_similarity_graph(graph: nx.Graph, seed: int = 42, top_labels: int = 40,
-                          figsize=(10, 8)) -> Figure:
+                          figsize=(10, 8), halo: str = None) -> Figure:
     """Draw the similarity graph on a matplotlib Figure (force-directed layout,
     node size proportional to the form frequency, edge width proportional to the
-    similarity, the most frequent forms annotated). """
+    similarity, the most frequent forms annotated). Nodes are colored by Louvain
+    community when the "community" node attribute is set (see detect_communities);
+    `halo` highlights a form and its neighbors (IRaMuTeQ halo) with a dashed circle.
+    """
 
     fig = Figure(figsize=figsize)
     ax = fig.add_subplot(111)
@@ -139,11 +174,30 @@ def draw_similarity_graph(graph: nx.Graph, seed: int = 42, top_labels: int = 40,
         return fig
     pos = nx.spring_layout(graph, seed=seed)
     freqs = nx.get_node_attributes(graph, "freq")
+    communities = nx.get_node_attributes(graph, "community")
     sizes = [100 + 40 * freqs.get(node, 1) for node in graph.nodes]
     widths = [0.5 + 4 * data["weight"] for _, _, data in graph.edges(data=True)]
     nx.draw_networkx_edges(graph, pos, ax=ax, width=widths, alpha=0.6, edge_color="#888888")
-    nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=sizes, node_color="#22a7f0",
-                           edgecolors="#115f9a", linewidths=0.8)
+    if communities:
+        node_colors = [COMMUNITY_PALETTE[communities.get(node, 0) % len(COMMUNITY_PALETTE)]
+                       for node in graph.nodes]
+    else:
+        node_colors = "#22a7f0"
+    edgecolors = ["#115f9a"] * graph.number_of_nodes()
+    if halo and halo in graph:
+        halo_set = halo_neighbors(graph, halo, radius=1)
+        for i, node in enumerate(graph.nodes):
+            if node == halo:
+                edgecolors[i] = "#b00000"
+            elif node in halo_set:
+                edgecolors[i] = "#e14b31"
+        hx, hy = pos[halo]
+        dists = [((pos[n][0] - hx) ** 2 + (pos[n][1] - hy) ** 2) ** 0.5 for n in halo_set if n != halo]
+        radius = max(dists) * 1.15 if dists else 0.15
+        ax.add_patch(Circle((hx, hy), radius, fill=False, linestyle="--", linewidth=1.8,
+                            edgecolor="#b00000", alpha=0.8))
+    nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=sizes, node_color=node_colors,
+                           edgecolors=edgecolors, linewidths=1.2)
     labels = {node: node for node in sorted(graph.nodes, key=lambda n: -freqs.get(n, 0))[:top_labels]}
     nx.draw_networkx_labels(graph, pos, labels=labels, ax=ax, font_size=8)
     ax.set_title("Similarity graph")
