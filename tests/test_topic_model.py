@@ -11,7 +11,9 @@ from qualcoder.topic_model import (
     bertopic_analysis,
     cluster_embeddings,
     ctfidf_topics,
+    plot_topic_distribution,
     plot_topic_sizes,
+    topic_by_variable,
     topics_summary,
 )
 
@@ -115,6 +117,31 @@ class TestBertopicAnalysis(unittest.TestCase):
     def test_empty_raises(self):
         with self.assertRaises(ValueError):
             bertopic_analysis([])
+
+
+class TestTopicByVariable(unittest.TestCase):
+
+    def test_distribution(self):
+        labels = [0] * 5 + [1] * 5 + [-1]
+        variables = ([{"code": "a"}] * 5 + [{"code": "b"}] * 5 + [{"code": "a"}])
+        modalities, topic_ids, counts = topic_by_variable(labels, variables, "code")
+        self.assertEqual(modalities, ["a", "b"])
+        self.assertEqual(topic_ids, [0, 1])
+        self.assertEqual(counts.tolist(), [[5, 0], [0, 5]])  # noise excluded
+
+    def test_empty_modalities_excluded(self):
+        labels = [0, 0, 1]
+        variables = [{"case": ""}, {"case": "c1"}, {"case": "c1"}]
+        modalities, topic_ids, counts = topic_by_variable(labels, variables, "case")
+        self.assertEqual(modalities, ["c1"])
+        self.assertEqual(topic_ids, [0, 1])
+        self.assertEqual(counts.tolist(), [[1, 1]])  # empty modality excluded
+
+    def test_plot(self):
+        modalities, topic_ids, counts = topic_by_variable(
+            [0, 0, 1, 1], [{"code": "a"}, {"code": "a"}, {"code": "b"}, {"code": "b"}], "code")
+        fig = plot_topic_distribution(modalities, topic_ids, counts)
+        self.assertEqual(len(fig.axes), 1)
 
 
 if __name__ == "__main__":

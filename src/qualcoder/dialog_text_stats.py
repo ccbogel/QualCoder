@@ -44,7 +44,14 @@ from .irastats import (
 from .irastats.similarity import build_graph, cooccurrence, detect_communities, draw_similarity_graph, similarity_matrix
 from .irastats.ca import ca_coordinate_rows, correspondence_analysis, lexical_table_by_variable, plot_ca
 from .irastats.reinert import draw_dendrogram, reinert_from_segments
-from .topic_model import AI_MODEL, DEFAULT_MODEL, bertopic_analysis, plot_topic_sizes
+from .topic_model import (
+    AI_MODEL,
+    DEFAULT_MODEL,
+    bertopic_analysis,
+    plot_topic_distribution,
+    plot_topic_sizes,
+    topic_by_variable,
+)
 from .irastats.report_html import descstats_html, specificites_html
 from .select_items import DialogSelectItems
 
@@ -275,7 +282,8 @@ class DialogTextStats(QtWidgets.QDialog):
         """ Refill the partition variable combos after a corpus rebuild, keeping
         the current selection when it still exists. """
 
-        for name in ("comboBox_descstats_variable", "comboBox_spec_variable", "comboBox_ca_variable"):
+        for name in ("comboBox_descstats_variable", "comboBox_spec_variable", "comboBox_ca_variable",
+                     "comboBox_bertopic_variable"):
             combo = getattr(self, name, None)
             if combo is None:
                 continue
@@ -969,17 +977,35 @@ class DialogTextStats(QtWidgets.QDialog):
         params.addWidget(self.pushButton_bertopic_csv)
         layout.addLayout(params)
 
+        dist_params = QtWidgets.QHBoxLayout()
+        dist_params.addWidget(QtWidgets.QLabel(_("Distribution by variable:")))
+        self.comboBox_bertopic_variable = QtWidgets.QComboBox()
+        self._fill_variable_combo(self.comboBox_bertopic_variable)
+        dist_params.addWidget(self.comboBox_bertopic_variable, 1)
+        self.pushButton_bertopic_dist = QtWidgets.QPushButton(_("Topics x variable chart"))
+        self.pushButton_bertopic_dist.setIcon(qta.icon("mdi6.chart-bar-stacked"))
+        self.pushButton_bertopic_dist.clicked.connect(self.show_bertopic_distribution)
+        dist_params.addWidget(self.pushButton_bertopic_dist)
+        layout.addLayout(dist_params)
+
         self.label_bertopic_info = QtWidgets.QLabel("")
         self.label_bertopic_info.setWordWrap(True)
         layout.addWidget(self.label_bertopic_info)
+        splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
         self.tableWidget_bertopic = QtWidgets.QTableWidget()
         self.tableWidget_bertopic.setColumnCount(4)
         self.tableWidget_bertopic.setHorizontalHeaderLabels(
             [_("Topic"), _("Size"), _("Top words"), _("Representative segment")])
         self.tableWidget_bertopic.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        layout.addWidget(self.tableWidget_bertopic)
+        splitter.addWidget(self.tableWidget_bertopic)
+        self.tableWidget_bertopic_dist = QtWidgets.QTableWidget()
+        self.tableWidget_bertopic_dist.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        splitter.addWidget(self.tableWidget_bertopic_dist)
+        splitter.setSizes([400, 200])
+        layout.addWidget(splitter)
         self.tabWidget.addTab(self.tab_bertopic, "BERTopic")
         self.bertopic_result = None
+        self.bertopic_distribution = None
 
     def run_bertopic(self):
         """ BERTopic-style analysis of the corpus: BERT embeddings
@@ -1022,6 +1048,25 @@ class DialogTextStats(QtWidgets.QDialog):
         self.label_bertopic_info.setText(
             _("Documents: ") + str(result["n_docs"]) + " | " + _("Topics: ") + str(result["n_topics"])
             + " | " + _("Noise documents: ") + str(result["n_noise"]) + " | " + _("Model: ") + result["model"])
+        variable = self.comboBox_bertopic_variable.currentData()
+        self.bertopic_distribution = None
+        if variable:
+            self.bertopic_distribution = topic_by_variable(
+                result["labels"], [s["variables"] for s in self.segments], variable)
+            modalities, topic_ids, counts = self.bertopic_distribution
+            self.tableWidget_bertopic_dist.setColumnCount(1 + len(topic_ids))
+            self.tableWidget_bertopic_dist.setHorizontalHeaderLabels(
+                [variable] + [f"topic {topic}" for topic in topic_ids])
+            self.tableWidget_bertopic_dist.setRowCount(len(modalities))
+            for i, modality in enumerate(modalities):
+                item = QtWidgets.QTableWidgetItem(modality)
+                item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                self.tableWidget_bertopic_dist.setItem(i, 0, item)
+                for j in range(len(topic_ids)):
+                    cell = QtWidgets.QTableWidgetItem(str(int(counts[i, j])))
+                    cell.setFlags(cell.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                    self.tableWidget_bertopic_dist.setItem(i, 1 + j, cell)
+            self.tableWidget_bertopic_dist.resizeColumnsToContents()
         msg = "BERTopic: " + str(result["n_topics"]) + " " + _("topics") + " (" + model_name + ")"
         self.parent_textEdit.append(msg)
 
@@ -1036,6 +1081,21 @@ class DialogTextStats(QtWidgets.QDialog):
         dialog = DialogFigure(self.app, figure, "BERTopic: " + _("topic sizes"))
         dialog.show()
         self._bertopic_chart_dialog = dialog
+
+    def show_bertopic_distribution(self):
+        """ Stacked bar chart of the topic distribution per modality of the selected
+        variable (code, case, document, attribute) in a non-blocking window. """
+
+        if self.bertopic_result is None:
+            self.run_bertopic()
+        if self.bertopic_result is None or self.bertopic_distribution is None:
+            Message(self.app, _("No variable"), _("Select a partition variable")).exec()
+            return
+        modalities, topic_ids, counts = self.bertopic_distribution
+        figure = plot_topic_distribution(modalities, topic_ids, counts)
+        dialog = DialogFigure(self.app, figure, "BERTopic: " + _("topic distribution"))
+        dialog.show()
+        self._bertopic_dist_dialog = dialog
 
     def export_bertopic_csv(self):
         if self.bertopic_result is None:
@@ -1058,6 +1118,14 @@ class DialogTextStats(QtWidgets.QDialog):
                 words = " | ".join(f"{w} ({s:.4f})" for w, s in topic["top_words"])
                 rep = topic["representative_texts"][0] if topic["representative_texts"] else ""
                 writer.writerow([f"topic {topic['topic']}", topic["size"], words, rep])
+            if self.bertopic_distribution is not None:
+                variable = self.comboBox_bertopic_variable.currentData()
+                modalities, topic_ids, counts = self.bertopic_distribution
+                writer.writerow([])
+                writer.writerow([_("Distribution by variable") + ": " + variable]
+                                + [f"topic {topic}" for topic in topic_ids])
+                for i, modality in enumerate(modalities):
+                    writer.writerow([modality] + [int(c) for c in counts[i]])
         msg = _("BERTopic topics exported to: ") + filepath
         Message(self.app, _("CSV export"), msg).exec()
         self.parent_textEdit.append(msg)

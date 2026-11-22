@@ -262,3 +262,59 @@ def plot_topic_sizes(result: dict, figsize=(9, 5)):
     ax.tick_params(axis="x", rotation=45)
     fig.tight_layout()
     return fig
+
+
+TOPIC_PALETTE = ["#e14b31", "#22a7f0", "#26CC00", "#ab3da9", "#FFA600", "#009C1A",
+                 "#0091ea", "#c2185b", "#5d4037", "#00897b"]
+
+
+def topic_by_variable(labels, segment_variables: list, variable: str):
+    """Distribution of the topics across the modalities of a partition variable
+    (code, case, document, file/case attribute) - the "topics x variable" cross.
+
+    Args:
+        labels: topic label per segment (from bertopic_analysis)
+        segment_variables: variables dict of each segment
+        variable: variable key ("code", "case", "document", "file:<name>", ...)
+    Returns:
+        (modalities, topic_ids, counts) with counts[i, j] = number of segments
+        with modality i and topic j; noise (label -1) and empty modalities are
+        excluded.
+    """
+
+    labels = np.asarray(labels)
+    values = [str(v.get(variable, "")) for v in segment_variables]
+    modalities = sorted({v for v in values if v != ""})
+    topic_ids = sorted({int(l) for l in labels.tolist() if int(l) != -1})
+    counts = np.zeros((len(modalities), len(topic_ids)), dtype=int)
+    modality_index = {m: i for i, m in enumerate(modalities)}
+    topic_index = {t: j for j, t in enumerate(topic_ids)}
+    for value, label in zip(values, labels.tolist()):
+        if value == "" or int(label) == -1:
+            continue
+        counts[modality_index[value], topic_index[int(label)]] += 1
+    return modalities, topic_ids, counts
+
+
+def plot_topic_distribution(modalities, topic_ids, counts, figsize=(10, 6)):
+    """Stacked bar chart of the topic distribution per modality of a variable
+    (matplotlib Figure, no backend needed). """
+
+    from matplotlib.figure import Figure
+
+    fig = Figure(figsize=figsize)
+    ax = fig.add_subplot(111)
+    if not modalities:
+        ax.set_title(_("Topic distribution: no variable"))
+        return fig
+    bottoms = np.zeros(len(modalities))
+    for j, topic in enumerate(topic_ids):
+        ax.bar(modalities, counts[:, j], bottom=bottoms, label=f"topic {topic}",
+               color=TOPIC_PALETTE[j % len(TOPIC_PALETTE)], edgecolor="white", linewidth=0.4)
+        bottoms += counts[:, j]
+    ax.set_ylabel(_("Documents"))
+    ax.set_title(_("Topic distribution by variable"))
+    ax.legend(fontsize=7)
+    ax.tick_params(axis="x", rotation=45)
+    fig.tight_layout()
+    return fig
