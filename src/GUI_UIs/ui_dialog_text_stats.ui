@@ -1159,10 +1159,38 @@
         </layout>
        </item>
        <item>
-        <widget class="QSplitter" name="splitter_ca">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
+            <widget class="QLabel" name="label_ca_help">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>50</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</string>
+             </property>
+             <property name="text">
+              <string>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+       </item>
+       <item>
+            <widget class="QLabel" name="label_ca_info">
+             <property name="toolTip">
+              <string>Total inertia, number of forms and columns of the last CA</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+       </item>
+       <item>
          <widget class="QTableWidget" name="tableWidget_ca">
           <property name="toolTip">
            <string>Eigenvalues and inertia of the CA axes</string>
@@ -1191,55 +1219,6 @@
            </property>
           </column>
          </widget>
-         <widget class="QWidget" name="widget_ca_right" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_ca_right">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="label_ca_help">
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>50</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</string>
-             </property>
-             <property name="text">
-              <string>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</string>
-             </property>
-             <property name="wordWrap">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_ca_info">
-             <property name="toolTip">
-              <string>Total inertia, number of forms and columns of the last CA</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="wordWrap">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </widget>
        </item>
       </layout>
      </widget>

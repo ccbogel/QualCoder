@@ -112,7 +112,6 @@ class DialogTextStats(QtWidgets.QDialog):
         self._connect_signals()
         self.splitter_descstats.setSizes([350, 500])
         self.splitter_spec.setSizes([400, 400])
-        self.splitter_ca.setSizes([300, 500])
         self.splitter_reinert.setSizes([350, 550])
         self.splitter_bertopic.setSizes([400, 200])
         self._icon_only_buttons()
