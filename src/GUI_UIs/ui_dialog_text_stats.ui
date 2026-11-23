@@ -1253,7 +1253,7 @@
             <string>Initial context unit size in occurrences: the corpus is split into segments of about this many words, cut at sentence boundaries when possible</string>
            </property>
            <property name="text">
-            <string>UCI size (occurrences):</string>
+            <string>Initial context unit size (occurrences):</string>
            </property>
           </widget>
          </item>
@@ -1349,7 +1349,7 @@
             <string>Minimum number of initial context units in each side of a split for it to be accepted</string>
            </property>
            <property name="text">
-            <string>Min UCI per class:</string>
+            <string>Min initial context units per class:</string>
            </property>
           </widget>
          </item>
@@ -1497,10 +1497,10 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Reinert CHD: the corpus is split into initial context units (segments of about the UCI size in occurrences), then into classes by successive binary splits maximizing the chi-square between classes. Click a class in the tree to see its characteristic forms (profile) and its most representative initial context units.</string>
+          <string>Reinert CHD: the corpus is split into initial context units (segments of about the initial context unit size in occurrences), then into classes by successive binary splits maximizing the chi-square between classes. Click a class in the tree to see its characteristic forms (profile) and its most representative initial context units.</string>
          </property>
          <property name="text">
-          <string>Reinert CHD: the corpus is split into initial context units (segments of about the UCI size in occurrences), then into classes by successive binary splits maximizing the chi-square between classes. Click a class in the tree to see its characteristic forms (profile) and its most representative initial context units.</string>
+          <string>Reinert CHD: the corpus is split into initial context units (segments of about the initial context unit size in occurrences), then into classes by successive binary splits maximizing the chi-square between classes. Click a class in the tree to see its characteristic forms (profile) and its most representative initial context units.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -1539,7 +1539,7 @@
           </column>
           <column>
            <property name="text">
-            <string notr="true">UCI</string>
+            <string>Initial context units</string>
            </property>
           </column>
           <column>
@@ -1600,10 +1600,10 @@
            <item>
             <widget class="QLabel" name="label_reinert_repr_uci">
              <property name="toolTip">
-              <string>Initial context units (segments of about the UCI size in occurrences) most characteristic of the selected class</string>
+              <string>Initial context units (segments of about the initial context unit size in occurrences) most characteristic of the selected class</string>
              </property>
              <property name="text">
-              <string>Most representative UCI:</string>
+              <string>Most representative initial context units:</string>
              </property>
             </widget>
            </item>

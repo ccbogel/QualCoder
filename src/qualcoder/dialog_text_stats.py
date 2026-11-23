@@ -767,7 +767,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self.parent_textEdit.append(msg)
 
     def run_reinert(self):
-        """ Reinert CHD on the corpus: UCI segmentation, forms x UCI matrix of the
+        """ Reinert CHD on the corpus: initial context unit segmentation, forms x initial context unit matrix of the
         active forms, then top-down dichotomic classification maximizing the
         chi-square between classes. """
 
@@ -844,7 +844,7 @@ class DialogTextStats(QtWidgets.QDialog):
             writer.writerow(["chi2", round(result["chi2"], 6), "df", result["df"],
                              _("chi2/df ratio"), round(result["chi2_ratio"], 6)])
             writer.writerow([])
-            writer.writerow([_("Class"), _("UCI"), "chi2", _("Characteristic forms")])
+            writer.writerow([_("Class"), _("Initial context unit"), "chi2", _("Characteristic forms")])
             for cls in result["classes"]:
                 writer.writerow([f"class {cls['id']}", cls["size"], round(cls["chi2"], 6),
                                  " | ".join(f"{p['forme']} ({p['valeur']:.2f})" for p in cls["profile"][:20])])
@@ -855,7 +855,7 @@ class DialogTextStats(QtWidgets.QDialog):
                     writer.writerow([f"class {cls['id']}", p["forme"], p["frequence"],
                                      round(p["chi2"], 6), round(p["valeur"], 6)])
             writer.writerow([])
-            writer.writerow([_("Class"), _("Representative UCI")])
+            writer.writerow([_("Class"), _("Representative initial context units")])
             for cls in result["classes"]:
                 for rep in cls["representative_ucis"]:
                     writer.writerow([f"class {cls['id']}", rep["text"]])

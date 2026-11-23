@@ -389,7 +389,7 @@ def draw_dendrogram(result: dict, figsize=(10, 7), top_forms: int = 5):
         positive = [p for p in cls["profile"] if p["valeur"] > 0]
         shown = positive[:top_forms] if positive else cls["profile"][:top_forms]
         # horizontal block under the class label, as in the IRaMuTeQ dendrogram
-        label = f"class {cls['id']} ({cls['size']} UCI)\n" + "\n".join(str(p["forme"])[:30] for p in shown)
+        label = f"class {cls['id']} ({cls['size']} initial context units)\n" + "\n".join(str(p["forme"])[:30] for p in shown)
         ax.annotate(label, (x, 0.0), fontsize=8, rotation=0, ha="center", va="top",
                     color=color_of(leaf), annotation_clip=False)
     ax.set_ylabel("chi2")
