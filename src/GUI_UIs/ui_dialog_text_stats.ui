@@ -39,6 +39,18 @@
           <bool>false</bool>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_selection">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>12</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
+           <number>6</number>
+          </property>
           <item>
            <widget class="QPushButton" name="pushButton_select_files">
 <property name="minimumSize">

@@ -26,6 +26,7 @@ class Ui_DialogTextStats(object):
         self.groupBox_selection.setFlat(False)
         self.groupBox_selection.setObjectName("groupBox_selection")
         self.horizontalLayout_selection = QtWidgets.QHBoxLayout(self.groupBox_selection)
+        self.horizontalLayout_selection.setContentsMargins(9, 12, 9, 6)
         self.horizontalLayout_selection.setObjectName("horizontalLayout_selection")
         self.pushButton_select_files = QtWidgets.QPushButton(parent=self.groupBox_selection)
         self.pushButton_select_files.setMinimumSize(QtCore.QSize(32, 32))
