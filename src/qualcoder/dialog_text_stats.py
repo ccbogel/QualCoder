@@ -220,7 +220,6 @@ class DialogTextStats(QtWidgets.QDialog):
                 tooltip = label
             button.setToolTip(tooltip)
             button.setText("")
-            button.setMinimumWidth(36)
 
     # --- Selection (same helpers as the other Reports dialogs) ---
 
@@ -1050,7 +1049,9 @@ class DialogFigure(QtWidgets.QDialog):
         self.pushButton_save = QtWidgets.QPushButton("")
         self.pushButton_save.setIcon(qta.icon("mdi6.image-outline"))
         self.pushButton_save.setToolTip(_("Save PNG"))
-        self.pushButton_save.setMinimumWidth(36)
+        # same square icon-button size as the .ui dialogs (32x32)
+        self.pushButton_save.setMinimumSize(32, 32)
+        self.pushButton_save.setMaximumSize(32, 32)
         self.pushButton_save.clicked.connect(self.save_png)
         buttons.addWidget(self.pushButton_save)
         buttons.addStretch(1)

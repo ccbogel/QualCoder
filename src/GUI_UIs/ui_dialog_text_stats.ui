@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Lexicometry (text statistics)</string>
   </property>
+  <property name="windowModality">
+   <enum>Qt::WindowModality::NonModal</enum>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_main">
    <item>
     <widget class="QTabWidget" name="tabWidget">
@@ -38,6 +41,18 @@
          <layout class="QHBoxLayout" name="horizontalLayout_selection">
           <item>
            <widget class="QPushButton" name="pushButton_select_files">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
             <property name="toolTip">
              <string>Restrict the corpus to the selected text files</string>
             </property>
@@ -48,6 +63,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_select_cases">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
             <property name="toolTip">
              <string>Restrict the corpus to the segments of the selected cases</string>
             </property>
@@ -58,6 +85,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_select_codes">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
             <property name="toolTip">
              <string>Restrict the corpus to the selected codes</string>
             </property>
@@ -144,6 +183,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_stopwords">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
             <property name="toolTip">
              <string>Browse for a custom stopwords text file</string>
             </property>
@@ -154,6 +205,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_build_corpus">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
             <property name="toolTip">
              <string>Build the analysable corpus from the current selection and parameters, then show a preview of the segments and the corpus size</string>
             </property>
@@ -164,6 +227,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_export_iramuteq">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
             <property name="toolTip">
              <string>Export the corpus (coded segments, plus whole documents if checked) in the IRaMuTeQ text format</string>
             </property>
@@ -306,6 +381,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_descstats_run">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Calculate the text statistics with the current parameters</string>
            </property>
@@ -316,6 +403,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_descstats_csv">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Export the text statistics report as a CSV file</string>
            </property>
@@ -326,6 +425,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_descstats_html">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Export the text statistics report as an HTML file</string>
            </property>
@@ -336,6 +447,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_descstats_odt">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Export the text statistics report as an ODT document (LibreOffice/OpenOffice)</string>
            </property>
@@ -521,6 +644,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_spec_run">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Calculate the specificities with the current parameters</string>
            </property>
@@ -531,6 +666,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_spec_csv">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Export the specificities table as a CSV file</string>
            </property>
@@ -541,6 +688,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_spec_html">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Export the specificities report as an HTML file</string>
            </property>
@@ -750,6 +909,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_sim_run">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Build the similarity graph with the current parameters</string>
            </property>
@@ -760,6 +931,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_sim_png">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Export the similarity graph as a PNG image</string>
            </property>
@@ -843,6 +1026,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_ca_run">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Calculate the correspondence analysis and show the factor map (axes 1 x 2)</string>
            </property>
@@ -853,6 +1048,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_ca_csv">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Export the form and modality coordinates (CSV)</string>
            </property>
@@ -863,6 +1070,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_ca_png">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Export the factor map as a PNG image</string>
            </property>
@@ -1077,6 +1296,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_reinert_run">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Run the Reinert descending hierarchical classification (CHD) with the current parameters</string>
            </property>
@@ -1087,6 +1318,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_reinert_csv">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Export the classes, profiles and representative UCI (CSV)</string>
            </property>
@@ -1097,6 +1340,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_reinert_ca">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Correspondence analysis of the forms x classes table, shown in a separate window</string>
            </property>
@@ -1107,6 +1362,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_reinert_dendro">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Show the dendrogram of the classification: one colour per class, with its most representative forms</string>
            </property>
@@ -1385,6 +1652,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_bertopic_run">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Calculate the topics with the current parameters (embeddings are computed locally; the first run downloads the model)</string>
            </property>
@@ -1395,6 +1674,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_bertopic_chart">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Bar chart of the size of each topic</string>
            </property>
@@ -1405,6 +1696,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_bertopic_csv">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Export the topics and their distribution (CSV)</string>
            </property>
@@ -1455,6 +1758,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_bertopic_dist">
+<property name="minimumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
+ <property name="maximumSize">
+  <size>
+   <width>32</width>
+   <height>32</height>
+  </size>
+ </property>
            <property name="toolTip">
             <string>Stacked bar chart of the topic distribution per modality of the selected variable</string>
            </property>
