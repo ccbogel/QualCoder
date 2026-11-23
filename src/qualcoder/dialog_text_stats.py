@@ -180,7 +180,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self.comboBox_sim_halo.addItem("")
         self.comboBox_bertopic_unit.addItem(_("Coded segments"), "segments")
         self.comboBox_bertopic_unit.addItem(_("Whole documents"), "documents")
-        self.comboBox_bertopic_unit.addItem(_("UCI (~40 occurrences)"), "uci")
+        self.comboBox_bertopic_unit.addItem(_("Initial context unit (UCI, ~40 occurrences)"), "uci")
         self.comboBox_bertopic_model.addItems([DEFAULT_MODEL, AI_MODEL])
         self._fill_variable_combo(self.comboBox_stats_variable)
         self._fill_variable_combo(self.comboBox_ca_variable)
@@ -270,7 +270,7 @@ class DialogTextStats(QtWidgets.QDialog):
         if self.reinert_result is None:
             return
         self._popout(plot_ca(self.reinert_result["ca"], axes=(0, 1)),
-                      _("Reinert classification: CA forms x classes"))
+                      _("Reinert classification: correspondence analysis (forms x classes)"))
 
     def popout_topics_chart(self):
         if self.bertopic_result is None:
@@ -730,7 +730,7 @@ class DialogTextStats(QtWidgets.QDialog):
             self.ca_result, self.ca_figure = computed
         if self.ca_result is None:
             return
-        e = ExportDirectoryPathDialog(self.app, "CA_coordinates.csv")
+        e = ExportDirectoryPathDialog(self.app, "correspondence_analysis_coordinates.csv")
         filepath = e.filepath
         if filepath is None:
             return
@@ -746,7 +746,7 @@ class DialogTextStats(QtWidgets.QDialog):
             for k, label in enumerate(result["col_labels"]):
                 writer.writerow([label, int(result["col_freq"][k])]
                                 + [round(float(result["col_coords"][k, a]), 6) for a in range(n_axes)])
-        msg = _("CA coordinates exported to: ") + filepath
+        msg = _("Correspondence analysis coordinates exported to: ") + filepath
         Message(self.app, _("CSV export"), msg).exec()
         self.parent_textEdit.append(msg)
 
@@ -757,12 +757,12 @@ class DialogTextStats(QtWidgets.QDialog):
         if computed is None:
             return
         figure = computed[1]
-        e = ExportDirectoryPathDialog(self.app, "CA_factor_map.png")
+        e = ExportDirectoryPathDialog(self.app, "correspondence_analysis_factor_map.png")
         filepath = e.filepath
         if filepath is None:
             return
         figure.savefig(filepath, dpi=150)
-        msg = _("CA factor map exported to: ") + filepath
+        msg = _("Correspondence analysis factor map exported to: ") + filepath
         Message(self.app, _("PNG export"), msg).exec()
         self.parent_textEdit.append(msg)
 
@@ -802,7 +802,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self.treeWidget_reinert.resizeColumnToContents(0)
         self.label_reinert_info.setText(
             _("Classes: ") + str(result["n_classes"])
-            + " | " + _("UCI: ") + str(len(result["uci_texts"]))
+            + " | " + _("Initial context units (UCI): ") + str(len(result["uci_texts"]))
             + " | chi2 = " + f"{result['chi2']:.2f}" + " (df = " + str(result["df"])
             + ", " + _("chi2/df ratio: ") + f"{result['chi2_ratio']:.3f}" + ")")
         msg = _("Reinert classification: ") + str(result["n_classes"]) + " " + _("classes")
