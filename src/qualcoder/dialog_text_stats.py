@@ -180,7 +180,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self.comboBox_sim_halo.addItem("")
         self.comboBox_bertopic_unit.addItem(_("Coded segments"), "segments")
         self.comboBox_bertopic_unit.addItem(_("Whole documents"), "documents")
-        self.comboBox_bertopic_unit.addItem(_("Initial context unit (UCI, ~40 occurrences)"), "uci")
+        self.comboBox_bertopic_unit.addItem(_("Initial context unit (~40 occurrences)"), "uci")
         self.comboBox_bertopic_model.addItems([DEFAULT_MODEL, AI_MODEL])
         self._fill_variable_combo(self.comboBox_stats_variable)
         self._fill_variable_combo(self.comboBox_ca_variable)
@@ -802,7 +802,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self.treeWidget_reinert.resizeColumnToContents(0)
         self.label_reinert_info.setText(
             _("Classes: ") + str(result["n_classes"])
-            + " | " + _("Initial context units (UCI): ") + str(len(result["uci_texts"]))
+            + " | " + _("Initial context units: ") + str(len(result["uci_texts"]))
             + " | chi2 = " + f"{result['chi2']:.2f}" + " (df = " + str(result["df"])
             + ", " + _("chi2/df ratio: ") + f"{result['chi2_ratio']:.3f}" + ")")
         msg = _("Reinert classification: ") + str(result["n_classes"]) + " " + _("classes")

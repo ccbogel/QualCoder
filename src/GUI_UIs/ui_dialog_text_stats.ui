@@ -1250,7 +1250,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Initial context unit (UCI) size in occurrences: the corpus is split into segments of about this many words, cut at sentence boundaries when possible</string>
+            <string>Initial context unit size in occurrences: the corpus is split into segments of about this many words, cut at sentence boundaries when possible</string>
            </property>
            <property name="text">
             <string>UCI size (occurrences):</string>
@@ -1260,7 +1260,7 @@
          <item>
           <widget class="QSpinBox" name="spinBox_reinert_size">
            <property name="toolTip">
-            <string>Initial context unit (UCI) size in occurrences: the corpus is split into segments of about this many words, cut at sentence boundaries when possible</string>
+            <string>Initial context unit size in occurrences: the corpus is split into segments of about this many words, cut at sentence boundaries when possible</string>
            </property>
            <property name="minimum">
             <number>10</number>
@@ -1282,7 +1282,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Minimum frequency for a form to be an 'active' form used in the forms x initial context unit (UCI) table (default 3, as in IRaMuTeQ)</string>
+            <string>Minimum frequency for a form to be an 'active' form used in the forms x initial context unit table (default 3, as in IRaMuTeQ)</string>
            </property>
            <property name="text">
             <string>Min frequency of active forms:</string>
@@ -1292,7 +1292,7 @@
          <item>
           <widget class="QSpinBox" name="spinBox_reinert_min_freq">
            <property name="toolTip">
-            <string>Minimum frequency for a form to be an 'active' form used in the forms x initial context unit (UCI) table (default 3, as in IRaMuTeQ)</string>
+            <string>Minimum frequency for a form to be an 'active' form used in the forms x initial context unit table (default 3, as in IRaMuTeQ)</string>
            </property>
            <property name="minimum">
             <number>1</number>
@@ -1346,7 +1346,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Minimum number of initial context units (UCI) in each side of a split for it to be accepted</string>
+            <string>Minimum number of initial context units in each side of a split for it to be accepted</string>
            </property>
            <property name="text">
             <string>Min UCI per class:</string>
@@ -1356,7 +1356,7 @@
          <item>
           <widget class="QSpinBox" name="spinBox_reinert_min_size">
            <property name="toolTip">
-            <string>Minimum number of initial context units (UCI) in each side of a split for it to be accepted</string>
+            <string>Minimum number of initial context units in each side of a split for it to be accepted</string>
            </property>
            <property name="minimum">
             <number>1</number>
@@ -1406,7 +1406,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Export the classes, profiles and representative initial context units (UCI) (CSV)</string>
+            <string>Export the classes, profiles and representative initial context units (CSV)</string>
            </property>
            <property name="text">
             <string>Export CSV</string>
@@ -1497,10 +1497,10 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Reinert CHD: the corpus is split into initial context units (UCI: segments of about the UCI size in occurrences), then into classes by successive binary splits maximizing the chi-square between classes. Click a class in the tree to see its characteristic forms (profile) and its most representative initial context units (UCI).</string>
+          <string>Reinert CHD: the corpus is split into initial context units (segments of about the UCI size in occurrences), then into classes by successive binary splits maximizing the chi-square between classes. Click a class in the tree to see its characteristic forms (profile) and its most representative initial context units.</string>
          </property>
          <property name="text">
-          <string>Reinert CHD: the corpus is split into initial context units (UCI: segments of about the UCI size in occurrences), then into classes by successive binary splits maximizing the chi-square between classes. Click a class in the tree to see its characteristic forms (profile) and its most representative initial context units (UCI).</string>
+          <string>Reinert CHD: the corpus is split into initial context units (segments of about the UCI size in occurrences), then into classes by successive binary splits maximizing the chi-square between classes. Click a class in the tree to see its characteristic forms (profile) and its most representative initial context units.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -1510,7 +1510,7 @@
        <item>
         <widget class="QLabel" name="label_reinert_info">
          <property name="toolTip">
-          <string>Summary of the last classification: classes, initial context units (UCI), chi-square</string>
+          <string>Summary of the last classification: classes, initial context units, chi-square</string>
          </property>
          <property name="text">
           <string/>
@@ -1527,7 +1527,7 @@
          </property>
          <widget class="QTreeWidget" name="treeWidget_reinert">
           <property name="toolTip">
-           <string>Classes of the CHD; click one to show its characteristic forms and representative initial context units (UCI)</string>
+           <string>Classes of the CHD; click one to show its characteristic forms and representative initial context units</string>
           </property>
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
@@ -1600,7 +1600,7 @@
            <item>
             <widget class="QLabel" name="label_reinert_repr_uci">
              <property name="toolTip">
-              <string>Initial context units (UCI: segments of about the UCI size in occurrences) most characteristic of the selected class</string>
+              <string>Initial context units (segments of about the UCI size in occurrences) most characteristic of the selected class</string>
              </property>
              <property name="text">
               <string>Most representative UCI:</string>
@@ -1610,7 +1610,7 @@
            <item>
             <widget class="QTextBrowser" name="textBrowser_reinert_uci">
              <property name="toolTip">
-              <string>Most representative initial context units (UCI) of the selected class</string>
+              <string>Most representative initial context units of the selected class</string>
              </property>
             </widget>
            </item>
@@ -1654,7 +1654,7 @@
          <item>
           <widget class="QLabel" name="label_bertopic_unit">
            <property name="toolTip">
-            <string>Unit of analysis: coded segments, whole documents, or initial context units (UCI, ~40 occurrences, as in the Reinert classification)</string>
+            <string>Unit of analysis: coded segments, whole documents, or initial context units (~40 occurrences, as in the Reinert classification)</string>
            </property>
            <property name="text">
             <string>Unit of analysis:</string>
@@ -1670,7 +1670,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Unit of analysis: coded segments, whole documents, or initial context units (UCI, ~40 occurrences, as in the Reinert classification)</string>
+            <string>Unit of analysis: coded segments, whole documents, or initial context units (~40 occurrences, as in the Reinert classification)</string>
            </property>
           </widget>
          </item>
