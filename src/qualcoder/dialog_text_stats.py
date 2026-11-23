@@ -97,7 +97,26 @@ class DialogTextStats(QtWidgets.QDialog):
         self._build_reinert_tab()
         self._build_bertopic_tab()
         layout.addWidget(self.tabWidget)
+        self._icon_only_buttons()
         self.resize(1100, 750)
+
+    def _icon_only_buttons(self):
+        """Icon-only buttons (as in Reports > Code Retrieval): the text label of
+        each button moves to its tooltip, so the rows stay compact with larger
+        fonts. """
+
+        for button in self.findChildren(QtWidgets.QPushButton):
+            label = button.text()
+            if not label:
+                continue
+            tooltip = button.toolTip()
+            if tooltip and label.lower() not in tooltip.lower():
+                tooltip = f"{label} - {tooltip}"
+            elif not tooltip:
+                tooltip = label
+            button.setToolTip(tooltip)
+            button.setText("")
+            button.setMinimumWidth(36)
 
     # --- Selection (same helpers as the other Reports dialogs) ---
 
@@ -420,19 +439,24 @@ class DialogTextStats(QtWidgets.QDialog):
         params.addStretch(1)
         layout.addLayout(params)
         layout.addWidget(self._info_label(
-            _("Left table: forms ranked by decreasing frequency. Right report: corpus summary, "
-              "frequency table, hapax (forms occurring once) and the breakdown by the selected "
-              "partition variable.")))
+            _("Left: forms by decreasing frequency. Right: corpus summary, hapax, breakdown by variable.")))
 
+        descstats_help = _(
+            "Left table: forms ranked by decreasing frequency with their share of the corpus. "
+            "Right report: corpus summary (occurrences, forms, active/supplementary forms, hapax), "
+            "the frequency table, the hapax (forms occurring once) and the breakdown by the "
+            "selected partition variable.")
         splitter = QtWidgets.QSplitter()
         self.tableWidget_descstats = QtWidgets.QTableWidget()
         self.tableWidget_descstats.setColumnCount(3)
         self.tableWidget_descstats.setHorizontalHeaderLabels([_("Form"), _("Frequency"), _("%")])
         self.tableWidget_descstats.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tableWidget_descstats.setToolTip(descstats_help)
         splitter.addWidget(self.tableWidget_descstats)
         self.textBrowser_descstats = QtWidgets.QTextBrowser()
+        self.textBrowser_descstats.setToolTip(descstats_help)
         splitter.addWidget(self.textBrowser_descstats)
-        splitter.setSizes([400, 400])
+        splitter.setSizes([350, 500])
         layout.addWidget(splitter)
         self.tabWidget.addTab(self.tab_descstats, _("Text statistics"))
         self.descstats = None
@@ -1526,8 +1550,10 @@ class DialogFigure(QtWidgets.QDialog):
         self.canvas = FigureCanvas(figure)
         layout.addWidget(self.canvas)
         buttons = QtWidgets.QHBoxLayout()
-        self.pushButton_save = QtWidgets.QPushButton(_("Save PNG"))
+        self.pushButton_save = QtWidgets.QPushButton("")
         self.pushButton_save.setIcon(qta.icon("mdi6.image-outline"))
+        self.pushButton_save.setToolTip(_("Save PNG"))
+        self.pushButton_save.setMinimumWidth(36)
         self.pushButton_save.clicked.connect(self.save_png)
         buttons.addWidget(self.pushButton_save)
         buttons.addStretch(1)
