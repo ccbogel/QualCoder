@@ -119,6 +119,24 @@
            </widget>
           </item>
           <item>
+           <spacer name="horizontalSpacer_selection">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_corpus_params">
+          <item>
            <widget class="QLabel" name="label_language">
             <property name="toolTip">
              <string>Language used for tokenisation, stopwords and light stemming</string>
@@ -155,6 +173,23 @@
             </property>
            </widget>
           </item>
+          <item>
+           <spacer name="horizontalSpacer_corpus_params">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_stopwords">
           <item>
            <widget class="QLabel" name="label_stopwords">
             <property name="toolTip">
@@ -204,6 +239,23 @@
            </widget>
           </item>
           <item>
+           <spacer name="horizontalSpacer_stopwords">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_corpus_buttons">
+          <item>
            <widget class="QPushButton" name="pushButton_build_corpus">
 <property name="minimumSize">
   <size>
@@ -247,17 +299,6 @@
             </property>
            </widget>
           </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_corpus_params"/>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_stopwords"/>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_corpus_buttons">
          <item>
           <widget class="QLabel" name="label_corpus_info">
            <property name="toolTip">
@@ -271,6 +312,19 @@
            </property>
           </widget>
          </item>
+          <item>
+           <spacer name="horizontalSpacer_corpus_buttons">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
         </layout>
        </item>
        <item>
@@ -1125,40 +1179,59 @@
            </property>
           </column>
          </widget>
-         <widget class="QLabel" name="label_ca_info">
-          <property name="toolTip">
-           <string>Total inertia, number of forms and columns of the last CA</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
+         <widget class="QWidget" name="widget_ca_right" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_ca_right">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_ca_help">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>50</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</string>
+             </property>
+             <property name="text">
+              <string>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_ca_info">
+             <property name="toolTip">
+              <string>Total inertia, number of forms and columns of the last CA</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_ca_help">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</string>
-         </property>
-         <property name="text">
-          <string>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
         </widget>
        </item>
       </layout>
      </widget>
+
      <widget class="QWidget" name="tab_reinert">
       <attribute name="title">
        <string>Reinert classification</string>
