@@ -48,6 +48,8 @@ from .corpus import (
     segment_to_iramuteq,
     format_iramuteq,
     export_iramuteq,
+    parse_iramuteq,
+    iramuteq_to_rows,
 )
 from .text import tokenize, load_stopwords, light_stem, normalize_tokens, segment_tokens
 from .lexicon import LexicalTable, build_lexical_table
@@ -83,6 +85,8 @@ __all__ = [
     "segment_to_iramuteq",
     "format_iramuteq",
     "export_iramuteq",
+    "parse_iramuteq",
+    "iramuteq_to_rows",
     "tokenize",
     "load_stopwords",
     "light_stem",

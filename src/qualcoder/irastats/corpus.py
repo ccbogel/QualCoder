@@ -303,3 +303,83 @@ def export_iramuteq(segments: list, filepath: str) -> int:
     with open(filepath, "w", encoding="utf-8") as file_:
         file_.write(format_iramuteq(segments))
     return len(segments)
+
+
+def parse_iramuteq(text: str) -> list:
+    """Parse a corpus in the IRaMuTeQ native text format into segment dicts.
+
+    Each text starts with a "****" line followed by starred variables
+    (*variable_modality, name and modality separated on the first "_"), then
+    the text body up to the next "****" line. The reserved variables *doc_<name>
+    and *cas_<name> give the document and case names; every other variable
+    becomes an entry of the segment "variables" dict (a repeated variable name
+    is joined with " + ", as for the codes of segment_to_iramuteq).
+
+    Returns:
+        List of {"text", "document", "case", "variables"} dicts, in file order.
+        Empty list when the text has no "****" header line (not an IRaMuTeQ file).
+    """
+
+    text = text.lstrip("\ufeff")
+    segments = []
+    current = None
+    for line in text.splitlines():
+        if line.startswith("****"):
+            if current is not None:
+                segments.append(current)
+            variables = {}
+            document = ""
+            case = ""
+            for token in line[4:].split():
+                if not token.startswith("*"):
+                    continue
+                name, sep, value = token[1:].partition("_")
+                if not sep:
+                    value = ""
+                if name == "doc":
+                    document = value
+                elif name == "cas":
+                    case = value
+                elif name in variables:
+                    variables[name] = variables[name] + " + " + value
+                else:
+                    variables[name] = value
+            current = {"text_lines": [], "document": document, "case": case, "variables": variables}
+        elif current is not None:
+            current["text_lines"].append(line)
+    if current is not None:
+        segments.append(current)
+    for segment in segments:
+        segment["text"] = "\n".join(segment.pop("text_lines")).strip()
+    return segments
+
+
+def iramuteq_to_rows(segments: list) -> tuple:
+    """Convert parsed IRaMuTeQ segments to (columns, rows) for a table-like import
+    (e.g. the survey import of Manage Files): one row per text, a "doc" column with
+    the document name (*doc_, else *cas_, else Text_N), a "text" column with the
+    segment text, and one column per variable (the IRaMuTeQ variables become
+    attributes).
+    """
+
+    var_names = set()
+    has_case = False
+    for segment in segments:
+        var_names.update(segment["variables"])
+        if segment["case"]:
+            has_case = True
+    var_names.discard("doc")
+    var_names.discard("text")
+    columns = ["doc", "text"]
+    if has_case:
+        columns.append("cas")
+    columns += sorted(var_names)
+    rows = []
+    for i, segment in enumerate(segments):
+        row = dict(segment["variables"])
+        if segment["case"]:
+            row["cas"] = segment["case"]
+        row["doc"] = segment["document"] or segment["case"] or f"Text_{i + 1}"
+        row["text"] = segment["text"]
+        rows.append({col: row.get(col, "") for col in columns})
+    return columns, rows
