@@ -110,10 +110,20 @@ class DialogTextStats(QtWidgets.QDialog):
         self._setup_icons()
         self._init_combos()
         self._connect_signals()
-        self.splitter_descstats.setSizes([350, 500])
-        self.splitter_spec.setSizes([400, 400])
+        self.splitter_stats.setSizes([500, 500])
+        self.splitter_graphs.setSizes([500, 500])
         self.splitter_reinert.setSizes([350, 550])
         self.splitter_bertopic.setSizes([400, 200])
+        self.splitter_reinert_plots.setSizes([500, 500])
+        self.splitter_topics_plots.setSizes([500, 500])
+        # embedded matplotlib canvases (replaced on each run)
+        self._sim_canvas = None
+        self._ca_canvas = None
+        self._reinert_dendro_canvas = None
+        self._reinert_ca_canvas = None
+        self._topics_canvas = None
+        self._topics_dist_canvas = None
+        self._popout_dialogs = []
         self._icon_only_buttons()
         self.resize(1100, 750)
 
@@ -147,6 +157,12 @@ class DialogTextStats(QtWidgets.QDialog):
             "pushButton_bertopic_chart": "mdi6.chart-bar",
             "pushButton_bertopic_csv": "mdi6.file-export-outline",
             "pushButton_bertopic_dist": "mdi6.table",
+            "pushButton_sim_popout": "mdi6.open-in-new",
+            "pushButton_ca_popout": "mdi6.open-in-new",
+            "pushButton_reinert_dendro_popout": "mdi6.open-in-new",
+            "pushButton_reinert_ca_popout": "mdi6.open-in-new",
+            "pushButton_bertopic_chart_popout": "mdi6.open-in-new",
+            "pushButton_bertopic_dist_popout": "mdi6.open-in-new",
         }
         for name, icon in icons.items():
             getattr(self, name).setIcon(qta.icon(icon))
@@ -166,8 +182,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self.comboBox_bertopic_unit.addItem(_("Whole documents"), "documents")
         self.comboBox_bertopic_unit.addItem(_("UCI (~40 occurrences)"), "uci")
         self.comboBox_bertopic_model.addItems([DEFAULT_MODEL, AI_MODEL])
-        self._fill_variable_combo(self.comboBox_descstats_variable)
-        self._fill_variable_combo(self.comboBox_spec_variable)
+        self._fill_variable_combo(self.comboBox_stats_variable)
         self._fill_variable_combo(self.comboBox_ca_variable)
         self.comboBox_ca_variable.insertItem(0, _("Segments"), "__segments__")
         self._fill_variable_combo(self.comboBox_bertopic_variable)
@@ -202,6 +217,76 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_bertopic_chart.clicked.connect(self.show_bertopic_chart)
         self.pushButton_bertopic_csv.clicked.connect(self.export_bertopic_csv)
         self.pushButton_bertopic_dist.clicked.connect(self.show_bertopic_distribution)
+        self.pushButton_sim_popout.clicked.connect(self.popout_similarity)
+        self.pushButton_ca_popout.clicked.connect(self.popout_ca)
+        self.pushButton_reinert_dendro_popout.clicked.connect(self.popout_reinert_dendrogram)
+        self.pushButton_reinert_ca_popout.clicked.connect(self.popout_reinert_ca)
+        self.pushButton_bertopic_chart_popout.clicked.connect(self.popout_topics_chart)
+        self.pushButton_bertopic_dist_popout.clicked.connect(self.popout_topics_distribution)
+
+    def _embed_figure(self, placeholder_name: str, figure, canvas_attr: str):
+        """Embed a matplotlib Figure in a placeholder widget of the .ui, replacing
+        any previous canvas (the figures are recomputed on each run). """
+
+        placeholder = getattr(self, placeholder_name)
+        layout = placeholder.layout()
+        old = getattr(self, canvas_attr, None)
+        if old is not None:
+            layout.removeWidget(old)
+            old.deleteLater()
+        canvas = FigureCanvas(figure)
+        layout.addWidget(canvas)
+        setattr(self, canvas_attr, canvas)
+
+    def _popout(self, figure, title: str):
+        """Open a figure in a separate non-blocking window (kept referenced). """
+
+        dialog = DialogFigure(self.app, figure, title)
+        dialog.show()
+        self._popout_dialogs.append(dialog)
+
+    def popout_similarity(self):
+        computed = self._compute_similarity()
+        if computed is None:
+            return
+        self._popout(computed[2], _("Similarity graph"))
+
+    def popout_ca(self):
+        computed = self._compute_ca()
+        if computed is None:
+            return
+        self._popout(computed[1], _("Correspondence analysis"))
+
+    def popout_reinert_dendrogram(self):
+        if self.reinert_result is None:
+            self.run_reinert()
+        if self.reinert_result is None:
+            return
+        self._popout(draw_dendrogram(self.reinert_result), _("Reinert classification dendrogram"))
+
+    def popout_reinert_ca(self):
+        if self.reinert_result is None:
+            self.run_reinert()
+        if self.reinert_result is None:
+            return
+        self._popout(plot_ca(self.reinert_result["ca"], axes=(0, 1)),
+                      _("Reinert classification: CA forms x classes"))
+
+    def popout_topics_chart(self):
+        if self.bertopic_result is None:
+            self.run_bertopic()
+        if self.bertopic_result is None:
+            return
+        self._popout(plot_topic_sizes(self.bertopic_result), _("Topics") + ": " + _("topic sizes"))
+
+    def popout_topics_distribution(self):
+        if self.bertopic_result is None:
+            self.run_bertopic()
+        if self.bertopic_result is None or self.bertopic_distribution is None:
+            return
+        modalities, topic_ids, counts = self.bertopic_distribution
+        self._popout(plot_topic_distribution(modalities, topic_ids, counts),
+                      _("Topics") + ": " + _("topic distribution"))
 
     def _icon_only_buttons(self):
         """Icon-only buttons (as in Reports > Code Retrieval): the text label of
@@ -337,7 +422,7 @@ class DialogTextStats(QtWidgets.QDialog):
         """ Refill the partition variable combos after a corpus rebuild, keeping
         the current selection when it still exists. """
 
-        for name in ("comboBox_descstats_variable", "comboBox_spec_variable", "comboBox_ca_variable",
+        for name in ("comboBox_stats_variable", "comboBox_ca_variable",
                      "comboBox_bertopic_variable"):
             combo = getattr(self, name, None)
             if combo is None:
@@ -396,10 +481,10 @@ class DialogTextStats(QtWidgets.QDialog):
     def run_descstats(self):
         """ Compute the descending statistics and show them. """
 
-        table = self.get_lexical_table(min_freq=self.spinBox_descstats_min_freq.value())
+        table = self.get_lexical_table(min_freq=self.spinBox_stats_min_freq.value())
         if table is None:
             return
-        variable = self.comboBox_descstats_variable.currentData() or None
+        variable = self.comboBox_stats_variable.currentData() or None
         try:
             self.descstats = descendant_statistics(table, variable=variable)
         except Exception as err:
@@ -452,7 +537,7 @@ class DialogTextStats(QtWidgets.QDialog):
             self.run_descstats()
         if self.descstats is None:
             return
-        variable = self.comboBox_descstats_variable.currentData() or None
+        variable = self.comboBox_stats_variable.currentData() or None
         e = ExportDirectoryPathDialog(self.app, "Text_statistics.html")
         filepath = e.filepath
         if filepath is None:
@@ -468,7 +553,7 @@ class DialogTextStats(QtWidgets.QDialog):
             self.run_descstats()
         if self.descstats is None:
             return
-        variable = self.comboBox_descstats_variable.currentData() or None
+        variable = self.comboBox_stats_variable.currentData() or None
         e = ExportDirectoryPathDialog(self.app, "Text_statistics.odt")
         filepath = e.filepath
         if filepath is None:
@@ -489,17 +574,17 @@ class DialogTextStats(QtWidgets.QDialog):
     def run_specificites(self):
         """ Compute the chi-square specificities for the selected variable. """
 
-        variable = self.comboBox_spec_variable.currentData()
+        variable = self.comboBox_stats_variable.currentData()
         if not variable:
             Message(self.app, _("No variable"), _("Select a partition variable")).exec()
             return
-        table = self.get_lexical_table(min_freq=1)
+        table = self.get_lexical_table(min_freq=self.spinBox_stats_min_freq.value())
         if table is None:
             return
         try:
             self.specificites_results = specificities(
                 table, variable,
-                min_freq=self.spinBox_spec_min_freq.value(),
+                min_freq=self.spinBox_stats_min_freq.value(),
                 p_threshold=self.doubleSpinBox_spec_p.value())
         except Exception as err:
             logger.error(err)
@@ -544,7 +629,7 @@ class DialogTextStats(QtWidgets.QDialog):
             self.run_specificites()
         if self.specificites_results is None:
             return
-        variable = self.comboBox_spec_variable.currentData()
+        variable = self.comboBox_stats_variable.currentData()
         e = ExportDirectoryPathDialog(self.app, "Specificities.html")
         filepath = e.filepath
         if filepath is None:
@@ -589,7 +674,7 @@ class DialogTextStats(QtWidgets.QDialog):
         time because the Figure shown in a DialogFigure cannot be saved once its
         Qt canvas has been closed/deleted. """
 
-        table = self.get_lexical_table(min_freq=1)
+        table = self.get_lexical_table(min_freq=self.spinBox_graph_min_freq.value())
         if table is None:
             return None
         variable = self.comboBox_ca_variable.currentData()
@@ -635,9 +720,7 @@ class DialogTextStats(QtWidgets.QDialog):
             + " | " + _("Columns: ") + str(len(result["col_labels"])))
         msg = _("Correspondence analysis: ") + str(n_axes) + " " + _("axes")
         self.parent_textEdit.append(msg)
-        dialog = DialogFigure(self.app, self.ca_figure, _("Correspondence analysis"))
-        dialog.show()
-        self._ca_dialog = dialog
+        self._embed_figure("widget_ca_plot", self.ca_figure, "_ca_canvas")
 
     def export_ca_csv(self):
         if self.ca_result is None:
@@ -789,9 +872,7 @@ class DialogTextStats(QtWidgets.QDialog):
         if self.reinert_result is None:
             return
         figure = draw_dendrogram(self.reinert_result)
-        dialog = DialogFigure(self.app, figure, _("Reinert classification dendrogram"))
-        dialog.show()
-        self._reinert_dendro_dialog = dialog
+        self._embed_figure("widget_reinert_dendro_plot", figure, "_reinert_dendro_canvas")
 
     def show_reinert_ca(self):
         """ Show the correspondence analysis of forms x classes in a non-blocking
@@ -802,10 +883,8 @@ class DialogTextStats(QtWidgets.QDialog):
         if self.reinert_result is None:
             return
         figure = plot_ca(self.reinert_result["ca"], axes=(0, 1))
-        dialog = DialogFigure(self.app, figure, _("Reinert classification: CA forms x classes"))
-        dialog.show()
-        self._reinert_ca_dialog = dialog
         self._reinert_ca_figure = figure
+        self._embed_figure("widget_reinert_ca_plot", figure, "_reinert_ca_canvas")
 
     def run_bertopic(self):
         """ BERTopic-style analysis of the corpus: BERT embeddings
@@ -900,9 +979,7 @@ class DialogTextStats(QtWidgets.QDialog):
         if self.bertopic_result is None:
             return
         figure = plot_topic_sizes(self.bertopic_result)
-        dialog = DialogFigure(self.app, figure, "BERTopic: " + _("topic sizes"))
-        dialog.show()
-        self._bertopic_chart_dialog = dialog
+        self._embed_figure("widget_topics_plot", figure, "_topics_canvas")
 
     def show_bertopic_distribution(self):
         """ Stacked bar chart of the topic distribution per modality of the selected
@@ -915,9 +992,7 @@ class DialogTextStats(QtWidgets.QDialog):
             return
         modalities, topic_ids, counts = self.bertopic_distribution
         figure = plot_topic_distribution(modalities, topic_ids, counts)
-        dialog = DialogFigure(self.app, figure, "BERTopic: " + _("topic distribution"))
-        dialog.show()
-        self._bertopic_dist_dialog = dialog
+        self._embed_figure("widget_topics_dist_plot", figure, "_topics_dist_canvas")
 
     def export_bertopic_csv(self):
         if self.bertopic_result is None:
@@ -964,7 +1039,7 @@ class DialogTextStats(QtWidgets.QDialog):
             return None
         try:
             labels, cooc, doc_freq, freq = cooccurrence(
-                table, min_freq=self.spinBox_sim_min_freq.value())
+                table, min_freq=self.spinBox_graph_min_freq.value())
             sim = similarity_matrix(labels, cooc, doc_freq, len(table.segment_texts),
                                     method=self.comboBox_sim_method.currentData())
             graph = build_graph(labels, sim, freq,
@@ -1012,9 +1087,7 @@ class DialogTextStats(QtWidgets.QDialog):
         msg = _("Similarity graph: ") + str(graph.number_of_nodes()) + " " + _("nodes") + ", " \
             + str(graph.number_of_edges()) + " " + _("edges")
         self.parent_textEdit.append(msg)
-        dialog = DialogFigure(self.app, self.similarity_figure, _("Similarity graph"))
-        dialog.show()
-        self._similarity_dialog = dialog  # keep a reference
+        self._embed_figure("widget_sim_plot", self.similarity_figure, "_sim_canvas")
 
     def export_similarity_png(self):
         # recompute a fresh figure: the one shown in a closed DialogFigure has a
