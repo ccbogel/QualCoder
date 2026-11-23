@@ -109,6 +109,36 @@
           </widget>
          </item>
          <item>
+          <spacer name="horizontalSpacer_corpus_params">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+               <item>
+        <spacer name="horizontalSpacer_corpus_params">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+</layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_corpus_language">
+         <item>
           <widget class="QLabel" name="label_language">
            <property name="toolTip">
             <string>Language used for tokenisation, stopwords and light stemming</string>
@@ -145,6 +175,23 @@
            </property>
           </widget>
          </item>
+       <item>
+        <spacer name="horizontalSpacer_corpus_language">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_stopwords">
          <item>
           <widget class="QLabel" name="label_stopwords">
            <property name="toolTip">
@@ -193,6 +240,23 @@
            </property>
           </widget>
          </item>
+       <item>
+        <spacer name="horizontalSpacer_stopwords">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_corpus_buttons">
          <item>
           <widget class="QPushButton" name="pushButton_build_corpus">
            <property name="minimumSize">
@@ -238,26 +302,6 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_corpus_params">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_stopwords"/>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_corpus_buttons">
-         <item>
           <widget class="QLabel" name="label_corpus_info">
            <property name="toolTip">
             <string>Size of the last built corpus</string>
@@ -270,7 +314,20 @@
            </property>
           </widget>
          </item>
-        </layout>
+               <item>
+        <spacer name="horizontalSpacer_corpus_buttons">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+</layout>
        </item>
        <item>
         <widget class="QTableWidget" name="tableWidget_segments">
@@ -1406,6 +1463,19 @@
          </property>
          <property name="text">
           <string>Reinert CHD: the corpus is split into UCI (segments of about the UCI size in occurrences), then into classes by successive binary splits maximizing the chi-square between classes. Click a class in the tree to see its characteristic forms (profile) and its most representative UCI.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_reinert_info">
+         <property name="toolTip">
+          <string>Summary of the last classification: classes, UCI, chi-square</string>
+         </property>
+         <property name="text">
+          <string/>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
