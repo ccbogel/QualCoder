@@ -28,6 +28,7 @@ import qtawesome as qta
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from PyQt6 import QtCore, QtGui, QtWidgets
 
+from .GUI.ui_dialog_text_stats import Ui_DialogTextStats
 from .helpers import ExportDirectoryPathDialog, Message
 from .irastats import (
     available_variables,
@@ -53,12 +54,12 @@ from .topic_model import (
     topic_by_variable,
 )
 from .irastats.report_html import descstats_html, specificites_html
+from .irastats.report_odt import descstats_odt
 from .select_items import DialogSelectItems
 
 logger = logging.getLogger(__name__)
 
 LANGUAGES = ["fr", "en", "de", "es", "it", "pt"]
-
 
 class DialogTextStats(QtWidgets.QDialog):
     """ Text statistics in the style of the IRaMuTeQ software, computed on the
@@ -67,56 +68,244 @@ class DialogTextStats(QtWidgets.QDialog):
     Opened from the Reports menu. The analysable corpus is built with
     irastats.corpus from the project database (self.app.conn); every computation
     engine lives in the pure-Python irastats package and is unit-tested without
-    a GUI. The UI is built in code so that no .ui file has to be regenerated.
+    a GUI. The UI is defined in src/GUI_UIs/ui_dialog_text_stats.ui (compiled to
+    qualcoder/GUI/ui_dialog_text_stats.py with pyuic6, as the other dialogs); only the
+    dynamic parts (icons, combo contents, signal connections) are set in code.
     """
 
     def __init__(self, app, parent_textedit):
         QtWidgets.QDialog.__init__(self)
         self.app = app
         self.parent_textEdit = parent_textedit
-        self.setWindowTitle(_("Lexicometry (text statistics)"))
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
-        self.setStyleSheet(font)
 
         self.file_ids = []
         self.case_ids = []
         self.code_ids = []
         self.segments = []
         self.lexical_table = None
+        self.descstats = None
+        self.specificites_results = None
+        self.ca_result = None
+        self.ca_figure = None
+        self.reinert_result = None
+        self.bertopic_result = None
+        self.bertopic_distribution = None
+        self.similarity_graph = None
+        self.similarity_figure = None
+        self.similarity_communities = []
 
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.addWidget(self._build_selection_group())
-        self.tabWidget = QtWidgets.QTabWidget()
-        self._build_corpus_tab()
-        self._build_descstats_tab()
-        self._build_specificites_tab()
-        self._build_similarity_tab()
-        self._build_ca_tab()
-        self._build_reinert_tab()
-        self._build_bertopic_tab()
-        layout.addWidget(self.tabWidget)
+        self.ui = Ui_DialogTextStats()
+        self.ui.setupUi(self)
+        # expose the widgets of the .ui as attributes (self.pushButton_...) so the
+        # rest of this class keeps working unchanged
+        for name, widget in vars(self.ui).items():
+            if isinstance(widget, QtWidgets.QWidget):
+                setattr(self, name, widget)
+
+        self.setWindowTitle(_("Lexicometry (text statistics)"))
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
+        self.setStyleSheet(font)
+
+        self._setup_icons()
+        self._init_combos()
+        self._connect_signals()
+        self.splitter_stats.setSizes([500, 500])
+        self.splitter_graphs.setSizes([500, 500])
+        self.splitter_reinert.setSizes([350, 550])
+        self.splitter_bertopic.setSizes([400, 200])
+        self.splitter_reinert_plots.setSizes([500, 500])
+        self.splitter_topics_plots.setSizes([500, 500])
+        # embedded matplotlib canvases (replaced on each run)
+        self._sim_canvas = None
+        self._ca_canvas = None
+        self._reinert_dendro_canvas = None
+        self._reinert_ca_canvas = None
+        self._topics_canvas = None
+        self._topics_dist_canvas = None
+        self._popout_dialogs = []
+        self._icon_only_buttons()
+        self.resize(1100, 750)
+
+    def _setup_icons(self):
+        """qtawesome icons for the buttons (icons cannot be stored in the .ui file). """
+
+        icons = {
+            "pushButton_select_files": "mdi6.file-outline",
+            "pushButton_select_cases": "mdi6.account-multiple",
+            "pushButton_select_codes": "mdi6.text",
+            "pushButton_stopwords": "mdi6.folder-outline",
+            "pushButton_build_corpus": "mdi6.play",
+            "pushButton_export_iramuteq": "mdi6.export",
+            "pushButton_descstats_run": "mdi6.play",
+            "pushButton_descstats_csv": "mdi6.file-export-outline",
+            "pushButton_descstats_html": "mdi6.script-text-outline",
+            "pushButton_descstats_odt": "mdi6.file-document-outline",
+            "pushButton_spec_run": "mdi6.play",
+            "pushButton_spec_csv": "mdi6.file-export-outline",
+            "pushButton_spec_html": "mdi6.script-text-outline",
+            "pushButton_sim_run": "mdi6.play",
+            "pushButton_sim_png": "mdi6.image-outline",
+            "pushButton_ca_run": "mdi6.play",
+            "pushButton_ca_csv": "mdi6.file-export-outline",
+            "pushButton_ca_png": "mdi6.image-outline",
+            "pushButton_reinert_run": "mdi6.play",
+            "pushButton_reinert_csv": "mdi6.file-export-outline",
+            "pushButton_reinert_ca": "mdi6.grid",
+            "pushButton_reinert_dendro": "mdi6.sitemap",
+            "pushButton_bertopic_run": "mdi6.play",
+            "pushButton_bertopic_chart": "mdi6.chart-bar",
+            "pushButton_bertopic_csv": "mdi6.file-export-outline",
+            "pushButton_bertopic_dist": "mdi6.table",
+            "pushButton_sim_popout": "mdi6.open-in-new",
+            "pushButton_ca_popout": "mdi6.open-in-new",
+            "pushButton_reinert_dendro_popout": "mdi6.open-in-new",
+            "pushButton_reinert_ca_popout": "mdi6.open-in-new",
+            "pushButton_bertopic_chart_popout": "mdi6.open-in-new",
+            "pushButton_bertopic_dist_popout": "mdi6.open-in-new",
+        }
+        for name, icon in icons.items():
+            getattr(self, name).setIcon(qta.icon(icon))
+
+    def _init_combos(self):
+        """Static combo contents; the partition variable combos are filled from the
+        project database by _fill_variable_combo / _refresh_variable_combos. """
+
+        self.comboBox_language.addItems(LANGUAGES)
+        lang = self.app.settings.get("language", "fr")
+        if lang in LANGUAGES:
+            self.comboBox_language.setCurrentText(lang)
+        self.comboBox_sim_method.addItem(_("Jaccard index (default)"), "jaccard")
+        self.comboBox_sim_method.addItem("chi2 (phi-squared)", "chi2")
+        self.comboBox_sim_halo.addItem("")
+        self.comboBox_bertopic_unit.addItem(_("Coded segments"), "segments")
+        self.comboBox_bertopic_unit.addItem(_("Whole documents"), "documents")
+        self.comboBox_bertopic_unit.addItem(_("Initial context unit (~40 occurrences)"), "uci")
+        self.comboBox_bertopic_model.addItems([DEFAULT_MODEL, AI_MODEL])
+        self._fill_variable_combo(self.comboBox_stats_variable)
+        self._fill_variable_combo(self.comboBox_ca_variable)
+        self.comboBox_ca_variable.insertItem(0, _("Segments"), "__segments__")
+        self._fill_variable_combo(self.comboBox_bertopic_variable)
+
+    def _connect_signals(self):
+        """Signal connections of the .ui widgets. """
+
+        self.pushButton_select_files.clicked.connect(self.select_files)
+        self.pushButton_select_cases.clicked.connect(self.select_cases)
+        self.pushButton_select_codes.clicked.connect(self.select_codes)
+        self.pushButton_stopwords.clicked.connect(self.browse_stopwords)
+        self.pushButton_build_corpus.clicked.connect(self.build_corpus)
+        self.pushButton_export_iramuteq.clicked.connect(self.export_iramuteq_dialog)
+        self.pushButton_descstats_run.clicked.connect(self.run_descstats)
+        self.pushButton_descstats_csv.clicked.connect(self.export_descstats_csv)
+        self.pushButton_descstats_html.clicked.connect(self.export_descstats_html)
+        self.pushButton_descstats_odt.clicked.connect(self.export_descstats_odt)
+        self.pushButton_spec_run.clicked.connect(self.run_specificites)
+        self.pushButton_spec_csv.clicked.connect(self.export_specificites_csv)
+        self.pushButton_spec_html.clicked.connect(self.export_specificites_html)
+        self.pushButton_sim_run.clicked.connect(self.run_similarity)
+        self.pushButton_sim_png.clicked.connect(self.export_similarity_png)
+        self.pushButton_ca_run.clicked.connect(self.run_ca)
+        self.pushButton_ca_csv.clicked.connect(self.export_ca_csv)
+        self.pushButton_ca_png.clicked.connect(self.export_ca_png)
+        self.pushButton_reinert_run.clicked.connect(self.run_reinert)
+        self.pushButton_reinert_csv.clicked.connect(self.export_reinert_csv)
+        self.pushButton_reinert_ca.clicked.connect(self.show_reinert_ca)
+        self.pushButton_reinert_dendro.clicked.connect(self.show_reinert_dendrogram)
+        self.treeWidget_reinert.itemClicked.connect(self.reinert_class_selected)
+        self.pushButton_bertopic_run.clicked.connect(self.run_bertopic)
+        self.pushButton_bertopic_chart.clicked.connect(self.show_bertopic_chart)
+        self.pushButton_bertopic_csv.clicked.connect(self.export_bertopic_csv)
+        self.pushButton_bertopic_dist.clicked.connect(self.show_bertopic_distribution)
+        self.pushButton_sim_popout.clicked.connect(self.popout_similarity)
+        self.pushButton_ca_popout.clicked.connect(self.popout_ca)
+        self.pushButton_reinert_dendro_popout.clicked.connect(self.popout_reinert_dendrogram)
+        self.pushButton_reinert_ca_popout.clicked.connect(self.popout_reinert_ca)
+        self.pushButton_bertopic_chart_popout.clicked.connect(self.popout_topics_chart)
+        self.pushButton_bertopic_dist_popout.clicked.connect(self.popout_topics_distribution)
+
+    def _embed_figure(self, placeholder_name: str, figure, canvas_attr: str):
+        """Embed a matplotlib Figure in a placeholder widget of the .ui, replacing
+        any previous canvas (the figures are recomputed on each run). """
+
+        placeholder = getattr(self, placeholder_name)
+        layout = placeholder.layout()
+        old = getattr(self, canvas_attr, None)
+        if old is not None:
+            layout.removeWidget(old)
+            old.deleteLater()
+        canvas = FigureCanvas(figure)
+        layout.addWidget(canvas)
+        setattr(self, canvas_attr, canvas)
+
+    def _popout(self, figure, title: str):
+        """Open a figure in a separate non-blocking window (kept referenced). """
+
+        dialog = DialogFigure(self.app, figure, title)
+        dialog.show()
+        self._popout_dialogs.append(dialog)
+
+    def popout_similarity(self):
+        computed = self._compute_similarity()
+        if computed is None:
+            return
+        self._popout(computed[2], _("Similarity graph"))
+
+    def popout_ca(self):
+        computed = self._compute_ca()
+        if computed is None:
+            return
+        self._popout(computed[1], _("Correspondence analysis"))
+
+    def popout_reinert_dendrogram(self):
+        if self.reinert_result is None:
+            self.run_reinert()
+        if self.reinert_result is None:
+            return
+        self._popout(draw_dendrogram(self.reinert_result), _("Reinert classification dendrogram"))
+
+    def popout_reinert_ca(self):
+        if self.reinert_result is None:
+            self.run_reinert()
+        if self.reinert_result is None:
+            return
+        self._popout(plot_ca(self.reinert_result["ca"], axes=(0, 1)),
+                      _("Reinert classification: correspondence analysis (forms x classes)"))
+
+    def popout_topics_chart(self):
+        if self.bertopic_result is None:
+            self.run_bertopic()
+        if self.bertopic_result is None:
+            return
+        self._popout(plot_topic_sizes(self.bertopic_result), _("Topics") + ": " + _("topic sizes"))
+
+    def popout_topics_distribution(self):
+        if self.bertopic_result is None:
+            self.run_bertopic()
+        if self.bertopic_result is None or self.bertopic_distribution is None:
+            return
+        modalities, topic_ids, counts = self.bertopic_distribution
+        self._popout(plot_topic_distribution(modalities, topic_ids, counts),
+                      _("Topics") + ": " + _("topic distribution"))
+
+    def _icon_only_buttons(self):
+        """Icon-only buttons (as in Reports > Code Retrieval): the text label of
+        each button moves to its tooltip, so the rows stay compact with larger
+        fonts. """
+
+        for button in self.findChildren(QtWidgets.QPushButton):
+            label = button.text()
+            if not label:
+                continue
+            tooltip = button.toolTip()
+            if tooltip and label.lower() not in tooltip.lower():
+                tooltip = f"{label} - {tooltip}"
+            elif not tooltip:
+                tooltip = label
+            button.setToolTip(tooltip)
+            button.setText("")
 
     # --- Selection (same helpers as the other Reports dialogs) ---
-
-    def _build_selection_group(self) -> QtWidgets.QGroupBox:
-        group = QtWidgets.QGroupBox(_("Selection"))
-        hlayout = QtWidgets.QHBoxLayout(group)
-        self.pushButton_select_files = QtWidgets.QPushButton(_("Select files"))
-        self.pushButton_select_files.setIcon(qta.icon("mdi6.file-outline"))
-        self.pushButton_select_files.clicked.connect(self.select_files)
-        self.pushButton_select_cases = QtWidgets.QPushButton(_("Select cases"))
-        self.pushButton_select_cases.setIcon(qta.icon("mdi6.account-outline"))
-        self.pushButton_select_cases.clicked.connect(self.select_cases)
-        self.pushButton_select_codes = QtWidgets.QPushButton(_("Select codes"))
-        self.pushButton_select_codes.setIcon(qta.icon("mdi6.text"))
-        self.pushButton_select_codes.clicked.connect(self.select_codes)
-        self.label_selection = QtWidgets.QLabel(_("All files, cases and codes"))
-        self.label_selection.setWordWrap(True)
-        for button in (self.pushButton_select_files, self.pushButton_select_cases, self.pushButton_select_codes):
-            hlayout.addWidget(button)
-        hlayout.addWidget(self.label_selection, 1)
-        return group
 
     def select_files(self):
         """ Restrict the corpus to the selected text files. """
@@ -182,55 +371,6 @@ class DialogTextStats(QtWidgets.QDialog):
         parts.append(_("Codes: ") + (str(len(self.code_ids)) if self.code_ids else _("all")))
         self.label_selection.setText(" | ".join(parts))
 
-    # --- Corpus tab ---
-
-    def _build_corpus_tab(self):
-        self.tab_corpus = QtWidgets.QWidget()
-        layout = QtWidgets.QVBoxLayout(self.tab_corpus)
-
-        params = QtWidgets.QHBoxLayout()
-        params.addWidget(QtWidgets.QLabel(_("Language:")))
-        self.comboBox_language = QtWidgets.QComboBox()
-        self.comboBox_language.addItems(LANGUAGES)
-        lang = self.app.settings.get("language", "fr")
-        if lang in LANGUAGES:
-            self.comboBox_language.setCurrentText(lang)
-        params.addWidget(self.comboBox_language)
-        params.addWidget(QtWidgets.QLabel(_("Custom stopwords file:")))
-        self.lineEdit_stopwords = QtWidgets.QLineEdit()
-        self.lineEdit_stopwords.setPlaceholderText(_("Optional text file, one word per line"))
-        self.pushButton_stopwords = QtWidgets.QPushButton(_("Browse"))
-        self.pushButton_stopwords.clicked.connect(self.browse_stopwords)
-        params.addWidget(self.lineEdit_stopwords, 1)
-        params.addWidget(self.pushButton_stopwords)
-        self.checkBox_stem = QtWidgets.QCheckBox(_("Light stemming"))
-        params.addWidget(self.checkBox_stem)
-        self.checkBox_documents = QtWidgets.QCheckBox(_("Include whole documents"))
-        params.addWidget(self.checkBox_documents)
-        layout.addLayout(params)
-
-        buttons = QtWidgets.QHBoxLayout()
-        self.pushButton_build_corpus = QtWidgets.QPushButton(_("Build corpus"))
-        self.pushButton_build_corpus.setIcon(qta.icon("mdi6.play"))
-        self.pushButton_build_corpus.clicked.connect(self.build_corpus)
-        buttons.addWidget(self.pushButton_build_corpus)
-        self.pushButton_export_iramuteq = QtWidgets.QPushButton(_("Export IRaMuTeQ"))
-        self.pushButton_export_iramuteq.setIcon(qta.icon("mdi6.export"))
-        self.pushButton_export_iramuteq.setToolTip(
-            _("Export the corpus (coded segments, plus whole documents if checked) in the IRaMuTeQ text format"))
-        self.pushButton_export_iramuteq.clicked.connect(self.export_iramuteq_dialog)
-        buttons.addWidget(self.pushButton_export_iramuteq)
-        self.label_corpus_info = QtWidgets.QLabel("")
-        buttons.addWidget(self.label_corpus_info, 1)
-        layout.addLayout(buttons)
-
-        self.tableWidget_segments = QtWidgets.QTableWidget()
-        self.tableWidget_segments.setColumnCount(4)
-        self.tableWidget_segments.setHorizontalHeaderLabels([_("Document"), _("Case"), _("Code"), _("Text")])
-        self.tableWidget_segments.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        layout.addWidget(self.tableWidget_segments)
-        self.tabWidget.addTab(self.tab_corpus, _("Corpus"))
-
     def browse_stopwords(self):
         filepath, _selected_filter = QtWidgets.QFileDialog.getOpenFileName(
             self, _("Custom stopwords file"), self.app.settings.get("directory", ""), "Text Files (*.txt)")
@@ -282,7 +422,7 @@ class DialogTextStats(QtWidgets.QDialog):
         """ Refill the partition variable combos after a corpus rebuild, keeping
         the current selection when it still exists. """
 
-        for name in ("comboBox_descstats_variable", "comboBox_spec_variable", "comboBox_ca_variable",
+        for name in ("comboBox_stats_variable", "comboBox_ca_variable",
                      "comboBox_bertopic_variable"):
             combo = getattr(self, name, None)
             if combo is None:
@@ -330,49 +470,6 @@ class DialogTextStats(QtWidgets.QDialog):
             return []
         return available_variables(self.segments)
 
-    # --- Descending statistics tab (IRaMuTeQ "rapport descendant") ---
-
-    def _build_descstats_tab(self):
-        self.tab_descstats = QtWidgets.QWidget()
-        layout = QtWidgets.QVBoxLayout(self.tab_descstats)
-
-        params = QtWidgets.QHBoxLayout()
-        params.addWidget(QtWidgets.QLabel(_("Minimum frequency of active forms:")))
-        self.spinBox_descstats_min_freq = QtWidgets.QSpinBox()
-        self.spinBox_descstats_min_freq.setRange(1, 9999)
-        self.spinBox_descstats_min_freq.setValue(1)
-        params.addWidget(self.spinBox_descstats_min_freq)
-        params.addWidget(QtWidgets.QLabel(_("Partition variable:")))
-        self.comboBox_descstats_variable = QtWidgets.QComboBox()
-        self._fill_variable_combo(self.comboBox_descstats_variable)
-        params.addWidget(self.comboBox_descstats_variable, 1)
-        self.pushButton_descstats_run = QtWidgets.QPushButton(_("Calculate"))
-        self.pushButton_descstats_run.setIcon(qta.icon("mdi6.play"))
-        self.pushButton_descstats_run.clicked.connect(self.run_descstats)
-        params.addWidget(self.pushButton_descstats_run)
-        self.pushButton_descstats_csv = QtWidgets.QPushButton(_("Export CSV"))
-        self.pushButton_descstats_csv.setIcon(qta.icon("mdi6.file-delimited-outline"))
-        self.pushButton_descstats_csv.clicked.connect(self.export_descstats_csv)
-        params.addWidget(self.pushButton_descstats_csv)
-        self.pushButton_descstats_html = QtWidgets.QPushButton(_("Export HTML"))
-        self.pushButton_descstats_html.setIcon(qta.icon("mdi6.file-code-outline"))
-        self.pushButton_descstats_html.clicked.connect(self.export_descstats_html)
-        params.addWidget(self.pushButton_descstats_html)
-        layout.addLayout(params)
-
-        splitter = QtWidgets.QSplitter()
-        self.tableWidget_descstats = QtWidgets.QTableWidget()
-        self.tableWidget_descstats.setColumnCount(3)
-        self.tableWidget_descstats.setHorizontalHeaderLabels([_("Form"), _("Frequency"), _("%")])
-        self.tableWidget_descstats.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        splitter.addWidget(self.tableWidget_descstats)
-        self.textBrowser_descstats = QtWidgets.QTextBrowser()
-        splitter.addWidget(self.textBrowser_descstats)
-        splitter.setSizes([400, 400])
-        layout.addWidget(splitter)
-        self.tabWidget.addTab(self.tab_descstats, _("Text statistics"))
-        self.descstats = None
-
     def _fill_variable_combo(self, combo: QtWidgets.QComboBox):
         """ Fill a partition variable combo: "none" plus the corpus variables. """
 
@@ -384,10 +481,10 @@ class DialogTextStats(QtWidgets.QDialog):
     def run_descstats(self):
         """ Compute the descending statistics and show them. """
 
-        table = self.get_lexical_table(min_freq=self.spinBox_descstats_min_freq.value())
+        table = self.get_lexical_table(min_freq=self.spinBox_stats_min_freq.value())
         if table is None:
             return
-        variable = self.comboBox_descstats_variable.currentData() or None
+        variable = self.comboBox_stats_variable.currentData() or None
         try:
             self.descstats = descendant_statistics(table, variable=variable)
         except Exception as err:
@@ -440,7 +537,7 @@ class DialogTextStats(QtWidgets.QDialog):
             self.run_descstats()
         if self.descstats is None:
             return
-        variable = self.comboBox_descstats_variable.currentData() or None
+        variable = self.comboBox_stats_variable.currentData() or None
         e = ExportDirectoryPathDialog(self.app, "Text_statistics.html")
         filepath = e.filepath
         if filepath is None:
@@ -451,71 +548,43 @@ class DialogTextStats(QtWidgets.QDialog):
         Message(self.app, _("HTML export"), msg).exec()
         self.parent_textEdit.append(msg)
 
-    # --- Specificities (chi-square) tab ---
-
-    def _build_specificites_tab(self):
-        self.tab_specificites = QtWidgets.QWidget()
-        layout = QtWidgets.QVBoxLayout(self.tab_specificites)
-
-        params = QtWidgets.QHBoxLayout()
-        params.addWidget(QtWidgets.QLabel(_("Partition variable:")))
-        self.comboBox_spec_variable = QtWidgets.QComboBox()
-        self._fill_variable_combo(self.comboBox_spec_variable)
-        params.addWidget(self.comboBox_spec_variable, 1)
-        params.addWidget(QtWidgets.QLabel(_("Minimum frequency:")))
-        self.spinBox_spec_min_freq = QtWidgets.QSpinBox()
-        self.spinBox_spec_min_freq.setRange(1, 9999)
-        self.spinBox_spec_min_freq.setValue(1)
-        params.addWidget(self.spinBox_spec_min_freq)
-        params.addWidget(QtWidgets.QLabel(_("Probability threshold:")))
-        self.doubleSpinBox_spec_p = QtWidgets.QDoubleSpinBox()
-        self.doubleSpinBox_spec_p.setRange(0.0001, 1.0)
-        self.doubleSpinBox_spec_p.setSingleStep(0.01)
-        self.doubleSpinBox_spec_p.setDecimals(4)
-        self.doubleSpinBox_spec_p.setValue(0.05)
-        params.addWidget(self.doubleSpinBox_spec_p)
-        self.pushButton_spec_run = QtWidgets.QPushButton(_("Calculate"))
-        self.pushButton_spec_run.setIcon(qta.icon("mdi6.play"))
-        self.pushButton_spec_run.clicked.connect(self.run_specificites)
-        params.addWidget(self.pushButton_spec_run)
-        self.pushButton_spec_csv = QtWidgets.QPushButton(_("Export CSV"))
-        self.pushButton_spec_csv.setIcon(qta.icon("mdi6.file-delimited-outline"))
-        self.pushButton_spec_csv.clicked.connect(self.export_specificites_csv)
-        params.addWidget(self.pushButton_spec_csv)
-        self.pushButton_spec_html = QtWidgets.QPushButton(_("Export HTML"))
-        self.pushButton_spec_html.setIcon(qta.icon("mdi6.file-code-outline"))
-        self.pushButton_spec_html.clicked.connect(self.export_specificites_html)
-        params.addWidget(self.pushButton_spec_html)
-        layout.addLayout(params)
-
-        splitter = QtWidgets.QSplitter()
-        self.tableWidget_spec = QtWidgets.QTableWidget()
-        self.tableWidget_spec.setColumnCount(7)
-        self.tableWidget_spec.setHorizontalHeaderLabels(
-            [_("Form"), _("Modality"), _("Count"), _("Expected count"), "chi2", _("Signed value"), "p"])
-        self.tableWidget_spec.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        splitter.addWidget(self.tableWidget_spec)
-        self.textBrowser_spec = QtWidgets.QTextBrowser()
-        splitter.addWidget(self.textBrowser_spec)
-        splitter.setSizes([400, 400])
-        layout.addWidget(splitter)
-        self.tabWidget.addTab(self.tab_specificites, _("Specificities"))
-        self.specificites_results = None
+    def export_descstats_odt(self):
+        if self.descstats is None:
+            self.run_descstats()
+        if self.descstats is None:
+            return
+        variable = self.comboBox_stats_variable.currentData() or None
+        e = ExportDirectoryPathDialog(self.app, "Text_statistics.odt")
+        filepath = e.filepath
+        if filepath is None:
+            return
+        if not filepath.lower().endswith(".odt"):
+            filepath += ".odt"
+        try:
+            doc = descstats_odt(self.descstats, variable=variable)
+            doc.save(filepath)
+        except Exception as err:
+            logger.error(err)
+            Message(self.app, _("Error"), str(err), "warning").exec()
+            return
+        msg = _("Text statistics ODT exported to: ") + filepath
+        Message(self.app, _("ODT export"), msg).exec()
+        self.parent_textEdit.append(msg)
 
     def run_specificites(self):
         """ Compute the chi-square specificities for the selected variable. """
 
-        variable = self.comboBox_spec_variable.currentData()
+        variable = self.comboBox_stats_variable.currentData()
         if not variable:
             Message(self.app, _("No variable"), _("Select a partition variable")).exec()
             return
-        table = self.get_lexical_table(min_freq=1)
+        table = self.get_lexical_table(min_freq=self.spinBox_stats_min_freq.value())
         if table is None:
             return
         try:
             self.specificites_results = specificities(
                 table, variable,
-                min_freq=self.spinBox_spec_min_freq.value(),
+                min_freq=self.spinBox_stats_min_freq.value(),
                 p_threshold=self.doubleSpinBox_spec_p.value())
         except Exception as err:
             logger.error(err)
@@ -560,7 +629,7 @@ class DialogTextStats(QtWidgets.QDialog):
             self.run_specificites()
         if self.specificites_results is None:
             return
-        variable = self.comboBox_spec_variable.currentData()
+        variable = self.comboBox_stats_variable.currentData()
         e = ExportDirectoryPathDialog(self.app, "Specificities.html")
         filepath = e.filepath
         if filepath is None:
@@ -599,55 +668,13 @@ class DialogTextStats(QtWidgets.QDialog):
         Message(self.app, _("IRaMuTeQ export"), msg).exec()
         self.parent_textEdit.append(msg)
 
-
-    # --- Correspondence analysis (CA) tab ---
-
-    def _build_ca_tab(self):
-        self.tab_ca = QtWidgets.QWidget()
-        layout = QtWidgets.QVBoxLayout(self.tab_ca)
-
-        params = QtWidgets.QHBoxLayout()
-        params.addWidget(QtWidgets.QLabel(_("Columns:")))
-        self.comboBox_ca_variable = QtWidgets.QComboBox()
-        self._fill_variable_combo(self.comboBox_ca_variable)
-        self.comboBox_ca_variable.insertItem(0, _("Segments"), "__segments__")
-        params.addWidget(self.comboBox_ca_variable, 1)
-        self.pushButton_ca_run = QtWidgets.QPushButton(_("Calculate"))
-        self.pushButton_ca_run.setIcon(qta.icon("mdi6.play"))
-        self.pushButton_ca_run.clicked.connect(self.run_ca)
-        params.addWidget(self.pushButton_ca_run)
-        self.pushButton_ca_csv = QtWidgets.QPushButton(_("Export coordinates CSV"))
-        self.pushButton_ca_csv.setIcon(qta.icon("mdi6.file-delimited-outline"))
-        self.pushButton_ca_csv.clicked.connect(self.export_ca_csv)
-        params.addWidget(self.pushButton_ca_csv)
-        self.pushButton_ca_png = QtWidgets.QPushButton(_("Export PNG"))
-        self.pushButton_ca_png.setIcon(qta.icon("mdi6.image-outline"))
-        self.pushButton_ca_png.clicked.connect(self.export_ca_png)
-        params.addWidget(self.pushButton_ca_png)
-        layout.addLayout(params)
-
-        splitter = QtWidgets.QSplitter()
-        self.tableWidget_ca = QtWidgets.QTableWidget()
-        self.tableWidget_ca.setColumnCount(4)
-        self.tableWidget_ca.setHorizontalHeaderLabels([_("Axis"), _("Eigenvalue"), _("% inertia"), _("Cumulative %")])
-        self.tableWidget_ca.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        splitter.addWidget(self.tableWidget_ca)
-        self.label_ca_info = QtWidgets.QLabel("")
-        self.label_ca_info.setWordWrap(True)
-        splitter.addWidget(self.label_ca_info)
-        splitter.setSizes([300, 500])
-        layout.addWidget(splitter)
-        self.tabWidget.addTab(self.tab_ca, _("Correspondence analysis"))
-        self.ca_result = None
-        self.ca_figure = None
-
     def _compute_ca(self):
         """ Compute the correspondence analysis and a fresh factor-map Figure.
         Returns (result, figure) or None on error. A fresh Figure is returned each
         time because the Figure shown in a DialogFigure cannot be saved once its
         Qt canvas has been closed/deleted. """
 
-        table = self.get_lexical_table(min_freq=1)
+        table = self.get_lexical_table(min_freq=self.spinBox_graph_min_freq.value())
         if table is None:
             return None
         variable = self.comboBox_ca_variable.currentData()
@@ -693,9 +720,7 @@ class DialogTextStats(QtWidgets.QDialog):
             + " | " + _("Columns: ") + str(len(result["col_labels"])))
         msg = _("Correspondence analysis: ") + str(n_axes) + " " + _("axes")
         self.parent_textEdit.append(msg)
-        dialog = DialogFigure(self.app, self.ca_figure, _("Correspondence analysis"))
-        dialog.show()
-        self._ca_dialog = dialog
+        self._embed_figure("widget_ca_plot", self.ca_figure, "_ca_canvas")
 
     def export_ca_csv(self):
         if self.ca_result is None:
@@ -705,7 +730,7 @@ class DialogTextStats(QtWidgets.QDialog):
             self.ca_result, self.ca_figure = computed
         if self.ca_result is None:
             return
-        e = ExportDirectoryPathDialog(self.app, "CA_coordinates.csv")
+        e = ExportDirectoryPathDialog(self.app, "correspondence_analysis_coordinates.csv")
         filepath = e.filepath
         if filepath is None:
             return
@@ -721,7 +746,7 @@ class DialogTextStats(QtWidgets.QDialog):
             for k, label in enumerate(result["col_labels"]):
                 writer.writerow([label, int(result["col_freq"][k])]
                                 + [round(float(result["col_coords"][k, a]), 6) for a in range(n_axes)])
-        msg = _("CA coordinates exported to: ") + filepath
+        msg = _("Correspondence analysis coordinates exported to: ") + filepath
         Message(self.app, _("CSV export"), msg).exec()
         self.parent_textEdit.append(msg)
 
@@ -732,92 +757,17 @@ class DialogTextStats(QtWidgets.QDialog):
         if computed is None:
             return
         figure = computed[1]
-        e = ExportDirectoryPathDialog(self.app, "CA_factor_map.png")
+        e = ExportDirectoryPathDialog(self.app, "correspondence_analysis_factor_map.png")
         filepath = e.filepath
         if filepath is None:
             return
         figure.savefig(filepath, dpi=150)
-        msg = _("CA factor map exported to: ") + filepath
+        msg = _("Correspondence analysis factor map exported to: ") + filepath
         Message(self.app, _("PNG export"), msg).exec()
         self.parent_textEdit.append(msg)
 
-
-    # --- Reinert classification (CHD) tab ---
-
-    def _build_reinert_tab(self):
-        self.tab_reinert = QtWidgets.QWidget()
-        layout = QtWidgets.QVBoxLayout(self.tab_reinert)
-
-        params = QtWidgets.QHBoxLayout()
-        params.addWidget(QtWidgets.QLabel(_("UCI size (occurrences):")))
-        self.spinBox_reinert_size = QtWidgets.QSpinBox()
-        self.spinBox_reinert_size.setRange(10, 500)
-        self.spinBox_reinert_size.setValue(40)
-        params.addWidget(self.spinBox_reinert_size)
-        params.addWidget(QtWidgets.QLabel(_("Min frequency of active forms:")))
-        self.spinBox_reinert_min_freq = QtWidgets.QSpinBox()
-        self.spinBox_reinert_min_freq.setRange(1, 999)
-        self.spinBox_reinert_min_freq.setValue(3)
-        params.addWidget(self.spinBox_reinert_min_freq)
-        params.addWidget(QtWidgets.QLabel(_("Max classes:")))
-        self.spinBox_reinert_max_classes = QtWidgets.QSpinBox()
-        self.spinBox_reinert_max_classes.setRange(2, 50)
-        self.spinBox_reinert_max_classes.setValue(10)
-        params.addWidget(self.spinBox_reinert_max_classes)
-        params.addWidget(QtWidgets.QLabel(_("Min UCI per class:")))
-        self.spinBox_reinert_min_size = QtWidgets.QSpinBox()
-        self.spinBox_reinert_min_size.setRange(1, 200)
-        self.spinBox_reinert_min_size.setValue(3)
-        params.addWidget(self.spinBox_reinert_min_size)
-        self.pushButton_reinert_run = QtWidgets.QPushButton(_("Calculate"))
-        self.pushButton_reinert_run.setIcon(qta.icon("mdi6.play"))
-        self.pushButton_reinert_run.clicked.connect(self.run_reinert)
-        params.addWidget(self.pushButton_reinert_run)
-        self.pushButton_reinert_csv = QtWidgets.QPushButton(_("Export CSV"))
-        self.pushButton_reinert_csv.setIcon(qta.icon("mdi6.file-delimited-outline"))
-        self.pushButton_reinert_csv.clicked.connect(self.export_reinert_csv)
-        params.addWidget(self.pushButton_reinert_csv)
-        self.pushButton_reinert_ca = QtWidgets.QPushButton(_("CA forms x classes"))
-        self.pushButton_reinert_ca.setIcon(qta.icon("mdi6.chart-scatter-plot"))
-        self.pushButton_reinert_ca.clicked.connect(self.show_reinert_ca)
-        params.addWidget(self.pushButton_reinert_ca)
-        self.pushButton_reinert_dendro = QtWidgets.QPushButton(_("Dendrogram"))
-        self.pushButton_reinert_dendro.setIcon(qta.icon("mdi6.chart-tree"))
-        self.pushButton_reinert_dendro.clicked.connect(self.show_reinert_dendrogram)
-        params.addWidget(self.pushButton_reinert_dendro)
-        layout.addLayout(params)
-
-        self.label_reinert_info = QtWidgets.QLabel("")
-        self.label_reinert_info.setWordWrap(True)
-        layout.addWidget(self.label_reinert_info)
-
-        splitter = QtWidgets.QSplitter()
-        self.treeWidget_reinert = QtWidgets.QTreeWidget()
-        self.treeWidget_reinert.setColumnCount(4)
-        self.treeWidget_reinert.setHeaderLabels([_("Class"), _("UCI"), "chi2", _("Characteristic forms")])
-        self.treeWidget_reinert.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.treeWidget_reinert.itemClicked.connect(self.reinert_class_selected)
-        splitter.addWidget(self.treeWidget_reinert)
-        right = QtWidgets.QWidget()
-        right_layout = QtWidgets.QVBoxLayout(right)
-        right_layout.setContentsMargins(0, 0, 0, 0)
-        self.tableWidget_reinert_profile = QtWidgets.QTableWidget()
-        self.tableWidget_reinert_profile.setColumnCount(4)
-        self.tableWidget_reinert_profile.setHorizontalHeaderLabels(
-            [_("Form"), _("Frequency"), "chi2", _("Signed value")])
-        self.tableWidget_reinert_profile.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        right_layout.addWidget(self.tableWidget_reinert_profile)
-        right_layout.addWidget(QtWidgets.QLabel(_("Most representative UCI:")))
-        self.textBrowser_reinert_uci = QtWidgets.QTextBrowser()
-        right_layout.addWidget(self.textBrowser_reinert_uci)
-        splitter.addWidget(right)
-        splitter.setSizes([350, 550])
-        layout.addWidget(splitter)
-        self.tabWidget.addTab(self.tab_reinert, _("Reinert classification"))
-        self.reinert_result = None
-
     def run_reinert(self):
-        """ Reinert CHD on the corpus: UCI segmentation, forms x UCI matrix of the
+        """ Reinert CHD on the corpus: initial context unit segmentation, forms x initial context unit matrix of the
         active forms, then top-down dichotomic classification maximizing the
         chi-square between classes. """
 
@@ -852,7 +802,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self.treeWidget_reinert.resizeColumnToContents(0)
         self.label_reinert_info.setText(
             _("Classes: ") + str(result["n_classes"])
-            + " | " + _("UCI: ") + str(len(result["uci_texts"]))
+            + " | " + _("Initial context units: ") + str(len(result["uci_texts"]))
             + " | chi2 = " + f"{result['chi2']:.2f}" + " (df = " + str(result["df"])
             + ", " + _("chi2/df ratio: ") + f"{result['chi2_ratio']:.3f}" + ")")
         msg = _("Reinert classification: ") + str(result["n_classes"]) + " " + _("classes")
@@ -894,7 +844,7 @@ class DialogTextStats(QtWidgets.QDialog):
             writer.writerow(["chi2", round(result["chi2"], 6), "df", result["df"],
                              _("chi2/df ratio"), round(result["chi2_ratio"], 6)])
             writer.writerow([])
-            writer.writerow([_("Class"), _("UCI"), "chi2", _("Characteristic forms")])
+            writer.writerow([_("Class"), _("Initial context unit"), "chi2", _("Characteristic forms")])
             for cls in result["classes"]:
                 writer.writerow([f"class {cls['id']}", cls["size"], round(cls["chi2"], 6),
                                  " | ".join(f"{p['forme']} ({p['valeur']:.2f})" for p in cls["profile"][:20])])
@@ -905,7 +855,7 @@ class DialogTextStats(QtWidgets.QDialog):
                     writer.writerow([f"class {cls['id']}", p["forme"], p["frequence"],
                                      round(p["chi2"], 6), round(p["valeur"], 6)])
             writer.writerow([])
-            writer.writerow([_("Class"), _("Representative UCI")])
+            writer.writerow([_("Class"), _("Representative initial context units")])
             for cls in result["classes"]:
                 for rep in cls["representative_ucis"]:
                     writer.writerow([f"class {cls['id']}", rep["text"]])
@@ -922,9 +872,7 @@ class DialogTextStats(QtWidgets.QDialog):
         if self.reinert_result is None:
             return
         figure = draw_dendrogram(self.reinert_result)
-        dialog = DialogFigure(self.app, figure, _("Reinert classification dendrogram"))
-        dialog.show()
-        self._reinert_dendro_dialog = dialog
+        self._embed_figure("widget_reinert_dendro_plot", figure, "_reinert_dendro_canvas")
 
     def show_reinert_ca(self):
         """ Show the correspondence analysis of forms x classes in a non-blocking
@@ -935,83 +883,8 @@ class DialogTextStats(QtWidgets.QDialog):
         if self.reinert_result is None:
             return
         figure = plot_ca(self.reinert_result["ca"], axes=(0, 1))
-        dialog = DialogFigure(self.app, figure, _("Reinert classification: CA forms x classes"))
-        dialog.show()
-        self._reinert_ca_dialog = dialog
         self._reinert_ca_figure = figure
-
-
-    # --- BERTopic tab (BERT-based topic modeling) ---
-
-    def _build_bertopic_tab(self):
-        self.tab_bertopic = QtWidgets.QWidget()
-        layout = QtWidgets.QVBoxLayout(self.tab_bertopic)
-
-        params = QtWidgets.QHBoxLayout()
-        params.addWidget(QtWidgets.QLabel(_("Unit of analysis:")))
-        self.comboBox_bertopic_unit = QtWidgets.QComboBox()
-        self.comboBox_bertopic_unit.addItem(_("Coded segments"), "segments")
-        self.comboBox_bertopic_unit.addItem(_("Whole documents"), "documents")
-        self.comboBox_bertopic_unit.addItem(_("UCI (~40 occurrences)"), "uci")
-        params.addWidget(self.comboBox_bertopic_unit)
-        params.addWidget(QtWidgets.QLabel(_("Embedding model:")))
-        self.comboBox_bertopic_model = QtWidgets.QComboBox()
-        self.comboBox_bertopic_model.setEditable(True)
-        self.comboBox_bertopic_model.addItems([DEFAULT_MODEL, AI_MODEL])
-        params.addWidget(self.comboBox_bertopic_model, 1)
-        params.addWidget(QtWidgets.QLabel(_("Min documents per topic:")))
-        self.spinBox_bertopic_min_size = QtWidgets.QSpinBox()
-        self.spinBox_bertopic_min_size.setRange(2, 500)
-        self.spinBox_bertopic_min_size.setValue(5)
-        params.addWidget(self.spinBox_bertopic_min_size)
-        params.addWidget(QtWidgets.QLabel(_("Top words per topic:")))
-        self.spinBox_bertopic_top_words = QtWidgets.QSpinBox()
-        self.spinBox_bertopic_top_words.setRange(3, 50)
-        self.spinBox_bertopic_top_words.setValue(10)
-        params.addWidget(self.spinBox_bertopic_top_words)
-        self.pushButton_bertopic_run = QtWidgets.QPushButton(_("Calculate"))
-        self.pushButton_bertopic_run.setIcon(qta.icon("mdi6.play"))
-        self.pushButton_bertopic_run.clicked.connect(self.run_bertopic)
-        params.addWidget(self.pushButton_bertopic_run)
-        self.pushButton_bertopic_chart = QtWidgets.QPushButton(_("Topic sizes"))
-        self.pushButton_bertopic_chart.setIcon(qta.icon("mdi6.chart-bar"))
-        self.pushButton_bertopic_chart.clicked.connect(self.show_bertopic_chart)
-        params.addWidget(self.pushButton_bertopic_chart)
-        self.pushButton_bertopic_csv = QtWidgets.QPushButton(_("Export CSV"))
-        self.pushButton_bertopic_csv.setIcon(qta.icon("mdi6.file-delimited-outline"))
-        self.pushButton_bertopic_csv.clicked.connect(self.export_bertopic_csv)
-        params.addWidget(self.pushButton_bertopic_csv)
-        layout.addLayout(params)
-
-        dist_params = QtWidgets.QHBoxLayout()
-        dist_params.addWidget(QtWidgets.QLabel(_("Distribution by variable:")))
-        self.comboBox_bertopic_variable = QtWidgets.QComboBox()
-        self._fill_variable_combo(self.comboBox_bertopic_variable)
-        dist_params.addWidget(self.comboBox_bertopic_variable, 1)
-        self.pushButton_bertopic_dist = QtWidgets.QPushButton(_("Topics x variable chart"))
-        self.pushButton_bertopic_dist.setIcon(qta.icon("mdi6.chart-bar-stacked"))
-        self.pushButton_bertopic_dist.clicked.connect(self.show_bertopic_distribution)
-        dist_params.addWidget(self.pushButton_bertopic_dist)
-        layout.addLayout(dist_params)
-
-        self.label_bertopic_info = QtWidgets.QLabel("")
-        self.label_bertopic_info.setWordWrap(True)
-        layout.addWidget(self.label_bertopic_info)
-        splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation.Vertical)
-        self.tableWidget_bertopic = QtWidgets.QTableWidget()
-        self.tableWidget_bertopic.setColumnCount(4)
-        self.tableWidget_bertopic.setHorizontalHeaderLabels(
-            [_("Topic"), _("Size"), _("Top words"), _("Representative segment")])
-        self.tableWidget_bertopic.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        splitter.addWidget(self.tableWidget_bertopic)
-        self.tableWidget_bertopic_dist = QtWidgets.QTableWidget()
-        self.tableWidget_bertopic_dist.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        splitter.addWidget(self.tableWidget_bertopic_dist)
-        splitter.setSizes([400, 200])
-        layout.addWidget(splitter)
-        self.tabWidget.addTab(self.tab_bertopic, "BERTopic")
-        self.bertopic_result = None
-        self.bertopic_distribution = None
+        self._embed_figure("widget_reinert_ca_plot", figure, "_reinert_ca_canvas")
 
     def run_bertopic(self):
         """ BERTopic-style analysis of the corpus: BERT embeddings
@@ -1024,18 +897,18 @@ class DialogTextStats(QtWidgets.QDialog):
             return
         model_name = self.comboBox_bertopic_model.currentText().strip() or DEFAULT_MODEL
         unit = self.comboBox_bertopic_unit.currentData()
-        if unit == "documents":
-            from .irastats.corpus import build_document_segments
-            segments = build_document_segments(self.app.conn, file_ids=self.file_ids or None)
-        elif unit == "uci":
-            from .irastats.reinert import build_uci_segments
-            segments = build_uci_segments(self.segments, size=40)
-        else:
-            segments = self.segments
-        if not segments:
-            Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
-            return
         try:
+            if unit == "documents":
+                from .irastats.corpus import build_document_segments
+                segments = build_document_segments(self.app.conn, file_ids=self.file_ids or None)
+            elif unit == "uci":
+                from .irastats.reinert import build_uci_segments
+                segments = build_uci_segments(self.segments, size=40)
+            else:
+                segments = self.segments
+            if not segments:
+                Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
+                return
             self.bertopic_result = bertopic_analysis(
                 segments,
                 model_name=model_name,
@@ -1046,7 +919,11 @@ class DialogTextStats(QtWidgets.QDialog):
                 custom_stopwords_path=self.lineEdit_stopwords.text() or None,
             )
         except ImportError as err:
-            Message(self.app, _("BERT embeddings unavailable"), str(err), "warning").exec()
+            logger.error(err)
+            Message(self.app, _("BERT embeddings unavailable"),
+                    _("BERTopic needs the sentence-transformers and torch packages "
+                      "(pip install sentence-transformers torch).") + "\n" + str(err),
+                    "warning").exec()
             return
         except Exception as err:
             logger.error(err)
@@ -1070,22 +947,27 @@ class DialogTextStats(QtWidgets.QDialog):
         variable = self.comboBox_bertopic_variable.currentData()
         self.bertopic_distribution = None
         if variable:
-            self.bertopic_distribution = topic_by_variable(
-                result["labels"], [s["variables"] for s in segments], variable)
-            modalities, topic_ids, counts = self.bertopic_distribution
-            self.tableWidget_bertopic_dist.setColumnCount(1 + len(topic_ids))
-            self.tableWidget_bertopic_dist.setHorizontalHeaderLabels(
-                [variable] + [f"topic {topic}" for topic in topic_ids])
-            self.tableWidget_bertopic_dist.setRowCount(len(modalities))
-            for i, modality in enumerate(modalities):
-                item = QtWidgets.QTableWidgetItem(modality)
-                item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.tableWidget_bertopic_dist.setItem(i, 0, item)
-                for j in range(len(topic_ids)):
-                    cell = QtWidgets.QTableWidgetItem(str(int(counts[i, j])))
-                    cell.setFlags(cell.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-                    self.tableWidget_bertopic_dist.setItem(i, 1 + j, cell)
-            self.tableWidget_bertopic_dist.resizeColumnsToContents()
+            try:
+                self.bertopic_distribution = topic_by_variable(
+                    result["labels"], [s["variables"] for s in segments], variable)
+            except Exception as err:
+                logger.error(err)
+                self.bertopic_distribution = None
+            else:
+                modalities, topic_ids, counts = self.bertopic_distribution
+                self.tableWidget_bertopic_dist.setColumnCount(1 + len(topic_ids))
+                self.tableWidget_bertopic_dist.setHorizontalHeaderLabels(
+                    [variable] + [f"topic {topic}" for topic in topic_ids])
+                self.tableWidget_bertopic_dist.setRowCount(len(modalities))
+                for i, modality in enumerate(modalities):
+                    item = QtWidgets.QTableWidgetItem(modality)
+                    item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                    self.tableWidget_bertopic_dist.setItem(i, 0, item)
+                    for j in range(len(topic_ids)):
+                        cell = QtWidgets.QTableWidgetItem(str(int(counts[i, j])))
+                        cell.setFlags(cell.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                        self.tableWidget_bertopic_dist.setItem(i, 1 + j, cell)
+                self.tableWidget_bertopic_dist.resizeColumnsToContents()
         msg = "BERTopic: " + str(result["n_topics"]) + " " + _("topics") + " (" + model_name + ")"
         self.parent_textEdit.append(msg)
 
@@ -1097,9 +979,7 @@ class DialogTextStats(QtWidgets.QDialog):
         if self.bertopic_result is None:
             return
         figure = plot_topic_sizes(self.bertopic_result)
-        dialog = DialogFigure(self.app, figure, "BERTopic: " + _("topic sizes"))
-        dialog.show()
-        self._bertopic_chart_dialog = dialog
+        self._embed_figure("widget_topics_plot", figure, "_topics_canvas")
 
     def show_bertopic_distribution(self):
         """ Stacked bar chart of the topic distribution per modality of the selected
@@ -1112,9 +992,7 @@ class DialogTextStats(QtWidgets.QDialog):
             return
         modalities, topic_ids, counts = self.bertopic_distribution
         figure = plot_topic_distribution(modalities, topic_ids, counts)
-        dialog = DialogFigure(self.app, figure, "BERTopic: " + _("topic distribution"))
-        dialog.show()
-        self._bertopic_dist_dialog = dialog
+        self._embed_figure("widget_topics_dist_plot", figure, "_topics_dist_canvas")
 
     def export_bertopic_csv(self):
         if self.bertopic_result is None:
@@ -1150,59 +1028,6 @@ class DialogTextStats(QtWidgets.QDialog):
         Message(self.app, _("CSV export"), msg).exec()
         self.parent_textEdit.append(msg)
 
-
-    # --- Similarity graph tab ---
-
-    def _build_similarity_tab(self):
-        self.tab_similarity = QtWidgets.QWidget()
-        layout = QtWidgets.QVBoxLayout(self.tab_similarity)
-
-        params = QtWidgets.QHBoxLayout()
-        params.addWidget(QtWidgets.QLabel(_("Association measure:")))
-        self.comboBox_sim_method = QtWidgets.QComboBox()
-        self.comboBox_sim_method.addItem(_("Jaccard index (default)"), "jaccard")
-        self.comboBox_sim_method.addItem("chi2 (phi-squared)", "chi2")
-        params.addWidget(self.comboBox_sim_method)
-        params.addWidget(QtWidgets.QLabel(_("Minimum frequency:")))
-        self.spinBox_sim_min_freq = QtWidgets.QSpinBox()
-        self.spinBox_sim_min_freq.setRange(1, 9999)
-        self.spinBox_sim_min_freq.setValue(1)
-        params.addWidget(self.spinBox_sim_min_freq)
-        params.addWidget(QtWidgets.QLabel(_("Edge threshold:")))
-        self.doubleSpinBox_sim_threshold = QtWidgets.QDoubleSpinBox()
-        self.doubleSpinBox_sim_threshold.setRange(0.0, 1.0)
-        self.doubleSpinBox_sim_threshold.setSingleStep(0.05)
-        self.doubleSpinBox_sim_threshold.setDecimals(3)
-        self.doubleSpinBox_sim_threshold.setValue(0.2)
-        params.addWidget(self.doubleSpinBox_sim_threshold)
-        self.checkBox_sim_communities = QtWidgets.QCheckBox(_("Detect communities (Louvain)"))
-        self.checkBox_sim_communities.setChecked(True)
-        params.addWidget(self.checkBox_sim_communities)
-        params.addWidget(QtWidgets.QLabel(_("Halo:")))
-        self.comboBox_sim_halo = QtWidgets.QComboBox()
-        self.comboBox_sim_halo.addItem("")
-        params.addWidget(self.comboBox_sim_halo)
-        self.pushButton_sim_run = QtWidgets.QPushButton(_("Calculate"))
-        self.pushButton_sim_run.setIcon(qta.icon("mdi6.play"))
-        self.pushButton_sim_run.clicked.connect(self.run_similarity)
-        params.addWidget(self.pushButton_sim_run)
-        self.pushButton_sim_png = QtWidgets.QPushButton(_("Export PNG"))
-        self.pushButton_sim_png.setIcon(qta.icon("mdi6.image-outline"))
-        self.pushButton_sim_png.clicked.connect(self.export_similarity_png)
-        params.addWidget(self.pushButton_sim_png)
-        layout.addLayout(params)
-
-        self.label_sim_info = QtWidgets.QLabel("")
-        self.label_sim_info.setWordWrap(True)
-        layout.addWidget(self.label_sim_info)
-        self.textBrowser_sim = QtWidgets.QTextBrowser()
-        layout.addWidget(self.textBrowser_sim)
-        self.tabWidget.addTab(self.tab_similarity, _("Similarity graph"))
-        self.similarity_graph = None
-        self.similarity_figure = None
-        self.similarity_communities = []
-
-
     def _compute_similarity(self):
         """ Compute the similarity graph, communities and a fresh Figure.
         Returns (graph, communities, figure) or None on error. A fresh Figure is
@@ -1214,7 +1039,7 @@ class DialogTextStats(QtWidgets.QDialog):
             return None
         try:
             labels, cooc, doc_freq, freq = cooccurrence(
-                table, min_freq=self.spinBox_sim_min_freq.value())
+                table, min_freq=self.spinBox_graph_min_freq.value())
             sim = similarity_matrix(labels, cooc, doc_freq, len(table.segment_texts),
                                     method=self.comboBox_sim_method.currentData())
             graph = build_graph(labels, sim, freq,
@@ -1262,10 +1087,7 @@ class DialogTextStats(QtWidgets.QDialog):
         msg = _("Similarity graph: ") + str(graph.number_of_nodes()) + " " + _("nodes") + ", " \
             + str(graph.number_of_edges()) + " " + _("edges")
         self.parent_textEdit.append(msg)
-        dialog = DialogFigure(self.app, self.similarity_figure, _("Similarity graph"))
-        dialog.show()
-        self._similarity_dialog = dialog  # keep a reference
-
+        self._embed_figure("widget_sim_plot", self.similarity_figure, "_sim_canvas")
 
     def export_similarity_png(self):
         # recompute a fresh figure: the one shown in a closed DialogFigure has a
@@ -1296,8 +1118,12 @@ class DialogFigure(QtWidgets.QDialog):
         self.canvas = FigureCanvas(figure)
         layout.addWidget(self.canvas)
         buttons = QtWidgets.QHBoxLayout()
-        self.pushButton_save = QtWidgets.QPushButton(_("Save PNG"))
+        self.pushButton_save = QtWidgets.QPushButton("")
         self.pushButton_save.setIcon(qta.icon("mdi6.image-outline"))
+        self.pushButton_save.setToolTip(_("Save PNG"))
+        # same square icon-button size as the .ui dialogs (32x32)
+        self.pushButton_save.setMinimumSize(32, 32)
+        self.pushButton_save.setMaximumSize(32, 32)
         self.pushButton_save.clicked.connect(self.save_png)
         buttons.addWidget(self.pushButton_save)
         buttons.addStretch(1)

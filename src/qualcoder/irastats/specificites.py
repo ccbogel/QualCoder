@@ -63,6 +63,14 @@ def modalities_of(table: LexicalTable, variable: str) -> list:
     return sorted({v for v in values if v != ""})
 
 
+def format_p(p: float) -> str:
+    """Format a p-value by convention: 3 decimal places, "<0.001" when smaller. """
+
+    if p < 0.001:
+        return "<0.001"
+    return f"{p:.3f}"
+
+
 def specificities(table: LexicalTable, variable: str, min_freq: int = 1,
                   p_threshold: float = 0.05, forms: list = None, active_only: bool = True) -> list:
     """Chi-square specificities of each form for each modality of a variable.
@@ -135,7 +143,8 @@ def specificities(table: LexicalTable, variable: str, min_freq: int = 1,
 
 
 def specificity_rows(results: list) -> list:
-    """CSV/HTML rows: [form, modality, count, expected count, chi2, signed value, p]. """
+    """CSV/HTML rows: [form, modality, count, expected count, chi2, signed value, p].
+    The p-value is formatted by convention (3 decimals, "<0.001" when smaller). """
 
     return [[r["forme"], r["modalite"], r["effectif"], r["effectif_attendu"],
-             round(r["chi2"], 6), round(r["valeur"], 6), f"{r['p']:.6g}"] for r in results]
+             round(r["chi2"], 6), round(r["valeur"], 6), format_p(r["p"])] for r in results]

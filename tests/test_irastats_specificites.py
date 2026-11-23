@@ -6,7 +6,13 @@ import unittest
 
 from qualcoder.irastats.lexicon import build_lexical_table
 from qualcoder.irastats.report_html import specificites_html
-from qualcoder.irastats.specificites import chi2_statistic, modalities_of, specificities, specificity_rows
+from qualcoder.irastats.specificites import (
+    chi2_statistic,
+    format_p,
+    modalities_of,
+    specificities,
+    specificity_rows,
+)
 
 
 def make_table():
@@ -81,6 +87,16 @@ class TestSpecificities(unittest.TestCase):
         rows = specificity_rows(specificities(self.table, "code", p_threshold=None))
         self.assertEqual(len(rows), 4)
         self.assertEqual(rows[0][:2], ["poire", "a"])  # alphabetical tie-break
+        # p formatted by convention: 3 decimals (chi2=6 -> p ~ 0.0143 -> "0.014")
+        self.assertEqual(rows[0][6], "0.014")
+
+    def test_format_p(self):
+        self.assertEqual(format_p(0.0143), "0.014")
+        self.assertEqual(format_p(0.05), "0.050")
+        self.assertEqual(format_p(0.001), "0.001")
+        self.assertEqual(format_p(0.0009), "<0.001")
+        self.assertEqual(format_p(0.0), "<0.001")
+        self.assertEqual(format_p(1.0), "1.000")
 
     def test_html_highlights_signs(self):
         html = specificites_html(specificities(self.table, "code", p_threshold=None), variable="code")
