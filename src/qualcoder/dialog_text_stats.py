@@ -53,6 +53,7 @@ from .topic_model import (
     topic_by_variable,
 )
 from .irastats.report_html import descstats_html, specificites_html
+from .irastats.report_odt import descstats_odt
 from .select_items import DialogSelectItems
 
 logger = logging.getLogger(__name__)
@@ -358,6 +359,12 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_descstats_html.setIcon(qta.icon("mdi6.file-code-outline"))
         self.pushButton_descstats_html.clicked.connect(self.export_descstats_html)
         params.addWidget(self.pushButton_descstats_html)
+        self.pushButton_descstats_odt = QtWidgets.QPushButton(_("Export ODT"))
+        self.pushButton_descstats_odt.setIcon(qta.icon("mdi6.file-document-outline"))
+        self.pushButton_descstats_odt.setToolTip(
+            _("Export the text statistics report as an ODT document (LibreOffice/OpenOffice)"))
+        self.pushButton_descstats_odt.clicked.connect(self.export_descstats_odt)
+        params.addWidget(self.pushButton_descstats_odt)
         layout.addLayout(params)
 
         splitter = QtWidgets.QSplitter()
@@ -449,6 +456,29 @@ class DialogTextStats(QtWidgets.QDialog):
             file_.write(descstats_html(self.descstats, variable=variable))
         msg = _("Text statistics HTML exported to: ") + filepath
         Message(self.app, _("HTML export"), msg).exec()
+        self.parent_textEdit.append(msg)
+
+    def export_descstats_odt(self):
+        if self.descstats is None:
+            self.run_descstats()
+        if self.descstats is None:
+            return
+        variable = self.comboBox_descstats_variable.currentData() or None
+        e = ExportDirectoryPathDialog(self.app, "Text_statistics.odt")
+        filepath = e.filepath
+        if filepath is None:
+            return
+        if not filepath.lower().endswith(".odt"):
+            filepath += ".odt"
+        try:
+            doc = descstats_odt(self.descstats, variable=variable)
+            doc.save(filepath)
+        except Exception as err:
+            logger.error(err)
+            Message(self.app, _("Error"), str(err), "warning").exec()
+            return
+        msg = _("Text statistics ODT exported to: ") + filepath
+        Message(self.app, _("ODT export"), msg).exec()
         self.parent_textEdit.append(msg)
 
     # --- Specificities (chi-square) tab ---

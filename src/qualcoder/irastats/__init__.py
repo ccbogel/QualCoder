@@ -36,6 +36,7 @@ can be unit-tested without a GUI:
 - similarity: similarity graph of co-occurring forms.
 - reinert: Reinert descending hierarchical classification (CHD).
 - report_html: HTML rendering helpers for the reports.
+- report_odt: ODT (word processor document) rendering helpers for the reports.
 """
 
 from .corpus import (
