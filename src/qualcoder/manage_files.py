@@ -59,6 +59,7 @@ from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_secs, \
     extract_epub_fulltext
 from .html_parser import *
+from .irastats.corpus import iramuteq_to_rows, parse_iramuteq
 from .latex_import import LatexImportError, tex_file_to_plain_text
 from .memo import DialogMemo
 from .pdf_preview import DialogPdfPagesToImages, DialogPdfPreview
@@ -2736,13 +2737,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         The Case name can be absent. Or can be from one primary column, or can also collate values from additional columns.
         Qualitative texts from multiple columns are collated into one file.
         The header for each block of text is the column name from the survey.
+        Also imports IRaMuTeQ native text files (*.txt): each "****" text becomes a file,
+        its starred variables (*variable_modality) become attributes.
         """
 
         filepath, filter_type = QtWidgets.QFileDialog.getOpenFileName(None, _("Select Survey"), "",
-                                                                      _("Data files") + " (*.csv *.CSV *.tsv *.TSV *.ods *.ODS *.xlsx *.XLSX *.xls *.XLS)")
+                                                                      _("Data files") + " (*.csv *.CSV *.tsv *.TSV *.ods *.ODS *.xlsx *.XLSX *.xls *.XLS)"
+                                                                      + ";;" + _("IRaMuTeQ corpus") + " (*.txt *.TXT)")
         if not filepath: return
 
         msg = _("Import from survey: ") + f"{filepath}"
+        preselect_text, preselect_case, preselect_attr = None, None, None
         if filepath.lower().endswith('.csv') or filepath.lower().endswith('.tsv'):
             delimiter = ','
             try:
@@ -2765,6 +2770,31 @@ class DialogManageFiles(QtWidgets.QDialog):
             except UnicodeDecodeError:
                 df = pd.read_csv(filepath, sep=delimiter, encoding='latin1', dtype=str)
 
+        elif filepath.lower().endswith('.txt'):
+            # IRaMuTeQ native corpus: each text starts with a "**** *variable_modality ..." line
+            try:
+                with open(filepath, 'r', encoding='utf-8-sig') as f:
+                    content = f.read()
+            except UnicodeDecodeError:
+                with open(filepath, 'r', encoding='latin1') as f:
+                    content = f.read()
+            segments = parse_iramuteq(content)
+            if not segments:
+                msg += "\n" + _("Not an IRaMuTeQ file: no **** text header found.")
+                self.parent_text_edit.append(msg)
+                Message(self.app, _("Import failed"),
+                        _("The selected text file is not in IRaMuTeQ format (no **** header lines)."),
+                        "warning").exec()
+                return
+            iramuteq_cols, iramuteq_rows = iramuteq_to_rows(segments)
+            df = pd.DataFrame(iramuteq_rows, columns=iramuteq_cols)
+            # The text body is the qualitative column, the document name the case,
+            # and every IRaMuTeQ variable an attribute
+            preselect_text = ["text"]
+            preselect_case = ["doc"]
+            preselect_attr = [c for c in iramuteq_cols if c not in ("doc", "text", "cas")]
+            msg += "\n" + _("IRaMuTeQ format: ") + f"{len(segments)} " + _("texts, ") \
+                   + f"{len(preselect_attr)} " + _("variables as attributes")
         elif filepath.lower().endswith('.ods'):
             df = pd.read_excel(filepath, engine='odf', dtype=str)
         else:
@@ -2772,7 +2802,8 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         # User determines: Case, Attributes, Qual text, code texts, attributes as case or file.
         columns = [str(c) for c in df.columns]
-        dialog = DialogSurveyImport(columns, self)
+        dialog = DialogSurveyImport(columns, self, text_cols=preselect_text,
+                                    case_cols=preselect_case, attr_cols=preselect_attr)
         if not dialog.exec(): return
         text_cols, case_cols, attr_cols = dialog.get_selections()
         #filename_col = dialog.get_filename_column()
@@ -4154,7 +4185,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 class DialogSurveyImport(QtWidgets.QDialog):
     """ Survey import dialog. To assign cases, attributes and qualitative text. """
 
-    def __init__(self, columns:list[str], parent=None):
+    def __init__(self, columns:list[str], parent=None, text_cols=None, case_cols=None, attr_cols=None):
         super().__init__(parent)
         self.setWindowTitle(_("Survey Import Assistant"))
         self.resize(780, 500)
@@ -4267,6 +4298,19 @@ class DialogSurveyImport(QtWidgets.QDialog):
 
         self.btn_text_add.clicked.connect(lambda: self.move_items(self.list_available, self.list_text))
         self.btn_text_rem.clicked.connect(lambda: self.move_items(self.list_text, self.list_available))
+
+        # Pre-selected columns, e.g. IRaMuTeQ import: text body, document name, variables as attributes
+        for name in case_cols or []:
+            self._move_named(self.list_available, self.list_case, name)
+        for name in attr_cols or []:
+            self._move_named(self.list_available, self.list_attr, name)
+        for name in text_cols or []:
+            self._move_named(self.list_available, self.list_text, name)
+        self.cb_case.setEnabled(self.list_case.count() > 0)
+
+    def _move_named(self, source, dest, name):
+        for item in source.findItems(name, QtCore.Qt.MatchFlag.MatchExactly):
+            dest.addItem(source.takeItem(source.row(item)))
 
     def move_items(self, source, dest):
         for item in source.selectedItems():
