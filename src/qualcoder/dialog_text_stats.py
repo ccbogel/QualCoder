@@ -195,9 +195,6 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_select_cases.clicked.connect(self.select_cases)
         self.pushButton_select_codes.clicked.connect(self.select_codes)
         self.pushButton_stopwords.clicked.connect(self.browse_stopwords)
-        # the two corpus options are mutually exclusive
-        self.checkBox_documents.toggled.connect(self._documents_toggled)
-        self.checkBox_coded_only.toggled.connect(self._coded_only_toggled)
         self.pushButton_build_corpus.clicked.connect(self.build_corpus)
         self.pushButton_export_iramuteq.clicked.connect(self.export_iramuteq_dialog)
         self.pushButton_descstats_run.clicked.connect(self.run_descstats)
@@ -227,15 +224,6 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_reinert_ca_popout.clicked.connect(self.popout_reinert_ca)
         self.pushButton_bertopic_chart_popout.clicked.connect(self.popout_topics_chart)
         self.pushButton_bertopic_dist_popout.clicked.connect(self.popout_topics_distribution)
-
-    def _documents_toggled(self, checked: bool):
-        """ 'Whole documents' and 'Only coded texts' are exclusive. """
-        if checked:
-            self.checkBox_coded_only.setChecked(False)
-
-    def _coded_only_toggled(self, checked: bool):
-        if checked:
-            self.checkBox_documents.setChecked(False)
 
     def _embed_figure(self, placeholder_name: str, figure, canvas_attr: str):
         """Embed a matplotlib Figure in a placeholder widget of the .ui, replacing
@@ -381,7 +369,7 @@ class DialogTextStats(QtWidgets.QDialog):
         parts = []
         parts.append(_("Files: ") + (str(len(self.file_ids)) if self.file_ids else _("all")))
         parts.append(_("Cases: ") + (str(len(self.case_ids)) if self.case_ids else _("all")))
-        parts.append(_("Codes: ") + (str(len(self.code_ids)) if self.code_ids else _("all")))
+        parts.append(_("Codes: ") + (str(len(self.code_ids)) if self.code_ids else _("all (whole documents)")))
         self.label_selection.setText(" | ".join(parts))
 
     def browse_stopwords(self):
@@ -394,18 +382,19 @@ class DialogTextStats(QtWidgets.QDialog):
         """ Build the segment list from the current selection. Sets self.segments. """
 
         try:
-            if self.checkBox_documents.isChecked():
-                # whole documents: the case/code selection does not apply
-                self.segments = build_document_segments(
-                    self.app.conn, file_ids=self.file_ids or None)
-            else:
-                # only coded texts (default)
+            if self.code_ids:
+                # specific codes selected: only their coded texts
                 self.segments = build_segments(
                     self.app.conn,
                     file_ids=self.file_ids or None,
                     case_ids=self.case_ids or None,
-                    code_ids=self.code_ids or None,
+                    code_ids=self.code_ids,
                 )
+            else:
+                # no code filter (all codes): the whole documents
+                # (only the file selection applies, not the case selection)
+                self.segments = build_document_segments(
+                    self.app.conn, file_ids=self.file_ids or None)
         except Exception as err:
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()

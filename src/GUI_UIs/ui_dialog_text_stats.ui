@@ -88,7 +88,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Restrict the corpus to the selected codes</string>
+            <string>Restrict the corpus to the coded texts of the selected codes. If no code is selected (all codes), the whole documents are used instead</string>
            </property>
            <property name="text">
             <string>Select codes</string>
@@ -98,7 +98,7 @@
          <item>
           <widget class="QLabel" name="label_selection">
            <property name="toolTip">
-            <string>Current corpus selection: files, cases and codes ('all' = the whole project)</string>
+            <string>Current corpus selection: files, cases and codes. 'Codes: all' = the whole documents are used (only the file selection applies); specific codes = only their coded texts are used</string>
            </property>
            <property name="text">
             <string>All files, cases and codes</string>
@@ -162,29 +162,6 @@
            </property>
            <property name="text">
             <string>Light stemming</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBox_documents">
-           <property name="toolTip">
-            <string>Use the whole documents as corpus (instead of the coded texts); the case and code selection does not apply</string>
-           </property>
-           <property name="text">
-            <string>Whole documents</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBox_coded_only">
-           <property name="toolTip">
-            <string>Use only the coded texts (segments) as corpus; the whole documents are ignored (default)</string>
-           </property>
-           <property name="text">
-            <string>Only coded texts</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -307,7 +284,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Export the current corpus (only coded texts, or whole documents, depending on the checkbox) in the IRaMuTeQ text format</string>
+            <string>Export the current corpus (whole documents if all codes are selected, otherwise the coded texts of the selected codes) in the IRaMuTeQ text format</string>
            </property>
            <property name="text">
             <string>Export IRaMuTeQ</string>
