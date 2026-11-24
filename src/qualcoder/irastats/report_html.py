@@ -85,6 +85,11 @@ def descstats_html(stats: dict, variable: str = None) -> str:
         [_("Hapax"), len(stats["hapax"])],
     ]
     parts.append(table_html([_("Measure"), _("Value")], summary))
+    parts.append("<p><i>" + escape(_("Definitions")) + ": "
+                 + escape(_("Segments = the analysed text units (coded texts of the selected codes, or whole documents); "
+                            "Occurrences = total number of words; Forms = distinct word forms after normalisation; "
+                            "Active forms = forms occurring at least the minimum frequency (rarer forms are supplementary); "
+                            "Hapax = forms occurring only once.")) + "</i></p>")
     parts.append(f"<h2>{escape(_('Frequencies (decreasing)'))}</h2>")
     parts.append(table_html([_("Form"), _("Frequency"), _("%")],
                             frequency_rows(stats)))
@@ -93,7 +98,7 @@ def descstats_html(stats: dict, variable: str = None) -> str:
         parts.append(table_html([_("Form"), _("Frequency")], hapax_rows(stats)))
     if variable and stats["by_variable"]:
         parts.append(f"<h2>{escape(_('Breakdown by variable'))}: {escape(variable)}</h2>")
-        parts.append(table_html([_("Modality"), _("Segments"), _("Occurrences"), _("Distinct forms")],
+        parts.append(table_html([_("Category"), _("Segments"), _("Occurrences"), _("Distinct forms")],
                                 variable_rows(stats)))
     return html_page(_("Text statistics"), "\n".join(parts))
 
@@ -111,6 +116,6 @@ def specificites_html(results: list, variable: str = None, p_threshold: float = 
                      f"{escape(_('probability threshold'))}: {p_threshold}</p>")
     rows = specificity_rows(results)
     classes = ["pos" if r["signe"] > 0 else ("neg" if r["signe"] < 0 else "") for r in results]
-    parts.append(table_html([_("Form"), _("Modality"), _("Count"), _("Expected count"),
+    parts.append(table_html([_("Form"), _("Category"), _("Count"), _("Expected count"),
                              "chi2", _("Signed value"), "p"], rows, row_classes=classes))
     return html_page(_("Specificities"), "\n".join(parts))

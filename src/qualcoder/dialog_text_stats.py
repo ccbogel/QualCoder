@@ -111,7 +111,6 @@ class DialogTextStats(QtWidgets.QDialog):
         self._setup_icons()
         self._init_combos()
         self._connect_signals()
-        self.splitter_stats.setSizes([500, 500])
         self.splitter_graphs.setSizes([500, 500])
         self.splitter_reinert.setSizes([350, 550])
         self.splitter_bertopic.setSizes([400, 200])
@@ -126,6 +125,9 @@ class DialogTextStats(QtWidgets.QDialog):
         self._topics_dist_canvas = None
         self._popout_dialogs = []
         self._icon_only_buttons()
+        # embedded in the Reports tab: do not force the main window minimum size
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Ignored,
+                           QtWidgets.QSizePolicy.Policy.Ignored)
         self.resize(1100, 750)
 
     def _setup_icons(self):
@@ -498,14 +500,6 @@ class DialogTextStats(QtWidgets.QDialog):
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()
             return
-        rows = frequency_rows(self.descstats)
-        self.tableWidget_descstats.setRowCount(len(rows))
-        for row, values in enumerate(rows):
-            for col, value in enumerate(values):
-                item = QtWidgets.QTableWidgetItem(str(value))
-                item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.tableWidget_descstats.setItem(row, col, item)
-        self.tableWidget_descstats.resizeColumnsToContents()
         self.textBrowser_descstats.setHtml(descstats_html(self.descstats, variable=variable))
         msg = (_("Text statistics: ") + _("Segments: ") + str(len(table.segment_texts))
                + " | " + _("Occurrences: ") + str(self.descstats["total_occurrences"])
@@ -520,7 +514,7 @@ class DialogTextStats(QtWidgets.QDialog):
         rows += hapax_rows(self.descstats)
         if self.descstats["by_variable"]:
             rows.append([])
-            rows.append([_("Modality"), _("Segments"), _("Occurrences"), _("Distinct forms")])
+            rows.append([_("Category"), _("Segments"), _("Occurrences"), _("Distinct forms")])
             rows += variable_rows(self.descstats)
         return rows
 
@@ -597,17 +591,6 @@ class DialogTextStats(QtWidgets.QDialog):
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()
             return
-        rows = specificity_rows(self.specificites_results)
-        self.tableWidget_spec.setRowCount(len(rows))
-        for row, values in enumerate(rows):
-            signe = self.specificites_results[row]["signe"]
-            for col, value in enumerate(values):
-                item = QtWidgets.QTableWidgetItem(str(value))
-                item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-                if col == 5 and signe != 0:
-                    item.setForeground(QtGui.QBrush(QtGui.QColor("#0a7d00" if signe > 0 else "#b00000")))
-                self.tableWidget_spec.setItem(row, col, item)
-        self.tableWidget_spec.resizeColumnsToContents()
         self.textBrowser_spec.setHtml(specificites_html(
             self.specificites_results, variable=variable, p_threshold=self.doubleSpinBox_spec_p.value()))
         msg = _("Specificities: ") + str(len(self.specificites_results)) + " " + _("rows for variable ") + variable
@@ -624,7 +607,7 @@ class DialogTextStats(QtWidgets.QDialog):
             return
         with open(filepath, "w", encoding="utf-8-sig", newline="") as file_:
             writer = csv.writer(file_)
-            writer.writerow([_("Form"), _("Modality"), _("Count"), _("Expected count"), "chi2",
+            writer.writerow([_("Form"), _("Category"), _("Count"), _("Expected count"), "chi2",
                              _("Signed value"), "p"])
             writer.writerows(specificity_rows(self.specificites_results))
         msg = _("Specificities CSV exported to: ") + filepath
@@ -749,7 +732,7 @@ class DialogTextStats(QtWidgets.QDialog):
             writer.writerow(header)
             writer.writerows(ca_coordinate_rows(result, n_axes=n_axes))
             writer.writerow([])
-            writer.writerow([_("Modality"), _("Frequency")] + [f"G{a + 1}" for a in range(n_axes)])
+            writer.writerow([_("Category"), _("Frequency")] + [f"G{a + 1}" for a in range(n_axes)])
             for k, label in enumerate(result["col_labels"]):
                 writer.writerow([label, int(result["col_freq"][k])]
                                 + [round(float(result["col_coords"][k, a]), 6) for a in range(n_axes)])

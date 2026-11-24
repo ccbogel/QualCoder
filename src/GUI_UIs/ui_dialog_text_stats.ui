@@ -464,16 +464,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QSplitter" name="splitter_stats">
-         <property name="orientation"><enum>Qt::Horizontal</enum></property>
-         <widget class="QWidget" name="widget_stats_left" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_stats_left">
-           <property name="leftMargin"><number>0</number></property>
-           <property name="topMargin"><number>0</number></property>
-           <property name="rightMargin"><number>0</number></property>
-           <property name="bottomMargin"><number>0</number></property>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_descstats_buttons">
+<layout class="QHBoxLayout" name="horizontalLayout_descstats_buttons">
            <item>
           <widget class="QPushButton" name="pushButton_descstats_run">
            <property name="minimumSize">
@@ -571,7 +562,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QLabel" name="label_descstats_help">
+<widget class="QLabel" name="label_descstats_help">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -585,7 +576,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Left table: forms ranked by decreasing frequency with their share of the corpus. Right report: corpus summary (occurrences, forms, active/supplementary forms, hapax), the frequency table, the hapax (forms occurring once) and the breakdown by the selected partition variable.</string>
+          <string>Report below: corpus summary, then the frequency table of the forms, the hapax and the breakdown by the partition variable. Definitions - segments = the analysed text units (coded texts of the selected codes, or whole documents); occurrences = total number of words; forms = distinct word forms after normalisation; active forms = forms occurring at least the minimum frequency (rarer forms are supplementary); hapax = forms occurring only once.</string>
          </property>
          <property name="text">
           <string>Left: forms by decreasing frequency. Right: corpus summary, hapax, breakdown by variable.</string>
@@ -596,52 +587,14 @@
         </widget>
        </item>
        <item>
-         <widget class="QTableWidget" name="tableWidget_descstats">
-          <property name="font">
-           <font>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="toolTip">
-           <string>Forms ranked by decreasing frequency with their share of the corpus</string>
-          </property>
-          <property name="editTriggers">
-           <set>QAbstractItemView::NoEditTriggers</set>
-          </property>
-          <column>
-           <property name="text">
-            <string>Form</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Frequency</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string notr="true">%</string>
-           </property>
-          </column>
-         </widget>
-       </item>
-       <item>
-         <widget class="QTextBrowser" name="textBrowser_descstats">
+<widget class="QTextBrowser" name="textBrowser_descstats">
           <property name="toolTip">
            <string>Corpus summary (occurrences, forms, active/supplementary forms, hapax), frequency table, hapax and breakdown by the selected partition variable</string>
           </property>
          </widget>
        </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="widget_stats_right" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_stats_right">
-           <property name="leftMargin"><number>0</number></property>
-           <property name="topMargin"><number>0</number></property>
-           <property name="rightMargin"><number>0</number></property>
-           <property name="bottomMargin"><number>0</number></property>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_spec_buttons">
+<layout class="QHBoxLayout" name="horizontalLayout_spec_buttons">
            <item>
           <widget class="QPushButton" name="pushButton_spec_run">
            <property name="minimumSize">
@@ -717,7 +670,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QLabel" name="label_spec_help">
+<widget class="QLabel" name="label_spec_help">
          <property name="maximumSize">
           <size>
            <width>16777215</width>
@@ -725,10 +678,10 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>For each form and each modality of the partition variable: chi-square of the 2x2 contingency table, signed value (green = over-represented, red = under-represented) and two-sided p-value (3 decimals, &lt;0.001 when smaller), sorted from the most specific to the least.</string>
+          <string>For each form and each category of the partition variable: chi-square of the 2x2 contingency table and two-sided p-value, sorted from the most specific to the least. Over-represented forms are shown in green, under-represented in red.</string>
          </property>
          <property name="text">
-          <string>For each form and each modality of the partition variable: chi-square of the 2x2 contingency table, signed value (green = over-represented, red = under-represented) and two-sided p-value (3 decimals, &lt;0.001 when smaller), sorted from the most specific to the least.</string>
+          <string>For each form and each category of the partition variable: chi-square of the 2x2 contingency table and two-sided p-value, sorted from the most specific to the least. Over-represented forms are shown in green, under-represented in red.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -736,61 +689,13 @@
         </widget>
        </item>
        <item>
-         <widget class="QTableWidget" name="tableWidget_spec">
-          <property name="toolTip">
-           <string>Specificities table: form, modality, observed and expected counts, chi-square, signed value and p-value</string>
-          </property>
-          <property name="editTriggers">
-           <set>QAbstractItemView::NoEditTriggers</set>
-          </property>
-          <column>
-           <property name="text">
-            <string>Form</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Modality</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Count</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Expected count</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string notr="true">chi2</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Signed value</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string notr="true">p</string>
-           </property>
-          </column>
-         </widget>
-       </item>
-       <item>
-         <widget class="QTextBrowser" name="textBrowser_spec">
+<widget class="QTextBrowser" name="textBrowser_spec">
           <property name="toolTip">
            <string>HTML report of the specificities, with over-represented forms in green and under-represented forms in red</string>
           </property>
          </widget>
        </item>
-          </layout>
-         </widget>
-        </widget>
-       </item>
+
       </layout>
      </widget>
      <widget class="QWidget" name="tab_graphs">
@@ -850,7 +755,7 @@
          <item>
           <widget class="QLabel" name="label_sim_threshold">
            <property name="toolTip">
-            <string>Minimum association value for an edge to be drawn between two forms</string>
+            <string>Minimum association value for an edge to be drawn between two forms in the similarity graph (not used by the correspondence analysis)</string>
            </property>
            <property name="text">
             <string>Edge threshold:</string>
@@ -860,7 +765,7 @@
          <item>
           <widget class="QDoubleSpinBox" name="doubleSpinBox_sim_threshold">
            <property name="toolTip">
-            <string>Minimum association value for an edge to be drawn between two forms</string>
+            <string>Minimum association value for an edge to be drawn between two forms in the similarity graph (not used by the correspondence analysis)</string>
            </property>
            <property name="decimals">
             <number>3</number>
@@ -1159,10 +1064,10 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</string>
+          <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2 (drawn below, or opened in a separate window) shows which forms are characteristic of which column categories - blue points = forms, red = columns, point size = frequency. The table lists the eigenvalues and inertia of the axes.</string>
          </property>
          <property name="text">
-          <string>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</string>
+          <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2 (drawn below, or opened in a separate window) shows which forms are characteristic of which column categories - blue points = forms, red = columns, point size = frequency. The table lists the eigenvalues and inertia of the axes.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
