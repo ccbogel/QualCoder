@@ -5,15 +5,16 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
-"POT-Creation-Date: 2026-11-24 11:31+0100\n"
-"PO-Revision-Date: 2026-11-24 11:44+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-24 13:19+0100\n"
+"PO-Revision-Date: 2026-11-24 13:25+0100\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Gtranslator 51.0\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/error_dlg.py:47
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_prompt_library.py:1277
@@ -383,6 +384,10 @@ msgstr "RETRANSCRIPTION :"
 msgid "END OF TRANSCRIPT"
 msgstr "FIN DE RETRANSCRIPTION"
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_file_summary.py:496
+msgid "TRANSCRIPT: "
+msgstr "RETRANSCRIPTION : "
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_file_summary.py:522
 msgid "PDF IMAGE DETAILS"
 msgstr "DÉTAILS DE L’IMAGE PDF"
@@ -535,6 +540,22 @@ msgstr "Coder une zone / image (E)"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:1800
 msgid "Go to bookmark (press B to set)"
 msgstr "Aller au signet (appuyer sur B pour définir)"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:1910
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6207
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6253
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:1412
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:1479
+msgid "Codings:"
+msgstr "Codages :"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:1912
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2755
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2762
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2485
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2488
+msgid "Memo:"
+msgstr "Mémo :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2013
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:730
@@ -692,6 +713,10 @@ msgstr "Zone codé"
 msgid "Select a code in the list first."
 msgstr "Sélectionner d’abord un code dans la liste."
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2758
+msgid "Area:"
+msgstr "Zone :"
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2767
 msgid "Annotation:"
 msgstr "Annotation :"
@@ -728,6 +753,20 @@ msgstr "Aucun code n’a été sélectionné"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2789
 msgid "Text coding is disabled for this file. Re-import the PDF."
 msgstr "Le codage du texte est désactivé pour ce fichier. Réimportez le PDF."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2918
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2955
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3843
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:485
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4717
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4739
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:1062
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:1083
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2684
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:5282
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:5304
+msgid "Annotation: "
+msgstr "Annotations : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:2995
 msgid "Select coding for memo"
@@ -1169,6 +1208,85 @@ msgstr "Texte : "
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2685
 msgid "Annotations for file: "
 msgstr "Annotations pour le fichier : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3863
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3872
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:4070
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_organiser.py:2874
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:459
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1505
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:773
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:790
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:805
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:821
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:833
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:845
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:977
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:1032
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:1062
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3552
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3627
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3696
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3792
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5529
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5554
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5580
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5606
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5625
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5646
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_tree.py:893
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:993
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1021
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1049
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1274
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1300
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1326
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1727
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2658
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:639
+msgid "Code: "
+msgstr "Code : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3865
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3873
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:4072
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:810
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:826
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:846
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:462
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4938
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:5573
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:776
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:793
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:808
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:979
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:1034
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:1065
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3555
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3628
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3698
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5532
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5558
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5583
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5983
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:162
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:205
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:248
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:627
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:660
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:685
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:713
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:995
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1023
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1052
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1276
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1302
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1329
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1729
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:1607
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:2661
+msgid "Memo: "
+msgstr "Mémo : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:3875
 msgid "Memos"
@@ -1814,13 +1932,27 @@ msgstr "Enregistrer le rapport dans le journal"
 msgid "PDF restructure report"
 msgstr "Rapport de restructuration PDF"
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6249
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:3225
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:1139
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3779
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3839
+msgid "File:"
+msgstr "Fichier :"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6250
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:5746
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:5750
+msgid "Date:"
+msgstr "Date :"
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6251
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1591
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_tree.py:1466
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_tree.py:1585
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:3287
 msgid "Coder:"
-msgstr "Codeur·se :"
+msgstr "Codeur⋅se :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6255
 msgid "Segments relocated approximately (need review):"
@@ -1922,12 +2054,12 @@ msgstr "Fréquence"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6500
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3519
 msgid "Coder(s)"
-msgstr "Codeur·se(s)"
+msgstr "Codeur⋅se(s)"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6521
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3547
 msgid "Code Co-occurrences"
-msgstr "Co-occurences de code"
+msgstr "Co-occurrences de code"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6525
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3560
@@ -1942,12 +2074,12 @@ msgstr "Code B"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6525
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3560
 msgid "Co-occurrence frequency"
-msgstr "Fréquence de co-occurence"
+msgstr "Fréquence de co-occurrence"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6537
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3571
 msgid "No co-occurrences found in this file."
-msgstr "Pas de co-occurences trouvées dans ce fichier."
+msgstr "Pas de co-occurrences trouvées dans ce fichier."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6540
 msgid "Coded Text Segments"
@@ -1973,7 +2105,7 @@ msgstr "Segments de texte codés"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_exact_matches.py:542
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:3636
 msgid "Coder"
-msgstr "Codeur·se"
+msgstr "Codeur⋅se"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6567
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_pdf.py:6625
@@ -2074,7 +2206,7 @@ msgstr "Confirmer ce changement"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_links.py:138
 msgid "Multiple occurrences"
-msgstr "Multiples occurences"
+msgstr "Multiples occurrences"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_links.py:138
 msgid "Multiples of text in path. Some links not updated."
@@ -2084,7 +2216,7 @@ msgstr ""
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_links.py:148
 msgid "Search folders"
-msgstr "Rechercher des données"
+msgstr "Rechercher des dossiers"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_links.py:177
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_links.py:192
@@ -2308,7 +2440,7 @@ msgstr "Montrer des noms comme"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:539
 msgid "Show this coder"
-msgstr "Montrer ce codeur·se"
+msgstr "Montrer ce codeur⋅se"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/journals.py:545
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1070
@@ -2989,6 +3121,18 @@ msgstr " annotation(s)."
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3933
 msgid " attribute definition(s)."
 msgstr " définition(s) d’attribut(s)."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3937
+msgid " category(ies)"
+msgstr " catégorie(s)"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3939
+msgid " code(s)"
+msgstr " code(s)"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3941
+msgid " coding(s)"
+msgstr " codage(s)"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3942
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_llm.py:3944
@@ -3881,6 +4025,14 @@ msgstr ""
 "R rotation dans le sens inverse des aiguilles d’une montre\n"
 "+ - (dé)zoomer"
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:2452
+msgid " Height: "
+msgstr " Hauteur : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_image.py:2453
+msgid " Scale: "
+msgstr " Échelle : "
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:201
 msgid "1) What do you want to search for?"
 msgstr "1) Que voulez-vous rechercher ?"
@@ -3896,7 +4048,7 @@ msgstr "1) Quel sujet souhaitez-vous approfondir ?"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:234
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:541
 msgid "Coders: "
-msgstr "Codeur·se : "
+msgstr "Codeur⋅se : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:253
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:563
@@ -3960,6 +4112,22 @@ msgstr "<pas de filtre de fichier>"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:629
 msgid "Search in all textfiles"
 msgstr "Rechercher dans tous les fichiers texte"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:641
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2609
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_av.py:725
+msgid "Codings: "
+msgstr "Codages : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:645
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes_by_segments.py:147
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:325
+msgid ""
+"\n"
+"MEMO: "
+msgstr ""
+"\n"
+"MÉMO : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_search_dialog.py:653
 msgid "Search in all cases"
@@ -4231,7 +4399,7 @@ msgstr "Vous ne pouvez pas cacher le codeur⋅se actuel."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:236
 msgid "New coder name:"
-msgstr "Nouveau nom de codeur·se :"
+msgstr "Nouveau nom de codeur⋅se :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/coder_names.py:244
 msgid "Name already exists."
@@ -5044,6 +5212,10 @@ msgstr "Entrée de base de données rétablie à son nom d’origine : "
 msgid "Bulk Rename of database file name entries"
 msgstr "Renommer l’entrée du fichier de la base de données"
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1614
+msgid "Renamed database file entry:"
+msgstr "Entrée de fichier de base de données renommée :"
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:1670
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/refi.py:2165
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/refi.py:2214
@@ -5300,7 +5472,7 @@ msgstr "Echec de l’import"
 msgid ""
 "The selected text file is not in IRaMuTeQ format (no **** header lines)."
 msgstr ""
-"Le fichier texte sélectionné n'est pas au format IRaMuTeQ (aucune ligne d'en-"
+"Le fichier texte sélectionné n’est pas au format IRaMuTeQ (aucune ligne d’en-"
 "tête ****)."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2796
@@ -5318,6 +5490,14 @@ msgstr "variables comme attributs"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2816
 msgid "No columns assigned as qualitative."
 msgstr "Aucune colonne n’est définie comme qualitative."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2817
+msgid ""
+"\n"
+"No columns assigned as qualitative."
+msgstr ""
+"\n"
+"Aucune colonne n’est définie comme qualitative."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:2837
 msgid "Survey"
@@ -5473,6 +5653,11 @@ msgstr "PDF sans texte"
 msgid "Cannot import"
 msgstr "Impossible d’importer"
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3470
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/text_file_replacement.py:340
+msgid "Cannot import "
+msgstr "Impossible d’importer "
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:3521
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_references.py:1031
 msgid " imported"
@@ -5563,6 +5748,14 @@ msgstr "Fichier supprimé : "
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4054
 msgid "Deleted: "
 msgstr "Supprimé : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4077
+msgid "Minimum: "
+msgstr "Minimum : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4078
+msgid "Maximum: "
+msgstr "Maximum : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4099
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/manage_files.py:4101
@@ -5936,9 +6129,17 @@ msgstr "Mémo mise à jour : "
 msgid "category "
 msgstr "catégorie "
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_organiser.py:1492
+msgid "Code "
+msgstr "Code "
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_organiser.py:1496
 msgid "under "
 msgstr "sous "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_organiser.py:1501
+msgid "Category "
+msgstr "Catégorie "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_organiser.py:1509
 msgid "Apply changes to code tree"
@@ -5963,6 +6164,10 @@ msgstr "Le nom de code est déjà utilisé : "
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_organiser.py:1699
 msgid "Code organiser - applied changes:"
 msgstr "Organisateur de code - changements appliqués :"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_organiser.py:1701
+msgid "Code organiser "
+msgstr "Organiser les codes "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_organiser.py:1709
 msgid "Applying changes failed. Nothing was changed."
@@ -6324,6 +6529,14 @@ msgstr "Début du segment"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:2880
 msgid "Clear segment"
 msgstr "Effacer le segment"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:2381
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:2873
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:2889
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:4938
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:5573
+msgid "Segment: "
+msgstr "Segments : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:2382
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_av.py:2890
@@ -6697,6 +6910,13 @@ msgstr "SEGMENT CODÉ"
 msgid "CODED MEMO"
 msgstr "MÉMO CODÉ"
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:383
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1577
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:2779
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:585
+msgid "Coder: "
+msgstr "Codeur⋅se : "
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/memo.py:396
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1592
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/speakers.py:1644
@@ -6879,7 +7099,7 @@ msgid ""
 "Select a coder name in Settings dropbox, otherwise coded text and media may "
 "appear uncoded."
 msgstr ""
-"Sélectionnez un codeur·se dans la liste déroulante des paramètres, sinon le "
+"Sélectionnez un codeur⋅se dans la liste déroulante des paramètres, sinon le "
 "texte et les médias peuvent être non codés."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/refi.py:456
@@ -7335,7 +7555,7 @@ msgstr "Fichier texte\n"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:407
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1243
 msgid "No coders selected"
-msgstr "Aucun codeur·se sélectionné"
+msgstr "Aucun codeur⋅se sélectionné"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:437
 msgid "CODER COMPARISON FOR FILE"
@@ -7406,13 +7626,13 @@ msgstr "Non codé : "
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:715
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:843
 msgid "Coder 0: "
-msgstr "Codeur·se 0 : "
+msgstr "Codeur⋅se 0 : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:568
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:716
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:844
 msgid "Coder 1: "
-msgstr "Codeur·se 1 : "
+msgstr "Codeur⋅se 1 : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:569
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:717
@@ -7462,6 +7682,19 @@ msgstr "Nombre de chevauchements : "
 msgid "Total: "
 msgstr "Total : "
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:582
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:592
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:848
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:1063
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3553
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3767
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:4901
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5649
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1050
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_models.py:1327
+msgid "msecs"
+msgstr "msecs"
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:711
 msgid "Total pixels: "
 msgstr "Total des pixels : "
@@ -7492,6 +7725,11 @@ msgstr "Aucune intersections"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:739
 msgid "Count of intersections: "
 msgstr "Nombre d’intersections : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:730
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:740
+msgid "pixels"
+msgstr "pixels"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_compare_coder_file.py:846
 msgid "Total text dual coded: "
@@ -7563,6 +7801,10 @@ msgstr ""
 "R rotation dans le sens inverse des aiguilles d’une montre\n"
 "+ - zoom avant et arrière\n"
 "E Exporter l’image"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/helpers.py:1064
+msgid "Scale:"
+msgstr "Échelle :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/helpers.py:1123
 msgid "Rotate clockwise R"
@@ -7774,7 +8016,7 @@ msgstr "Enregistrer le fichier CSV"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1198
 msgid "Each row contains filename, coder, coded, codename and categories."
 msgstr ""
-"Chaque ligne contient le nom du fichier, codeur·se, codage, nom du code et "
+"Chaque ligne contient le nom du fichier, codeur⋅se, codage, nom du code et "
 "catégories."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1082
@@ -7835,7 +8077,7 @@ msgstr "Paramètres de recherche des annotations"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1575
 msgid "Coder: All coders"
-msgstr "Codeur·se : Tous les codeur·ses"
+msgstr "Codeur⋅se : Tous les codeur⋅ses"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1579
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1756
@@ -7909,9 +8151,25 @@ msgstr "Codage par: "
 msgid "Codes: "
 msgstr "Codes : "
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1723
+msgid "Attributes:"
+msgstr "Attributs :"
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1725
 msgid "No cases or files match attribute selection"
 msgstr "Aucun cas ou fichier ne correspond à la sélection des attributs"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1742
+msgid ""
+"\n"
+"Files:\n"
+msgstr ""
+"\n"
+"Fichiers :\n"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1747
+msgid " Files: "
+msgstr " Fichiers : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:1749
 msgid ""
@@ -7924,6 +8182,12 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:2221
 msgid "Text code statistics:"
 msgstr "Statistiques de codes texte :"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:2223
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:2305
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:2384
+msgid "Count:"
+msgstr "Compte :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:2224
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:2306
@@ -7948,6 +8212,11 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:2426
 msgid "Code count totals"
 msgstr "Nombre total de codes"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:2541
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:3478
+msgid "MEMO:"
+msgstr "MÉMO :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:2556
 msgid "Overlapping codes:"
@@ -8060,7 +8329,7 @@ msgstr "Code changé"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:3041
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:3099
 msgid "Run report again to update display"
-msgstr "Exécuter à nouveau le rapport pour mettre à jour l'affichage"
+msgstr "Exécuter à nouveau le rapport pour mettre à jour l’affichage"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:3113
 msgid "Delete coded section."
@@ -8069,6 +8338,14 @@ msgstr "Supprimer la section codée."
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:3114
 msgid "Delete coded section"
 msgstr "Supprimer le texte codé"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:3227
+msgid "FILE MEMO:"
+msgstr "MEMO DE FICHIER :"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:3235
+msgid "CASE MEMO:"
+msgstr "MÉMO DE CAS :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_codes.py:3610
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:1270
@@ -8201,7 +8478,7 @@ msgstr "Pas de co-occurrence"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:2106
 msgid "No co-occurring codes found for the segments in the graph."
 msgstr ""
-"Aucun co-occurences de code n’a été trouvé pour les segments du graphe."
+"Aucun co-occurrences de code n’a été trouvé pour les segments du graphe."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:2201
 msgid "At least two code nodes are needed to show co-occurrence lines."
@@ -8373,6 +8650,10 @@ msgstr "Sélectionner les fichiers d’image"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3607
 msgid " width"
 msgstr " largeur"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3607
+msgid " height:"
+msgstr " hauteur :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:3615
 msgid "Select coded area"
@@ -8649,6 +8930,10 @@ msgstr "Citer le logiciel :"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5112
 msgid "Analytical summary exported to:\n"
 msgstr "Résumé analytique exporté vers :\n"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5117
+msgid "The file could not be saved:\n"
+msgstr "Le fichier n’a pas pu être enregistré :\n"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:5146
 msgid "Save Graph"
@@ -9092,7 +9377,7 @@ msgstr "Ajouter"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:8668
 msgid "Co-occurrences"
-msgstr "Cooccurences"
+msgstr "Cooccurrences"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph.py:8678
 msgid "Add parent code"
@@ -10904,7 +11189,7 @@ msgstr ""
 "\n"
 "- [Effectifs des codes](qualcoder://menu/reports/code_frequencies) recense "
 "le nombre de fois où les codes et les catégories ont été utilisés.\n"
-"- [Occurences des codes par fichier/cas](qualcoder://menu/reports/"
+"- [Occurrences des codes par fichier/cas](qualcoder://menu/reports/"
 "code_comparison_table) offre un aperçu concis des endroits où les codes "
 "sélectionnés apparaissent le plus souvent.\n"
 "- [Résumé du fichier](qualcoder://menu/reports/file_summary) et [Résumé des "
@@ -11551,6 +11836,16 @@ msgstr ""
 "Analyse des données codées sous la forme « {} » (segments correspondants à "
 "« {} » dans le champ d’application.)"
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:4708
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:4778
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:5480
+msgid ""
+"\n"
+"Prompt:"
+msgstr ""
+"\n"
+"Instruction :"
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:4709
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:4779
 msgid ""
@@ -11578,6 +11873,14 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:4774
 msgid "Exploring the free topic \"{}\" in the data."
 msgstr "Exploration du thème libre « {} » dans les données."
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:4776
+msgid ""
+"\n"
+"Description:"
+msgstr ""
+"\n"
+"Description :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:4836
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:8985
@@ -11682,6 +11985,10 @@ msgstr "Type :"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:5750
 msgid "Summary:"
 msgstr "Résumé :"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:5746
+msgid "Prompt:"
+msgstr "Instruction :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/ai_chat.py:5814
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_relations.py:263
@@ -12390,6 +12697,19 @@ msgstr "Images codés"
 msgid "Coded audio / video"
 msgstr "Audios / vidéos codés"
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:264
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:266
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:728
+msgid " File: "
+msgstr " Fichier : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:269
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:731
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:4144
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_text.py:4214
+msgid "Code:"
+msgstr "Codeur⋅se :"
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/code_in_all_files.py:405
 msgid "Apply more codes to this segment"
 msgstr "Appliquer d’autres codes à ce segment"
@@ -12511,6 +12831,14 @@ msgstr ""
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_av.py:827
 msgid "Not saved"
 msgstr "Rien n’a été enregistré"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_av.py:831
+msgid "Width:"
+msgstr "Largeur :"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_av.py:834
+msgid "Height:"
+msgstr "Hauteur :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_av.py:854
 msgid "Loop selection"
@@ -12655,6 +12983,12 @@ msgstr "Nuage de mots créé à partir de segments de texte codés"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:272
 msgid "File filter"
 msgstr "Filtre de fichier"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:272
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:293
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:314
+msgid "Text:"
+msgstr "Texte :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_charts.py:293
 msgid "Case filter"
@@ -13176,6 +13510,10 @@ msgstr "Fichier d’enquête :"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/import_survey.py:324
 msgid "Fields:"
 msgstr "Champs :"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/import_survey.py:324
+msgid "Rows:"
+msgstr "Lignes :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/import_survey.py:339
 msgid "Attribute name error"
@@ -14280,6 +14618,10 @@ msgstr "Relations utilisateur exportées vers :\n"
 msgid "Relation detail"
 msgstr "Détail de la relation"
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_relations.py:596
+msgid "Framework: "
+msgstr "Cadre : "
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_relations.py:601
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/view_graph_relations.py:650
 msgid "Relation name:"
@@ -14787,7 +15129,7 @@ msgstr "Problème lors de la création de la base de données "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:3352
 msgid "Coder name changed to: "
-msgstr "Nom du codeur·se changé en : "
+msgstr "Nom du codeur⋅se changé en : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:3361
 msgid ""
@@ -14881,7 +15223,7 @@ msgstr "Changer"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:3501
 msgid "Default coder name changed to: "
-msgstr "Le nom du codeur·se par défaut a été changé en : "
+msgstr "Le nom du codeur⋅se par défaut a été changé en : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:3510
 msgid "Checking the project database"
@@ -14973,6 +15315,25 @@ msgstr "Date du projet : "
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:3973
 msgid "Project memo: "
 msgstr "Mémo de projet : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:3980
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:369
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:243
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:408
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:410
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:722
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1299
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:1482
+msgid "Files: "
+msgstr "Fichiers : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:3984
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:403
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:370
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:242
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/reports.py:412
+msgid "Cases: "
+msgstr "Cas : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/__main__.py:3988
 msgid "Code categories: "
@@ -15203,6 +15564,10 @@ msgstr "Toutes les catégories sélectionnées"
 msgid "Categories selected"
 msgstr "Catégories sélectionnées"
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:404
+msgid "Categories selected "
+msgstr "Catégories sélectionnées "
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:554
 msgid "No visible codes to export."
 msgstr "Aucun code visible à exporter."
@@ -15233,7 +15598,7 @@ msgstr "Pas de code visible à tracer."
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:652
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:765
 msgid "There are no co-occurrences to plot."
-msgstr "Pas de co-occurences à tracer."
+msgstr "Pas de co-occurrences à tracer."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:656
 msgid "Code Co-occurrence Graph"
@@ -15251,7 +15616,7 @@ msgstr "Export réussie"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:695
 msgid "Coloured nodes"
-msgstr "Noeuds colorés"
+msgstr "Nœuds colorés"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/report_cooccurrence.py:700
 msgid "Coloured labels"
@@ -15433,6 +15798,11 @@ msgstr ""
 msgid "Cases exist"
 msgstr "Le cas existe"
 
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:520
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:604
+msgid "attribute:"
+msgstr "attribut : "
+
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:542
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:626
 msgid "Cases and attributes imported from: "
@@ -15469,6 +15839,14 @@ msgstr "Cliquez pour gérer les fichier de ce cas"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:1097
 msgid "Viewing text of case: "
 msgstr "Voir le texte du cas : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:1139
+msgid "Characters:"
+msgstr "Caractères :"
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:1154
+msgid "Image:"
+msgstr "Image :"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/cases.py:1166
 msgid "AV media:"
@@ -16039,7 +16417,7 @@ msgstr " caractères.\n"
 msgid "Made by coder: "
 msgstr ""
 "Fait par le \n"
-"·euse : "
+"⋅euse : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:232
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:279
@@ -16080,6 +16458,13 @@ msgstr "Tous les codages de texte par "
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:174
 msgid " resized by "
 msgstr " redimensionné par "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:258
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:305
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:131
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:174
+msgid " characters."
+msgstr " caractères."
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/special_functions.py:276
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/GUI/special_functions.py:148
@@ -16605,7 +16990,7 @@ msgstr "Fichier des mots vides personnalisés"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:896
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:910
 msgid "No coded segments or documents found"
-msgstr "Aucun segment ni document codé n'a été trouvé"
+msgstr "Aucun segment ni document codé n’a été trouvé"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:457
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:503
@@ -16625,7 +17010,7 @@ msgstr "Formes actives : "
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:461
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:504
 msgid "Occurrences: "
-msgstr "Cooccurences : "
+msgstr "Cooccurrences : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:463
 msgid "Corpus built: "
@@ -16674,7 +17059,7 @@ msgstr "Modalité"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/irastats/report_html.py:96
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/irastats/report_odt.py:86
 msgid "Occurrences"
-msgstr "Cooccurences"
+msgstr "Cooccurrences"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:516
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/irastats/report_html.py:82
@@ -16717,7 +17102,7 @@ msgstr "Export ODT"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:682
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:991
 msgid "No variable"
-msgstr "Aucune variable\t"
+msgstr "Aucune variable"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:579
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:682
@@ -16766,11 +17151,15 @@ msgstr "segments"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:668
 msgid "IRaMuTeQ export"
-msgstr "Export d'IRaMuTeQ"
+msgstr "Export d’IRaMuTeQ"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:719
 msgid "Total inertia: "
 msgstr "Inertie totale : "
+
+#: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:720
+msgid "Columns: "
+msgstr "Colonnes : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:721
 msgid "Correspondence analysis: "
@@ -16783,11 +17172,11 @@ msgstr "axes"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:749
 msgid "Correspondence analysis coordinates exported to: "
 msgstr ""
-"Coordonnées d'Analyse factorielle des correspondances exportées vers : "
+"Coordonnées d’Analyse factorielle des correspondances exportées vers : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:765
 msgid "Correspondence analysis factor map exported to: "
-msgstr "Carte des facteurs d'analyse de correspondance exportés vers : "
+msgstr "Carte des facteurs d’analyse de correspondance exportés vers : "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:766
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:1105
@@ -16882,7 +17271,7 @@ msgstr "Modèle"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:1010
 msgid "Unit of analysis"
-msgstr "Unité d'analyse"
+msgstr "Unité d’analyse"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:1012
 msgid "Noise documents"
@@ -16930,7 +17319,7 @@ msgstr "Graphique de similitude: "
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:1087
 msgid "nodes"
-msgstr "noeuds"
+msgstr "nœuds"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/dialog_text_stats.py:1088
 msgid "edges"
@@ -17412,7 +17801,7 @@ msgstr "Statistiques descendantes"
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/irastats/report_html.py:81
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/irastats/report_odt.py:72
 msgid "Total occurrences"
-msgstr "Total d’occurences"
+msgstr "Total d’occurrences"
 
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/irastats/report_html.py:83
 #: /home/qwerty/Bureau/QualCoder/src/qualcoder/irastats/report_odt.py:74
@@ -17460,100 +17849,101 @@ msgstr "seuil de probabilité"
 msgid "Specificities"
 msgstr "Particularités"
 
-msgid "Copy selected text"
-msgstr "Copier le texte sélectionné"
+#~ msgid "Copy selected text"
+#~ msgstr "Copier le texte sélectionné"
 
-msgid "VLC not installed cannot play audio or video."
-msgstr "VLC non installé ne peut pas lire l’audio ou la vidéo."
+#~ msgid "VLC not installed cannot play audio or video."
+#~ msgstr "VLC non installé ne peut pas lire l’audio ou la vidéo."
 
-msgid "View AV error"
-msgstr "Voir l’erreur AV"
+#~ msgid "View AV error"
+#~ msgstr "Voir l’erreur AV"
 
-msgid "Font"
-msgstr "Police"
+#~ msgid "Font"
+#~ msgstr "Police"
 
-msgid "Tree font size"
-msgstr "Taille de la police de l’arbre"
+#~ msgid "Tree font size"
+#~ msgstr "Taille de la police de l’arbre"
 
-msgid "Working directory"
-msgstr "Répertoire de travail"
+#~ msgid "Working directory"
+#~ msgstr "Répertoire de travail"
 
-msgid "Language"
-msgstr "Langue"
+#~ msgid "Language"
+#~ msgstr "Langue"
 
-msgid "Show IDs"
-msgstr "Afficher les IDs"
+#~ msgid "Show IDs"
+#~ msgstr "Afficher les IDs"
 
-msgid "Timestamp format"
-msgstr "Format d’horodatage"
+#~ msgid "Timestamp format"
+#~ msgstr "Format d’horodatage"
 
-msgid "Speaker name format"
-msgstr "Format du nom de l’orateur"
+#~ msgid "Speaker name format"
+#~ msgstr "Format du nom de l’orateur"
 
-msgid "Report text context characters: "
-msgstr "Rapporter les caractères du contexte du texte : "
+#~ msgid "Report text context characters: "
+#~ msgstr "Rapporter les caractères du contexte du texte : "
 
-msgid "Style"
-msgstr "Style"
+#~ msgid "Style"
+#~ msgstr "Style"
 
-msgid "Backup on open"
-msgstr "Sauvegarde sur les ouvertures"
+#~ msgid "Backup on open"
+#~ msgstr "Sauvegarde sur les ouvertures"
 
-msgid "Backup AV files"
-msgstr "Sauvegarde des fichiers multimédias"
+#~ msgid "Backup AV files"
+#~ msgstr "Sauvegarde des fichiers multimédias"
 
-msgid "AI integration is enabled"
-msgstr "L’intégration de l’IA est activée"
+#~ msgid "AI integration is enabled"
+#~ msgstr "L’intégration de l’IA est activée"
 
-msgid "AI integration is disabled"
-msgstr "L’intégration de l’IA est désactivée"
+#~ msgid "AI integration is disabled"
+#~ msgstr "L’intégration de l’IA est désactivée"
 
-msgid "AI permissions"
-msgstr "Autorisations de l’IA"
+#~ msgid "AI permissions"
+#~ msgstr "Autorisations de l’IA"
 
-msgid "Folder paths / represents \\"
-msgstr "Chemins d’accès aux dossiers / représente \\"
+#~ msgid "Folder paths / represents \\"
+#~ msgstr "Chemins d’accès aux dossiers / représente \\"
 
-msgid "This version: "
-msgstr "Cette version : "
+#~ msgid "This version: "
+#~ msgstr "Cette version : "
 
-msgid "Select files to view"
-msgstr "Sélectionnez des fichiers à afficher"
+#~ msgid "Select files to view"
+#~ msgstr "Sélectionnez des fichiers à afficher"
 
-msgid "File Attributes"
-msgstr "Attributs du fichier"
+#~ msgid "File Attributes"
+#~ msgstr "Attributs du fichier"
 
-msgid "Files: all text files"
-msgstr "Fichiers : tous les fichiers texte"
+#~ msgid "Files: all text files"
+#~ msgstr "Fichiers : tous les fichiers texte"
 
-msgid "all text files"
-msgstr "tous les fichiers texte"
+#~ msgid "all text files"
+#~ msgstr "tous les fichiers texte"
 
-msgid "Codebook for"
-msgstr "Grille de codage pour"
+#~ msgid "Codebook for"
+#~ msgstr "Grille de codage pour"
 
-msgid " of these codings are owned by someone else."
-msgstr " ces codes appartiennent à quelqu’un d’autre."
+#~ msgid " of these codings are owned by someone else."
+#~ msgstr " ces codes appartiennent à quelqu’un d’autre."
 
-msgid "Warning: removed codings owned by someone else: "
-msgstr ""
-"Avertissement : suppression des codes appartenant à quelqu’un d’autre : "
+#~ msgid "Warning: removed codings owned by someone else: "
+#~ msgstr ""
+#~ "Avertissement : suppression des codes appartenant à quelqu’un d’autre : "
 
-msgid "Save graph analytical summary"
-msgstr "Enregistrer le résumé du graphe analytique"
+#~ msgid "Save graph analytical summary"
+#~ msgstr "Enregistrer le résumé du graphe analytique"
 
-msgid "The AI not yet fully loaded. Please wait and retry."
-msgstr ""
-"L’IA n’est pas encore complètement chargée. Veuillez patienter et réessayer."
+#~ msgid "The AI not yet fully loaded. Please wait and retry."
+#~ msgstr ""
+#~ "L’IA n’est pas encore complètement chargée. Veuillez patienter et "
+#~ "réessayer."
 
-msgid "Please enable the AI first and set it in Settings."
-msgstr "Veuillez d’abord activer l’IA et la définir dans les paramètres."
+#~ msgid "Please enable the AI first and set it in Settings."
+#~ msgstr "Veuillez d’abord activer l’IA et la définir dans les paramètres."
 
-msgid "The AI is busy or not set up correctly."
-msgstr "L’IA est occupée ou n’est pas configurée correctement."
+#~ msgid "The AI is busy or not set up correctly."
+#~ msgstr "L’IA est occupée ou n’est pas configurée correctement."
 
-msgid "The AI is busy, please wait a moment and retry."
-msgstr "L’IA est occupée, veuillez attendre un moment et réessayer."
+#~ msgid "The AI is busy, please wait a moment and retry."
+#~ msgstr "L’IA est occupée, veuillez attendre un moment et réessayer."
 
-msgid "Cannot open file"
-msgstr "Ne peut pas ouvrir le fichier"
+#~ msgid "Cannot open file"
+#~ msgstr "Ne peut pas ouvrir le fichier"
