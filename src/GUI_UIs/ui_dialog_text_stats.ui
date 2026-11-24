@@ -3,13 +3,13 @@
  <class>DialogTextStats</class>
  <widget class="QDialog" name="DialogTextStats">
   <property name="windowModality">
-   <enum>Qt::NonModal</enum>
+   <enum>Qt::WindowModality::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1224</width>
+    <width>1330</width>
     <height>750</height>
    </rect>
   </property>
@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_corpus">
       <attribute name="title">
@@ -88,7 +88,8 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Restrict the corpus to the coded texts of the selected codes. If no code is selected (all codes), the whole documents are used instead</string>
+            <string>Restrict the corpus to the coded texts of the selected codes. 
+If no code is selected (all codes), the whole documents are used instead</string>
            </property>
            <property name="text">
             <string>Select codes</string>
@@ -97,6 +98,12 @@
          </item>
          <item>
           <widget class="QLabel" name="label_selection">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="toolTip">
             <string>Current corpus selection: files, cases and codes. 'Codes: all' = the whole documents are used (only the file selection applies); specific codes = only their coded texts are used</string>
            </property>
@@ -111,7 +118,7 @@
          <item>
           <spacer name="horizontalSpacer_corpus_params">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -124,7 +131,7 @@
          <item>
           <spacer name="horizontalSpacer_corpus_params">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -140,6 +147,12 @@
         <layout class="QHBoxLayout" name="horizontalLayout_corpus_language">
          <item>
           <widget class="QLabel" name="label_language">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="toolTip">
             <string>Language used for tokenisation, stopwords and light stemming</string>
            </property>
@@ -157,8 +170,15 @@
          </item>
          <item>
           <widget class="QCheckBox" name="checkBox_stem">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="toolTip">
-            <string>Light stemming (truncate trailing suffixes); no heavy lemmatizer is used</string>
+            <string>Light stemming (truncate trailing suffixes).
+Heavy lemmatizer not used.</string>
            </property>
            <property name="text">
             <string>Light stemming</string>
@@ -168,7 +188,7 @@
          <item>
           <spacer name="horizontalSpacer_corpus_language">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -180,7 +200,6 @@
          </item>
         </layout>
        </item>
-
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_corpus_buttons">
          <item>
@@ -198,7 +217,8 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Build the analysable corpus from the current selection and parameters, then show a preview of the segments and the corpus size</string>
+            <string>Build the analysable corpus from the current selections.
+Show a preview of the segments and the corpus size.</string>
            </property>
            <property name="text">
             <string>Build corpus</string>
@@ -220,7 +240,8 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Export the current corpus (whole documents if all codes are selected, otherwise the coded texts of the selected codes) in the IRaMuTeQ text format</string>
+            <string>Export the current corpus to  IRaMuTeQ text format.
+Whole documents if all codes are selected, otherwise the coded texts of the selected codes.</string>
            </property>
            <property name="text">
             <string>Export IRaMuTeQ</string>
@@ -243,7 +264,7 @@
          <item>
           <spacer name="horizontalSpacer_corpus_buttons">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -261,7 +282,7 @@
           <string>Preview of the corpus segments (document, case, code, text)</string>
          </property>
          <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
+          <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
          </property>
          <column>
           <property name="text">
@@ -303,7 +324,9 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Minimum frequency for a form to be an 'active' form: forms occurring at least this many times in the corpus are used in the analyses, rarer forms are 'supplementary'</string>
+            <string>Minimum frequency for a form to be an active form.
+Forms occurring at least this many times in the corpus are used in the analyses.
+Rarer forms are supplementary.</string>
            </property>
            <property name="text">
             <string>Minimum frequency of active forms:</string>
@@ -313,7 +336,9 @@
          <item>
           <widget class="QSpinBox" name="spinBox_stats_min_freq">
            <property name="toolTip">
-            <string>Minimum frequency for a form to be an 'active' form: forms occurring at least this many times in the corpus are used in the analyses, rarer forms are 'supplementary'</string>
+            <string>Minimum frequency for a form to be an active form. 
+Forms occurring at least this many times in the corpus are used in the analyses.
+Rarer forms are supplementary.</string>
            </property>
            <property name="minimum">
             <number>1</number>
@@ -396,7 +421,7 @@
          <item>
           <spacer name="horizontalSpacer_stats">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -447,7 +472,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Export the text statistics report as a CSV file</string>
+            <string>Export the report to a CSV file</string>
            </property>
            <property name="text">
             <string>Export CSV</string>
@@ -469,7 +494,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Export the text statistics report as an HTML file</string>
+            <string>Export report to HTML file</string>
            </property>
            <property name="text">
             <string>Export HTML</string>
@@ -491,7 +516,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Export the text statistics report as an ODT document (LibreOffice/OpenOffice)</string>
+            <string>Export the report in ODT (Open Text Document) format</string>
            </property>
            <property name="text">
             <string>Export ODT</string>
@@ -513,7 +538,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Export the specificities table as a CSV file</string>
+            <string>Export the specificities table to a CSV file</string>
            </property>
            <property name="text">
             <string>Export CSV</string>
@@ -535,7 +560,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Export the specificities report as an HTML file</string>
+            <string>Export the specificities report to an HTML file</string>
            </property>
            <property name="text">
             <string>Export HTML</string>
@@ -545,7 +570,7 @@
          <item>
           <spacer name="horizontalSpacer_descstats">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -572,10 +597,17 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Calculate runs all the statistics in the report below: descending text statistics (corpus summary, frequency table, hapax, breakdown by the partition variable) and, when a partition variable is selected, the chi-square specificities (green = over-represented, red = under-represented). Definitions - segments = the analysed text units (coded texts of the selected codes, or whole documents); occurrences = total number of words; forms = distinct word forms after normalisation; active forms = forms occurring at least the minimum frequency (rarer forms are supplementary); hapax = forms occurring only once.</string>
+          <string>Calculate runs all the statistics in the report. 
+Text statistics (corpus summary, frequency table, hapax, breakdown by the partition variable) and, when a partition variable is selected, the chi-square specificities (green = over-represented, red = under-represented). 
+Definitions:
+Segments = the analysed text units (coded texts of the selected codes, or whole documents)
+Occurrences = total number of words
+Forms = distinct word forms after normalisation
+Active forms = forms occurring at least the minimum frequency (rarer forms are supplementary)
+Hapax = forms occurring only once.</string>
          </property>
          <property name="text">
-          <string>Calculate runs all the statistics in the report below: descending text statistics (corpus summary, frequency table, hapax, breakdown by the partition variable) and, when a partition variable is selected, the chi-square specificities (green = over-represented, red = under-represented). Definitions - segments = the analysed text units (coded texts of the selected codes, or whole documents); occurrences = total number of words; forms = distinct word forms after normalisation; active forms = forms occurring at least the minimum frequency (rarer forms are supplementary); hapax = forms occurring only once.</string>
+          <string>Calculate the report. Text statistics (corpus summary, frequency table, hapax, breakdown by partition variable). When a partition variable is selected, chi-square specificities (green = over-represented, red = under-represented). Definitions - Segments = the text units (coded texts of selected codes, or whole documents); Occurrences = total number of words; Forms = distinct word forms after normalisation; Active forms = forms occurring at aminimum frequency; Hapax = forms occurring only once.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -589,9 +621,6 @@
          </property>
         </widget>
        </item>
-
-
-
       </layout>
      </widget>
      <widget class="QWidget" name="tab_graphs">
@@ -747,7 +776,7 @@
          <item>
           <spacer name="horizontalSpacer_graphs">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -762,7 +791,7 @@
        <item>
         <widget class="QSplitter" name="splitter_graphs">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <widget class="QWidget" name="widget_graphs_left" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_graphs_left">
@@ -849,7 +878,7 @@
              <item>
               <spacer name="horizontalSpacer_sim">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -1008,7 +1037,7 @@
              <item>
               <spacer name="horizontalSpacer_ca">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -1045,7 +1074,7 @@
               <string>Eigenvalues and inertia of the correspondence analysis axes</string>
              </property>
              <property name="editTriggers">
-              <set>QAbstractItemView::NoEditTriggers</set>
+              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
              </property>
              <column>
               <property name="text">
@@ -1363,7 +1392,7 @@
          <item>
           <spacer name="horizontalSpacer_reinert">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -1410,14 +1439,14 @@
        <item>
         <widget class="QSplitter" name="splitter_reinert">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <widget class="QTreeWidget" name="treeWidget_reinert">
           <property name="toolTip">
            <string>Classes of the CHD; click one to show its characteristic forms and representative initial context units</string>
           </property>
           <property name="editTriggers">
-           <set>QAbstractItemView::NoEditTriggers</set>
+           <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
           </property>
           <column>
            <property name="text">
@@ -1460,7 +1489,7 @@
               <string>Profile of the selected class: forms with their frequency, chi-square and signed value</string>
              </property>
              <property name="editTriggers">
-              <set>QAbstractItemView::NoEditTriggers</set>
+              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
              </property>
              <column>
               <property name="text">
@@ -1508,7 +1537,7 @@
        <item>
         <widget class="QSplitter" name="splitter_reinert_plots">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <widget class="QWidget" name="widget_reinert_dendro_plot" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_reinert_dendro_plot"/>
@@ -1732,7 +1761,7 @@
          <item>
           <spacer name="horizontalSpacer_bertopic">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -1831,14 +1860,14 @@
        <item>
         <widget class="QSplitter" name="splitter_bertopic">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <widget class="QTableWidget" name="tableWidget_bertopic">
           <property name="toolTip">
            <string>Topics: size, characteristic words (c-TF-IDF score) and a representative segment</string>
           </property>
           <property name="editTriggers">
-           <set>QAbstractItemView::NoEditTriggers</set>
+           <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
           </property>
           <column>
            <property name="text">
@@ -1866,7 +1895,7 @@
            <string>Distribution of the topics per modality of the selected variable</string>
           </property>
           <property name="editTriggers">
-           <set>QAbstractItemView::NoEditTriggers</set>
+           <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
           </property>
          </widget>
         </widget>
@@ -1874,7 +1903,7 @@
        <item>
         <widget class="QSplitter" name="splitter_topics_plots">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <widget class="QWidget" name="widget_topics_plot" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_topics_plot"/>
