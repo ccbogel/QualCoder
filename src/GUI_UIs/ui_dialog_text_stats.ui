@@ -175,6 +175,16 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_documents_only">
+           <property name="toolTip">
+            <string>Use only the whole documents as corpus (ignore the coded segments); the case and code selection does not apply</string>
+           </property>
+           <property name="text">
+            <string>Whole documents only</string>
+           </property>
+          </widget>
+         </item>
        <item>
         <spacer name="horizontalSpacer_corpus_language">
          <property name="orientation">
@@ -294,7 +304,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Export the corpus (coded segments, plus whole documents if checked) in the IRaMuTeQ text format</string>
+            <string>Export the current corpus (coded segments, plus whole documents if checked, or whole documents only) in the IRaMuTeQ text format</string>
            </property>
            <property name="text">
             <string>Export IRaMuTeQ</string>

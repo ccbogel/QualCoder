@@ -32,6 +32,7 @@ from .GUI.ui_dialog_text_stats import Ui_DialogTextStats
 from .helpers import ExportDirectoryPathDialog, Message
 from .irastats import (
     available_variables,
+    build_document_segments,
     build_lexical_table,
     build_segments,
     descendant_statistics,
@@ -194,6 +195,9 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_select_cases.clicked.connect(self.select_cases)
         self.pushButton_select_codes.clicked.connect(self.select_codes)
         self.pushButton_stopwords.clicked.connect(self.browse_stopwords)
+        # the two document options are mutually exclusive
+        self.checkBox_documents.toggled.connect(self._documents_toggled)
+        self.checkBox_documents_only.toggled.connect(self._documents_only_toggled)
         self.pushButton_build_corpus.clicked.connect(self.build_corpus)
         self.pushButton_export_iramuteq.clicked.connect(self.export_iramuteq_dialog)
         self.pushButton_descstats_run.clicked.connect(self.run_descstats)
@@ -223,6 +227,15 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_reinert_ca_popout.clicked.connect(self.popout_reinert_ca)
         self.pushButton_bertopic_chart_popout.clicked.connect(self.popout_topics_chart)
         self.pushButton_bertopic_dist_popout.clicked.connect(self.popout_topics_distribution)
+
+    def _documents_toggled(self, checked: bool):
+        """ 'Include whole documents' and 'Whole documents only' are exclusive. """
+        if checked:
+            self.checkBox_documents_only.setChecked(False)
+
+    def _documents_only_toggled(self, checked: bool):
+        if checked:
+            self.checkBox_documents.setChecked(False)
 
     def _embed_figure(self, placeholder_name: str, figure, canvas_attr: str):
         """Embed a matplotlib Figure in a placeholder widget of the .ui, replacing
@@ -381,13 +394,18 @@ class DialogTextStats(QtWidgets.QDialog):
         """ Build the segment list from the current selection. Sets self.segments. """
 
         try:
-            self.segments = build_segments(
-                self.app.conn,
-                file_ids=self.file_ids or None,
-                case_ids=self.case_ids or None,
-                code_ids=self.code_ids or None,
-                include_documents=self.checkBox_documents.isChecked(),
-            )
+            if self.checkBox_documents_only.isChecked():
+                # whole documents only: the case/code selection does not apply
+                self.segments = build_document_segments(
+                    self.app.conn, file_ids=self.file_ids or None)
+            else:
+                self.segments = build_segments(
+                    self.app.conn,
+                    file_ids=self.file_ids or None,
+                    case_ids=self.case_ids or None,
+                    code_ids=self.code_ids or None,
+                    include_documents=self.checkBox_documents.isChecked(),
+                )
         except Exception as err:
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()
@@ -899,7 +917,6 @@ class DialogTextStats(QtWidgets.QDialog):
         unit = self.comboBox_bertopic_unit.currentData()
         try:
             if unit == "documents":
-                from .irastats.corpus import build_document_segments
                 segments = build_document_segments(self.app.conn, file_ids=self.file_ids or None)
             elif unit == "uci":
                 from .irastats.reinert import build_uci_segments
