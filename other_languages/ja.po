@@ -21,9 +21,8 @@ msgid "Copy"
 msgstr "コピー"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/error_dlg.py:45
-#, fuzzy
 msgid "Copy error message and traceback to the clipboard."
-msgstr "エラーメッセージをコピーし、クリップボードにトレースバックします。"
+msgstr "エラーメッセージとトレースバックをクリップボードにコピー"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/error_dlg.py:65
 msgid "Exception handler"
@@ -34,9 +33,8 @@ msgstr "例外ハンドラ"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_vectorstore.py:127
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/ai_chat.py:9501
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/GUI/special_functions.py:53
-#, fuzzy
 msgid "Uncaught exception: "
-msgstr "不正な例外:"
+msgstr "捕捉されない例外: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:116
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:175
@@ -80,9 +78,8 @@ msgstr "ケースファイルの表示"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:396
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:443
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4298
-#, fuzzy
 msgid "Sort by name ascending"
-msgstr "名前の昇順でソート"
+msgstr "名前で並べ替え（昇順）"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:120
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2037
@@ -93,9 +90,8 @@ msgstr "名前の昇順でソート"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:397
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:444
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4299
-#, fuzzy
 msgid "Sort by name descending"
-msgstr "名前の降下でソート"
+msgstr "名前で並べ替え（降順）"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:121
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2038
@@ -103,9 +99,8 @@ msgstr "名前の降下でソート"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:1309
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:170
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4300
-#, fuzzy
 msgid "Sort by case ascending"
-msgstr "ケースの昇順でソート"
+msgstr "ケースで並べ替え（昇順）"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:122
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2039
@@ -113,9 +108,8 @@ msgstr "ケースの昇順でソート"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_av.py:1310
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:171
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4301
-#, fuzzy
 msgid "Sort by case descending"
-msgstr "ケースの降下でソート"
+msgstr "ケースで並べ替え（降順）"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:123
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2040
@@ -125,9 +119,8 @@ msgstr "ケースの降下でソート"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:172
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:398
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4302
-#, fuzzy
 msgid "Sort by date ascending"
-msgstr "日付の昇順でソート"
+msgstr "日付で並べ替え（昇順）"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:124
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2041
@@ -137,9 +130,8 @@ msgstr "日付の昇順でソート"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:173
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:399
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4303
-#, fuzzy
 msgid "Sort by date descending"
-msgstr "日付降下でソート"
+msgstr "日付で並べ替え（降順）"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:152
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:2101
@@ -166,7 +158,7 @@ msgstr "ケースを選択"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:226
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:4390
 msgid "Show files containing the text. (Blank for all)"
-msgstr "テキストを含むファイルを表示します。(すべて空白)"
+msgstr "ファイル名に指定した文字列を含むファイルを表示（空欄の場合は全て表示）"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:210
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:4874
@@ -181,7 +173,7 @@ msgstr "テキストを含むファイルを表示します。(すべて空白)"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:230
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:261
 msgid "Nothing found"
-msgstr "何も見つからない"
+msgstr "一致する結果はありません"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:210
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:4874
@@ -196,7 +188,7 @@ msgstr "何も見つからない"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:230
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:261
 msgid "No matching files found"
-msgstr "一致するファイルが見つかりません"
+msgstr "条件に一致するファイルが見つかりません"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:240
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:598
@@ -209,9 +201,8 @@ msgstr "一致するファイルが見つかりません"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_exact_matches.py:184
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1378
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1448
-#, fuzzy
 msgid "Characters: "
-msgstr "キャラクター:"
+msgstr "文字数: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:253
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:1897
@@ -228,28 +219,25 @@ msgstr "キャラクター:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:470
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_charts.py:549
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1376
-#, fuzzy
 msgid "Case: "
-msgstr "ケース:"
+msgstr "ケース: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:255
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:314
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_codes.py:262
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_exact_matches.py:197
-#, fuzzy
 msgid ""
 "\n"
 "Codings: "
-msgstr "コーディング:"
+msgstr "\nコーディング件数: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:265
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:322
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_exact_matches.py:202
-#, fuzzy
 msgid ""
 "\n"
 "Memo: "
-msgstr "メモ:"
+msgstr "\nメモ: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:303
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_pdf.py:5210
@@ -275,55 +263,48 @@ msgstr "メモ:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/code_text.py:1371
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:619
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/reports.py:713
-#, fuzzy
 msgid "Date: "
-msgstr "日付:"
+msgstr "日付: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:308
-#, fuzzy
 msgid "Owner: "
-msgstr "オーナー:"
+msgstr "所有者: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:311
 msgid "Internal text document"
-msgstr "内部テキスト文書"
+msgstr "内部テキストファイル"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:313
-#, fuzzy
 msgid "External text document: "
-msgstr "外部テキスト文書:"
+msgstr "外部テキストファイル: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:315
-#, fuzzy
 msgid "External audio file: "
-msgstr "外部オーディオファイル:"
+msgstr "外部音声ファイル: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:317
 msgid "Internal audio file"
-msgstr "内部オーディオファイル"
+msgstr "内部音声ファイル"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:319
-#, fuzzy
 msgid "External video file: "
-msgstr "外的なビデオ ファイル:"
+msgstr "外部ビデオファイル: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:321
 msgid "Internal video file"
 msgstr "内部ビデオファイル"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:323
-#, fuzzy
 msgid "External image file: "
-msgstr "外部イメージファイル:"
+msgstr "外部画像ファイル: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:325
 msgid "Internal image file"
 msgstr "内部画像ファイル"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:326
-#, fuzzy
 msgid "Media path: "
-msgstr "メディアパス:"
+msgstr "ファイルの保存先: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:346
 msgid "CASE:"
@@ -331,7 +312,7 @@ msgstr "ケース："
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:359
 msgid "No case assignment"
-msgstr "ケース割り当てなし"
+msgstr "ケースの割り当てなし"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:367
 msgid "ATTRIBUTES:"
@@ -346,21 +327,20 @@ msgstr "メタデータ："
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:409
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:462
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/manage_files.py:2100
-#, fuzzy
 msgid "Duration: "
-msgstr "期間:"
+msgstr "再生時間: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:415
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:468
 msgid "Duration: Cannot obtain. VLC not installed."
-msgstr "期間 取得できません。VLCがインストールされていません。"
+msgstr "再生時間: 取得できません。VLCがインストールされていません。"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:424
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:477
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:578
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:680
 msgid "CODE COUNTS:"
-msgstr "コード・カウント："
+msgstr "コード別コーディング件数："
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:426
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:479
@@ -368,60 +348,54 @@ msgstr "コード・カウント："
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:683
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_code_summary.py:649
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_code_summary.py:700
-#, fuzzy
 msgid "Count: "
-msgstr "カウント:"
+msgstr "コーディング件数: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:428
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:480
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:583
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:684
-#, fuzzy
 msgid "Percent: "
-msgstr "パーセント:"
+msgstr "コーディング割合: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:429
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:481
-#, fuzzy
 msgid "Average segment: "
-msgstr "平均セグメント:"
+msgstr "コーディング区間の平均時間: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:429
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:481
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_graph.py:3600
-#, fuzzy
 msgid " msecs"
-msgstr "msecsの"
+msgstr "ミリ秒"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:437
 msgid "TRANSCRIPT:"
-msgstr "トランスクリプト："
+msgstr "文字起こし："
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:439
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:490
 msgid "END OF TRANSCRIPT"
-msgstr "記録終了"
+msgstr "文字起こし情報の終わり"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:514
 msgid "PDF IMAGE DETAILS"
-msgstr "pdf画像詳細"
+msgstr "PDF画像の詳細"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:523
 msgid "Pages"
-msgstr "ページ"
+msgstr "ページ数"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:527
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:539
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/view_image.py:2354
-#, fuzzy
 msgid "Width: "
-msgstr "幅:"
+msgstr "幅: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:527
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:539
-#, fuzzy
 msgid "Height: "
-msgstr "高さ:"
+msgstr "高さ: "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:528
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:539
@@ -437,14 +411,12 @@ msgstr "区域:"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_code_summary.py:649
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:1104
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_compare_coder_file.py:1107
-#, fuzzy
 msgid " pixels"
-msgstr "ピクセル"
+msgstr " ピクセル"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:565
-#, fuzzy
 msgid "Image too large"
-msgstr "余りに大きいイメージ"
+msgstr "画像が大きすぎます"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/report_file_summary.py:565
 msgid ""
