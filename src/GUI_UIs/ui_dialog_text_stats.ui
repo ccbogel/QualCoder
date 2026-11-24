@@ -168,20 +168,23 @@
          <item>
           <widget class="QCheckBox" name="checkBox_documents">
            <property name="toolTip">
-            <string>Also include the whole documents in the corpus, not only the coded segments</string>
+            <string>Use the whole documents as corpus (instead of the coded texts); the case and code selection does not apply</string>
            </property>
            <property name="text">
-            <string>Include whole documents</string>
+            <string>Whole documents</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="checkBox_documents_only">
+          <widget class="QCheckBox" name="checkBox_coded_only">
            <property name="toolTip">
-            <string>Use only the whole documents as corpus (ignore the coded segments); the case and code selection does not apply</string>
+            <string>Use only the coded texts (segments) as corpus; the whole documents are ignored (default)</string>
            </property>
            <property name="text">
-            <string>Whole documents only</string>
+            <string>Only coded texts</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -304,7 +307,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Export the current corpus (coded segments, plus whole documents if checked, or whole documents only) in the IRaMuTeQ text format</string>
+            <string>Export the current corpus (only coded texts, or whole documents, depending on the checkbox) in the IRaMuTeQ text format</string>
            </property>
            <property name="text">
             <string>Export IRaMuTeQ</string>
