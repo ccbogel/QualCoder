@@ -807,6 +807,762 @@ Attention : cette action est irréversible.</translation>
     </message>
 </context>
 <context>
+    <name>DialogTextStats</name>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Lexicometry (text statistics)</source>
+        <translation>Lexicométrie (statistiques textuelles)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Corpus</source>
+        <translation>Corpus</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Restrict the corpus to the selected text files</source>
+        <translation>Limiter le corpus aux fichiers texte sélectionnés</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Select files</source>
+        <translation>Sélectionner des fichiers</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Restrict the corpus to the segments of the selected cases</source>
+        <translation>Limiter le corpus aux segments des cas sélectionnés</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Select cases</source>
+        <translation>Sélectionner des cas</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Restrict the corpus to the selected codes</source>
+        <translation>Limiter le corpus aux codes sélectionnés</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Select codes</source>
+        <translation>Sélectionner les codes</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Current corpus selection: files, cases and codes (&apos;all&apos; = the whole project)</source>
+        <translation>Sélection actuelle de corpus: fichiers, cas et codes (« all » = tout le projet)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>All files, cases and codes</source>
+        <translation>Tous les dossiers, cas et codes</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Language used for tokenisation, stopwords and light stemming</source>
+        <translation>Langue utilisée pour les tokenisations, les mots vides et les racinations légères</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Language:</source>
+        <translation>Langue:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Light stemming (truncate trailing suffixes); no heavy lemmatizer is used</source>
+        <translation>Racinations légères (suffixes de tranche); aucun lemmatiseur lourd n’est utilisé</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Light stemming</source>
+        <translation>Racinations légères</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Also include the whole documents in the corpus, not only the coded segments</source>
+        <translation>Inclure également l’ensemble des documents dans le corpus, pas seulement les segments codés</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Include whole documents</source>
+        <translation>Inclure les documents entiers</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Optional text file with one stopword per line, added to the built-in stopword list</source>
+        <translation>Fichier texte optionnel avec un mot vide par ligne, ajouté à la liste des mots vide</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Custom stopwords file:</source>
+        <translation>Mots vides personnalisés :</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Optional text file, one word per line</source>
+        <translation>Fichier texte optionnel, un mot par ligne</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Browse for a custom stopwords text file</source>
+        <translation>Rechercher un fichier texte de mots vides personnalisé</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Browse</source>
+        <translation>Parcourir</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Build the analysable corpus from the current selection and parameters, then show a preview of the segments and the corpus size</source>
+        <translation>Construisez le corpus analytique à partir de la sélection et des paramètres actuels, puis montrez un aperçu des segments et de la taille du corpus</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Build corpus</source>
+        <translation>Construire le corpus</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export the corpus (coded segments, plus whole documents if checked) in the IRaMuTeQ text format</source>
+        <translation>Exporter le corpus (segments codés, plus documents entiers si coché) au format texte IRaMuTeQ</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export IRaMuTeQ</source>
+        <translation>Exporter IRaMuTeQ</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Size of the last built corpus</source>
+        <translation>Taille du dernier corpus construit</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Preview of the corpus segments (document, case, code, text)</source>
+        <translation>Aperçu des segments du corpus (document, cas, code, texte)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Document</source>
+        <translation>Document</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Case</source>
+        <translation>Cas</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Code</source>
+        <translation>Code</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Text</source>
+        <translation>Texte</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Statistics</source>
+        <translation>Statistiques</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Minimum frequency for a form to be an &apos;active&apos; form: forms occurring at least this many times in the corpus are used in the analyses, rarer forms are &apos;supplementary&apos;</source>
+        <translation>Fréquence minimale pour qu’une forme soit une forme « active : les formes se produisant au moins autant de fois dans le corpus sont utilisées dans les analyses, les formes plus rares sont «supplémentaires »</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Minimum frequency of active forms:</source>
+        <translation>Fréquence minimale des formes actives:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Partition variable used for the breakdown (code, case, document or attribute)</source>
+        <translation>Variable de partition utilisée pour la distribution (code, cas, document ou attribut)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Partition variable:</source>
+        <translation>Variable de partition:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Keep only the specificities with a two-sided p-value &lt;= this threshold</source>
+        <translation>Ne conserver que les spécificités avec une valeur de p à deux faces &lt;= ce seuil</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Probability threshold:</source>
+        <translation>Seuil de probabilité:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Calculate the text statistics with the current parameters</source>
+        <translation>Calculer les statistiques du texte avec les paramètres actuels</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Calculate</source>
+        <translation>Calculer</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export the text statistics report as a CSV file</source>
+        <translation>Exporter le rapport statistique texte en tant que fichier CSV</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export CSV</source>
+        <translation>Export CSV</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export the text statistics report as an HTML file</source>
+        <translation>Exporter le rapport statistique texte comme un fichier HTML</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export HTML</source>
+        <translation>Exporter HTML</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export the text statistics report as an ODT document (LibreOffice/OpenOffice)</source>
+        <translation>Exporter le rapport statistique en tant que document ODT (LibreOffice/OpenOffice)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export ODT</source>
+        <translation>Export ODT</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Left table: forms ranked by decreasing frequency with their share of the corpus. Right report: corpus summary (occurrences, forms, active/supplementary forms, hapax), the frequency table, the hapax (forms occurring once) and the breakdown by the selected partition variable.</source>
+        <translation>Formes classées par fréquence décroissante avec leur part du corpus. Résumé de corpus (occurrences, formes, formes actives/supplémentaires, hapax), table de fréquence, hapax (formes survenant une fois) et ventilation par la variable de partition sélectionnée.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Left: forms by decreasing frequency. Right: corpus summary, hapax, breakdown by variable.</source>
+        <translation>Se forme en diminuant la fréquence.  Résumé du corpus, hapax, ventilation par variable.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Forms ranked by decreasing frequency with their share of the corpus</source>
+        <translation>Formes classés par fréquence décroissante avec leur part du corpus</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Form</source>
+        <translation>Forme</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Frequency</source>
+        <translation>Fréquence</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Corpus summary (occurrences, forms, active/supplementary forms, hapax), frequency table, hapax and breakdown by the selected partition variable</source>
+        <translation>Résumé Corpus (occurrences, formes, formes actives/supplémentaires, hapax), tableau de fréquence, hapax et ventilation par la variable de partition sélectionnée</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Calculate the specificities with the current parameters</source>
+        <translation>Calculer les spécificités avec les paramètres actuels</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export the specificities table as a CSV file</source>
+        <translation>Exporter le tableau des spécificités en tant que fichier CSV</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export the specificities report as an HTML file</source>
+        <translation>Exporter le rapport des spécificités comme fichier HTML</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>For each form and each modality of the partition variable: chi-square of the 2x2 contingency table, signed value (green = over-represented, red = under-represented) and two-sided p-value (3 decimals, &lt;0.001 when smaller), sorted from the most specific to the least.</source>
+        <translation>Pour chaque forme et chaque modalité de la variable de partition : chi-square du tableau de contingence 2x2, valeur signée (vert = surreprésenté, rouge = sous-représenté) et valeur de p à deux faces (3 décimales, &lt; 0,001 quand plus petite), triée du plus spécifique au moins.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Specificities table: form, modality, observed and expected counts, chi-square, signed value and p-value</source>
+        <translation>Tableau des spécificités : forme, modalité, nombres observés et attendus, chi carré, valeur signée et valeur p</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Modality</source>
+        <translation>Modalités</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Count</source>
+        <translation>Nombre</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Expected count</source>
+        <translation>Nombre prévu</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Signed value</source>
+        <translation>Valeur signée</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>HTML report of the specificities, with over-represented forms in green and under-represented forms in red</source>
+        <translation>Rapport HTML des spécificités, avec des formes surreprésentées sous forme verte et sousreprésentée en rouge</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Graphs</source>
+        <translation>Graphiques</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Only forms occurring at least this many times appear as nodes</source>
+        <translation>Seules les formes survenant au moins autant de fois apparaissent comme nœuds</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Minimum frequency:</source>
+        <translation>Fréquence minimale:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Association measure between forms co-occurring in the same segment: Jaccard index (default) or chi-square (phi-squared)</source>
+        <translation>Mesure de l’association entre les formes coexistant dans le même segment : indice Jaccard (par défaut) ou chi-carré (phi-carré)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Association measure:</source>
+        <translation>Mesure d’association:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Minimum association value for an edge to be drawn between two forms</source>
+        <translation>Valeur minimale d’association pour un bord à tracer entre deux formes</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Edge threshold:</source>
+        <translation>Seuil de bord:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Detect communities of strongly associated forms with the Louvain algorithm; each community gets its own colour in the graph</source>
+        <translation>Détecter les communautés de formes fortement associées à l’algorithme de Louvain; chaque communauté obtient sa propre couleur dans le graphique</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Detect communities (Louvain)</source>
+        <translation>Détecter les communautés (Louvain)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Draw a red halo around the direct neighbours of this form in the graph</source>
+        <translation>Dessiner un halo rouge autour des voisins directs de cette forme dans le graphique</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Halo:</source>
+        <translation>Halo :</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Columns of the analysed table: &apos;Segments&apos; = forms x segments, otherwise forms x modalities of the partition variable</source>
+        <translation>Colonnes du tableau analysé: «Segments » = formulaires x segments, sinon formulaires x modalités de la variable de partition</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Correspondence analysis columns:</source>
+        <translation>Colonnes d’analyse de correspondance:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Build the similarity graph with the current parameters</source>
+        <translation>Construire le graphique de similarité avec les paramètres actuels</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export the similarity graph as a PNG image</source>
+        <translation>Exporter le graphique de similarité comme image PNG</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export PNG</source>
+        <translation>Exportation PNG</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Open in a separate window</source>
+        <translation>Ouvrir dans une fenêtre séparée</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Similarity graph: each node is a form (size = frequency), each edge links two forms co-occurring in the same segment (width = association strength), node colours = detected communities. Below: the strongest edges and the communities.</source>
+        <translation>Graphique de similarité : chaque noeud est une forme (taille = fréquence), chaque lien relie deux formes qui cohabitent dans le même segment (largeur = force d’association), couleurs de nœud = communautés détectées. Ci-dessous : les liens les plus forts et les communautés.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Summary of the last graph: nodes, edges, communities</source>
+        <translation>Résumé du dernier graphique: noeuds, liens, communautés</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Strongest edges of the graph (form - form: association value) and detected communities</source>
+        <translation>Les liens les plus forts du graphique (forme - forme: valeur d’association) et les communautés détectées</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Calculate the correspondence analysis and show the factor map (axes 1 x 2)</source>
+        <translation>Calculer l’analyse de correspondance et afficher la carte des facteurs (axes 1 x 2)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export the form and modality coordinates (CSV)</source>
+        <translation>Exporter les coordonnées du formulaire et des modalités (CSV)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export coordinates CSV</source>
+        <translation>Export des coordonnées CSV</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export the factor map as a PNG image</source>
+        <translation>Exporter la carte des facteurs comme image PNG</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</source>
+        <translation>Analyse par correspondance du tableau des formulaires x colonnes : table de gauche = valeurs propres et inertie des axes, droite = inertie totale, et la carte des facteurs s’ouvre dans une fenêtre séparée (points bleus = formes, rouge = colonnes, point taille = fréquence).</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Eigenvalues and inertia of the correspondence analysis axes</source>
+        <translation>Valeurs propres et inertie des axes d’analyse de correspondance</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Axis</source>
+        <translation>Axe</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Eigenvalue</source>
+        <translation>Valeur propre</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>% inertia</source>
+        <translation>% d’inertie</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Cumulative %</source>
+        <translation>Total %</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Total inertia, number of forms and columns of the last correspondence analysis</source>
+        <translation>inertie totale, nombre de formes et colonnes de la dernière analyse de correspondance</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Reinert classification</source>
+        <translation>Classement des réinertes</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Initial context unit size in occurrences: the corpus is split into segments of about this many words, cut at sentence boundaries when possible</source>
+        <translation>Taille initiale de l’unité de contexte dans les occurrences : le corpus est divisé en segments d’environ ces nombreux mots, coupés aux limites des phrases si possible</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Initial context unit size (occurrences):</source>
+        <translation>Taille initiale de l’unité de contexte (occurrences):</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Minimum frequency for a form to be an &apos;active&apos; form used in the forms x initial context unit table (default 3, as in IRaMuTeQ)</source>
+        <translation>Fréquence minimale pour qu’un formulaire soit un formulaire « actif » utilisé dans le tableau d’unités de contexte initial des formulaires x (par défaut 3, comme dans IRaMuTeQ)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Min frequency of active forms:</source>
+        <translation>Fréquence minimale des formes actives:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Maximum number of classes (default 10, as in IRaMuTeQ)</source>
+        <translation>Nombre maximal de classes (par défaut 10, comme dans IRaMuTeQ)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Max classes:</source>
+        <translation>Cours maxi:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Minimum number of initial context units in each side of a split for it to be accepted</source>
+        <translation>Nombre minimum d’unités de contexte initiales de chaque côté d’une scission pour qu’elle soit acceptée</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Min initial context units per class:</source>
+        <translation>Unités de contexte initiales minimales par classe:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Run the Reinert descending hierarchical classification (CHD) with the current parameters</source>
+        <translation>Exécuter la classification hiérarchique descendante de Reinert (CHD) avec les paramètres actuels</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export the classes, profiles and representative initial context units (CSV)</source>
+        <translation>Exporter les classes, profils et unités de contexte initial représentatives (CSV)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Correspondence analysis of the forms x classes table, shown in a separate window</source>
+        <translation>Analyse par correspondance du tableau des formulaires x classes, montré dans une fenêtre séparée</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Correspondence analysis: forms x classes</source>
+        <translation>Analyse de correspondance: formulaires x classes</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Show the dendrogram of the classification: one colour per class, with its most representative forms</source>
+        <translation>Afficher le dendrogramme du classement : une couleur par classe, avec ses formes les plus représentatives</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Dendrogram</source>
+        <translation>Dendrogramme</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Reinert CHD: the corpus is split into initial context units (segments of about the initial context unit size in occurrences), then into classes by successive binary splits maximizing the chi-square between classes. Click a class in the tree to see its characteristic forms (profile) and its most representative initial context units.</source>
+        <translation>Reinert CHD&#xa0;: le corpus est divisé en unités de contexte initial (segments d’environ la taille initiale de l’unité de contexte dans les occurrences), puis en classes par des fractions binaires successives maximisant le chi-carré entre les classes. Cliquez sur une classe dans l’arbre pour voir ses formes caractéristiques (profil) et ses unités de contexte initial les plus représentatives.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Summary of the last classification: classes, initial context units, chi-square</source>
+        <translation>Résumé de la dernière classification: classes, unités contextuelles initiales, chi carré</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Classes of the CHD; click one to show its characteristic forms and representative initial context units</source>
+        <translation>Classes du CHD; cliquez sur une pour montrer ses formes caractéristiques et les unités de contexte initial représentatives</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Class</source>
+        <translation>Classe</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Initial context units</source>
+        <translation>Unités contexte initiales</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Characteristic forms</source>
+        <translation>Formes caractéristiques</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Profile of the selected class: forms with their frequency, chi-square and signed value</source>
+        <translation>Profil de la classe sélectionnée : formulaires avec leur fréquence, chi carré et valeur signée</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Initial context units (segments of about the initial context unit size in occurrences) most characteristic of the selected class</source>
+        <translation>Unités contextuelles initiales (segments de la taille initiale de l’unité contextuelle dans les occurrences) la plus caractéristique de la classe sélectionnée</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Most representative initial context units:</source>
+        <translation>Unités de contexte initiales les plus représentatives:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Most representative initial context units of the selected class</source>
+        <translation>Les unités de contexte initial les plus représentatives de la classe sélectionnée</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Topics (BERT): topic modeling with BERT embeddings (sentence-transformers), clustering and c-TF-IDF topic words. Requires the sentence-transformers and torch packages; the embedding model is downloaded on first use.</source>
+        <translation>Sujets (BERT) : modélisation des sujets avec les éléments BERT intégrés (sentence-transformateurs), clustering et c-TF-IDF. Nécessite les paquets phrase-transformers et torch&#x2009;; le modèle d’intégration est téléchargé lors de la première utilisation.</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Unit of analysis: coded segments, whole documents, or initial context units (~40 occurrences, as in the Reinert classification)</source>
+        <translation>Unité d’analyse : segments codés, documents entiers ou unités contextuelles initiales (~40&#xa0;occurrences, comme dans la classification de Reinert)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Unit of analysis:</source>
+        <translation>Unité d’analyse:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Sentence-transformers model used to compute the BERT embeddings</source>
+        <translation>Modèle Sentence-transformers utilisé pour calculer l’intégration BERT</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Embedding model:</source>
+        <translation>Modèle d&apos;intégration:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Minimum number of documents in a topic (smaller groups are noise)</source>
+        <translation>Nombre minimum de documents dans un sujet (les petits groupes sont le bruit)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Min documents per topic:</source>
+        <translation>Minimum de documents par sujet:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Number of characteristic words shown for each topic</source>
+        <translation>Nombre de mots caractéristiques indiqués pour chaque thème</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Top words per topic:</source>
+        <translation>Principaux mots par thème :</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Calculate the topics with the current parameters (embeddings are computed locally; the first run downloads the model)</source>
+        <translation>Calculer les thème avec les paramètres actuels (les embodages sont calculés localement; la première exécution télécharge le modèle)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Bar chart of the size of each topic</source>
+        <translation>Graphique à barre pour la taille de chaque thème</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Topic sizes</source>
+        <translation>Tailles des thèmes</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Export the topics and their distribution (CSV)</source>
+        <translation>Exporter les thèmes et leur distribution (CSV)</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Partition variable used for the topic distribution table and chart</source>
+        <translation>Variable de partition utilisée pour le tableau et le graphique de répartition des thèmes</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Distribution by variable:</source>
+        <translation>Répartition par variable:</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Stacked bar chart of the topic distribution per modality of the selected variable</source>
+        <translation>Diagramme à barres empilées de la distribution des sujets par modalité de la variable sélectionnée</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Topics x variable chart</source>
+        <translation>Sujets x graphique variable</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Summary of the last BERTopic run: documents, topics, model</source>
+        <translation>Résumé de la dernière série BERTopic: documents, sujets, modèle</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Topics: size, characteristic words (c-TF-IDF score) and a representative segment</source>
+        <translation>Sujets : taille, mots caractéristiques (score c-TF-IDF) et segment représentatif</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Topic</source>
+        <translation>Thème</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Size</source>
+        <translation>Taille</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Top words</source>
+        <translation>Principaux mots</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Representative segment</source>
+        <translation>Segment représentatif</translation>
+    </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
+        <source>Distribution of the topics per modality of the selected variable</source>
+        <translation>Répartition des thèmes par modalité de la variable sélectionnée</translation>
+    </message>
+</context>
+<context>
     <name>Dialog_AiPrompts</name>
     <message>
         <location filename="../../GUI_UIs/ui_ai_edit_prompts.ui" line="0"/>
@@ -1169,7 +1925,7 @@ Classement par nom de fichier et nom de code.</translation>
     <message>
         <location filename="../../GUI_UIs/ui_comparison_table.ui" line="0"/>
         <source>Sum the code counts per case or per attribute value, instead of showing each file separately.</source>
-        <translation>Additionnez les décomptes de codes par cas ou par valeur d&apos;attribut, au lieu d&apos;afficher chaque fichier séparément.</translation>
+        <translation>Additionnez les décomptes de codes par cas ou par valeur d’attribut, au lieu d’afficher chaque fichier séparément.</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_comparison_table.ui" line="0"/>
@@ -3201,7 +3957,7 @@ Cochez Tous les journaux pour rechercher dans tous les journaux</translation>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_journals.ui" line="0"/>
         <source>Insert coded segments from any file, case or code in the project</source>
-        <translation>Insérez des segments codés provenant de n&apos;importe quel fichier, dossier ou code dans le projet</translation>
+        <translation>Insérez des segments codés provenant de n’importe quel fichier, dossier ou code dans le projet</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_journals.ui" line="0"/>
@@ -3212,17 +3968,17 @@ Cochez Tous les journaux pour rechercher dans tous les journaux</translation>
 <context>
     <name>Dialog_manage_attributes</name>
     <message>
-        <location filename="../../GUI_UIs/ui_dialog_manage_attributes.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_manage_attributes.ui" line="0"/>
         <source>Attributes</source>
         <translation>Attributs</translation>
     </message>
     <message>
-        <location filename="../../GUI_UIs/ui_dialog_manage_attributes.ui" line="0"/>
-        <source>Add</source>
-        <translation>Ajouter</translation>
+        <location filename="../../GUI_UIs/ui_manage_attributes.ui" line="0"/>
+        <source>Create a new variable</source>
+        <translation>Créer une nouvelle variable</translation>
     </message>
     <message>
-        <location filename="../../GUI_UIs/ui_dialog_manage_attributes.ui" line="0"/>
+        <location filename="../../GUI_UIs/ui_manage_attributes.ui" line="0"/>
         <source>Delete</source>
         <translation>Effacer</translation>
     </message>
@@ -3261,7 +4017,7 @@ Text files (from any source) are exported from the text stored in the database a
 (You can open the project folder and copy/paste the original text file if preferred.)</source>
         <translation>Exporter le fichier sélectionné.
 Les fichiers texte (quelle que soit leur origine) sont exportés à partir du texte stocké dans la base de données sous forme de fichiers .txt.
-(Vous pouvez ouvrir le dossier du projet et copier-coller le fichier texte d&apos;origine si vous le souhaitez.)</translation>
+(Vous pouvez ouvrir le dossier du projet et copier-coller le fichier texte d’origine si vous le souhaitez.)</translation>
     </message>
     <message>
         <location filename="../../GUI_UIs/ui_dialog_manage_files.ui" line="0"/>
@@ -3493,6 +4249,11 @@ Vérifiez après avoir appliqué la fonction.</translation>
         <source>Export references</source>
         <translation>Exporter les références</translation>
     </message>
+    <message>
+        <location filename="../../GUI_UIs/ui_manage_references.ui" line="0"/>
+        <source>Create a reference.</source>
+        <translation>Créez une référence.</translation>
+    </message>
 </context>
 <context>
     <name>Dialog_memo</name>
@@ -3657,7 +4418,7 @@ Vérifiez après avoir appliqué la fonction.</translation>
         <location filename="../../GUI_UIs/ui_dialog_pseudonyms.ui" line="0"/>
         <source>Pseudonyms. Data de-identification applied on file import. Does not apply for PDF imports.
 Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</source>
-        <translation>Pseudonymes. Dé-identification des données appliquée à l&apos;import de fichiers (hors PDF).
+        <translation>Pseudonymes. Dé-identification des données appliquée à l’import de fichiers (hors PDF).
 Sensible à la casse : ajouter une entrée par variante (ex. : Tom Jones et TOM JONES)</translation>
     </message>
     <message>
@@ -3827,7 +4588,7 @@ La sélection des attributs prévaudra sur les fichiers ou dossiers sélectionn�
         <source>Export format.
 
 To also export variables, check the variables checkbox and select csv or xlsx format.</source>
-        <translation>Format d&apos;exportation.
+        <translation>Format d’exportation.
 
 Pour exporter également les variables, cochez la case « Variables » et sélectionnez le format CSV ou XLSX.</translation>
     </message>
