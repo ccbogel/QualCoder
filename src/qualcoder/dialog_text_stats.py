@@ -32,6 +32,7 @@ from .GUI.ui_dialog_text_stats import Ui_DialogTextStats
 from .helpers import ExportDirectoryPathDialog, Message
 from .irastats import (
     available_variables,
+    build_document_segments,
     build_lexical_table,
     build_segments,
     descendant_statistics,
@@ -53,7 +54,7 @@ from .topic_model import (
     plot_topic_sizes,
     topic_by_variable,
 )
-from .irastats.report_html import descstats_html, specificites_html
+from .irastats.report_html import descstats_html, specificites_html, statistics_html
 from .irastats.report_odt import descstats_odt
 from .select_items import DialogSelectItems
 
@@ -110,7 +111,6 @@ class DialogTextStats(QtWidgets.QDialog):
         self._setup_icons()
         self._init_combos()
         self._connect_signals()
-        self.splitter_stats.setSizes([500, 500])
         self.splitter_graphs.setSizes([500, 500])
         self.splitter_reinert.setSizes([350, 550])
         self.splitter_bertopic.setSizes([400, 200])
@@ -125,6 +125,9 @@ class DialogTextStats(QtWidgets.QDialog):
         self._topics_dist_canvas = None
         self._popout_dialogs = []
         self._icon_only_buttons()
+        # embedded in the Reports tab: do not force the main window minimum size
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Ignored,
+                           QtWidgets.QSizePolicy.Policy.Ignored)
         self.resize(1100, 750)
 
     def _setup_icons(self):
@@ -134,14 +137,12 @@ class DialogTextStats(QtWidgets.QDialog):
             "pushButton_select_files": "mdi6.file-outline",
             "pushButton_select_cases": "mdi6.account-multiple",
             "pushButton_select_codes": "mdi6.text",
-            "pushButton_stopwords": "mdi6.folder-outline",
             "pushButton_build_corpus": "mdi6.play",
             "pushButton_export_iramuteq": "mdi6.export",
             "pushButton_descstats_run": "mdi6.play",
             "pushButton_descstats_csv": "mdi6.file-export-outline",
             "pushButton_descstats_html": "mdi6.script-text-outline",
             "pushButton_descstats_odt": "mdi6.file-document-outline",
-            "pushButton_spec_run": "mdi6.play",
             "pushButton_spec_csv": "mdi6.file-export-outline",
             "pushButton_spec_html": "mdi6.script-text-outline",
             "pushButton_sim_run": "mdi6.play",
@@ -193,14 +194,12 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_select_files.clicked.connect(self.select_files)
         self.pushButton_select_cases.clicked.connect(self.select_cases)
         self.pushButton_select_codes.clicked.connect(self.select_codes)
-        self.pushButton_stopwords.clicked.connect(self.browse_stopwords)
         self.pushButton_build_corpus.clicked.connect(self.build_corpus)
         self.pushButton_export_iramuteq.clicked.connect(self.export_iramuteq_dialog)
-        self.pushButton_descstats_run.clicked.connect(self.run_descstats)
+        self.pushButton_descstats_run.clicked.connect(self.run_statistics)
         self.pushButton_descstats_csv.clicked.connect(self.export_descstats_csv)
         self.pushButton_descstats_html.clicked.connect(self.export_descstats_html)
         self.pushButton_descstats_odt.clicked.connect(self.export_descstats_odt)
-        self.pushButton_spec_run.clicked.connect(self.run_specificites)
         self.pushButton_spec_csv.clicked.connect(self.export_specificites_csv)
         self.pushButton_spec_html.clicked.connect(self.export_specificites_html)
         self.pushButton_sim_run.clicked.connect(self.run_similarity)
@@ -223,6 +222,17 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_reinert_ca_popout.clicked.connect(self.popout_reinert_ca)
         self.pushButton_bertopic_chart_popout.clicked.connect(self.popout_topics_chart)
         self.pushButton_bertopic_dist_popout.clicked.connect(self.popout_topics_distribution)
+
+    def _fit_table(self, table, max_col_width: int = 500):
+        """ Resize the columns to their contents but cap them at max_col_width,
+        then wrap the rows so long cell texts stay readable and fit. """
+
+        table.setWordWrap(True)
+        table.resizeColumnsToContents()
+        for col in range(table.columnCount()):
+            if table.columnWidth(col) > max_col_width:
+                table.setColumnWidth(col, max_col_width)
+        table.resizeRowsToContents()
 
     def _embed_figure(self, placeholder_name: str, figure, canvas_attr: str):
         """Embed a matplotlib Figure in a placeholder widget of the .ui, replacing
@@ -368,26 +378,26 @@ class DialogTextStats(QtWidgets.QDialog):
         parts = []
         parts.append(_("Files: ") + (str(len(self.file_ids)) if self.file_ids else _("all")))
         parts.append(_("Cases: ") + (str(len(self.case_ids)) if self.case_ids else _("all")))
-        parts.append(_("Codes: ") + (str(len(self.code_ids)) if self.code_ids else _("all")))
+        parts.append(_("Codes: ") + (str(len(self.code_ids)) if self.code_ids else _("all (whole documents)")))
         self.label_selection.setText(" | ".join(parts))
-
-    def browse_stopwords(self):
-        filepath, _selected_filter = QtWidgets.QFileDialog.getOpenFileName(
-            self, _("Custom stopwords file"), self.app.settings.get("directory", ""), "Text Files (*.txt)")
-        if filepath:
-            self.lineEdit_stopwords.setText(filepath)
 
     def get_segments(self) -> bool:
         """ Build the segment list from the current selection. Sets self.segments. """
 
         try:
-            self.segments = build_segments(
-                self.app.conn,
-                file_ids=self.file_ids or None,
-                case_ids=self.case_ids or None,
-                code_ids=self.code_ids or None,
-                include_documents=self.checkBox_documents.isChecked(),
-            )
+            if self.code_ids:
+                # specific codes selected: only their coded texts
+                self.segments = build_segments(
+                    self.app.conn,
+                    file_ids=self.file_ids or None,
+                    case_ids=self.case_ids or None,
+                    code_ids=self.code_ids,
+                )
+            else:
+                # no code filter (all codes): the whole documents
+                # (only the file selection applies, not the case selection)
+                self.segments = build_document_segments(
+                    self.app.conn, file_ids=self.file_ids or None)
         except Exception as err:
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()
@@ -409,7 +419,6 @@ class DialogTextStats(QtWidgets.QDialog):
                 language=self.comboBox_language.currentText(),
                 min_freq=min_freq,
                 stem=self.checkBox_stem.isChecked(),
-                custom_stopwords_path=self.lineEdit_stopwords.text() or None,
             )
         except Exception as err:
             logger.error(err)
@@ -478,32 +487,40 @@ class DialogTextStats(QtWidgets.QDialog):
         for variable in self.available_variables():
             combo.addItem(variable, variable)
 
-    def run_descstats(self):
-        """ Compute the descending statistics and show them. """
+    def run_descstats(self) -> bool:
+        """ Compute and store the descending statistics. Returns True on success. """
 
         table = self.get_lexical_table(min_freq=self.spinBox_stats_min_freq.value())
         if table is None:
-            return
+            return False
         variable = self.comboBox_stats_variable.currentData() or None
         try:
             self.descstats = descendant_statistics(table, variable=variable)
         except Exception as err:
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()
-            return
-        rows = frequency_rows(self.descstats)
-        self.tableWidget_descstats.setRowCount(len(rows))
-        for row, values in enumerate(rows):
-            for col, value in enumerate(values):
-                item = QtWidgets.QTableWidgetItem(str(value))
-                item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.tableWidget_descstats.setItem(row, col, item)
-        self.tableWidget_descstats.resizeColumnsToContents()
-        self.textBrowser_descstats.setHtml(descstats_html(self.descstats, variable=variable))
+            return False
         msg = (_("Text statistics: ") + _("Segments: ") + str(len(table.segment_texts))
                + " | " + _("Occurrences: ") + str(self.descstats["total_occurrences"])
                + " | " + _("Forms: ") + str(self.descstats["distinct_forms"]))
         self.parent_textEdit.append(msg)
+        return True
+
+    def run_statistics(self):
+        """ Calculate all the statistics (descending statistics and, when a partition
+        variable is selected, the chi-square specificities) and show them in a
+        single report. """
+
+        if not self.run_descstats():
+            return
+        variable = self.comboBox_stats_variable.currentData() or None
+        if variable:
+            self.run_specificites()
+        self.textBrowser_stats.setHtml(statistics_html(
+            self.descstats,
+            self.specificites_results if variable else None,
+            variable=variable,
+            p_threshold=self.doubleSpinBox_spec_p.value()))
 
     def _descstats_csv_rows(self):
         rows = [[_("Form"), _("Frequency"), _("%")]]
@@ -513,7 +530,7 @@ class DialogTextStats(QtWidgets.QDialog):
         rows += hapax_rows(self.descstats)
         if self.descstats["by_variable"]:
             rows.append([])
-            rows.append([_("Modality"), _("Segments"), _("Occurrences"), _("Distinct forms")])
+            rows.append([_("Category"), _("Segments"), _("Occurrences"), _("Distinct forms")])
             rows += variable_rows(self.descstats)
         return rows
 
@@ -571,16 +588,17 @@ class DialogTextStats(QtWidgets.QDialog):
         Message(self.app, _("ODT export"), msg).exec()
         self.parent_textEdit.append(msg)
 
-    def run_specificites(self):
-        """ Compute the chi-square specificities for the selected variable. """
+    def run_specificites(self) -> bool:
+        """ Compute and store the chi-square specificities for the selected variable.
+        Returns True on success. """
 
         variable = self.comboBox_stats_variable.currentData()
         if not variable:
             Message(self.app, _("No variable"), _("Select a partition variable")).exec()
-            return
+            return False
         table = self.get_lexical_table(min_freq=self.spinBox_stats_min_freq.value())
         if table is None:
-            return
+            return False
         try:
             self.specificites_results = specificities(
                 table, variable,
@@ -589,22 +607,10 @@ class DialogTextStats(QtWidgets.QDialog):
         except Exception as err:
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()
-            return
-        rows = specificity_rows(self.specificites_results)
-        self.tableWidget_spec.setRowCount(len(rows))
-        for row, values in enumerate(rows):
-            signe = self.specificites_results[row]["signe"]
-            for col, value in enumerate(values):
-                item = QtWidgets.QTableWidgetItem(str(value))
-                item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
-                if col == 5 and signe != 0:
-                    item.setForeground(QtGui.QBrush(QtGui.QColor("#0a7d00" if signe > 0 else "#b00000")))
-                self.tableWidget_spec.setItem(row, col, item)
-        self.tableWidget_spec.resizeColumnsToContents()
-        self.textBrowser_spec.setHtml(specificites_html(
-            self.specificites_results, variable=variable, p_threshold=self.doubleSpinBox_spec_p.value()))
+            return False
         msg = _("Specificities: ") + str(len(self.specificites_results)) + " " + _("rows for variable ") + variable
         self.parent_textEdit.append(msg)
+        return True
 
     def export_specificites_csv(self):
         if self.specificites_results is None:
@@ -617,7 +623,7 @@ class DialogTextStats(QtWidgets.QDialog):
             return
         with open(filepath, "w", encoding="utf-8-sig", newline="") as file_:
             writer = csv.writer(file_)
-            writer.writerow([_("Form"), _("Modality"), _("Count"), _("Expected count"), "chi2",
+            writer.writerow([_("Form"), _("Category"), _("Count"), _("Expected count"), "chi2",
                              _("Signed value"), "p"])
             writer.writerows(specificity_rows(self.specificites_results))
         msg = _("Specificities CSV exported to: ") + filepath
@@ -742,7 +748,7 @@ class DialogTextStats(QtWidgets.QDialog):
             writer.writerow(header)
             writer.writerows(ca_coordinate_rows(result, n_axes=n_axes))
             writer.writerow([])
-            writer.writerow([_("Modality"), _("Frequency")] + [f"G{a + 1}" for a in range(n_axes)])
+            writer.writerow([_("Category"), _("Frequency")] + [f"G{a + 1}" for a in range(n_axes)])
             for k, label in enumerate(result["col_labels"]):
                 writer.writerow([label, int(result["col_freq"][k])]
                                 + [round(float(result["col_coords"][k, a]), 6) for a in range(n_axes)])
@@ -785,7 +791,6 @@ class DialogTextStats(QtWidgets.QDialog):
                 min_class_size=self.spinBox_reinert_min_size.value(),
                 language=self.comboBox_language.currentText(),
                 stem=self.checkBox_stem.isChecked(),
-                custom_stopwords_path=self.lineEdit_stopwords.text() or None,
             )
         except Exception as err:
             logger.error(err)
@@ -897,38 +902,50 @@ class DialogTextStats(QtWidgets.QDialog):
             return
         model_name = self.comboBox_bertopic_model.currentText().strip() or DEFAULT_MODEL
         unit = self.comboBox_bertopic_unit.currentData()
+        # busy pop-up: the first run downloads the BERT model and can take minutes
+        progress = QtWidgets.QProgressDialog(
+            _("Loading the BERT model and computing the topics.\n"
+              "The first run downloads the model and can take several minutes - please wait..."),
+            "", 0, 0, self)
+        progress.setWindowTitle(_("Topics"))
+        progress.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
+        progress.setMinimumDuration(0)
+        progress.show()
+        QtWidgets.QApplication.processEvents()
         try:
-            if unit == "documents":
-                from .irastats.corpus import build_document_segments
-                segments = build_document_segments(self.app.conn, file_ids=self.file_ids or None)
-            elif unit == "uci":
-                from .irastats.reinert import build_uci_segments
-                segments = build_uci_segments(self.segments, size=40)
-            else:
-                segments = self.segments
-            if not segments:
-                Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
+            try:
+                if unit == "documents":
+                    segments = build_document_segments(self.app.conn, file_ids=self.file_ids or None)
+                elif unit == "uci":
+                    from .irastats.reinert import build_uci_segments
+                    segments = build_uci_segments(self.segments, size=40)
+                else:
+                    segments = self.segments
+                if not segments:
+                    Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
+                    return
+                self.bertopic_result = bertopic_analysis(
+                    segments,
+                    model_name=model_name,
+                    min_cluster_size=self.spinBox_bertopic_min_size.value(),
+                    top_n=self.spinBox_bertopic_top_words.value(),
+                    language=self.comboBox_language.currentText(),
+                    stem=self.checkBox_stem.isChecked(),
+                )
+            except ImportError as err:
+                logger.error(err)
+                Message(self.app, _("BERT embeddings unavailable"),
+                        _("BERTopic needs the sentence-transformers and torch packages "
+                          "(pip install sentence-transformers torch).") + "\n" + str(err),
+                        "warning").exec()
                 return
-            self.bertopic_result = bertopic_analysis(
-                segments,
-                model_name=model_name,
-                min_cluster_size=self.spinBox_bertopic_min_size.value(),
-                top_n=self.spinBox_bertopic_top_words.value(),
-                language=self.comboBox_language.currentText(),
-                stem=self.checkBox_stem.isChecked(),
-                custom_stopwords_path=self.lineEdit_stopwords.text() or None,
-            )
-        except ImportError as err:
-            logger.error(err)
-            Message(self.app, _("BERT embeddings unavailable"),
-                    _("BERTopic needs the sentence-transformers and torch packages "
-                      "(pip install sentence-transformers torch).") + "\n" + str(err),
-                    "warning").exec()
-            return
-        except Exception as err:
-            logger.error(err)
-            Message(self.app, _("Error"), str(err), "warning").exec()
-            return
+            except Exception as err:
+                logger.error(err)
+                Message(self.app, _("Error"), str(err), "warning").exec()
+                return
+        finally:
+            progress.close()
+            QtWidgets.QApplication.processEvents()
         result = self.bertopic_result
         self.tableWidget_bertopic.setRowCount(len(result["topics"]))
         for row, topic in enumerate(result["topics"]):
@@ -939,7 +956,7 @@ class DialogTextStats(QtWidgets.QDialog):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.tableWidget_bertopic.setItem(row, col, item)
-        self.tableWidget_bertopic.resizeColumnsToContents()
+        self._fit_table(self.tableWidget_bertopic)
         self.label_bertopic_info.setText(
             _("Documents: ") + str(result["n_docs"]) + " | " + _("Topics: ") + str(result["n_topics"])
             + " | " + _("Noise documents: ") + str(result["n_noise"]) + " | " + _("Unit: ")
@@ -967,7 +984,7 @@ class DialogTextStats(QtWidgets.QDialog):
                         cell = QtWidgets.QTableWidgetItem(str(int(counts[i, j])))
                         cell.setFlags(cell.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
                         self.tableWidget_bertopic_dist.setItem(i, 1 + j, cell)
-                self.tableWidget_bertopic_dist.resizeColumnsToContents()
+                self._fit_table(self.tableWidget_bertopic_dist)
         msg = "BERTopic: " + str(result["n_topics"]) + " " + _("topics") + " (" + model_name + ")"
         self.parent_textEdit.append(msg)
 

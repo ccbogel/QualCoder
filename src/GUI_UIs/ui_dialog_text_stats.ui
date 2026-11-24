@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1142</width>
+    <width>1224</width>
     <height>750</height>
    </rect>
   </property>
@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>6</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_corpus">
       <attribute name="title">
@@ -88,7 +88,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Restrict the corpus to the selected codes</string>
+            <string>Restrict the corpus to the coded texts of the selected codes. If no code is selected (all codes), the whole documents are used instead</string>
            </property>
            <property name="text">
             <string>Select codes</string>
@@ -98,7 +98,7 @@
          <item>
           <widget class="QLabel" name="label_selection">
            <property name="toolTip">
-            <string>Current corpus selection: files, cases and codes ('all' = the whole project)</string>
+            <string>Current corpus selection: files, cases and codes. 'Codes: all' = the whole documents are used (only the file selection applies); specific codes = only their coded texts are used</string>
            </property>
            <property name="text">
             <string>All files, cases and codes</string>
@@ -121,20 +121,20 @@
            </property>
           </spacer>
          </item>
-               <item>
-        <spacer name="horizontalSpacer_corpus_params">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-</layout>
+         <item>
+          <spacer name="horizontalSpacer_corpus_params">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_corpus_language">
@@ -166,95 +166,21 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="checkBox_documents">
-           <property name="toolTip">
-            <string>Also include the whole documents in the corpus, not only the coded segments</string>
+          <spacer name="horizontalSpacer_corpus_language">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
-           <property name="text">
-            <string>Include whole documents</string>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
            </property>
-          </widget>
+          </spacer>
          </item>
-       <item>
-        <spacer name="horizontalSpacer_corpus_language">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
         </layout>
        </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_stopwords">
-         <item>
-          <widget class="QLabel" name="label_stopwords">
-           <property name="toolTip">
-            <string>Optional text file with one stopword per line, added to the built-in stopword list</string>
-           </property>
-           <property name="text">
-            <string>Custom stopwords file:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_stopwords">
-           <property name="maximumSize">
-            <size>
-             <width>320</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Optional text file with one stopword per line, added to the built-in stopword list</string>
-           </property>
-           <property name="placeholderText">
-            <string>Optional text file, one word per line</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_stopwords">
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Browse for a custom stopwords text file</string>
-           </property>
-           <property name="text">
-            <string>Browse</string>
-           </property>
-          </widget>
-         </item>
-       <item>
-        <spacer name="horizontalSpacer_stopwords">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-        </layout>
-       </item>
+
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_corpus_buttons">
          <item>
@@ -294,7 +220,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Export the corpus (coded segments, plus whole documents if checked) in the IRaMuTeQ text format</string>
+            <string>Export the current corpus (whole documents if all codes are selected, otherwise the coded texts of the selected codes) in the IRaMuTeQ text format</string>
            </property>
            <property name="text">
             <string>Export IRaMuTeQ</string>
@@ -314,20 +240,20 @@
            </property>
           </widget>
          </item>
-               <item>
-        <spacer name="horizontalSpacer_corpus_buttons">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-</layout>
+         <item>
+          <spacer name="horizontalSpacer_corpus_buttons">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QTableWidget" name="tableWidget_segments">
@@ -362,7 +288,9 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tab_stats">
-      <attribute name="title"><string>Statistics</string></attribute>
+      <attribute name="title">
+       <string>Statistics</string>
+      </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_stats">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_stats_params">
@@ -465,26 +393,24 @@
            </property>
           </widget>
          </item>
-          <item>
-           <spacer name="horizontalSpacer_stats">
-            <property name="orientation"><enum>Qt::Horizontal</enum></property>
-            <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-           </spacer>
-          </item>
+         <item>
+          <spacer name="horizontalSpacer_stats">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </item>
        <item>
-        <widget class="QSplitter" name="splitter_stats">
-         <property name="orientation"><enum>Qt::Horizontal</enum></property>
-         <widget class="QWidget" name="widget_stats_left" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_stats_left">
-           <property name="leftMargin"><number>0</number></property>
-           <property name="topMargin"><number>0</number></property>
-           <property name="rightMargin"><number>0</number></property>
-           <property name="bottomMargin"><number>0</number></property>
-       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_descstats_buttons">
-           <item>
+         <item>
           <widget class="QPushButton" name="pushButton_descstats_run">
            <property name="minimumSize">
             <size>
@@ -505,8 +431,8 @@
             <string>Calculate</string>
            </property>
           </widget>
-           </item>
-           <item>
+         </item>
+         <item>
           <widget class="QPushButton" name="pushButton_descstats_csv">
            <property name="minimumSize">
             <size>
@@ -527,8 +453,8 @@
             <string>Export CSV</string>
            </property>
           </widget>
-           </item>
-           <item>
+         </item>
+         <item>
           <widget class="QPushButton" name="pushButton_descstats_html">
            <property name="minimumSize">
             <size>
@@ -549,8 +475,8 @@
             <string>Export HTML</string>
            </property>
           </widget>
-           </item>
-           <item>
+         </item>
+         <item>
           <widget class="QPushButton" name="pushButton_descstats_odt">
            <property name="minimumSize">
             <size>
@@ -571,110 +497,8 @@
             <string>Export ODT</string>
            </property>
           </widget>
-           </item>
-          <item>
-           <spacer name="horizontalSpacer_descstats">
-            <property name="orientation"><enum>Qt::Horizontal</enum></property>
-            <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-           </spacer>
-          </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_descstats_help">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>10</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Left table: forms ranked by decreasing frequency with their share of the corpus. Right report: corpus summary (occurrences, forms, active/supplementary forms, hapax), the frequency table, the hapax (forms occurring once) and the breakdown by the selected partition variable.</string>
-         </property>
-         <property name="text">
-          <string>Left: forms by decreasing frequency. Right: corpus summary, hapax, breakdown by variable.</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-         <widget class="QTableWidget" name="tableWidget_descstats">
-          <property name="font">
-           <font>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="toolTip">
-           <string>Forms ranked by decreasing frequency with their share of the corpus</string>
-          </property>
-          <property name="editTriggers">
-           <set>QAbstractItemView::NoEditTriggers</set>
-          </property>
-          <column>
-           <property name="text">
-            <string>Form</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Frequency</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string notr="true">%</string>
-           </property>
-          </column>
-         </widget>
-       </item>
-       <item>
-         <widget class="QTextBrowser" name="textBrowser_descstats">
-          <property name="toolTip">
-           <string>Corpus summary (occurrences, forms, active/supplementary forms, hapax), frequency table, hapax and breakdown by the selected partition variable</string>
-          </property>
-         </widget>
-       </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="widget_stats_right" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_stats_right">
-           <property name="leftMargin"><number>0</number></property>
-           <property name="topMargin"><number>0</number></property>
-           <property name="rightMargin"><number>0</number></property>
-           <property name="bottomMargin"><number>0</number></property>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_spec_buttons">
-           <item>
-          <widget class="QPushButton" name="pushButton_spec_run">
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Calculate the specificities with the current parameters</string>
-           </property>
-           <property name="text">
-            <string>Calculate</string>
-           </property>
-          </widget>
-           </item>
-           <item>
+         </item>
+         <item>
           <widget class="QPushButton" name="pushButton_spec_csv">
            <property name="minimumSize">
             <size>
@@ -695,8 +519,8 @@
             <string>Export CSV</string>
            </property>
           </widget>
-           </item>
-           <item>
+         </item>
+         <item>
           <widget class="QPushButton" name="pushButton_spec_html">
            <property name="minimumSize">
             <size>
@@ -717,28 +541,41 @@
             <string>Export HTML</string>
            </property>
           </widget>
-           </item>
-          <item>
-           <spacer name="horizontalSpacer_spec">
-            <property name="orientation"><enum>Qt::Horizontal</enum></property>
-            <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-           </spacer>
-          </item>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_descstats">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </item>
        <item>
-        <widget class="QLabel" name="label_spec_help">
+        <widget class="QLabel" name="label_descstats_help">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>10</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>50</height>
+           <height>20</height>
           </size>
          </property>
          <property name="toolTip">
-          <string>For each form and each modality of the partition variable: chi-square of the 2x2 contingency table, signed value (green = over-represented, red = under-represented) and two-sided p-value (3 decimals, &lt;0.001 when smaller), sorted from the most specific to the least.</string>
+          <string>Calculate runs all the statistics in the report below: descending text statistics (corpus summary, frequency table, hapax, breakdown by the partition variable) and, when a partition variable is selected, the chi-square specificities (green = over-represented, red = under-represented). Definitions - segments = the analysed text units (coded texts of the selected codes, or whole documents); occurrences = total number of words; forms = distinct word forms after normalisation; active forms = forms occurring at least the minimum frequency (rarer forms are supplementary); hapax = forms occurring only once.</string>
          </property>
          <property name="text">
-          <string>For each form and each modality of the partition variable: chi-square of the 2x2 contingency table, signed value (green = over-represented, red = under-represented) and two-sided p-value (3 decimals, &lt;0.001 when smaller), sorted from the most specific to the least.</string>
+          <string>Calculate runs all the statistics in the report below: descending text statistics (corpus summary, frequency table, hapax, breakdown by the partition variable) and, when a partition variable is selected, the chi-square specificities (green = over-represented, red = under-represented). Definitions - segments = the analysed text units (coded texts of the selected codes, or whole documents); occurrences = total number of words; forms = distinct word forms after normalisation; active forms = forms occurring at least the minimum frequency (rarer forms are supplementary); hapax = forms occurring only once.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -746,65 +583,21 @@
         </widget>
        </item>
        <item>
-         <widget class="QTableWidget" name="tableWidget_spec">
-          <property name="toolTip">
-           <string>Specificities table: form, modality, observed and expected counts, chi-square, signed value and p-value</string>
-          </property>
-          <property name="editTriggers">
-           <set>QAbstractItemView::NoEditTriggers</set>
-          </property>
-          <column>
-           <property name="text">
-            <string>Form</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Modality</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Count</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Expected count</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string notr="true">chi2</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Signed value</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string notr="true">p</string>
-           </property>
-          </column>
-         </widget>
-       </item>
-       <item>
-         <widget class="QTextBrowser" name="textBrowser_spec">
-          <property name="toolTip">
-           <string>HTML report of the specificities, with over-represented forms in green and under-represented forms in red</string>
-          </property>
-         </widget>
-       </item>
-          </layout>
-         </widget>
+        <widget class="QTextBrowser" name="textBrowser_stats">
+         <property name="toolTip">
+          <string>All the statistics in a single report: descending text statistics (corpus summary, frequencies, hapax, breakdown by variable) and chi-square specificities of the selected partition variable</string>
+         </property>
         </widget>
        </item>
+
+
+
       </layout>
      </widget>
      <widget class="QWidget" name="tab_graphs">
-      <attribute name="title"><string>Graphs</string></attribute>
+      <attribute name="title">
+       <string>Graphs</string>
+      </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_graphs">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_graphs_params">
@@ -860,7 +653,7 @@
          <item>
           <widget class="QLabel" name="label_sim_threshold">
            <property name="toolTip">
-            <string>Minimum association value for an edge to be drawn between two forms</string>
+            <string>Minimum association value for an edge to be drawn between two forms in the similarity graph (not used by the correspondence analysis)</string>
            </property>
            <property name="text">
             <string>Edge threshold:</string>
@@ -870,7 +663,7 @@
          <item>
           <widget class="QDoubleSpinBox" name="doubleSpinBox_sim_threshold">
            <property name="toolTip">
-            <string>Minimum association value for an edge to be drawn between two forms</string>
+            <string>Minimum association value for an edge to be drawn between two forms in the similarity graph (not used by the correspondence analysis)</string>
            </property>
            <property name="decimals">
             <number>3</number>
@@ -951,289 +744,355 @@
            </property>
           </widget>
          </item>
-          <item>
-           <spacer name="horizontalSpacer_graphs">
-            <property name="orientation"><enum>Qt::Horizontal</enum></property>
-            <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-           </spacer>
-          </item>
+         <item>
+          <spacer name="horizontalSpacer_graphs">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </item>
        <item>
         <widget class="QSplitter" name="splitter_graphs">
-         <property name="orientation"><enum>Qt::Horizontal</enum></property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
          <widget class="QWidget" name="widget_graphs_left" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_graphs_left">
-           <property name="leftMargin"><number>0</number></property>
-           <property name="topMargin"><number>0</number></property>
-           <property name="rightMargin"><number>0</number></property>
-           <property name="bottomMargin"><number>0</number></property>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_sim_buttons">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
-          <widget class="QPushButton" name="pushButton_sim_run">
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Build the similarity graph with the current parameters</string>
-           </property>
-           <property name="text">
-            <string>Calculate</string>
-           </property>
-          </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_sim_buttons">
+             <item>
+              <widget class="QPushButton" name="pushButton_sim_run">
+               <property name="minimumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Build the similarity graph with the current parameters</string>
+               </property>
+               <property name="text">
+                <string>Calculate</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_sim_png">
+               <property name="minimumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Export the similarity graph as a PNG image</string>
+               </property>
+               <property name="text">
+                <string>Export PNG</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_sim_popout">
+               <property name="minimumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Open in a separate window</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_sim">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
            </item>
            <item>
-          <widget class="QPushButton" name="pushButton_sim_png">
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Export the similarity graph as a PNG image</string>
-           </property>
-           <property name="text">
-            <string>Export PNG</string>
-           </property>
-          </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_sim_popout">
-             <property name="minimumSize"><size><width>32</width><height>32</height></size></property>
-             <property name="maximumSize"><size><width>32</width><height>32</height></size></property>
-             <property name="toolTip"><string>Open in a separate window</string></property>
-             <property name="text"><string/></property>
+            <widget class="QLabel" name="label_sim_help">
+             <property name="toolTip">
+              <string>Similarity graph: each node is a form (size = frequency), each edge links two forms co-occurring in the same segment (width = association strength), node colours = detected communities. Below: the strongest edges and the communities.</string>
+             </property>
+             <property name="text">
+              <string>Similarity graph: each node is a form (size = frequency), each edge links two forms co-occurring in the same segment (width = association strength), node colours = detected communities. Below: the strongest edges and the communities.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
-          <item>
-           <spacer name="horizontalSpacer_sim">
-            <property name="orientation"><enum>Qt::Horizontal</enum></property>
-            <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-           </spacer>
-          </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_sim_help">
-         <property name="toolTip">
-          <string>Similarity graph: each node is a form (size = frequency), each edge links two forms co-occurring in the same segment (width = association strength), node colours = detected communities. Below: the strongest edges and the communities.</string>
-         </property>
-         <property name="text">
-          <string>Similarity graph: each node is a form (size = frequency), each edge links two forms co-occurring in the same segment (width = association strength), node colours = detected communities. Below: the strongest edges and the communities.</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_sim_info">
-         <property name="toolTip">
-          <string>Summary of the last graph: nodes, edges, communities</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-<widget class="QWidget" name="widget_sim_plot" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_sim_plot"/>
-         </widget>
-       </item>
-       <item>
-        <widget class="QTextBrowser" name="textBrowser_sim">
-         <property name="toolTip">
-          <string>Strongest edges of the graph (form - form: association value) and detected communities</string>
-         </property>
-        </widget>
-       </item>
+           <item>
+            <widget class="QLabel" name="label_sim_info">
+             <property name="toolTip">
+              <string>Summary of the last graph: nodes, edges, communities</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="widget_sim_plot" native="true">
+             <layout class="QVBoxLayout" name="verticalLayout_sim_plot"/>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTextBrowser" name="textBrowser_sim">
+             <property name="toolTip">
+              <string>Strongest edges of the graph (form - form: association value) and detected communities</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
          <widget class="QWidget" name="widget_graphs_right" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_graphs_right">
-           <property name="leftMargin"><number>0</number></property>
-           <property name="topMargin"><number>0</number></property>
-           <property name="rightMargin"><number>0</number></property>
-           <property name="bottomMargin"><number>0</number></property>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_ca_buttons">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
-          <widget class="QPushButton" name="pushButton_ca_run">
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Calculate the correspondence analysis and show the factor map (axes 1 x 2)</string>
-           </property>
-           <property name="text">
-            <string>Calculate</string>
-           </property>
-          </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_ca_buttons">
+             <item>
+              <widget class="QPushButton" name="pushButton_ca_run">
+               <property name="minimumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Calculate the correspondence analysis and show the factor map (axes 1 x 2)</string>
+               </property>
+               <property name="text">
+                <string>Calculate</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_ca_csv">
+               <property name="minimumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Export the form and modality coordinates (CSV)</string>
+               </property>
+               <property name="text">
+                <string>Export coordinates CSV</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_ca_png">
+               <property name="minimumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Export the factor map as a PNG image</string>
+               </property>
+               <property name="text">
+                <string>Export PNG</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_ca_popout">
+               <property name="minimumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Open in a separate window</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_ca">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
            </item>
            <item>
-          <widget class="QPushButton" name="pushButton_ca_csv">
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Export the form and modality coordinates (CSV)</string>
-           </property>
-           <property name="text">
-            <string>Export coordinates CSV</string>
-           </property>
-          </widget>
-           </item>
-           <item>
-          <widget class="QPushButton" name="pushButton_ca_png">
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Export the factor map as a PNG image</string>
-           </property>
-           <property name="text">
-            <string>Export PNG</string>
-           </property>
-          </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_ca_popout">
-             <property name="minimumSize"><size><width>32</width><height>32</height></size></property>
-             <property name="maximumSize"><size><width>32</width><height>32</height></size></property>
-             <property name="toolTip"><string>Open in a separate window</string></property>
-             <property name="text"><string/></property>
+            <widget class="QLabel" name="label_ca_help">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>50</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2 (drawn below, or opened in a separate window) shows which forms are characteristic of which column categories - blue points = forms, red = columns, point size = frequency. The table lists the eigenvalues and inertia of the axes.</string>
+             </property>
+             <property name="text">
+              <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2 (drawn below, or opened in a separate window) shows which forms are characteristic of which column categories - blue points = forms, red = columns, point size = frequency. The table lists the eigenvalues and inertia of the axes.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
-          <item>
-           <spacer name="horizontalSpacer_ca">
-            <property name="orientation"><enum>Qt::Horizontal</enum></property>
-            <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
-           </spacer>
-          </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_ca_help">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</string>
-         </property>
-         <property name="text">
-          <string>Correspondence analysis of the forms x columns table: left table = eigenvalues and inertia of the axes, right = total inertia, and the factor map opens in a separate window (blue points = forms, red = columns, point size = frequency).</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTableWidget" name="tableWidget_ca">
-         <property name="toolTip">
-          <string>Eigenvalues and inertia of the correspondence analysis axes</string>
-         </property>
-         <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
-         </property>
-         <column>
-          <property name="text">
-           <string>Axis</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Eigenvalue</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>% inertia</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Cumulative %</string>
-          </property>
-         </column>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_ca_info">
-         <property name="toolTip">
-          <string>Total inertia, number of forms and columns of the last correspondence analysis</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-<widget class="QWidget" name="widget_ca_plot" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_ca_plot"/>
-         </widget>
-       </item>
+           <item>
+            <widget class="QTableWidget" name="tableWidget_ca">
+             <property name="toolTip">
+              <string>Eigenvalues and inertia of the correspondence analysis axes</string>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <column>
+              <property name="text">
+               <string>Axis</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Eigenvalue</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>% inertia</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Cumulative %</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_ca_info">
+             <property name="toolTip">
+              <string>Total inertia, number of forms and columns of the last correspondence analysis</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="widget_ca_plot" native="true">
+             <layout class="QVBoxLayout" name="verticalLayout_ca_plot"/>
+            </widget>
+           </item>
           </layout>
          </widget>
         </widget>
        </item>
       </layout>
      </widget>
-
      <widget class="QWidget" name="tab_reinert">
       <attribute name="title">
        <string>Reinert classification</string>
@@ -1457,23 +1316,51 @@
            </property>
           </widget>
          </item>
-                    <item>
-            <widget class="QPushButton" name="pushButton_reinert_dendro_popout">
-             <property name="minimumSize"><size><width>32</width><height>32</height></size></property>
-             <property name="maximumSize"><size><width>32</width><height>32</height></size></property>
-             <property name="toolTip"><string>Open in a separate window</string></property>
-             <property name="text"><string/></property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_reinert_ca_popout">
-             <property name="minimumSize"><size><width>32</width><height>32</height></size></property>
-             <property name="maximumSize"><size><width>32</width><height>32</height></size></property>
-             <property name="toolTip"><string>Open in a separate window</string></property>
-             <property name="text"><string/></property>
-            </widget>
-           </item>
-<item>
+         <item>
+          <widget class="QPushButton" name="pushButton_reinert_dendro_popout">
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Open in a separate window</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_reinert_ca_popout">
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Open in a separate window</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer_reinert">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -1620,7 +1507,9 @@
        </item>
        <item>
         <widget class="QSplitter" name="splitter_reinert_plots">
-         <property name="orientation"><enum>Qt::Horizontal</enum></property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
          <widget class="QWidget" name="widget_reinert_dendro_plot" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_reinert_dendro_plot"/>
          </widget>
@@ -1818,15 +1707,29 @@
            </property>
           </widget>
          </item>
-                    <item>
-            <widget class="QPushButton" name="pushButton_bertopic_chart_popout">
-             <property name="minimumSize"><size><width>32</width><height>32</height></size></property>
-             <property name="maximumSize"><size><width>32</width><height>32</height></size></property>
-             <property name="toolTip"><string>Open in a separate window</string></property>
-             <property name="text"><string/></property>
-            </widget>
-           </item>
-<item>
+         <item>
+          <widget class="QPushButton" name="pushButton_bertopic_chart_popout">
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Open in a separate window</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer_bertopic">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -1888,15 +1791,29 @@
            </property>
           </widget>
          </item>
-                   <item>
-            <widget class="QPushButton" name="pushButton_bertopic_dist_popout">
-             <property name="minimumSize"><size><width>32</width><height>32</height></size></property>
-             <property name="maximumSize"><size><width>32</width><height>32</height></size></property>
-             <property name="toolTip"><string>Open in a separate window</string></property>
-             <property name="text"><string/></property>
-            </widget>
-           </item>
-</layout>
+         <item>
+          <widget class="QPushButton" name="pushButton_bertopic_dist_popout">
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Open in a separate window</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QLabel" name="label_bertopic_info">
@@ -1956,7 +1873,9 @@
        </item>
        <item>
         <widget class="QSplitter" name="splitter_topics_plots">
-         <property name="orientation"><enum>Qt::Horizontal</enum></property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
          <widget class="QWidget" name="widget_topics_plot" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_topics_plot"/>
          </widget>
