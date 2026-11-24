@@ -54,7 +54,7 @@ from .topic_model import (
     plot_topic_sizes,
     topic_by_variable,
 )
-from .irastats.report_html import descstats_html, specificites_html
+from .irastats.report_html import descstats_html, specificites_html, statistics_html
 from .irastats.report_odt import descstats_odt
 from .select_items import DialogSelectItems
 
@@ -137,14 +137,12 @@ class DialogTextStats(QtWidgets.QDialog):
             "pushButton_select_files": "mdi6.file-outline",
             "pushButton_select_cases": "mdi6.account-multiple",
             "pushButton_select_codes": "mdi6.text",
-            "pushButton_stopwords": "mdi6.folder-outline",
             "pushButton_build_corpus": "mdi6.play",
             "pushButton_export_iramuteq": "mdi6.export",
             "pushButton_descstats_run": "mdi6.play",
             "pushButton_descstats_csv": "mdi6.file-export-outline",
             "pushButton_descstats_html": "mdi6.script-text-outline",
             "pushButton_descstats_odt": "mdi6.file-document-outline",
-            "pushButton_spec_run": "mdi6.play",
             "pushButton_spec_csv": "mdi6.file-export-outline",
             "pushButton_spec_html": "mdi6.script-text-outline",
             "pushButton_sim_run": "mdi6.play",
@@ -196,14 +194,12 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_select_files.clicked.connect(self.select_files)
         self.pushButton_select_cases.clicked.connect(self.select_cases)
         self.pushButton_select_codes.clicked.connect(self.select_codes)
-        self.pushButton_stopwords.clicked.connect(self.browse_stopwords)
         self.pushButton_build_corpus.clicked.connect(self.build_corpus)
         self.pushButton_export_iramuteq.clicked.connect(self.export_iramuteq_dialog)
-        self.pushButton_descstats_run.clicked.connect(self.run_descstats)
+        self.pushButton_descstats_run.clicked.connect(self.run_statistics)
         self.pushButton_descstats_csv.clicked.connect(self.export_descstats_csv)
         self.pushButton_descstats_html.clicked.connect(self.export_descstats_html)
         self.pushButton_descstats_odt.clicked.connect(self.export_descstats_odt)
-        self.pushButton_spec_run.clicked.connect(self.run_specificites)
         self.pushButton_spec_csv.clicked.connect(self.export_specificites_csv)
         self.pushButton_spec_html.clicked.connect(self.export_specificites_html)
         self.pushButton_sim_run.clicked.connect(self.run_similarity)
@@ -374,12 +370,6 @@ class DialogTextStats(QtWidgets.QDialog):
         parts.append(_("Codes: ") + (str(len(self.code_ids)) if self.code_ids else _("all (whole documents)")))
         self.label_selection.setText(" | ".join(parts))
 
-    def browse_stopwords(self):
-        filepath, _selected_filter = QtWidgets.QFileDialog.getOpenFileName(
-            self, _("Custom stopwords file"), self.app.settings.get("directory", ""), "Text Files (*.txt)")
-        if filepath:
-            self.lineEdit_stopwords.setText(filepath)
-
     def get_segments(self) -> bool:
         """ Build the segment list from the current selection. Sets self.segments. """
 
@@ -418,7 +408,6 @@ class DialogTextStats(QtWidgets.QDialog):
                 language=self.comboBox_language.currentText(),
                 min_freq=min_freq,
                 stem=self.checkBox_stem.isChecked(),
-                custom_stopwords_path=self.lineEdit_stopwords.text() or None,
             )
         except Exception as err:
             logger.error(err)
@@ -487,24 +476,40 @@ class DialogTextStats(QtWidgets.QDialog):
         for variable in self.available_variables():
             combo.addItem(variable, variable)
 
-    def run_descstats(self):
-        """ Compute the descending statistics and show them. """
+    def run_descstats(self) -> bool:
+        """ Compute and store the descending statistics. Returns True on success. """
 
         table = self.get_lexical_table(min_freq=self.spinBox_stats_min_freq.value())
         if table is None:
-            return
+            return False
         variable = self.comboBox_stats_variable.currentData() or None
         try:
             self.descstats = descendant_statistics(table, variable=variable)
         except Exception as err:
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()
-            return
-        self.textBrowser_descstats.setHtml(descstats_html(self.descstats, variable=variable))
+            return False
         msg = (_("Text statistics: ") + _("Segments: ") + str(len(table.segment_texts))
                + " | " + _("Occurrences: ") + str(self.descstats["total_occurrences"])
                + " | " + _("Forms: ") + str(self.descstats["distinct_forms"]))
         self.parent_textEdit.append(msg)
+        return True
+
+    def run_statistics(self):
+        """ Calculate all the statistics (descending statistics and, when a partition
+        variable is selected, the chi-square specificities) and show them in a
+        single report. """
+
+        if not self.run_descstats():
+            return
+        variable = self.comboBox_stats_variable.currentData() or None
+        if variable:
+            self.run_specificites()
+        self.textBrowser_stats.setHtml(statistics_html(
+            self.descstats,
+            self.specificites_results if variable else None,
+            variable=variable,
+            p_threshold=self.doubleSpinBox_spec_p.value()))
 
     def _descstats_csv_rows(self):
         rows = [[_("Form"), _("Frequency"), _("%")]]
@@ -572,16 +577,17 @@ class DialogTextStats(QtWidgets.QDialog):
         Message(self.app, _("ODT export"), msg).exec()
         self.parent_textEdit.append(msg)
 
-    def run_specificites(self):
-        """ Compute the chi-square specificities for the selected variable. """
+    def run_specificites(self) -> bool:
+        """ Compute and store the chi-square specificities for the selected variable.
+        Returns True on success. """
 
         variable = self.comboBox_stats_variable.currentData()
         if not variable:
             Message(self.app, _("No variable"), _("Select a partition variable")).exec()
-            return
+            return False
         table = self.get_lexical_table(min_freq=self.spinBox_stats_min_freq.value())
         if table is None:
-            return
+            return False
         try:
             self.specificites_results = specificities(
                 table, variable,
@@ -590,11 +596,10 @@ class DialogTextStats(QtWidgets.QDialog):
         except Exception as err:
             logger.error(err)
             Message(self.app, _("Error"), str(err), "warning").exec()
-            return
-        self.textBrowser_spec.setHtml(specificites_html(
-            self.specificites_results, variable=variable, p_threshold=self.doubleSpinBox_spec_p.value()))
+            return False
         msg = _("Specificities: ") + str(len(self.specificites_results)) + " " + _("rows for variable ") + variable
         self.parent_textEdit.append(msg)
+        return True
 
     def export_specificites_csv(self):
         if self.specificites_results is None:
@@ -775,7 +780,6 @@ class DialogTextStats(QtWidgets.QDialog):
                 min_class_size=self.spinBox_reinert_min_size.value(),
                 language=self.comboBox_language.currentText(),
                 stem=self.checkBox_stem.isChecked(),
-                custom_stopwords_path=self.lineEdit_stopwords.text() or None,
             )
         except Exception as err:
             logger.error(err)
@@ -905,7 +909,6 @@ class DialogTextStats(QtWidgets.QDialog):
                 top_n=self.spinBox_bertopic_top_words.value(),
                 language=self.comboBox_language.currentText(),
                 stem=self.checkBox_stem.isChecked(),
-                custom_stopwords_path=self.lineEdit_stopwords.text() or None,
             )
         except ImportError as err:
             logger.error(err)

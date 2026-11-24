@@ -71,8 +71,8 @@ def table_html(headers: list, rows: list, row_classes: list = None) -> str:
     return "\n".join(out)
 
 
-def descstats_html(stats: dict, variable: str = None) -> str:
-    """HTML report of the descending statistics (IRaMuTeQ "rapport descendant"). """
+def descstats_body(stats: dict, variable: str = None) -> str:
+    """Body fragment of the descending statistics report (IRaMuTeQ "rapport descendant"). """
 
     from .descstats import frequency_rows, hapax_rows, variable_rows
 
@@ -100,11 +100,17 @@ def descstats_html(stats: dict, variable: str = None) -> str:
         parts.append(f"<h2>{escape(_('Breakdown by variable'))}: {escape(variable)}</h2>")
         parts.append(table_html([_("Category"), _("Segments"), _("Occurrences"), _("Distinct forms")],
                                 variable_rows(stats)))
-    return html_page(_("Text statistics"), "\n".join(parts))
+    return "\n".join(parts)
 
 
-def specificites_html(results: list, variable: str = None, p_threshold: float = 0.05) -> str:
-    """HTML report of the chi-square specificities, highlighting over-represented
+def descstats_html(stats: dict, variable: str = None) -> str:
+    """HTML report of the descending statistics (IRaMuTeQ "rapport descendant"). """
+
+    return html_page(_("Text statistics"), descstats_body(stats, variable))
+
+
+def specificites_body(results: list, variable: str = None, p_threshold: float = 0.05) -> str:
+    """Body fragment of the chi-square specificities report, highlighting over-represented
     (positive, .pos) and under-represented (negative, .neg) forms. """
 
     from .specificites import specificity_rows
@@ -118,4 +124,24 @@ def specificites_html(results: list, variable: str = None, p_threshold: float = 
     classes = ["pos" if r["signe"] > 0 else ("neg" if r["signe"] < 0 else "") for r in results]
     parts.append(table_html([_("Form"), _("Category"), _("Count"), _("Expected count"),
                              "chi2", _("Signed value"), "p"], rows, row_classes=classes))
-    return html_page(_("Specificities"), "\n".join(parts))
+    return "\n".join(parts)
+
+
+def specificites_html(results: list, variable: str = None, p_threshold: float = 0.05) -> str:
+    """HTML report of the chi-square specificities. """
+
+    return html_page(_("Specificities"), specificites_body(results, variable, p_threshold))
+
+
+def statistics_html(stats: dict, results: list = None, variable: str = None,
+                    p_threshold: float = 0.05) -> str:
+    """Single-page report with all the statistics: descending statistics plus the
+    chi-square specificities (when a partition variable is selected). """
+
+    body = descstats_body(stats, variable)
+    if results:
+        body += "\n" + specificites_body(results, variable, p_threshold)
+    else:
+        body += ("\n<p><i>" + escape(_("Select a partition variable to also compute "
+                                      "the chi-square specificities.")) + "</i></p>")
+    return html_page(_("Text statistics"), body)

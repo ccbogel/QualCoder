@@ -180,71 +180,7 @@
          </item>
         </layout>
        </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_stopwords">
-         <item>
-          <widget class="QLabel" name="label_stopwords">
-           <property name="toolTip">
-            <string>Optional text file with one stopword per line, added to the built-in stopword list</string>
-           </property>
-           <property name="text">
-            <string>Custom stopwords file:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_stopwords">
-           <property name="maximumSize">
-            <size>
-             <width>320</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Optional text file with one stopword per line, added to the built-in stopword list</string>
-           </property>
-           <property name="placeholderText">
-            <string>Optional text file, one word per line</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_stopwords">
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Browse for a custom stopwords text file</string>
-           </property>
-           <property name="text">
-            <string>Browse</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_stopwords">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
+
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_corpus_buttons">
          <item>
@@ -563,77 +499,6 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_descstats">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_descstats_help">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>10</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Report below: corpus summary, then the frequency table of the forms, the hapax and the breakdown by the partition variable. Definitions - segments = the analysed text units (coded texts of the selected codes, or whole documents); occurrences = total number of words; forms = distinct word forms after normalisation; active forms = forms occurring at least the minimum frequency (rarer forms are supplementary); hapax = forms occurring only once.</string>
-         </property>
-         <property name="text">
-          <string>Forms by decreasing frequency.  Corpus summary, hapax, breakdown by variable.</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTextBrowser" name="textBrowser_descstats">
-         <property name="toolTip">
-          <string>Corpus summary (occurrences, forms, active/supplementary forms, hapax), frequency table, hapax and breakdown by the selected partition variable</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_spec_buttons">
-         <item>
-          <widget class="QPushButton" name="pushButton_spec_run">
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Calculate the specificities with the current parameters</string>
-           </property>
-           <property name="text">
-            <string>Calculate</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QPushButton" name="pushButton_spec_csv">
            <property name="minimumSize">
             <size>
@@ -678,7 +543,7 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_spec">
+          <spacer name="horizontalSpacer_descstats">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -693,18 +558,24 @@
         </layout>
        </item>
        <item>
-        <widget class="QLabel" name="label_spec_help">
+        <widget class="QLabel" name="label_descstats_help">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>10</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>50</height>
+           <height>20</height>
           </size>
          </property>
          <property name="toolTip">
-          <string>For each form and each category of the partition variable: chi-square of the 2x2 contingency table and two-sided p-value, sorted from the most specific to the least. Over-represented forms are shown in green, under-represented in red.</string>
+          <string>Calculate runs all the statistics in the report below: descending text statistics (corpus summary, frequency table, hapax, breakdown by the partition variable) and, when a partition variable is selected, the chi-square specificities (green = over-represented, red = under-represented). Definitions - segments = the analysed text units (coded texts of the selected codes, or whole documents); occurrences = total number of words; forms = distinct word forms after normalisation; active forms = forms occurring at least the minimum frequency (rarer forms are supplementary); hapax = forms occurring only once.</string>
          </property>
          <property name="text">
-          <string>For each form and each category of the partition variable: chi-square of the 2x2 contingency table and two-sided p-value, sorted from the most specific to the least. Over-represented forms are shown in green, under-represented in red.</string>
+          <string>Calculate runs all the statistics in the report below: descending text statistics (corpus summary, frequency table, hapax, breakdown by the partition variable) and, when a partition variable is selected, the chi-square specificities (green = over-represented, red = under-represented). Definitions - segments = the analysed text units (coded texts of the selected codes, or whole documents); occurrences = total number of words; forms = distinct word forms after normalisation; active forms = forms occurring at least the minimum frequency (rarer forms are supplementary); hapax = forms occurring only once.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -712,12 +583,15 @@
         </widget>
        </item>
        <item>
-        <widget class="QTextBrowser" name="textBrowser_spec">
+        <widget class="QTextBrowser" name="textBrowser_stats">
          <property name="toolTip">
-          <string>HTML report of the specificities, with over-represented forms in green and under-represented forms in red</string>
+          <string>All the statistics in a single report: descending text statistics (corpus summary, frequencies, hapax, breakdown by variable) and chi-square specificities of the selected partition variable</string>
          </property>
         </widget>
        </item>
+
+
+
       </layout>
      </widget>
      <widget class="QWidget" name="tab_graphs">
