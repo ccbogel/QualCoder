@@ -713,7 +713,7 @@ class Ui_DialogTextStats(object):
         self.pushButton_select_files.setText(_translate("DialogTextStats", "Select files"))
         self.pushButton_select_cases.setToolTip(_translate("DialogTextStats", "Restrict the corpus to the segments of the selected cases"))
         self.pushButton_select_cases.setText(_translate("DialogTextStats", "Select cases"))
-        self.pushButton_select_codes.setToolTip(_translate("DialogTextStats", "Restrict the corpus to the coded texts of the selected codes. If no code is selected (all codes), the whole documents are used instead"))
+        self.pushButton_select_codes.setToolTip(_translate("DialogTextStats", "Restrict the corpus to the coded texts of the selected codes. If all codes are selected (or none is), the whole documents are used instead"))
         self.pushButton_select_codes.setText(_translate("DialogTextStats", "Select codes"))
         self.label_selection.setToolTip(_translate("DialogTextStats", "Current corpus selection: files, cases and codes. \'Codes: all\' = the whole documents are used (only the file selection applies); specific codes = only their coded texts are used"))
         self.label_selection.setText(_translate("DialogTextStats", "All files, cases and codes"))

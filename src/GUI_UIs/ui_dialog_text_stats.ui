@@ -88,7 +88,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Restrict the corpus to the coded texts of the selected codes. If no code is selected (all codes), the whole documents are used instead</string>
+            <string>Restrict the corpus to the coded texts of the selected codes. If all codes are selected (or none is), the whole documents are used instead</string>
            </property>
            <property name="text">
             <string>Select codes</string>
