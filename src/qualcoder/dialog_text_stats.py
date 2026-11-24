@@ -223,6 +223,17 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_bertopic_chart_popout.clicked.connect(self.popout_topics_chart)
         self.pushButton_bertopic_dist_popout.clicked.connect(self.popout_topics_distribution)
 
+    def _fit_table(self, table, max_col_width: int = 500):
+        """ Resize the columns to their contents but cap them at max_col_width,
+        then wrap the rows so long cell texts stay readable and fit. """
+
+        table.setWordWrap(True)
+        table.resizeColumnsToContents()
+        for col in range(table.columnCount()):
+            if table.columnWidth(col) > max_col_width:
+                table.setColumnWidth(col, max_col_width)
+        table.resizeRowsToContents()
+
     def _embed_figure(self, placeholder_name: str, figure, canvas_attr: str):
         """Embed a matplotlib Figure in a placeholder widget of the .ui, replacing
         any previous canvas (the figures are recomputed on each run). """
@@ -891,36 +902,50 @@ class DialogTextStats(QtWidgets.QDialog):
             return
         model_name = self.comboBox_bertopic_model.currentText().strip() or DEFAULT_MODEL
         unit = self.comboBox_bertopic_unit.currentData()
+        # busy pop-up: the first run downloads the BERT model and can take minutes
+        progress = QtWidgets.QProgressDialog(
+            _("Loading the BERT model and computing the topics.\n"
+              "The first run downloads the model and can take several minutes - please wait..."),
+            "", 0, 0, self)
+        progress.setWindowTitle(_("Topics"))
+        progress.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
+        progress.setMinimumDuration(0)
+        progress.show()
+        QtWidgets.QApplication.processEvents()
         try:
-            if unit == "documents":
-                segments = build_document_segments(self.app.conn, file_ids=self.file_ids or None)
-            elif unit == "uci":
-                from .irastats.reinert import build_uci_segments
-                segments = build_uci_segments(self.segments, size=40)
-            else:
-                segments = self.segments
-            if not segments:
-                Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
+            try:
+                if unit == "documents":
+                    segments = build_document_segments(self.app.conn, file_ids=self.file_ids or None)
+                elif unit == "uci":
+                    from .irastats.reinert import build_uci_segments
+                    segments = build_uci_segments(self.segments, size=40)
+                else:
+                    segments = self.segments
+                if not segments:
+                    Message(self.app, _("Nothing found"), _("No coded segments or documents found")).exec()
+                    return
+                self.bertopic_result = bertopic_analysis(
+                    segments,
+                    model_name=model_name,
+                    min_cluster_size=self.spinBox_bertopic_min_size.value(),
+                    top_n=self.spinBox_bertopic_top_words.value(),
+                    language=self.comboBox_language.currentText(),
+                    stem=self.checkBox_stem.isChecked(),
+                )
+            except ImportError as err:
+                logger.error(err)
+                Message(self.app, _("BERT embeddings unavailable"),
+                        _("BERTopic needs the sentence-transformers and torch packages "
+                          "(pip install sentence-transformers torch).") + "\n" + str(err),
+                        "warning").exec()
                 return
-            self.bertopic_result = bertopic_analysis(
-                segments,
-                model_name=model_name,
-                min_cluster_size=self.spinBox_bertopic_min_size.value(),
-                top_n=self.spinBox_bertopic_top_words.value(),
-                language=self.comboBox_language.currentText(),
-                stem=self.checkBox_stem.isChecked(),
-            )
-        except ImportError as err:
-            logger.error(err)
-            Message(self.app, _("BERT embeddings unavailable"),
-                    _("BERTopic needs the sentence-transformers and torch packages "
-                      "(pip install sentence-transformers torch).") + "\n" + str(err),
-                    "warning").exec()
-            return
-        except Exception as err:
-            logger.error(err)
-            Message(self.app, _("Error"), str(err), "warning").exec()
-            return
+            except Exception as err:
+                logger.error(err)
+                Message(self.app, _("Error"), str(err), "warning").exec()
+                return
+        finally:
+            progress.close()
+            QtWidgets.QApplication.processEvents()
         result = self.bertopic_result
         self.tableWidget_bertopic.setRowCount(len(result["topics"]))
         for row, topic in enumerate(result["topics"]):
@@ -931,7 +956,7 @@ class DialogTextStats(QtWidgets.QDialog):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setFlags(item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.tableWidget_bertopic.setItem(row, col, item)
-        self.tableWidget_bertopic.resizeColumnsToContents()
+        self._fit_table(self.tableWidget_bertopic)
         self.label_bertopic_info.setText(
             _("Documents: ") + str(result["n_docs"]) + " | " + _("Topics: ") + str(result["n_topics"])
             + " | " + _("Noise documents: ") + str(result["n_noise"]) + " | " + _("Unit: ")
@@ -959,7 +984,7 @@ class DialogTextStats(QtWidgets.QDialog):
                         cell = QtWidgets.QTableWidgetItem(str(int(counts[i, j])))
                         cell.setFlags(cell.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
                         self.tableWidget_bertopic_dist.setItem(i, 1 + j, cell)
-                self.tableWidget_bertopic_dist.resizeColumnsToContents()
+                self._fit_table(self.tableWidget_bertopic_dist)
         msg = "BERTopic: " + str(result["n_topics"]) + " " + _("topics") + " (" + model_name + ")"
         self.parent_textEdit.append(msg)
 
