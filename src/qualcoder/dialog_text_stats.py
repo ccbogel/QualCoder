@@ -359,10 +359,7 @@ class DialogTextStats(QtWidgets.QDialog):
         if not ui.exec():
             return
         selected = ui.get_selected()
-        # 'all' row, empty selection, or every code selected one by one:
-        # no real code filter -> the whole documents will be used
-        if not selected or any(row["id"] == -1 for row in selected) \
-                or len(selected) >= len(codes):
+        if not selected or any(row["id"] == -1 for row in selected):
             self.code_ids = []
         else:
             self.code_ids = [row["id"] for row in selected]
