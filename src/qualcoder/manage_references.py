@@ -1246,19 +1246,28 @@ class DialogReferenceManager(QtWidgets.QDialog):
         ui_re.setupUi(reference_editor)
         ui_re.tableWidget.setStyleSheet(f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";')
         ui_re.buttonBox.setStyleSheet(f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";')
-        ui_re.tableWidget.setColumnCount(2)
-        ui_re.tableWidget.setHorizontalHeaderLabels(["RIS", "Data"])
+        ui_re.tableWidget.setColumnCount(3)
+        ui_re.tableWidget.setHorizontalHeaderLabels([_("Field"), "Code", _("Data")])
+        ui_re.tableWidget.hideColumn(1)
         for row, key in enumerate(short_dict):
             ui_re.tableWidget.insertRow(row)
-            ris_item = QtWidgets.QTableWidgetItem(key)
-            ris_item.setFlags(ris_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            item_code = QtWidgets.QTableWidgetItem(key)
+            item_code.setFlags(item_code.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            longtag = ""
             for tagkey in TAG_KEY_MAPPING:
                 if key == tagkey:
-                    tooltip_longtag = TAG_KEY_MAPPING[tagkey]
-                    ris_item.setToolTip(tooltip_longtag)
-            ui_re.tableWidget.setItem(row, 0, ris_item)
-            value_item = QtWidgets.QTableWidgetItem(short_dict[key])
-            ui_re.tableWidget.setItem(row, 1, value_item)
+                    longtag = TAG_KEY_MAPPING[tagkey]
+            item_tag = QtWidgets.QTableWidgetItem(longtag)
+            item_tag.setFlags(QtCore.Qt.ItemFlag.NoItemFlags)
+            ui_re.tableWidget.setItem(row, 0, item_tag)
+            ui_re.tableWidget.setItem(row, 1, item_code)
+            if key in ("AB", "N1"):
+                text_edit= QtWidgets.QTextEdit()
+                text_edit.setText(short_dict[key])
+                ui_re.tableWidget.setCellWidget(row, 2, text_edit)
+            else:
+                item_value = QtWidgets.QTableWidgetItem(short_dict[key])
+                ui_re.tableWidget.setItem(row, 2, item_value)
         ui_re.tableWidget.resizeColumnsToContents()
         ui_re.tableWidget.horizontalHeader().setStretchLastSection(True)
         ui_re.tableWidget.resizeRowsToContents()
@@ -1272,10 +1281,15 @@ class DialogReferenceManager(QtWidgets.QDialog):
             cur.execute("select tag from ris where risid=? and tag=?", [ris_id, key])
             key_exists = cur.fetchone()
             if not key_exists:
-                cur.execute("insert into ris (risid,tag,longtag,value) values(?,?,?,'')", [ris_id, key,tooltip_longtag])
+                cur.execute("insert into ris (risid,tag,longtag,value) values(?,?,?,'')", [ris_id, key,longtag])
                 self.app.conn.commit()
-            if ui_re.tableWidget.item(row, 1).text() != short_dict[key]:
-                value = ui_re.tableWidget.item(row, 1).text()
+            if key in ("AB", "N1"):
+                value = ui_re.tableWidget.cellWidget(row, 2).toPlainText()
+                cur.execute("update ris set value=? where risid=? and tag=?", [value, ris_id, key])
+                self.app.conn.commit()
+                ref_edited = True
+            if key not in ("AB", "N1") and ui_re.tableWidget.item(row, 2).text() != short_dict[key]:
+                value = ui_re.tableWidget.item(row, 2).text()
                 if key == "TY":
                     value = self.check_reference_type(value)
                 cur.execute("update ris set value=? where risid=? and tag=?", [value, ris_id, key])
@@ -1347,14 +1361,14 @@ class DialogReferenceManager(QtWidgets.QDialog):
         ref_data.append(["TY", 'type_of_reference', newref.combo.currentText().split(' - ')[1]])
         rows = newref.ui.tableWidget.rowCount()
         for r in range (1, rows):
-            tag = newref.ui.tableWidget.item(r, 2).text()
+            tag = newref.ui.tableWidget.item(r, 1).text()
             if tag == "AB":
                 value = newref.ab_text_edit.toPlainText()
             elif tag == "N1":
                 value = newref.n1_text_edit.toPlainText()
             else:
                 try:
-                    value = newref.ui.tableWidget.item(r, 1).text()
+                    value = newref.ui.tableWidget.item(r, 2).text()
                 except AttributeError:
                     value = ''
             for keytag in TAG_KEY_MAPPING:
@@ -1393,42 +1407,45 @@ class DialogNewReference(QtWidgets.QDialog):
         self.ui.tableWidget.setStyleSheet(f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";')
         self.ui.buttonBox.setStyleSheet(f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";')
         self.ui.tableWidget.setColumnCount(3)
-        self.ui.tableWidget.hideColumn(2)
-        self.ui.tableWidget.setHorizontalHeaderLabels([_("Field"), _("Data"), "Code"])
-        label = QtWidgets.QLabel("Separate authors using ;")
+        self.ui.tableWidget.hideColumn(1)
+        self.ui.tableWidget.setHorizontalHeaderLabels([_("Field"), "Code", _("Data")])
+        label = QtWidgets.QLabel("Separate authors using ; Separate keywords and phrases with ;")
         self.ui.gridLayout.addWidget(label, 2, 0, 1, 1)
-
         self.combo = QtWidgets.QComboBox()
         display = []
         for item in ref_types.keys():
-            #print(item, ref_types[item])
             display.append(f"{ref_types[item]} - {item}")
         self.combo.addItems(display)
         self.ui.tableWidget.insertRow(0)
-        self.ui.tableWidget.setCellWidget(0, 1, self.combo)
-        item = QtWidgets.QTableWidgetItem(_("Reference type"))
-        item.setFlags(QtCore.Qt.ItemFlag.NoItemFlags) 
-        self.ui.tableWidget.setItem(0, 0, item)
-        item = QtWidgets.QTableWidgetItem("TY")
-        self.ui.tableWidget.setItem(0, 2, item)
-
+        self.ui.tableWidget.setCellWidget(0, 2, self.combo)
+        item_tag = QtWidgets.QTableWidgetItem(_("Reference type"))
+        item_tag.setFlags(QtCore.Qt.ItemFlag.NoItemFlags)
+        self.ui.tableWidget.setItem(0, 0, item_tag)
+        item_code = QtWidgets.QTableWidgetItem("TY")
+        self.ui.tableWidget.setItem(0, 1, item_code)
         self.ab_text_edit = QtWidgets.QTextEdit()
         self.n1_text_edit = QtWidgets.QTextEdit()
-
         self.field_map = {}
         for tagkey in TAG_KEY_MAPPING:
-            #print(tagkey, TAG_KEY_MAPPING[tagkey])
             if tagkey not in ["A4", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "ER",
                               "ID", "JA", "JF", "L1", "L2", "L4", "UK"]:
                 self.field_map[tagkey] = TAG_KEY_MAPPING[tagkey]
         # Initial setup for JOUR
         self.create_rows()
         self.combo.currentTextChanged.connect(self.create_rows)
-        self.ui.tableWidget.resizeColumnsToContents()
-        self.ui.tableWidget.resizeRowsToContents()
-        self.ui.tableWidget.horizontalHeader().setStretchLastSection(True)
 
     def create_rows(self):
+        data_persist = {}  # If the combobox changes, preserve entered data
+        for row in range(self.ui.tableWidget.rowCount()):
+            code =self.ui.tableWidget.item(row, 1).text()
+            data = self.ui.tableWidget.item(row, 2)
+            if data is not None and code not in ("AB", "N1"):
+                data_persist[code] = data.text()
+            if code == "AB":
+                data_persist[code] = self.ab_text_edit.toPlainText()
+            if code == "N1":
+                data_persist[code] = self.n1_text_edit.toPlainText()
+
         self.ui.tableWidget.setRowCount(1)
         self.ab_text_edit = QtWidgets.QTextEdit()  # Need to redefine, avoids free memory release for variable issue
         self.n1_text_edit = QtWidgets.QTextEdit()  # Need to redefine
@@ -1446,40 +1463,50 @@ class DialogNewReference(QtWidgets.QDialog):
             if key == "M1":
                 item_tag.setToolTip(_("Miscellaneous"))
             self.ui.tableWidget.setItem(row + 1, 0, item_tag)
-            if key == "AB":
-                self.ui.tableWidget.setCellWidget(row + 1, 1, self.ab_text_edit)
-            if key == "N1":
-                self.ui.tableWidget.setCellWidget(row + 1, 1, self.n1_text_edit) 
+
             item_code = QtWidgets.QTableWidgetItem(key)
             item_code.setFlags(item_code.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(row + 1, 2, item_code)
+            self.ui.tableWidget.setItem(row + 1, 1, item_code)
+
+            if key == "AB":
+                self.ab_text_edit.setText(data_persist.get("AB", ""))
+                self.ui.tableWidget.setCellWidget(row + 1, 2, self.ab_text_edit)
+            elif key == "N1":
+                self.n1_text_edit.setText(data_persist.get("AB", ""))
+                self.ui.tableWidget.setCellWidget(row + 1, 2, self.n1_text_edit)
+            else:
+                value = data_persist.get(key, "")
+                item = QtWidgets.QTableWidgetItem(value)
+                self.ui.tableWidget.setItem(row + 1, 2, item)
+        self.ui.tableWidget.horizontalHeader().setStretchLastSection(True)
+        self.ui.tableWidget.resizeRowsToContents()
 
 
 ref_type_fields = {
     'ABST': 'TI AB AU PY CY SP EP DO UR Y2 KW N1',
     'ANCIENT': 'TI T2 TT TA AU PY LA SN CY PB SP EP OP RP KW N1',
-    'ADVS': 'TI T2 AU PY M3 CY PB OP RP DO KW KW N1',
-    'ART': 'TI T2 AU PY M3 CY PB OP RP DO KW KW N1',
+    'ADVS': 'TI T2 AU PY M3 CY PB OP RP DO KW N1',
+    'ART': 'TI T2 AU PY M3 CY PB OP RP DO KW N1',
     'BLOG': 'TI AU PY CY AB SP EP UR Y2 KW N1',
     'BILL': 'TI AU PY DA PB IS M1 SE UR KW N1',
     'BOOK': 'TI T2 AU PY VL NV IS SN CY PB SP EP OP RP KW N1',
     'CHAP': 'TI T2 AU PY VL NV IS SN CY PB SE SP EP OP RP KW N1',
     'CPAPER': 'TI T2 AU PY VL NV IS SN CY PB SE SP EP DO UR KW N1',
-    'EBOOK': 'TI T2 AU PY VL NV IS SN CY PB SP EP OP RP DO KW KW N1',
-    'ECHAP': 'TI T2 AU PY VL NV IS SE SN CY PB SP EP OP RP DO KW KW N1',
+    'EBOOK': 'TI T2 AU PY VL NV IS SN CY PB SP EP OP RP DO KW N1',
+    'ECHAP': 'TI T2 AU PY VL NV IS SE SN CY PB SP EP OP RP DO KW N1',
     'EJOUR': 'TI AU PY JO VL IS SP EP DO UR AB DO UR KW N1',
     'ENCYC': 'TI T2 AU PY VL NV IS SN CY PB SP EP OP RP KW N1',
-    'GEN': 'TI T2 AU PY VL NV IS SN CY PB SP EP OP RP DO KW KW N1',
+    'GEN': 'TI T2 AU PY VL NV IS SN CY PB SP EP OP RP DO KW N1',
     'INPR': 'TI AU PY JO DO UR AB DO UR KW N1',
     'JOUR': 'TI AU PY JO VL IS SP EP DO UR AB DO UR KW N1',
     'MULTI': 'TI T2 AU PY M3 CY PB OP RP DO UR KW KW N1',
     'NEWS': 'TI AU PY CY ET IS VL NV AB SE SP DO EP SN UR KW N1',
     'RPRT': 'TI AU PY CY ET IS VL NV AB SP DO EP SN UR KW N1',
     'SER': 'TI AU PY CY ET IS VL NV AB SP DO EP SN UR KW N1',
-    'SOUND': 'TI T2 AU PY M3 CY PB OP RP DO KW KW N1',
+    'SOUND': 'TI T2 AU PY M3 CY PB OP RP DO KW N1',
     'THES': 'TI AU PY CY AB SP EP DO UR KW N1',
     'UNBILL': 'TI AU PY DA PB IS M1 SE UR KW N1',
-    'VIDEO': 'TI T2 AU PY M3 CY PB OP RP DO KW KW N1',
+    'VIDEO': 'TI T2 AU PY M3 CY PB OP RP DO KW N1',
     'WEB': 'TI AU PY CY AB SP EP DO UR Y2 KW N1'
 }
 

@@ -1557,11 +1557,17 @@ class RefiImport:
 
         # Read the text and enter into sqlite source table
         try:
-            with open(source_path, encoding='utf-8', errors='replace') as f:
+            # utf-8-sig drops a BOM if present, so a BOM never shifts position 0 (#1727).
+            # A file without a BOM reads exactly as with utf-8.
+            with open(source_path, encoding='utf-8-sig', errors='replace') as f:
                 fulltext = f.read()
                 # Replace fixes mismatched coding with line endings on import from Windows text files.
                 # Due to 2 character line endings
-                if fulltext is not None and add_ending:
+                # QualCoder stores coding positions against \n text (one character per line
+                # break), even when the exported file itself uses \r\n (old Windows exports,
+                # or the MaxQDA line-endings option), so the extra space must not be added
+                # for QualCoder-origin files (#1727). Other software keeps the old behaviour.
+                if fulltext is not None and add_ending and "QualCoder" not in self.software_name:
                     fulltext = fulltext.replace('\n', '\n ')
                 source['fulltext'] = fulltext
                 # Adding split()- DOnt know why ?? - Removed
@@ -2136,12 +2142,12 @@ class RefiExport(QtWidgets.QDialog):
                     shutil.copyfile(os.path.join(self.app.project_path, 'documents', s['name']),
                                     prep_path + destination)
                 except FileNotFoundError:
-                    with open(prep_path + destination, 'w', encoding="utf-8-sig") as f:
+                    with open(prep_path + destination, 'w', encoding="utf-8", newline="\n") as f:  # was: utf-8-sig
                         f.write(s['fulltext'])
             # Also need to export a plain text file as a source
             # plaintext has different guid from richtext, and also might be associated with media - eg transcripts
             if s['plaintext_filename'] is not None:
-                with open(os.path.join(prep_path, 'sources', s['plaintext_filename']), "w", encoding="utf-8-sig") as f:
+                with open(os.path.join(prep_path, 'sources', s['plaintext_filename']), "w", encoding="utf-8", newline='\n') as f:  # was utf-8-sig
                     try:
                         if add_line_ending_for_maxqda:
                             f.write(s['fulltext'].replace("\n", "\r\n"))
@@ -2152,7 +2158,7 @@ class RefiExport(QtWidgets.QDialog):
                         print(err)
 
         for notefile in self.note_files:
-            with open(os.path.join(prep_path, 'sources', notefile[0]), "w", encoding="utf-8-sig") as f:
+            with open(os.path.join(prep_path, 'sources', notefile[0]), "w", encoding="utf-8", newline='\n') as f:  # was utf-8-sig
                 f.write(notefile[1])
         options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
@@ -2211,7 +2217,7 @@ class RefiExport(QtWidgets.QDialog):
             return
         filename = Path(directory) / filename
         try:
-            with open(filename, 'w', encoding='utf-8-sig') as f:
+            with open(filename, 'w', encoding='utf-8') as f:  # Was utf-8-sig
                 f.write(self.xml)
             msg = _("Codebook has been exported to ")
             msg += str(filename)

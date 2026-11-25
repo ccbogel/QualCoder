@@ -20,6 +20,7 @@ https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io
 https://qualcoder.org/
 """
+from collections import defaultdict
 import datetime
 import pymupdf
 import json
@@ -58,6 +59,7 @@ from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_secs, \
     extract_epub_fulltext
 from .html_parser import *
+from .irastats.corpus import iramuteq_to_rows, parse_iramuteq
 from .latex_import import LatexImportError, tex_file_to_plain_text
 from .memo import DialogMemo
 from .pdf_preview import DialogPdfPagesToImages, DialogPdfPreview
@@ -1022,9 +1024,16 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Import a transcription from an external file (e.g. a noScribe .txt or .html export)
         # into the empty .txt transcription auto-created for an audio/video file.
         action_import_transcription = None
+        action_batch_transcriptions = None
         if mediapath is not None and len(mediapath) > 5 and \
                 mediapath[:6] in ("/audio", "audio:", "/video", "video:"):
             action_import_transcription = menu.addAction(_("Import transcription from file"))
+            selected_ids = {int(self.ui.tableWidget.item(r, self.ID_COLUMN).text())
+                            for r in self.visible_selected_rows()}
+            selected_media = [s for s in self.source if s['id'] in selected_ids and
+                              (s['mediapath'] or '').startswith(("/audio/", "audio:", "/video/", "video:"))]
+            if len(selected_media) > 1:
+                action_batch_transcriptions = menu.addAction(_("Import matching transcriptions from folder"))
         action_view_original_text = None
         action_pdf_to_images = None
         action_extract_pdf_text = None
@@ -1118,6 +1127,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         if action == action_view:
             self.view()
+            return
+        if action == action_batch_transcriptions:
+            self.import_matching_transcriptions(selected_media)
             return
         if action == action_import_transcription:
             self.import_transcription_from_file(id_)
@@ -2435,6 +2447,81 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_text_edit.append(tr_name + _(" created."))
         return tr_id, tr_name
 
+    def read_transcription(self, filepath, pseudonyms):
+        """Read transcript text using the same conversions for single and batch imports."""
+        if Path(filepath).suffix.lower() in (".html", ".htm"):
+            text = html_to_text(Path(filepath).read_text(encoding="utf-8", errors="surrogateescape"))
+        else:
+            text, detected_encoding = self.decode_text_with_best_encoding(filepath)
+            logger.debug(f"Import transcription from {filepath} decoded as {detected_encoding}")
+        text = (text or "").replace("\r\n", "\n").replace("\r", "\n").removeprefix("\ufeff")
+        for pseudonym in pseudonyms:
+            text = re.sub(rf"(?<!\w){re.escape(pseudonym['original'])}(?!\w)", pseudonym['pseudonym'], text)
+        return text
+
+    def import_matching_transcriptions(self, media):
+        """Fill empty linked transcripts from same-basename files in a chosen folder."""
+        directory = QtWidgets.QFileDialog.getExistingDirectory(
+            self, _("Select folder containing transcriptions"), str(Path(self.app.project_path).parent))
+        if not directory:
+            return
+        sidecars = defaultdict(list)
+        try:
+            for path in Path(directory).iterdir():
+                if path.suffix.lower() in (".txt", ".srt", ".vtt", ".md", ".html", ".htm") and path.is_file():
+                    sidecars[path.stem].append(path)
+        except OSError as err:
+            Message(self.app, _("Warning"), str(err), "warning").exec()
+            return
+        # Distinct source IDs (e.g. an .mp3 and .mp4) can share the same basename.
+        stems = defaultdict(list)
+        for source in media:
+            stems[Path(source['name']).stem].append(source)
+        imported = []
+        skipped = []
+        pseudonyms = self.load_pseudonyms()
+        with self.app.conn:
+            for stem, sources in stems.items():
+                if not sidecars[stem]:
+                    skipped.extend(s['name'] + " — " + _("No matching file") for s in sources)
+                    continue
+                if len(sources) != 1 or len(sidecars[stem]) != 1:
+                    skipped.extend(s['name'] + " — " + _("Ambiguous match") for s in sources)
+                    continue
+                source = sources[0]
+                try:
+                    text = self.read_transcription(sidecars[stem][0], pseudonyms)
+                    text.encode("utf-8")  # SQLite cannot store surrogate bytes from a malformed HTML export.
+                except Exception as err:
+                    skipped.append(source['name'] + " — " + str(err))
+                    continue
+                if not text.strip():
+                    skipped.append(source['name'] + " — " + _("No readable text"))
+                    continue
+                cur = self.app.conn.execute(
+                    "update source set fulltext=? where id=(select av_text_id from source where id=?) "
+                    "and mediapath is null and ifnull(fulltext, '')='' "
+                    "and not exists (select 1 from source other where other.av_text_id=source.id and other.id<>?) "
+                    "and not exists (select 1 from code_text where fid=source.id) "
+                    "and not exists (select 1 from annotation where fid=source.id) returning id, name",
+                    (text, source['id'], source['id']))
+                target = cur.fetchone()
+                if target is None:
+                    skipped.append(source['name'] + " — " + _("No empty, uncoded linked transcription"))
+                else:
+                    imported.append((*target, text))
+        if imported:
+            self.app.delete_backup = False
+            for target_id, name, text in imported:
+                self.app.vectorstore_import_document(target_id, name, text)
+            self.load_file_data()
+            self._emit_project_table_changes(["source"])
+        summary = _("Imported: ") + str(len(imported)) + "\n" + _("Skipped: ") + str(len(skipped))
+        message = Message(self.app, _("Import transcriptions"), summary)
+        if skipped:
+            message.setDetailedText("\n".join(skipped))
+        message.exec()
+
     def import_transcription_from_file(self, id_):
         """ Load transcript text from an external file (e.g. a noScribe .txt or .html export)
         into the .txt transcription that QualCoder auto-creates for an audio or video file.
@@ -2499,34 +2586,16 @@ class DialogManageFiles(QtWidgets.QDialog):
         if not filepath:
             return
 
-        # --- Read the file (same logic as load_file_text for txt and html)
-        text_ = ""
         try:
-            if filepath[-5:].lower() == ".html" or filepath[-4:].lower() == ".htm":
-                with open(filepath, "r", encoding="utf-8", errors="surrogateescape") as sourcefile:
-                    html_text = sourcefile.read()
-                text_ = html_to_text(html_text)
-            else:
-                text_, detected_encoding = self.decode_text_with_best_encoding(filepath)
-                logger.debug(f"Import transcription from {filepath} decoded as {detected_encoding}")
+            text_ = self.read_transcription(filepath, self.load_pseudonyms())
         except Exception as err:
             logger.warning(str(err))
             Message(self.app, _("Warning"), _("Cannot read file") + f"\n{filepath}\n{err}", "warning").exec()
             return
-        if text_ is None:
-            text_ = ""
-        # Normalise line endings and strip BOM so stored positions match the editor (see load_file_text)
-        text_ = text_.replace("\r\n", "\n").replace("\r", "\n")
-        if text_ and text_[0] == "\ufeff":
-            text_ = text_[1:]
-        if text_.strip() == "":
+        if not text_.strip():
             Message(self.app, _("Warning"),
                     _("The selected file has no readable text.") + f"\n{filepath}", "warning").exec()
             return
-
-        # --- Apply pseudonyms, consistent with text import
-        for pseudonym in self.load_pseudonyms():
-            text_ = re.sub(rf"(?<!\w){re.escape(pseudonym['original'])}(?!\w)", pseudonym['pseudonym'], text_)
 
         # --- Warn before overwriting existing transcription, codings or annotations
         cur.execute("select length(ifnull(fulltext,'')) from source where id=?", [tr_id])
@@ -2668,13 +2737,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         The Case name can be absent. Or can be from one primary column, or can also collate values from additional columns.
         Qualitative texts from multiple columns are collated into one file.
         The header for each block of text is the column name from the survey.
+        Also imports IRaMuTeQ native text files (*.txt): each "****" text becomes a file,
+        its starred variables (*variable_modality) become attributes.
         """
 
         filepath, filter_type = QtWidgets.QFileDialog.getOpenFileName(None, _("Select Survey"), "",
-                                                                      _("Data files") + " (*.csv *.CSV *.tsv *.TSV *.ods *.ODS *.xlsx *.XLSX *.xls *.XLS)")
+                                                                      _("Data files") + " (*.csv *.CSV *.tsv *.TSV *.ods *.ODS *.xlsx *.XLSX *.xls *.XLS)"
+                                                                      + ";;" + _("IRaMuTeQ corpus") + " (*.txt *.TXT)")
         if not filepath: return
 
         msg = _("Import from survey: ") + f"{filepath}"
+        preselect_text, preselect_case, preselect_attr = None, None, None
         if filepath.lower().endswith('.csv') or filepath.lower().endswith('.tsv'):
             delimiter = ','
             try:
@@ -2697,6 +2770,31 @@ class DialogManageFiles(QtWidgets.QDialog):
             except UnicodeDecodeError:
                 df = pd.read_csv(filepath, sep=delimiter, encoding='latin1', dtype=str)
 
+        elif filepath.lower().endswith('.txt'):
+            # IRaMuTeQ native corpus: each text starts with a "**** *variable_modality ..." line
+            try:
+                with open(filepath, 'r', encoding='utf-8-sig') as f:
+                    content = f.read()
+            except UnicodeDecodeError:
+                with open(filepath, 'r', encoding='latin1') as f:
+                    content = f.read()
+            segments = parse_iramuteq(content)
+            if not segments:
+                msg += "\n" + _("Not an IRaMuTeQ file: no **** text header found.")
+                self.parent_text_edit.append(msg)
+                Message(self.app, _("Import failed"),
+                        _("The selected text file is not in IRaMuTeQ format (no **** header lines)."),
+                        "warning").exec()
+                return
+            iramuteq_cols, iramuteq_rows = iramuteq_to_rows(segments)
+            df = pd.DataFrame(iramuteq_rows, columns=iramuteq_cols)
+            # The text body is the qualitative column, the document name the case,
+            # and every IRaMuTeQ variable an attribute
+            preselect_text = ["text"]
+            preselect_case = ["doc"]
+            preselect_attr = [c for c in iramuteq_cols if c not in ("doc", "text", "cas")]
+            msg += "\n" + _("IRaMuTeQ format: ") + f"{len(segments)} " + _("texts, ") \
+                   + f"{len(preselect_attr)} " + _("variables as attributes")
         elif filepath.lower().endswith('.ods'):
             df = pd.read_excel(filepath, engine='odf', dtype=str)
         else:
@@ -2704,7 +2802,8 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         # User determines: Case, Attributes, Qual text, code texts, attributes as case or file.
         columns = [str(c) for c in df.columns]
-        dialog = DialogSurveyImport(columns, self)
+        dialog = DialogSurveyImport(columns, self, text_cols=preselect_text,
+                                    case_cols=preselect_case, attr_cols=preselect_attr)
         if not dialog.exec(): return
         text_cols, case_cols, attr_cols = dialog.get_selections()
         #filename_col = dialog.get_filename_column()
@@ -4086,7 +4185,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 class DialogSurveyImport(QtWidgets.QDialog):
     """ Survey import dialog. To assign cases, attributes and qualitative text. """
 
-    def __init__(self, columns:list[str], parent=None):
+    def __init__(self, columns:list[str], parent=None, text_cols=None, case_cols=None, attr_cols=None):
         super().__init__(parent)
         self.setWindowTitle(_("Survey Import Assistant"))
         self.resize(780, 500)
@@ -4199,6 +4298,19 @@ class DialogSurveyImport(QtWidgets.QDialog):
 
         self.btn_text_add.clicked.connect(lambda: self.move_items(self.list_available, self.list_text))
         self.btn_text_rem.clicked.connect(lambda: self.move_items(self.list_text, self.list_available))
+
+        # Pre-selected columns, e.g. IRaMuTeQ import: text body, document name, variables as attributes
+        for name in case_cols or []:
+            self._move_named(self.list_available, self.list_case, name)
+        for name in attr_cols or []:
+            self._move_named(self.list_available, self.list_attr, name)
+        for name in text_cols or []:
+            self._move_named(self.list_available, self.list_text, name)
+        self.cb_case.setEnabled(self.list_case.count() > 0)
+
+    def _move_named(self, source, dest, name):
+        for item in source.findItems(name, QtCore.Qt.MatchFlag.MatchExactly):
+            dest.addItem(source.takeItem(source.row(item)))
 
     def move_items(self, source, dest):
         for item in source.selectedItems():

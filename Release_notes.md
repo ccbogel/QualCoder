@@ -168,11 +168,17 @@ Create a .Desktop file for launch, enter this command (adapt it according to the
 
 Overall, improved the user interface styling to give a modern look. Reduced the number of style options to three only, to make maintenance easier: native, original, dark.
 
-Using AI identify hard to see bugs, with solutions to resolve them.
+Using AI to identify hard to see bugs, with solutions to resolve them.
+
+## AI 
+
+Improve AI model access.
 
 ## Code Text, Code A/V
 
 Added option to select multiple coded text segments and resize them, providing they are all in the exact same positions. Marker options now are: underline, marker (a strong coloured highlight of the coded text), marker light (a light coloured highlight of the coded text).
+
+Added Code Branch Filter to reduce tree clutter by showing only the select branch.
 
 ## Graph (Mind map)
 
@@ -182,9 +188,34 @@ Radial option, now displays multiple radial graphs where there are multiple root
 
 More sort options: Image by filename / pdf page / y value ; Audio video timeline, by filename then start time value.
 
+## REFI export / import
+
+Improvements to REFI QDPX Project export and import.
+
 ## References
 
 Option to manually add a new reference.
+
+## Text statistics (IRaMuTeQ methods)
+
+New "Text statistics (IRaMuTeQ methods)" submenu in the Reports menu: builds an analysable corpus (coded segments or whole documents, with codes, cases and attributes as variables) from the project, with tokenisation, stopwords (built-in FR/EN lists plus an editable custom file) and optional light stemming, and a sparse forms x segments lexical table (active vs supplementary forms). Computation engines live in the pure-Python `irastats` package and are unit-tested without a GUI.
+First analysis tab: descending text statistics (total occurrences, active/supplementary forms, decreasing frequency table, hapax, breakdown by partition variable), with CSV and HTML export.
+New 'Specificities' tab: chi-square specificities per form and per modality of a partition variable (signed value, two-sided p-value via scipy.stats.chi2, configurable probability threshold, default 0.05), sorted from most to least specific, with CSV/HTML export and over/under-representation highlighting.
+New 'Export IRaMuTeQ' button in the Corpus tab: writes the corpus (coded segments, plus whole documents when the checkbox is set) in the IRaMuTeQ text format, one '**** *code_<modality> *cas_<modality> *doc_<modality> ...' block per segment (native IRaMuTeQ variable format, restricted charset). The existing IRaMuTeQ export of the Report Codes dialog now shares the same token helper (irastats.corpus.iramuteq_token).
+New 'Similarity graph' tab: co-occurrence graph of forms within segments (networkx), association measure configurable (Jaccard by default, or chi2/phi-squared), adjustable edge threshold, Louvain community detection (nodes colored by community, communities listed), halo of a selected form, drawn in a non-blocking matplotlib window (node size proportional to frequency, edge width to similarity), with PNG export.
+New 'Correspondence analysis' tab: CA of the lexical table (forms x modalities of a partition variable, or forms x segments) by SVD of the standardized residuals (numpy only), eigenvalues/inertia table, factor map on axes 1x2 in a non-blocking matplotlib window (point size proportional to frequency, most contributive forms annotated), coordinates exported to CSV, PNG export.
+New 'BERTopic' tab in the lexicometry dialog (proposal): BERT-based topic modeling of the corpus - sentence-transformers embeddings, clustering (HDBSCAN when available, else KMeans), c-TF-IDF topic words; unit of analysis selectable (coded segments / whole documents / UCI ~40 occurrences); topic table with representative segments, topic-size chart, distribution of topics by variable (code/case/document/attribute: table + stacked bar chart + CSV), and CSV export. Uses only dependencies already required by the AI features (scikit-learn is now declared explicitly).
+Lexicometry dialog usability: wider window, tooltips on every button/checkbox/field, shorter comboboxes and stopwords field on its own row, explanation line under the parameters of each tab (UCI, CA, similarity graph, BERTopic), p-values of the specificities rounded to 3 decimals ("<0.001" when smaller), and a new 'Export ODT' button in the Text statistics tab.
+The lexicometry dialog UI is now a Qt Designer file (src/GUI_UIs/ui_dialog_text_stats.ui, compiled to src/qualcoder/GUI/ui_dialog_text_stats.py with pyuic6), like the other dialogs; only icons, dynamic combo contents and signal connections are set in code.
+Graphical consistency with the other QualCoder windows: all buttons of the lexicometry dialog are now square 32x32 icon buttons (minimumSize = maximumSize, as in the Reports dialogs such as code frequencies/comparisons), and the dialog is NonModal like ui_dialog_report_codings; layout margins and spacing keep the Qt defaults used across the other .ui files.
+Lexicometry dialog reorganized into 5 tabs (Corpus / Statistics / Graphs / Reinert classification / Topics): Statistics and Graphs each show two result panels with shared parameters (partition variable, minimum frequency), the BERTopic tab is renamed Topics, and all graphs (similarity, CA factor map, Reinert dendrogram and forms x classes CA, topic charts) are now embedded directly in the dialog via matplotlib canvases, with an optional 'open in separate window' button and PNG export.
+Wording of the lexicometry dialog: 'CA' is replaced by 'Correspondence analysis' in all labels, buttons and messages, and UCI is spelled out as 'initial context unit' in the tooltips, help texts and combo entries (French translation: 'unité de contexte initiale (UCI)', provided by the translation workflow).
+Lexicometry dialog, Corpus tab: no more checkbox for the corpus source - it is inferred from the code selection: if all codes are selected (no filter) the whole documents are used (only the file selection applies), otherwise only the coded texts of the selected codes are used.
+Lexicometry dialog, further UI feedback: the dialog no longer forces the main window minimum width (size policy Ignored when embedded in the Reports tab); in the Statistics tab the left/right split and the two duplicate tables are removed (each section shows only its HTML report); 'Modality' is renamed 'Category'; the help texts define segments/occurrences/forms/active forms/hapax, explain the correspondence analysis in one line, clarify that the edge threshold applies to the similarity graph only, and no longer mention the p-value decimals.
+Lexicometry dialog, further feedback: in the Statistics tab a single Calculate button now runs all the statistics (descending statistics, frequencies, hapax, chi-square specificities) into one report shown in a single text area; the custom stopwords file row is removed from the Corpus tab (built-in stopword lists remain).
+Lexicometry dialog, Topics tab: a busy pop-up is shown while the BERT model is downloaded/loaded and the topics are computed (first run can take several minutes), and the topic tables cap their columns at 500 px with word-wrapped rows so long texts fit.
+
+New 'Reinert classification' tab: descending hierarchical classification (CHD, Reinert 1983/1990) of the corpus - UCI segmentation (~40 occurrences, bounded by punctuation), forms x UCI matrix of active forms (frequency >= 3), top-down binary splits maximizing the chi-square between classes (initialised from the first CA axis, refined by iterative reassignment, up to ~10 classes), with class profiles (signed chi-square specificities), most representative UCI per class, chi2/df summary, dendrogram of the classification tree (one color per class, most representative forms listed under each class) and CA of forms x classes (non-blocking matplotlib windows, PNG export), and CSV export. Defaults follow IRaMuTeQ and are adjustable in the dialog.
 
 ## Bug fixes
 

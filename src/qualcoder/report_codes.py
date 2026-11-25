@@ -51,6 +51,7 @@ from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
     ExportDirectoryPathDialog, init_persistent_tree_header, restore_persistent_tree_widths, \
     doc_end_position, doc_position_from_index
+from .irastats.corpus import iramuteq_token as _iramuteq_token  # shared with the IRaMuTeQ export of irastats
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .ris import Ris
@@ -93,11 +94,6 @@ def _xlsx_safe(value):
     if isinstance(value, str):
         return ILLEGAL_CHARACTERS_RE.sub("", value)
     return value
-
-
-def _iramuteq_token(text) -> str:
-    """ IRaMuTeQ separates starred variables by spaces, so none can contain whitespace. """
-    return re.sub(r"\s+", "_", str(text).strip())
 
 
 class DialogReportCodes(QtWidgets.QDialog):
