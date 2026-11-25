@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_corpus">
       <attribute name="title">
@@ -154,7 +154,7 @@ Heavy lemmatizer not used.</string>
             </size>
            </property>
            <property name="toolTip">
-            <string>Build the analysable corpus from the current selections.
+            <string>Build the corpus from the current selections.
 Show a preview of the segments and the corpus size.</string>
            </property>
            <property name="text">
@@ -285,11 +285,10 @@ Whole documents if all codes are selected, otherwise the coded texts of the sele
            </property>
            <property name="toolTip">
             <string>Minimum frequency for a form to be an active form.
-Forms occurring at least this many times in the corpus are used in the analyses.
-Rarer forms are supplementary.</string>
+Forms occurring at least this many times in the corpus are used in the analyses.</string>
            </property>
            <property name="text">
-            <string>Minimum frequency of active forms:</string>
+            <string>Minimum active forms:</string>
            </property>
           </widget>
          </item>
@@ -297,8 +296,7 @@ Rarer forms are supplementary.</string>
           <widget class="QSpinBox" name="spinBox_stats_min_freq">
            <property name="toolTip">
             <string>Minimum frequency for a form to be an active form. 
-Forms occurring at least this many times in the corpus are used in the analyses.
-Rarer forms are supplementary.</string>
+Forms occurring at least this many times in the corpus are used in the analyses.</string>
            </property>
            <property name="minimum">
             <number>1</number>
@@ -349,7 +347,7 @@ Rarer forms are supplementary.</string>
             </size>
            </property>
            <property name="toolTip">
-            <string>Keep only the specificities with a two-sided p-value &lt;= this threshold</string>
+            <string>Keep the specificities with a two-sided p-value &lt;= threshold</string>
            </property>
            <property name="text">
             <string>Probability threshold:</string>
@@ -359,7 +357,7 @@ Rarer forms are supplementary.</string>
          <item>
           <widget class="QDoubleSpinBox" name="doubleSpinBox_spec_p">
            <property name="toolTip">
-            <string>Keep only the specificities with a two-sided p-value &lt;= this threshold</string>
+            <string>Keep the specificities with a two-sided p-value &lt;= threshold</string>
            </property>
            <property name="decimals">
             <number>4</number>
@@ -410,10 +408,10 @@ Rarer forms are supplementary.</string>
             </size>
            </property>
            <property name="toolTip">
-            <string>Calculate the text statistics with the current parameters</string>
+            <string>Calculate the text statistics.</string>
            </property>
            <property name="text">
-            <string>Calculate</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -435,7 +433,7 @@ Rarer forms are supplementary.</string>
             <string>Export the report to a CSV file</string>
            </property>
            <property name="text">
-            <string>Export CSV</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -457,7 +455,7 @@ Rarer forms are supplementary.</string>
             <string>Export report to HTML file</string>
            </property>
            <property name="text">
-            <string>Export HTML</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -479,7 +477,7 @@ Rarer forms are supplementary.</string>
             <string>Export the report in ODT (Open Text Document) format</string>
            </property>
            <property name="text">
-            <string>Export ODT</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -501,7 +499,7 @@ Rarer forms are supplementary.</string>
             <string>Export the specificities table to a CSV file</string>
            </property>
            <property name="text">
-            <string>Export CSV</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -523,7 +521,7 @@ Rarer forms are supplementary.</string>
             <string>Export the specificities report to an HTML file</string>
            </property>
            <property name="text">
-            <string>Export HTML</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -547,13 +545,13 @@ Rarer forms are supplementary.</string>
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>10</height>
+           <height>30</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>20</height>
+           <height>30</height>
           </size>
          </property>
          <property name="toolTip">
@@ -567,7 +565,7 @@ Active forms = forms occurring at least the minimum frequency (rarer forms are s
 Hapax = forms occurring only once.</string>
          </property>
          <property name="text">
-          <string>Text statistics report (corpus summary, frequency table, hapax, breakdown by partition variable). When a partition variable is selected, chi-square specificities (green = over-represented, red = under-represented).</string>
+          <string>Text statistics report (summary, frequency table, hapax, partition variable breakdown). Partition variable: chi-square specificities shown (green = over-represented, red = under-represented).</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -589,166 +587,6 @@ Hapax = forms occurring only once.</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_graphs">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_graphs_params">
-         <item>
-          <widget class="QLabel" name="label_graph_min_freq">
-           <property name="toolTip">
-            <string>Only forms occurring at least this many times appear as nodes</string>
-           </property>
-           <property name="text">
-            <string>Minimum frequency:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="spinBox_graph_min_freq">
-           <property name="toolTip">
-            <string>Only forms occurring at least this many times appear as nodes</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>9999</number>
-           </property>
-           <property name="value">
-            <number>1</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_sim_method">
-           <property name="toolTip">
-            <string>Association measure between forms co-occurring in the same segment: Jaccard index (default) or chi-square (phi-squared)</string>
-           </property>
-           <property name="text">
-            <string>Association measure:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBox_sim_method">
-           <property name="maximumSize">
-            <size>
-             <width>220</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Association measure between forms co-occurring in the same segment: Jaccard index (default) or chi-square (phi-squared)</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_sim_threshold">
-           <property name="toolTip">
-            <string>Minimum association value for an edge between two forms in the similarity graph (not used by the correspondence analysis)</string>
-           </property>
-           <property name="text">
-            <string>Edge threshold:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_sim_threshold">
-           <property name="toolTip">
-            <string>Minimum association value for an edge between two forms in the similarity graph (not used by the correspondence analysis)</string>
-           </property>
-           <property name="decimals">
-            <number>3</number>
-           </property>
-           <property name="maximum">
-            <double>1.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.050000000000000</double>
-           </property>
-           <property name="value">
-            <double>0.200000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBox_sim_communities">
-           <property name="toolTip">
-            <string>Detect communities of strongly associated forms with the Louvain algorithm; each community gets its own colour in the graph</string>
-           </property>
-           <property name="text">
-            <string>Detect communities (Louvain)</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_sim_halo">
-           <property name="toolTip">
-            <string>Draw a red halo around the direct neighbours of this form in the graph</string>
-           </property>
-           <property name="text">
-            <string>Halo:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBox_sim_halo">
-           <property name="maximumSize">
-            <size>
-             <width>180</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Draw a red halo around the direct neighbours of this form in the graph</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_ca_columns">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>20</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Columns of the analysed table: 'Segments' = forms x segments, otherwise forms x modalities of the partition variable</string>
-           </property>
-           <property name="text">
-            <string>Correspondence analysis columns:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBox_ca_variable">
-           <property name="maximumSize">
-            <size>
-             <width>240</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Columns of the analysed table: 'Segments' = forms x segments, otherwise forms x modalities of the partition variable</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_graphs">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
         <widget class="QSplitter" name="splitter_graphs">
          <property name="orientation">
           <enum>Qt::Orientation::Horizontal</enum>
@@ -768,92 +606,250 @@ Hapax = forms occurring only once.</string>
             <number>0</number>
            </property>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_sim_buttons">
-             <item>
-              <widget class="QPushButton" name="pushButton_sim_run">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>Build the similarity graph with the current parameters</string>
-               </property>
-               <property name="text">
-                <string>Calculate</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_sim_png">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>Export the similarity graph as a PNG image</string>
-               </property>
-               <property name="text">
-                <string>Export PNG</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_sim_popout">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>Open in a separate window</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_sim">
-               <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
+            <widget class="QGroupBox" name="groupBox_similarity_graph">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>70</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>70</height>
+              </size>
+             </property>
+             <property name="title">
+              <string/>
+             </property>
+             <widget class="QLabel" name="label_graph_min_freq">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>2</y>
+                <width>70</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="toolTip">
+               <string>Forms occurring at least this many times appear as nodes.</string>
+              </property>
+              <property name="text">
+               <string>Frequency:</string>
+              </property>
+             </widget>
+             <widget class="QSpinBox" name="spinBox_graph_min_freq">
+              <property name="geometry">
+               <rect>
+                <x>90</x>
+                <y>5</y>
+                <width>54</width>
+                <height>26</height>
+               </rect>
+              </property>
+              <property name="toolTip">
+               <string>Forms occurring at least this many times appear as nodes.</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>9999</number>
+              </property>
+              <property name="value">
+               <number>1</number>
+              </property>
+             </widget>
+             <widget class="QLabel" name="label_sim_method">
+              <property name="geometry">
+               <rect>
+                <x>148</x>
+                <y>2</y>
+                <width>111</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="toolTip">
+               <string>Association measure between forms co-occurring in the same segment: Jaccard index (default) or chi-square (phi-squared)</string>
+              </property>
+              <property name="text">
+               <string>Association:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+             </widget>
+             <widget class="QComboBox" name="comboBox_sim_method">
+              <property name="geometry">
+               <rect>
+                <x>260</x>
+                <y>5</y>
+                <width>76</width>
+                <height>26</height>
+               </rect>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>220</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Association measure between forms co-occurring in the same segment: Jaccard index (default) or chi-square (phi-squared)</string>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="pushButton_sim_run">
+              <property name="geometry">
+               <rect>
+                <x>1</x>
+                <y>39</y>
+                <width>32</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Build the similarity graph.</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="pushButton_sim_png">
+              <property name="geometry">
+               <rect>
+                <x>40</x>
+                <y>39</y>
+                <width>32</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Export the similarity graph as a PNG image</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="pushButton_sim_popout">
+              <property name="geometry">
+               <rect>
+                <x>80</x>
+                <y>39</y>
+                <width>32</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Open in a separate window</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+             <widget class="QLabel" name="label_sim_threshold">
+              <property name="geometry">
+               <rect>
+                <x>118</x>
+                <y>40</y>
+                <width>141</width>
+                <height>26</height>
+               </rect>
+              </property>
+              <property name="toolTip">
+               <string>Minimum association value for an edge between two forms in the similarity graph.</string>
+              </property>
+              <property name="text">
+               <string>Edge threshold:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+             </widget>
+             <widget class="QDoubleSpinBox" name="doubleSpinBox_sim_threshold">
+              <property name="geometry">
+               <rect>
+                <x>260</x>
+                <y>40</y>
+                <width>91</width>
+                <height>26</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Minimum association value for an edge between two forms in the similarity graph.</string>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="maximum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.050000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.200000000000000</double>
+              </property>
+             </widget>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_sim_buttons"/>
            </item>
            <item>
             <widget class="QLabel" name="label_sim_help">
              <property name="toolTip">
-              <string>Similarity graph: each node is a form (size = frequency), each edge links two forms co-occurring in the same segment (width = association strength), node colours = detected communities.</string>
+              <string>Similarity graph
+Each node is a form (size = frequency).
+Each edge links two forms co-occurring in the same segment (width = association strength)
+Node colours = detected communities.</string>
              </property>
              <property name="text">
               <string>Similarity graph: each node is a form (size = frequency), each edge links two forms co-occurring in the same segment (width = association strength), node colours = detected communities.</string>
@@ -905,109 +901,240 @@ Hapax = forms occurring only once.</string>
             <number>0</number>
            </property>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_ca_buttons">
-             <item>
-              <widget class="QPushButton" name="pushButton_ca_run">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>Calculate the correspondence analysis and show the factor map (axes 1 x 2)</string>
-               </property>
-               <property name="text">
-                <string>Calculate</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_ca_csv">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>Export the form and modality coordinates (CSV)</string>
-               </property>
-               <property name="text">
-                <string>Export coordinates CSV</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_ca_png">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>Export the factor map as a PNG image</string>
-               </property>
-               <property name="text">
-                <string>Export PNG</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_ca_popout">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>Open in a separate window</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_ca">
-               <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
+            <layout class="QHBoxLayout" name="horizontalLayout_ca_buttons"/>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_correspondence">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>70</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>70</height>
+              </size>
+             </property>
+             <property name="title">
+              <string/>
+             </property>
+             <widget class="QPushButton" name="pushButton_ca_run">
+              <property name="geometry">
+               <rect>
+                <x>1</x>
+                <y>39</y>
+                <width>32</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Calculate the correspondence analysis and show the factor map (axes 1 x 2)</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="pushButton_ca_png">
+              <property name="geometry">
+               <rect>
+                <x>39</x>
+                <y>39</y>
+                <width>32</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Export the factor map as a PNG image</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="pushButton_ca_popout">
+              <property name="geometry">
+               <rect>
+                <x>78</x>
+                <y>39</y>
+                <width>32</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Open in a separate window</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="pushButton_ca_csv">
+              <property name="geometry">
+               <rect>
+                <x>117</x>
+                <y>39</y>
+                <width>32</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Export the form and modality coordinates (CSV)</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+             <widget class="QCheckBox" name="checkBox_sim_communities">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>141</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="toolTip">
+               <string>Detect communities of strongly associated forms with the Louvain algorithm.
+Each community gets its own colour in the graph.</string>
+              </property>
+              <property name="text">
+               <string>Communities</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+             <widget class="QLabel" name="label_sim_halo">
+              <property name="geometry">
+               <rect>
+                <x>180</x>
+                <y>38</y>
+                <width>51</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="toolTip">
+               <string>Draw a red halo around the direct neighbours of this form in the graph</string>
+              </property>
+              <property name="text">
+               <string>Halo:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+             </widget>
+             <widget class="QComboBox" name="comboBox_sim_halo">
+              <property name="geometry">
+               <rect>
+                <x>240</x>
+                <y>41</y>
+                <width>76</width>
+                <height>26</height>
+               </rect>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>180</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Draw a red halo around the direct neighbours of this form in the graph</string>
+              </property>
+             </widget>
+             <widget class="QComboBox" name="comboBox_ca_variable">
+              <property name="geometry">
+               <rect>
+                <x>240</x>
+                <y>10</y>
+                <width>240</width>
+                <height>26</height>
+               </rect>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>240</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Columns of the analysed table: 'Segments' = forms x segments, otherwise forms x modalities of the partition variable</string>
+              </property>
+             </widget>
+             <widget class="QLabel" name="label_ca_columns">
+              <property name="geometry">
+               <rect>
+                <x>150</x>
+                <y>13</y>
+                <width>81</width>
+                <height>20</height>
+               </rect>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Columns of the analysed table: 'Segments' = forms x segments, otherwise forms x modalities of the partition variable</string>
+              </property>
+              <property name="text">
+               <string>Columns:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+             </widget>
+            </widget>
            </item>
            <item>
             <widget class="QLabel" name="label_ca_help">
@@ -1018,7 +1145,9 @@ Hapax = forms occurring only once.</string>
               </size>
              </property>
              <property name="toolTip">
-              <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2 (drawn below, or opened in a separate window) shows which forms are characteristic of which column categories - blue points = forms, red = columns, point size = frequency.</string>
+              <string>Correspondence analysis of the forms x columns table.
+The factor map on axes 1 x 2 shows which forms are characteristic of which column categories.
+Bblue points = forms. R red = columns. Point size = frequency.</string>
              </property>
              <property name="text">
               <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2 (drawn below, or opened in a separate window) shows which forms are characteristic of which column categories - blue points = forms, red = columns, point size = frequency.</string>
