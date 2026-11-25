@@ -469,10 +469,7 @@
                  </item>
                  <item>
                   <layout class="QGridLayout" name="gridLayout_project_summary">
-                   <property name="horizontalSpacing">
-                    <number>8</number>
-                   </property>
-                   <property name="verticalSpacing">
+                   <property name="spacing">
                     <number>8</number>
                    </property>
                   </layout>
@@ -788,7 +785,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>33</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
@@ -915,6 +912,7 @@
     <addaction name="actionCode_relations"/>
     <addaction name="actionCode_text_exact_matches"/>
     <addaction name="actionText_segments_by_codes"/>
+    <addaction name="actionText_statistics"/>
     <addaction name="actionView_Graph"/>
     <addaction name="menuAI_assisted_analysis"/>
    </widget>
@@ -1351,6 +1349,11 @@
    </property>
    <property name="toolTip">
     <string>Checks whether the current QualCoder project is well prepared for working with the AI agent and produces a report</string>
+   </property>
+  </action>
+  <action name="actionText_statistics">
+   <property name="text">
+    <string>Text statistics</string>
    </property>
   </action>
  </widget>
