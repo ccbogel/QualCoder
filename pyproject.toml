@@ -1,8 +1,27 @@
-# ------
+# ----------------------------------------------
 # PyProject.toml - required for uv, ruff and ty
-# ------
+# ----------------------------------------------
 # This file is generated from dev/uv_req_sync/src/uv_req_sync/_init__.py.
-# Generated on 2026-11-20 13:59:27.465409+00:00
+# Generated on 2026-11-25 00:32:03.295707+00:00
+# ----------------------------------------------
+# This file is part of QualCoder.
+# 
+# QualCoder is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later version.
+# 
+# QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+# If not, see <https://www.gnu.org/licenses/>.
+# 
+# Author: Alberto Antonio Rebonatto Neto (BetoNetu)
+# https://github.com/ccbogel/QualCoder
+# https://qualcoder-org.github.io
+# https://qualcoder.wordpress.com/
+# https://qualcoder.org/
 
 [project]
 name = "qualcoder"
@@ -52,6 +71,8 @@ dependencies = [
     "qtawesome",
     "requests",
     "rispy",
+    "scikit-learn", # explicit: used by topic_model (BERTopic tab); already pulled in via sentence-transformers
+    "scipy", # explicit: used by irastats (already pulled in via scikit-learn, and in the PyInstaller specs)
     "sentence-transformers",
     "six",
     "striprtf",

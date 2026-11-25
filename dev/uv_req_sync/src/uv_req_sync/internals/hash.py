@@ -1,4 +1,26 @@
-"""Creates `hashmap.py` which is checked for deciding if the pyproject.toml needs to be"""
+"""
+Creates `hashmap.py` which is checked for deciding if the pyproject.toml needs to be
+---
+
+This file is part of QualCoder.
+
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
+
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
+
+Author: Alberto Antonio Rebonatto Neto (BetoNetu)
+https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
+https://qualcoder.wordpress.com/
+https://qualcoder.org/
+"""
 
 def main() -> None:
     """Creates hashmap.py by sha256 the file and each line"""
@@ -25,10 +47,34 @@ def main() -> None:
         line_hash=sha256(line).hexdigest()
         hash_lines.append({i:f"{line_hash}"})
     file_str=\
-f"""\"\"\"Hashmap keeping the hash numbers from requirements.txt and it's lines\"\"\"
-# This file is generated from dev/uv_req_sync/internals/hash.py
-# It is used as to verify requirements.txt for changes. Please do not touch
-# Generated on {datetime.now(UTC)}
+f"""\"\"\"
+Hashmap keeping the hash numbers from requirements.txt and it's lines
+
+This file is generated from dev/uv_req_sync/internals/hash.py
+It is used as to verify requirements.txt for changes. Please do not touch
+Generated on {datetime.now(UTC)}
+---
+
+This file is part of QualCoder.
+
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
+
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
+
+Author: Alberto Antonio Rebonatto Neto (BetoNetu)
+https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
+https://qualcoder.wordpress.com/
+https://qualcoder.org/
+\"\"\"
+
 file_hash=\"{reqs_txt_hash}\"
 list_lines_hash={hash_lines}
 """

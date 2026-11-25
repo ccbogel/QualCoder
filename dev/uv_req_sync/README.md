@@ -53,8 +53,8 @@ source .venv/bin/activate # Unix like (Mac, Linux, BSD, etc)
 .venv\Scripts\activate.bat # Windows (cmd.exe)
 .venv\Scripts\activate.ps1 # Windows (PowerShell) 
 pip install tomli-w # required as Python's tomllib is read only
-cd src # foes into the src dir
-python -m 
+cd src # goes into the src dir
+python -m uv_req_sync
 ```
 
 ##### Running with uv:

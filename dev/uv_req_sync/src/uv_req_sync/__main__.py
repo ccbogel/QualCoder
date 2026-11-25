@@ -1,4 +1,26 @@
-"Main"
+"""
+Main entrypoint for uv_req_sync
+---
+
+This file is part of QualCoder.
+
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
+
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
+
+Author: Alberto Antonio Rebonatto Neto (BetoNetu)
+https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
+https://qualcoder.wordpress.com/
+https://qualcoder.org/
+"""
 import os
 import re
 import tomllib
@@ -76,7 +98,7 @@ HASHMAPS=DEV_SLASH_UV/"src"/"uv_req_sync"/"hashmap.py"
 # ---------------
 # Main processing
 # ---------------
-def process(metadata:bool) -> None:
+def process(metadata:bool=False) -> None:
     print("------------------------")
     print("Starting processing")
     print("------------------------")
@@ -257,11 +279,30 @@ def process(metadata:bool) -> None:
     from datetime import UTC, datetime
     
     header_comment=dedent(f"""\
-    # ------
+    # ----------------------------------------------
     # PyProject.toml - required for uv, ruff and ty
-    # ------
+    # ----------------------------------------------
     # This file is generated from dev/uv_req_sync/src/uv_req_sync/_init__.py.
     # Generated on {datetime.now(UTC)}
+    # ----------------------------------------------
+    # This file is part of QualCoder.
+    # 
+    # QualCoder is free software: you can redistribute it and/or modify it under the
+    # terms of the GNU Lesser General Public License as published by the Free Software
+    # Foundation, either version 3 of the License, or (at your option) any later version.
+    # 
+    # QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    # without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    # See the GNU General Public License for more details.
+    # 
+    # You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+    # If not, see <https://www.gnu.org/licenses/>.
+    # 
+    # Author: Alberto Antonio Rebonatto Neto (BetoNetu)
+    # https://github.com/ccbogel/QualCoder
+    # https://qualcoder-org.github.io
+    # https://qualcoder.wordpress.com/
+    # https://qualcoder.org/
 
     """)
     pyproject_lines.insert(0, header_comment)
@@ -317,11 +358,12 @@ def process(metadata:bool) -> None:
             w.writelines(new_template_lines) 
 
 
-def work_and_exit(metadata:bool) -> None:
-        process(metadata)
-        from sys import exit
-        print("Done")
-        exit(0)
+def work_and_exit(metadata:bool=False) -> None:
+    """Do the processing then exits"""
+    process(metadata)
+    from sys import exit
+    print("Done")
+    exit(0)
 
 # -------------------------------------
 # Runtime logic/Main

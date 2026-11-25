@@ -1,5 +1,27 @@
-"""Dedups the requirements list. Since the logic of the comparison on `parse_reqs.txt` adds the "new" lines at the end of `req_list`
-it is important to dedup that list giving priority for the newer/latter items of the list"""
+"""
+Dedups the requirements list. Since the logic of the comparison on `parse_reqs.txt` adds the "new" lines at the end of `req_list`
+it is important to dedup that list giving priority for the newer/latter items of the list
+---
+
+This file is part of QualCoder.
+
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
+
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
+
+Author: Alberto Antonio Rebonatto Neto (BetoNetu)
+https://github.com/ccbogel/QualCoder
+https://qualcoder-org.github.io
+https://qualcoder.wordpress.com/
+https://qualcoder.org/
+"""
 import re
 
 _NAME_RE = re.compile(r'^\s*([A-Za-z0-9_.\-]+)')
