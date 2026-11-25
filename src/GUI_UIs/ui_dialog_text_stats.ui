@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_corpus">
       <attribute name="title">
@@ -47,7 +47,7 @@
             <string>Restrict the corpus to the selected text files</string>
            </property>
            <property name="text">
-            <string>Select files</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -69,7 +69,7 @@
             <string>Restrict the corpus to the segments of the selected cases</string>
            </property>
            <property name="text">
-            <string>Select cases</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -92,64 +92,15 @@
 If no code is selected (all codes), the whole documents are used instead</string>
            </property>
            <property name="text">
-            <string>Select codes</string>
+            <string/>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QLabel" name="label_selection">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Current corpus selection: files, cases and codes. 'Codes: all' = the whole documents are used (only the file selection applies); specific codes = only their coded texts are used</string>
-           </property>
-           <property name="text">
-            <string>All files, cases and codes</string>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_corpus_params">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_corpus_params">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_corpus_language">
-         <item>
+         <item alignment="Qt::AlignmentFlag::AlignRight">
           <widget class="QLabel" name="label_language">
            <property name="minimumSize">
             <size>
-             <width>0</width>
+             <width>100</width>
              <height>0</height>
             </size>
            </property>
@@ -158,6 +109,9 @@ If no code is selected (all codes), the whole documents are used instead</string
            </property>
            <property name="text">
             <string>Language:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
            </property>
           </widget>
          </item>
@@ -172,7 +126,7 @@ If no code is selected (all codes), the whole documents are used instead</string
           <widget class="QCheckBox" name="checkBox_stem">
            <property name="minimumSize">
             <size>
-             <width>100</width>
+             <width>200</width>
              <height>0</height>
             </size>
            </property>
@@ -185,23 +139,6 @@ Heavy lemmatizer not used.</string>
            </property>
           </widget>
          </item>
-         <item>
-          <spacer name="horizontalSpacer_corpus_language">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_corpus_buttons">
          <item>
           <widget class="QPushButton" name="pushButton_build_corpus">
            <property name="minimumSize">
@@ -221,7 +158,7 @@ Heavy lemmatizer not used.</string>
 Show a preview of the segments and the corpus size.</string>
            </property>
            <property name="text">
-            <string>Build corpus</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -244,17 +181,40 @@ Show a preview of the segments and the corpus size.</string>
 Whole documents if all codes are selected, otherwise the coded texts of the selected codes.</string>
            </property>
            <property name="text">
-            <string>Export IRaMuTeQ</string>
+            <string/>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_corpus_info">
+          <spacer name="horizontalSpacer_corpus_params">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_corpus_language">
+         <item>
+          <widget class="QLabel" name="label_selection">
+           <property name="minimumSize">
+            <size>
+             <width>500</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="toolTip">
-            <string>Size of the last built corpus</string>
+            <string>Current corpus selection: files, cases and codes. 'Codes: all' = the whole documents are used (only the file selection applies); specific codes = only their coded texts are used</string>
            </property>
            <property name="text">
-            <string/>
+            <string>All files, cases and codes</string>
            </property>
            <property name="wordWrap">
             <bool>true</bool>
@@ -262,7 +222,7 @@ Whole documents if all codes are selected, otherwise the coded texts of the sele
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_corpus_buttons">
+          <spacer name="horizontalSpacer_corpus_language">
            <property name="orientation">
             <enum>Qt::Orientation::Horizontal</enum>
            </property>
