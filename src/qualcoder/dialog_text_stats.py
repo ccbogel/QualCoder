@@ -131,7 +131,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self.resize(1100, 750)
 
     def _setup_icons(self):
-        """qtawesome icons for the buttons (icons cannot be stored in the .ui file). """
+        """qtawesome icons for the buttons. """
 
         icons = {
             "pushButton_select_files": "mdi6.file-outline",
@@ -141,10 +141,10 @@ class DialogTextStats(QtWidgets.QDialog):
             "pushButton_export_iramuteq": "mdi6.export",
             "pushButton_descstats_run": "mdi6.play",
             "pushButton_descstats_csv": "mdi6.file-export-outline",
-            "pushButton_descstats_html": "mdi6.script-text-outline",
+            "pushButton_descstats_html": "mdi6.export",
             "pushButton_descstats_odt": "mdi6.file-document-outline",
             "pushButton_spec_csv": "mdi6.file-export-outline",
-            "pushButton_spec_html": "mdi6.script-text-outline",
+            "pushButton_spec_html": "mdi6.export",
             "pushButton_sim_run": "mdi6.play",
             "pushButton_sim_png": "mdi6.image-outline",
             "pushButton_ca_run": "mdi6.play",
