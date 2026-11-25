@@ -166,7 +166,7 @@ class DialogTextStats(QtWidgets.QDialog):
             "pushButton_bertopic_dist_popout": "mdi6.open-in-new",
         }
         for name, icon in icons.items():
-            getattr(self, name).setIcon(qta.icon(icon))
+            getattr(self, name).setIcon(qta.icon(icon, options=[{'scale_factor': 1.4}]))
 
     def _init_combos(self):
         """Static combo contents; the partition variable combos are filled from the
