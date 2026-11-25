@@ -607,7 +607,7 @@ Active forms = forms occurring at least the minimum frequency (rarer forms are s
 Hapax = forms occurring only once.</string>
          </property>
          <property name="text">
-          <string>Calculate the report. Text statistics (corpus summary, frequency table, hapax, breakdown by partition variable). When a partition variable is selected, chi-square specificities (green = over-represented, red = under-represented). Definitions - Segments = the text units (coded texts of selected codes, or whole documents); Occurrences = total number of words; Forms = distinct word forms after normalisation; Active forms = forms occurring at aminimum frequency; Hapax = forms occurring only once.</string>
+          <string>Text statistics report (corpus summary, frequency table, hapax, breakdown by partition variable). When a partition variable is selected, chi-square specificities (green = over-represented, red = under-represented).</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -682,7 +682,7 @@ Hapax = forms occurring only once.</string>
          <item>
           <widget class="QLabel" name="label_sim_threshold">
            <property name="toolTip">
-            <string>Minimum association value for an edge to be drawn between two forms in the similarity graph (not used by the correspondence analysis)</string>
+            <string>Minimum association value for an edge between two forms in the similarity graph (not used by the correspondence analysis)</string>
            </property>
            <property name="text">
             <string>Edge threshold:</string>
@@ -692,7 +692,7 @@ Hapax = forms occurring only once.</string>
          <item>
           <widget class="QDoubleSpinBox" name="doubleSpinBox_sim_threshold">
            <property name="toolTip">
-            <string>Minimum association value for an edge to be drawn between two forms in the similarity graph (not used by the correspondence analysis)</string>
+            <string>Minimum association value for an edge between two forms in the similarity graph (not used by the correspondence analysis)</string>
            </property>
            <property name="decimals">
             <number>3</number>
@@ -893,10 +893,10 @@ Hapax = forms occurring only once.</string>
            <item>
             <widget class="QLabel" name="label_sim_help">
              <property name="toolTip">
-              <string>Similarity graph: each node is a form (size = frequency), each edge links two forms co-occurring in the same segment (width = association strength), node colours = detected communities. Below: the strongest edges and the communities.</string>
+              <string>Similarity graph: each node is a form (size = frequency), each edge links two forms co-occurring in the same segment (width = association strength), node colours = detected communities.</string>
              </property>
              <property name="text">
-              <string>Similarity graph: each node is a form (size = frequency), each edge links two forms co-occurring in the same segment (width = association strength), node colours = detected communities. Below: the strongest edges and the communities.</string>
+              <string>Similarity graph: each node is a form (size = frequency), each edge links two forms co-occurring in the same segment (width = association strength), node colours = detected communities.</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
@@ -1058,10 +1058,10 @@ Hapax = forms occurring only once.</string>
               </size>
              </property>
              <property name="toolTip">
-              <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2 (drawn below, or opened in a separate window) shows which forms are characteristic of which column categories - blue points = forms, red = columns, point size = frequency. The table lists the eigenvalues and inertia of the axes.</string>
+              <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2 (drawn below, or opened in a separate window) shows which forms are characteristic of which column categories - blue points = forms, red = columns, point size = frequency.</string>
              </property>
              <property name="text">
-              <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2 (drawn below, or opened in a separate window) shows which forms are characteristic of which column categories - blue points = forms, red = columns, point size = frequency. The table lists the eigenvalues and inertia of the axes.</string>
+              <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2 (drawn below, or opened in a separate window) shows which forms are characteristic of which column categories - blue points = forms, red = columns, point size = frequency.</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
