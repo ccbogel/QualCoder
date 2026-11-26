@@ -1150,7 +1150,7 @@ The factor map on axes 1 x 2 shows which forms are characteristic of which colum
 Bblue points = forms. R red = columns. Point size = frequency.</string>
              </property>
              <property name="text">
-              <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2 (drawn below, or opened in a separate window) shows which forms are characteristic of which column categories - blue points = forms, red = columns, point size = frequency.</string>
+              <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2. Shows which forms are characteristic of which column categories. Blue points = forms, red = columns, size = frequency.</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
