@@ -82,6 +82,11 @@ class Ui_DialogTextStats(object):
         self.label_selection.setWordWrap(True)
         self.label_selection.setObjectName("label_selection")
         self.horizontalLayout_corpus_language.addWidget(self.label_selection)
+        self.label_corpus_info = QtWidgets.QLabel(parent=self.tab_corpus)
+        self.label_corpus_info.setMinimumSize(QtCore.QSize(400, 0))
+        self.label_corpus_info.setText("")
+        self.label_corpus_info.setObjectName("label_corpus_info")
+        self.horizontalLayout_corpus_language.addWidget(self.label_corpus_info)
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout_corpus_language.addItem(spacerItem1)
         self.verticalLayout_corpus.addLayout(self.horizontalLayout_corpus_language)
@@ -657,7 +662,7 @@ class Ui_DialogTextStats(object):
         self.verticalLayout_main.addWidget(self.tabWidget)
 
         self.retranslateUi(DialogTextStats)
-        self.tabWidget.setCurrentIndex(4)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(DialogTextStats)
 
     def retranslateUi(self, DialogTextStats):
