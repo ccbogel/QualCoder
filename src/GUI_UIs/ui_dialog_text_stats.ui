@@ -3,7 +3,7 @@
  <class>DialogTextStats</class>
  <widget class="QDialog" name="DialogTextStats">
   <property name="windowModality">
-   <enum>Qt::WindowModality::NonModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_corpus">
       <attribute name="title">
@@ -96,7 +96,7 @@ If no code is selected (all codes), the whole documents are used instead</string
            </property>
           </widget>
          </item>
-         <item alignment="Qt::AlignmentFlag::AlignRight">
+         <item>
           <widget class="QLabel" name="label_language">
            <property name="minimumSize">
             <size>
@@ -109,9 +109,6 @@ If no code is selected (all codes), the whole documents are used instead</string
            </property>
            <property name="text">
             <string>Language:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
            </property>
           </widget>
          </item>
@@ -187,9 +184,6 @@ Whole documents if all codes are selected, otherwise the coded texts of the sele
          </item>
          <item>
           <spacer name="horizontalSpacer_corpus_params">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
            <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
@@ -223,9 +217,6 @@ Whole documents if all codes are selected, otherwise the coded texts of the sele
          </item>
          <item>
           <spacer name="horizontalSpacer_corpus_language">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
            <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
@@ -242,7 +233,7 @@ Whole documents if all codes are selected, otherwise the coded texts of the sele
           <string>Preview of the corpus segments (document, case, code, text)</string>
          </property>
          <property name="editTriggers">
-          <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+          <set>QAbstractItemView::NoEditTriggers</set>
          </property>
          <column>
           <property name="text">
@@ -378,9 +369,6 @@ Forms occurring at least this many times in the corpus are used in the analyses.
          </item>
          <item>
           <spacer name="horizontalSpacer_stats">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
            <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
@@ -527,9 +515,6 @@ Forms occurring at least this many times in the corpus are used in the analyses.
          </item>
          <item>
           <spacer name="horizontalSpacer_descstats">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
            <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
@@ -575,7 +560,7 @@ Hapax = forms occurring only once.</string>
        <item>
         <widget class="QTextBrowser" name="textBrowser_stats">
          <property name="toolTip">
-          <string>All the statistics in a single report: descending text statistics (corpus summary, frequencies, hapax, breakdown by variable) and chi-square specificities of the selected partition variable</string>
+          <string/>
          </property>
         </widget>
        </item>
@@ -588,9 +573,6 @@ Hapax = forms occurring only once.</string>
       <layout class="QVBoxLayout" name="verticalLayout_graphs">
        <item>
         <widget class="QSplitter" name="splitter_graphs">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
          <widget class="QWidget" name="widget_graphs_left" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_graphs_left">
            <property name="leftMargin">
@@ -674,9 +656,6 @@ Hapax = forms occurring only once.</string>
               </property>
               <property name="text">
                <string>Association:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
              <widget class="QComboBox" name="comboBox_sim_method">
@@ -796,9 +775,6 @@ Hapax = forms occurring only once.</string>
               </property>
               <property name="text">
                <string>Edge threshold:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
              </widget>
              <widget class="QDoubleSpinBox" name="doubleSpinBox_sim_threshold">
@@ -1067,9 +1043,6 @@ Each community gets its own colour in the graph.</string>
               <property name="text">
                <string>Halo:</string>
               </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-              </property>
              </widget>
              <widget class="QComboBox" name="comboBox_sim_halo">
               <property name="geometry">
@@ -1130,9 +1103,6 @@ Each community gets its own colour in the graph.</string>
               <property name="text">
                <string>Columns:</string>
               </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-              </property>
              </widget>
             </widget>
            </item>
@@ -1163,7 +1133,7 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
               <string>Eigenvalues and inertia of the correspondence analysis axes</string>
              </property>
              <property name="editTriggers">
-              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+              <set>QAbstractItemView::NoEditTriggers</set>
              </property>
              <column>
               <property name="text">
@@ -1480,9 +1450,6 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
          </item>
          <item>
           <spacer name="horizontalSpacer_reinert">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
            <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
@@ -1527,15 +1494,12 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
        </item>
        <item>
         <widget class="QSplitter" name="splitter_reinert">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
          <widget class="QTreeWidget" name="treeWidget_reinert">
           <property name="toolTip">
            <string>Classes of the CHD; click one to show its characteristic forms and representative initial context units</string>
           </property>
           <property name="editTriggers">
-           <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+           <set>QAbstractItemView::NoEditTriggers</set>
           </property>
           <column>
            <property name="text">
@@ -1578,7 +1542,7 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
               <string>Profile of the selected class: forms with their frequency, chi-square and signed value</string>
              </property>
              <property name="editTriggers">
-              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+              <set>QAbstractItemView::NoEditTriggers</set>
              </property>
              <column>
               <property name="text">
@@ -1625,9 +1589,6 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
        </item>
        <item>
         <widget class="QSplitter" name="splitter_reinert_plots">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
          <widget class="QWidget" name="widget_reinert_dendro_plot" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_reinert_dendro_plot"/>
          </widget>
@@ -1849,9 +1810,6 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
          </item>
          <item>
           <spacer name="horizontalSpacer_bertopic">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
            <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
@@ -1948,15 +1906,12 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
        </item>
        <item>
         <widget class="QSplitter" name="splitter_bertopic">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
          <widget class="QTableWidget" name="tableWidget_bertopic">
           <property name="toolTip">
            <string>Topics: size, characteristic words (c-TF-IDF score) and a representative segment</string>
           </property>
           <property name="editTriggers">
-           <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+           <set>QAbstractItemView::NoEditTriggers</set>
           </property>
           <column>
            <property name="text">
@@ -1984,16 +1939,13 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
            <string>Distribution of the topics per modality of the selected variable</string>
           </property>
           <property name="editTriggers">
-           <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+           <set>QAbstractItemView::NoEditTriggers</set>
           </property>
          </widget>
         </widget>
        </item>
        <item>
         <widget class="QSplitter" name="splitter_topics_plots">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
          <widget class="QWidget" name="widget_topics_plot" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_topics_plot"/>
          </widget>
