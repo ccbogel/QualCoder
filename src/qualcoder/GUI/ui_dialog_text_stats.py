@@ -728,7 +728,7 @@ class Ui_DialogTextStats(object):
         self.label_ca_help.setToolTip(_translate("DialogTextStats", "Correspondence analysis of the forms x columns table.\n"
 "The factor map on axes 1 x 2 shows which forms are characteristic of which column categories.\n"
 "Bblue points = forms. R red = columns. Point size = frequency."))
-        self.label_ca_help.setText(_translate("DialogTextStats", "Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2 (drawn below, or opened in a separate window) shows which forms are characteristic of which column categories - blue points = forms, red = columns, point size = frequency."))
+        self.label_ca_help.setText(_translate("DialogTextStats", "Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2. Shows which forms are characteristic of which column categories. Blue points = forms, red = columns, size = frequency."))
         self.tableWidget_ca.setToolTip(_translate("DialogTextStats", "Eigenvalues and inertia of the correspondence analysis axes"))
         item = self.tableWidget_ca.horizontalHeaderItem(0)
         item.setText(_translate("DialogTextStats", "Axis"))
