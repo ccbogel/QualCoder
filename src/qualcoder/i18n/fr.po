@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-26 08:21+0100\n"
-"PO-Revision-Date: 2026-11-25 17:16+0100\n"
+"PO-Revision-Date: 2026-11-26 11:28+0100\n"
 "Last-Translator: Justin\n"
 "Language-Team: FR <LL@li.org>\n"
 "Language: fr\n"
@@ -7132,6 +7132,8 @@ msgstr "Erreur de saisie du cas dans la base de données"
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:919
 msgid "Replaced filename characters that are illegal on Windows: "
 msgstr ""
+"Remplacement des caractères non autorisés dans les noms de fichiers sous "
+"Windows :"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/refi.py:944
 msgid "Cannot copy Image file from: "
@@ -10627,13 +10629,12 @@ msgid "Run SQL query"
 msgstr "Exécuter la requête SQL"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:490
-#, fuzzy
 msgid "Lexicometry. Text analysis."
-msgstr "Lexicométrie (statistiques textuelles)"
+msgstr "Lexicométrie. Statistiques textuelles."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:491
 msgid "Apply statistical methods to the lexicon."
-msgstr ""
+msgstr "Appliquer des méthodes statistiques au lexique."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:492
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/irastats/report_html.py:88
@@ -10645,30 +10646,37 @@ msgid ""
 "Active forms: Nouns, main verbs, adjectives, adverbs. Occuring two ro more "
 "times in the corpus. Active forms contain meaning."
 msgstr ""
+"Formes actives : noms, verbes principaux, adjectifs, adverbes. Apparaissant "
+"au moins deux fois dans le corpus. Les formes actives véhiculent du sens."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:494
 msgid "Corpus: Structures machine-readable collection of texts."
-msgstr ""
+msgstr "Corpus : ensemble de textes structurés et lisibles par machine."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:495
 msgid "Forms: Nouns, main verbs, adjectives, adverbs."
-msgstr ""
+msgstr "Corpus : ensemble de textes structurés et lisibles par machine."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:496
 msgid "Hapax: A form occuring only once."
-msgstr ""
+msgstr "Hapax : forme qui n'apparaît qu'une seule fois."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:497
 msgid ""
 "Partition variable: Scores the tokens (words). Makes the tokens compete "
 "against each other numerically for statistical comparisons."
 msgstr ""
+"Variable de partition : attribue un score aux tokens (mots). Permet de "
+"mettre les tokens en concurrence les uns avec les autres sur le plan "
+"numérique à des fins de comparaisons statistiques."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:498
 msgid ""
 "Stemming: Removes word endings to group word variants. e.g. runs, running = "
 "run"
 msgstr ""
+"Lemnisation : supprime les terminaisons des mots afin de regrouper leurs "
+"variantes. Par exemple : runs, running = run"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:499
 msgid ""
@@ -10676,63 +10684,74 @@ msgid ""
 "prepositions, conjunctions articles and auxillary words. Excluded from "
 "clustering math."
 msgstr ""
+"Formes accessoires : mots fonctionnels ou grammaticaux tels que les pronoms, "
+"les prépositions, les conjonctions, les articles et les mots auxiliaires. "
+"Exclus du calcul des regroupements."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:500
 msgid "Tokenization: Breaks text into units (words) called tokens."
-msgstr ""
+msgstr "Tokenisation : divise le texte en unités (mots) appelées « tokens »."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:501
-#, fuzzy
 msgid "Graphs tab"
-msgstr "Le graphe «"
+msgstr "Onglet Graphiques"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:502
 msgid "TODO: "
-msgstr ""
+msgstr "À faire : "
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:503
-#, fuzzy
 msgid "Reinert classification tab"
-msgstr "Classification Reinert : "
+msgstr "Onglet de la classification de Reinert"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:504
 msgid ""
 "An unsupervised clustering technique used to group text segments into "
 "distinct classes based on word co-occurrence."
 msgstr ""
+"Une technique de regroupement non supervisée utilisée pour classer des "
+"segments de texte en catégories distinctes en fonction de la cooccurrence "
+"des mots."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:505
 msgid ""
 "Reinert CHD: Descending Hierarchical Classification. Based on word co-"
 "occurence."
 msgstr ""
+"Reinert CHD : Classification hiérarchique descendante. Basée sur la "
+"cooccurrence des mots."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:506
-#, fuzzy
 msgid "Topics tab"
-msgstr "Thèmes : "
+msgstr "Onglet des thèmes"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:507
 msgid ""
 "BERT: Bidirectional Encoder Representations from Transformers. Reads text "
 "before and after a word to get context."
 msgstr ""
+"BERT : Bidirectional Encoder Representations from Transformers. Analyse le "
+"texte qui précède et qui suit un mot pour en dégager le contexte."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:508
 msgid ""
 "c-TF-IDF: Modified TF-IDF formula. TF = term frequency. IDF - Inverse "
 "document frequency."
 msgstr ""
+"c-TF-IDF : formule TF-IDF modifiée. TF = fréquence du terme. IDF = fréquence "
+"inverse du document."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:509
 msgid ""
 "infloat/mulitlingual-e5 large : Open source text embedding model from "
 "Microsoft."
 msgstr ""
+"infloat/mulitlingual-e5 large : Modèle open source d'intégration de texte "
+"développé par Microsoft."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:510
 msgid "paraphrase-multilingual-MiniLM-L12-v2 : Lightweight rembedding model."
-msgstr ""
+msgstr "paraphrase-multilingual-MiniLM-L12-v2 : Modèle de réencodage léger."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/information.py:515
 msgid ""
@@ -17913,9 +17932,8 @@ msgstr "Statistiques textuelles"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/irastats/report_html.py:79
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/irastats/report_odt.py:70
-#, fuzzy
 msgid "Totals"
-msgstr "Total"
+msgstr "Totaux"
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/irastats/report_html.py:81
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/irastats/report_odt.py:72
@@ -17950,6 +17968,12 @@ msgid ""
 "minimum frequency (rarer forms are supplementary); Hapax = forms occurring "
 "only once."
 msgstr ""
+"Segments = unités de texte analysées (textes codés selon les codes "
+"sélectionnés, ou documents entiers) ; Occurrences = nombre total de mots ; "
+"Formes = formes lexicales distinctes après normalisation ; Formes actives = "
+"formes apparaissant au moins à la fréquence minimale (les formes plus rares "
+"sont considérées comme supplémentaires) ; Hapax = formes n'apparaissant "
+"qu'une seule fois."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/irastats/report_html.py:93
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/irastats/report_odt.py:79
@@ -17981,6 +18005,8 @@ msgstr "Particularités"
 msgid ""
 "Select a partition variable to also compute the chi-square specificities."
 msgstr ""
+"Sélectionnez une variable de partition pour calculer également les "
+"spécificités du chi carré."
 
 #: /home/qwerty/Documents/Production/Software/QualCoder/QualCoder/src/qualcoder/irastats/report_odt.py:86
 msgid "Modality"

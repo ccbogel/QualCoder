@@ -862,7 +862,8 @@ Le lemmatiseur intensif n'est pas utilisé.</translation>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Build the corpus from the current selections.
 Show a preview of the segments and the corpus size.</source>
-      <translation type="unfinished"/>
+      <translation>Construire le corpus depuis la sélection.
+Montrer une prévisualisation des segments et de la taille du corpus.</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
@@ -915,18 +916,20 @@ Les documents complets si tous les codes sont sélectionnés, sinon les textes c
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Minimum frequency for a form to be an active form.
 Forms occurring at least this many times in the corpus are used in the analyses.</source>
-      <translation type="unfinished"/>
+      <translation>Fréquence minimale requise pour qu'une forme soit considérée comme active.
+Les formes apparaissant au moins ce nombre de fois dans le corpus sont prises en compte dans les analyses.</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Minimum active forms:</source>
-      <translation type="unfinished"/>
+      <translation>Formes actives minimales :</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Minimum frequency for a form to be an active form. 
 Forms occurring at least this many times in the corpus are used in the analyses.</source>
-      <translation type="unfinished"/>
+      <translation>Fréquence minimale requise pour qu’une forme soit considérée comme active.
+Les formes apparaissant au moins ce nombre de fois dans le corpus sont prises en comptes dans les analyses.</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
@@ -943,7 +946,7 @@ Forms occurring at least this many times in the corpus are used in the analyses.
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Keep the specificities with a two-sided p-value &lt;= threshold</source>
-      <translation type="unfinished"/>
+      <translation>Laisser les spécificités avec deux p value &lt;= seuil</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
@@ -953,7 +956,7 @@ Forms occurring at least this many times in the corpus are used in the analyses.
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Calculate the text statistics.</source>
-      <translation type="unfinished"/>
+      <translation>Calculer les statistiques textuelles</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
@@ -1002,7 +1005,7 @@ Hapax = formes n'apparaissant qu'une seule fois.</translation>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Text statistics report (summary, frequency table, hapax, partition variable breakdown). Partition variable: chi-square specificities shown (green = over-represented, red = under-represented).</source>
-      <translation type="unfinished"/>
+      <translation>Rapport statistique sur le texte (résumé, tableau de fréquences, hapax, ventilation par variable de partition). Variable de partition : spécificités du test du chi carré indiquées (vert = surreprésenté, rouge = sous-représenté).</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
@@ -1013,12 +1016,12 @@ Hapax = formes n'apparaissant qu'une seule fois.</translation>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Forms occurring at least this many times appear as nodes.</source>
-      <translation type="unfinished"/>
+      <translation>Les formes apparaissant au moins ce nombre de fois s'affichent sous forme de nœuds.</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Frequency:</source>
-      <translation type="unfinished"/>
+      <translation>Fréquence :</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
@@ -1029,12 +1032,12 @@ Hapax = formes n'apparaissant qu'une seule fois.</translation>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Association:</source>
-      <translation type="unfinished"/>
+      <translation>Association :</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Build the similarity graph.</source>
-      <translation type="unfinished"/>
+      <translation>Construire le graphique des similarités.</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
@@ -1055,7 +1058,7 @@ Hapax = formes n'apparaissant qu'une seule fois.</translation>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Minimum association value for an edge between two forms in the similarity graph.</source>
-      <translation type="unfinished"/>
+      <translation>Valeur minimale d'association pour une arête reliant deux formes dans le graphe de similarité.</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
@@ -1068,7 +1071,10 @@ Hapax = formes n'apparaissant qu'une seule fois.</translation>
 Each node is a form (size = frequency).
 Each edge links two forms co-occurring in the same segment (width = association strength)
 Node colours = detected communities.</source>
-      <translation type="unfinished"/>
+      <translation>Graphique de similarité
+Chaque nœud représente une forme (taille = fréquence).
+Chaque arête relie deux formes cooccurantes dans le même segment (largeur = force de l'association).
+Couleurs des nœuds = communautés détectées.</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
@@ -1104,12 +1110,13 @@ Node colours = detected communities.</source>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Detect communities of strongly associated forms with the Louvain algorithm.
 Each community gets its own colour in the graph.</source>
-      <translation type="unfinished"/>
+      <translation>Identifier les communautés de formes étroitement associées à l'aide de l'algorithme de Louvain.
+Chaque communauté est représentée par une couleur distincte dans le graphe.</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Communities</source>
-      <translation type="unfinished"/>
+      <translation>Communautés</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
@@ -1131,19 +1138,21 @@ Each community gets its own colour in the graph.</source>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Columns:</source>
-      <translation type="unfinished"/>
+      <translation>Colonnes :</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Correspondence analysis of the forms x columns table.
 The factor map on axes 1 x 2 shows which forms are characteristic of which column categories.
 Bblue points = forms. R red = columns. Point size = frequency.</source>
-      <translation type="unfinished"/>
+      <translation>Analyse en correspondances du tableau « formes × colonnes ».
+La carte factorielle sur les axes 1 × 2 montre quelles formes sont caractéristiques de quelles catégories de colonnes.
+Points bleus = formes. Points rouges = colonnes. Taille des points = fréquence.</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
       <source>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2. Shows which forms are characteristic of which column categories. Blue points = forms, red = columns, size = frequency.</source>
-      <translation type="unfinished"/>
+      <translation>Analyse en correspondances du tableau « formes × colonnes » : carte des facteurs sur les axes 1 × 2. Elle montre quelles formes sont caractéristiques de quelles catégories de colonnes. Points bleus = formes, points rouges = colonnes, taille = fréquence.</translation>
     </message>
     <message>
       <location filename="../../GUI_UIs/ui_dialog_text_stats.ui" line="0"/>
@@ -6560,7 +6569,7 @@ N’encodez pas ce texte avant d’avoir rechargé Codage &gt; Coder le texte de
     <message>
       <location filename="../../GUI_UIs/ui_main.ui" line="0"/>
       <source>Text statistics</source>
-      <translation type="unfinished"/>
+      <translation>Statistiques textuelles</translation>
     </message>
   </context>
 </TS>
