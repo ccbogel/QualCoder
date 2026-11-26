@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 
 def descendant_statistics(table: LexicalTable, variable: str = None) -> dict:
-    """Descending statistics of a lexical table.
+    """Total of a lexical table.
 
     Args:
         table: a LexicalTable (irastats.lexicon)
