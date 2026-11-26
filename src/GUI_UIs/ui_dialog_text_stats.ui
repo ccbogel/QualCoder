@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="tab_corpus">
       <attribute name="title">
@@ -953,34 +953,6 @@ Each community gets its own colour in the graph.</string>
                <string>Draw a red halo around the direct neighbours of this form in the graph</string>
               </property>
              </widget>
-             <widget class="QPushButton" name="pushButton_info_3">
-              <property name="geometry">
-               <rect>
-                <x>120</x>
-                <y>39</y>
-                <width>32</width>
-                <height>30</height>
-               </rect>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>32</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>32</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="toolTip">
-               <string>Text analysis information</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
             </widget>
            </item>
            <item>
@@ -1030,6 +1002,9 @@ Node colours = detected communities.</string>
           </layout>
          </widget>
          <widget class="QWidget" name="widget_graphs_right" native="true">
+          <property name="styleSheet">
+           <string notr="true">border-left: 1px solid #777777;</string>
+          </property>
           <layout class="QVBoxLayout" name="verticalLayout_graphs_right">
            <property name="leftMargin">
             <number>0</number>
@@ -1066,7 +1041,7 @@ Node colours = detected communities.</string>
              <widget class="QPushButton" name="pushButton_ca_run">
               <property name="geometry">
                <rect>
-                <x>1</x>
+                <x>120</x>
                 <y>39</y>
                 <width>32</width>
                 <height>30</height>
@@ -1094,7 +1069,7 @@ Node colours = detected communities.</string>
              <widget class="QPushButton" name="pushButton_ca_png">
               <property name="geometry">
                <rect>
-                <x>39</x>
+                <x>160</x>
                 <y>39</y>
                 <width>32</width>
                 <height>30</height>
@@ -1122,7 +1097,7 @@ Node colours = detected communities.</string>
              <widget class="QPushButton" name="pushButton_ca_popout">
               <property name="geometry">
                <rect>
-                <x>78</x>
+                <x>200</x>
                 <y>39</y>
                 <width>32</width>
                 <height>30</height>
@@ -1150,7 +1125,7 @@ Node colours = detected communities.</string>
              <widget class="QPushButton" name="pushButton_ca_csv">
               <property name="geometry">
                <rect>
-                <x>117</x>
+                <x>240</x>
                 <y>39</y>
                 <width>32</width>
                 <height>30</height>
@@ -1178,7 +1153,7 @@ Node colours = detected communities.</string>
              <widget class="QComboBox" name="comboBox_ca_variable">
               <property name="geometry">
                <rect>
-                <x>240</x>
+                <x>120</x>
                 <y>10</y>
                 <width>240</width>
                 <height>26</height>
@@ -1191,32 +1166,60 @@ Node colours = detected communities.</string>
                </size>
               </property>
               <property name="toolTip">
-               <string>Columns of the analysed table: 'Segments' = forms x segments, otherwise forms x modalities of the partition variable</string>
+               <string>Partition variable: Segments = forms x segments, otherwise forms x modalities of the partition variable</string>
               </property>
              </widget>
              <widget class="QLabel" name="label_ca_columns">
               <property name="geometry">
                <rect>
-                <x>150</x>
+                <x>10</x>
                 <y>13</y>
-                <width>81</width>
+                <width>101</width>
                 <height>20</height>
                </rect>
               </property>
               <property name="maximumSize">
                <size>
-                <width>100</width>
+                <width>120</width>
                 <height>20</height>
                </size>
               </property>
               <property name="toolTip">
-               <string>Columns of the analysed table: 'Segments' = forms x segments, otherwise forms x modalities of the partition variable</string>
+               <string>Partition variable: Segments = forms x segments, otherwise forms x modalities of the partition variable</string>
               </property>
               <property name="text">
-               <string>Columns:</string>
+               <string>Variable</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="pushButton_info_3">
+              <property name="geometry">
+               <rect>
+                <x>370</x>
+                <y>40</y>
+                <width>32</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>32</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Text analysis information</string>
+              </property>
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </widget>
@@ -1234,8 +1237,11 @@ Node colours = detected communities.</string>
 The factor map on axes 1 x 2 shows which forms are characteristic of which column categories.
 Bblue points = forms. R red = columns. Point size = frequency.</string>
              </property>
+             <property name="styleSheet">
+              <string notr="true">padding-left: 1px;</string>
+             </property>
              <property name="text">
-              <string>Correspondence analysis of the forms x columns table: the factor map on axes 1 x 2. Shows which forms are characteristic of which column categories. Blue points = forms, red = columns, size = frequency.</string>
+              <string>Correspondence analysis of forms x columns: factor map on axes 1 x 2. Shows forms by column categories. Blue = forms. Red = columns. Size = frequency.</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
@@ -1246,6 +1252,9 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
             <widget class="QTableWidget" name="tableWidget_ca">
              <property name="toolTip">
               <string>Eigenvalues and inertia of the correspondence analysis axes</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">padding-left:1px;</string>
              </property>
              <property name="editTriggers">
               <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
@@ -1312,7 +1321,8 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
             </size>
            </property>
            <property name="toolTip">
-            <string>Initial context unit size in occurrences: the corpus is split into segments of about this many words, cut at sentence boundaries when possible</string>
+            <string>Initial context unit size in occurrences.
+The corpus is split into segments of about this many words, cut at sentence boundaries when possible</string>
            </property>
            <property name="text">
             <string>Initial context unit size (occurrences):</string>
@@ -1322,7 +1332,8 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
          <item>
           <widget class="QSpinBox" name="spinBox_reinert_size">
            <property name="toolTip">
-            <string>Initial context unit size in occurrences: the corpus is split into segments of about this many words, cut at sentence boundaries when possible</string>
+            <string>Initial context unit size in occurrences.
+The corpus is split into segments of about this many words, cut at sentence boundaries when possible</string>
            </property>
            <property name="minimum">
             <number>10</number>
@@ -1344,17 +1355,19 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
             </size>
            </property>
            <property name="toolTip">
-            <string>Minimum frequency for a form to be an 'active' form used in the forms x initial context unit table (default 3, as in IRaMuTeQ)</string>
+            <string>Minimum frequency for a form to be an 'active' form.
+Used in the forms x initial context unit table (default 3, as in IRaMuTeQ)</string>
            </property>
            <property name="text">
-            <string>Min frequency of active forms:</string>
+            <string>Min active forms:</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QSpinBox" name="spinBox_reinert_min_freq">
            <property name="toolTip">
-            <string>Minimum frequency for a form to be an 'active' form used in the forms x initial context unit table (default 3, as in IRaMuTeQ)</string>
+            <string>Minimum frequency for a form to be an 'active' form.
+Used in the forms x initial context unit table (default 3, as in IRaMuTeQ)</string>
            </property>
            <property name="minimum">
             <number>1</number>
@@ -1408,7 +1421,7 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
             </size>
            </property>
            <property name="toolTip">
-            <string>Minimum number of initial context units in each side of a split for it to be accepted</string>
+            <string>Minimum number of initial context units in each side of a split.</string>
            </property>
            <property name="text">
             <string>Min initial context units per class:</string>
@@ -1418,7 +1431,7 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
          <item>
           <widget class="QSpinBox" name="spinBox_reinert_min_size">
            <property name="toolTip">
-            <string>Minimum number of initial context units in each side of a split for it to be accepted</string>
+            <string>Minimum number of initial context units in each side of a split.</string>
            </property>
            <property name="minimum">
             <number>1</number>
@@ -1446,7 +1459,7 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
             </size>
            </property>
            <property name="toolTip">
-            <string>Run the Reinert descending hierarchical classification (CHD) with the current parameters</string>
+            <string>Run the Reinert descending hierarchical classification (CHD)</string>
            </property>
            <property name="text">
             <string>Calculate</string>
@@ -1493,7 +1506,7 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
             <string>Correspondence analysis of the forms x classes table, shown in a separate window</string>
            </property>
            <property name="text">
-            <string>Correspondence analysis: forms x classes</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -1512,7 +1525,7 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
             </size>
            </property>
            <property name="toolTip">
-            <string>Show the dendrogram of the classification: one colour per class, with its most representative forms</string>
+            <string>Dendrogram of the classification: one colour per class, with its most representative forms</string>
            </property>
            <property name="text">
             <string>Dendrogram</string>
@@ -1534,7 +1547,7 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
             </size>
            </property>
            <property name="toolTip">
-            <string>Open in a separate window</string>
+            <string>Open dendrogram in a separate window</string>
            </property>
            <property name="text">
             <string/>
@@ -1556,7 +1569,7 @@ Bblue points = forms. R red = columns. Point size = frequency.</string>
             </size>
            </property>
            <property name="toolTip">
-            <string>Open in a separate window</string>
+            <string>Open correspondence analysis in a separate window</string>
            </property>
            <property name="text">
             <string/>
