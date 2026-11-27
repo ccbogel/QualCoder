@@ -271,11 +271,12 @@ class Ui_DialogTextStats(object):
         self.checkBox_sim_communities.setChecked(True)
         self.checkBox_sim_communities.setObjectName("checkBox_sim_communities")
         self.label_sim_halo = QtWidgets.QLabel(parent=self.groupBox_similarity_graph)
-        self.label_sim_halo.setGeometry(QtCore.QRect(380, 40, 51, 28))
+        self.label_sim_halo.setGeometry(QtCore.QRect(380, 40, 28, 28))
+        self.label_sim_halo.setText("")
         self.label_sim_halo.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
         self.label_sim_halo.setObjectName("label_sim_halo")
         self.comboBox_sim_halo = QtWidgets.QComboBox(parent=self.groupBox_similarity_graph)
-        self.comboBox_sim_halo.setGeometry(QtCore.QRect(450, 41, 76, 26))
+        self.comboBox_sim_halo.setGeometry(QtCore.QRect(410, 41, 76, 26))
         self.comboBox_sim_halo.setMaximumSize(QtCore.QSize(180, 16777215))
         self.comboBox_sim_halo.setObjectName("comboBox_sim_halo")
         self.verticalLayout_graphs_left.addWidget(self.groupBox_similarity_graph)
@@ -666,7 +667,7 @@ class Ui_DialogTextStats(object):
         self.verticalLayout_main.addWidget(self.tabWidget)
 
         self.retranslateUi(DialogTextStats)
-        self.tabWidget.setCurrentIndex(4)
+        self.tabWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(DialogTextStats)
 
     def retranslateUi(self, DialogTextStats):
@@ -725,15 +726,15 @@ class Ui_DialogTextStats(object):
 "Forms = distinct word forms after normalisation\n"
 "Active forms = forms occurring at least the minimum frequency (rarer forms are supplementary)\n"
 "Hapax = forms occurring only once."))
-        self.label_descstats_help.setText(_translate("DialogTextStats", "Text statistics report (summary, frequency table, hapax, partition variable breakdown). Partition variable: chi-square specificities shown (green = over-represented, red = under-represented)."))
+        self.label_descstats_help.setText(_translate("DialogTextStats", "Text statistics report (summary, frequency table, hapax, partition variable breakdown). Partition variable: chi-square specificities (green = over-represented, red = under-represented)."))
         self.textBrowser_stats.setToolTip(_translate("DialogTextStats", "All the statistics in a single report: descending text statistics (corpus summary, frequencies, hapax, breakdown by variable) and chi-square specificities of the selected partition variable"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_stats), _translate("DialogTextStats", "Statistics"))
         self.label_graph_min_freq.setToolTip(_translate("DialogTextStats", "Forms occurring at least this many times appear as nodes."))
         self.label_graph_min_freq.setText(_translate("DialogTextStats", "Frequency:"))
         self.spinBox_graph_min_freq.setToolTip(_translate("DialogTextStats", "Forms occurring at least this many times appear as nodes."))
-        self.label_sim_method.setToolTip(_translate("DialogTextStats", "Association measure between forms co-occurring in the same segment: Jaccard index (default) or chi-square (phi-squared)"))
+        self.label_sim_method.setToolTip(_translate("DialogTextStats", "Association measure between forms co-occurring in the same segment."))
         self.label_sim_method.setText(_translate("DialogTextStats", "Association:"))
-        self.comboBox_sim_method.setToolTip(_translate("DialogTextStats", "Association measure between forms co-occurring in the same segment: Jaccard index (default) or chi-square (phi-squared)"))
+        self.comboBox_sim_method.setToolTip(_translate("DialogTextStats", "Association measure between forms co-occurring in the same segment."))
         self.pushButton_sim_run.setToolTip(_translate("DialogTextStats", "Build the similarity graph."))
         self.pushButton_sim_png.setToolTip(_translate("DialogTextStats", "Export the similarity graph as a PNG image"))
         self.pushButton_sim_popout.setToolTip(_translate("DialogTextStats", "Open in a separate window"))
@@ -744,7 +745,6 @@ class Ui_DialogTextStats(object):
 "Each community gets its own colour in the graph."))
         self.checkBox_sim_communities.setText(_translate("DialogTextStats", "Communities"))
         self.label_sim_halo.setToolTip(_translate("DialogTextStats", "Draw a red halo around the direct neighbours of this form in the graph"))
-        self.label_sim_halo.setText(_translate("DialogTextStats", "Halo:"))
         self.comboBox_sim_halo.setToolTip(_translate("DialogTextStats", "Draw a red halo around the direct neighbours of this form in the graph"))
         self.label_sim_help.setToolTip(_translate("DialogTextStats", "Similarity graph\n"
 "Each node is a form (size = frequency).\n"
