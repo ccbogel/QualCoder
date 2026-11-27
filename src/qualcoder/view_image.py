@@ -1303,7 +1303,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         """  Show categories and codes of selected branch. """
 
         target_item = self.ui.treeWidget.currentItem()
-        codename= target_item.text(0)
+        if target_item is None:
+            return
+        self.show_codes_like_filter = ""
+        self.show_codes_colour_filter = ""
         self.show_codes_branch_filter = target_item.text(1)
 
         # Hide all items initially
@@ -1423,9 +1426,11 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.show_codes_like_filter = ""
         self.show_codes_colour_filter = ""
         self.show_codes_branch_filter = ""
+        self.ui.lineEdit_code_filter.blockSignals(True)
         self.ui.lineEdit_code_filter.setText("")
+        self.ui.lineEdit_code_filter.blockSignals(False)
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, "")  # Show all codes
+        self.recursive_traverse(root, "")  # Show all codes and categories
         self.ui.pushButton_clear_filter_code.setVisible(False)
         self.ui.pushButton_clear_filter_code.setStyleSheet("")  # reset style
 
@@ -1460,8 +1465,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             # Recurse first so we know whether any descendant matches.
             descendant_match = self.recursive_traverse(child, text_, case_sensitive)
             if text_ == "":
-                if is_code:
-                    child.setHidden(False)
+                child.setHidden(False)
                 any_visible_descendant = True
                 continue
             self_match = False
