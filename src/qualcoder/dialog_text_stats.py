@@ -172,6 +172,7 @@ class DialogTextStats(QtWidgets.QDialog):
         }
         for name, icon in icons.items():
             getattr(self, name).setIcon(qta.icon(icon, options=[{'scale_factor': 1.4}]))
+        self.ui.label_sim_halo.setPixmap(qta.icon('mdi6.circle-outline').pixmap(26, 26))
 
     def _init_combos(self):
         """Static combo contents; the partition variable combos are filled from the
