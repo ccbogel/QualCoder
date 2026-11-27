@@ -30,6 +30,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .GUI.ui_dialog_text_stats import Ui_DialogTextStats
 from .helpers import ExportDirectoryPathDialog, Message
+from .information import DialogInformation, lexicometry_information
 from .irastats import (
     available_variables,
     build_document_segments,
@@ -164,6 +165,10 @@ class DialogTextStats(QtWidgets.QDialog):
             "pushButton_reinert_ca_popout": "mdi6.open-in-new",
             "pushButton_bertopic_chart_popout": "mdi6.open-in-new",
             "pushButton_bertopic_dist_popout": "mdi6.open-in-new",
+            "pushButton_info": "mdi6.help",
+            "pushButton_info_2": "mdi6.help",
+            "pushButton_info_3": "mdi6.help",
+            "pushButton_info_4": "mdi6.help"
         }
         for name, icon in icons.items():
             getattr(self, name).setIcon(qta.icon(icon, options=[{'scale_factor': 1.4}]))
@@ -222,6 +227,15 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_reinert_ca_popout.clicked.connect(self.popout_reinert_ca)
         self.pushButton_bertopic_chart_popout.clicked.connect(self.popout_topics_chart)
         self.pushButton_bertopic_dist_popout.clicked.connect(self.popout_topics_distribution)
+        self.pushButton_info.clicked.connect(self.analysis_information)
+        self.pushButton_info_2.clicked.connect(self.analysis_information)
+        self.pushButton_info_3.clicked.connect(self.analysis_information)
+        self.pushButton_info_4.clicked.connect(self.analysis_information)
+
+    def analysis_information(self):
+        ui = DialogInformation(self.app, _("Text analysis"), lexicometry_information)
+        ui.exec()
+
 
     def _fit_table(self, table, max_col_width: int = 500):
         """ Resize the columns to their contents but cap them at max_col_width,
