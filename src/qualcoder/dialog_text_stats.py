@@ -182,7 +182,7 @@ class DialogTextStats(QtWidgets.QDialog):
         lang = self.app.settings.get("language", "fr")
         if lang in LANGUAGES:
             self.comboBox_language.setCurrentText(lang)
-        self.comboBox_sim_method.addItem(_("Jaccard index (default)"), "jaccard")
+        self.comboBox_sim_method.addItem(_("Jaccard index"), "jaccard")
         self.comboBox_sim_method.addItem("chi2 (phi-squared)", "chi2")
         self.comboBox_sim_halo.addItem("")
         self.comboBox_bertopic_unit.addItem(_("Coded segments"), "segments")
