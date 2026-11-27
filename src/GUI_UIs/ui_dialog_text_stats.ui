@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>4</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_corpus">
       <attribute name="title">
@@ -622,7 +622,7 @@ Active forms = forms occurring at least the minimum frequency (rarer forms are s
 Hapax = forms occurring only once.</string>
          </property>
          <property name="text">
-          <string>Text statistics report (summary, frequency table, hapax, partition variable breakdown). Partition variable: chi-square specificities shown (green = over-represented, red = under-represented).</string>
+          <string>Text statistics report (summary, frequency table, hapax, partition variable breakdown). Partition variable: chi-square specificities (green = over-represented, red = under-represented).</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -727,7 +727,7 @@ Hapax = forms occurring only once.</string>
                </rect>
               </property>
               <property name="toolTip">
-               <string>Association measure between forms co-occurring in the same segment: Jaccard index (default) or chi-square (phi-squared)</string>
+               <string>Association measure between forms co-occurring in the same segment.</string>
               </property>
               <property name="text">
                <string>Association:</string>
@@ -752,7 +752,7 @@ Hapax = forms occurring only once.</string>
                </size>
               </property>
               <property name="toolTip">
-               <string>Association measure between forms co-occurring in the same segment: Jaccard index (default) or chi-square (phi-squared)</string>
+               <string>Association measure between forms co-occurring in the same segment.</string>
               </property>
              </widget>
              <widget class="QPushButton" name="pushButton_sim_run">
@@ -920,7 +920,7 @@ Each community gets its own colour in the graph.</string>
                <rect>
                 <x>380</x>
                 <y>40</y>
-                <width>51</width>
+                <width>28</width>
                 <height>28</height>
                </rect>
               </property>
@@ -928,7 +928,7 @@ Each community gets its own colour in the graph.</string>
                <string>Draw a red halo around the direct neighbours of this form in the graph</string>
               </property>
               <property name="text">
-               <string>Halo:</string>
+               <string/>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -937,7 +937,7 @@ Each community gets its own colour in the graph.</string>
              <widget class="QComboBox" name="comboBox_sim_halo">
               <property name="geometry">
                <rect>
-                <x>450</x>
+                <x>410</x>
                 <y>41</y>
                 <width>76</width>
                 <height>26</height>
