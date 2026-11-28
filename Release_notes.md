@@ -202,6 +202,7 @@ More sort options: Image by filename / pdf page / y value ; Audio video timeline
 ## REFI export / import
 
 Improvements to REFI QDPX Project export and import. Several issues identified. Thanks to improvement feeback from cybernative.ai.
+Duplicate code or category names were previously not well handled. Now duplicate names have a suffix added on import.
 
 ## References
 
