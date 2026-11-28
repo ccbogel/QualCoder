@@ -253,7 +253,7 @@ DEFAULT_FRAMEWORKS = {
 # Poedit / xgettext extraction block
 # This block is NEVER executed. It exists so that poedit and xgettext can find
 # every translatable string in the source. All calls use _() directly
-if False:  # noqa: SIM108  — intentional dead code for string extraction
+if False:  # intentional dead code for string extraction
     # Framework names
     _("Grounded Theory (Strauss & Corbin)")
     _("Qualitative Content Analysis (Mayring)")
