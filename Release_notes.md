@@ -201,7 +201,7 @@ More sort options: Image by filename / pdf page / y value ; Audio video timeline
 
 ## REFI export / import
 
-Improvements to REFI QDPX Project export and import.
+Improvements to REFI QDPX Project export and import. Several issues identified. Thanks to improvement feeback from cybernative.ai.
 
 ## References
 
