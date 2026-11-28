@@ -4846,7 +4846,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         """  Show categories and codes of selected branch. """
 
         target_item = self.ui.treeWidget.currentItem()
-        codename= target_item.text(0)
+        if target_item is None:
+            return
+        self.show_codes_like_filter = ""
+        self.show_codes_colour_filter = ""
         self.show_codes_branch_filter = target_item.text(1)
 
         # Hide all items initially
@@ -4908,8 +4911,11 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.ui.lineEdit_code_filter.blockSignals(False)
         else:
             text_ = str(filter_text)
+            self.show_codes_branch_filter = ""
             
         case_sensitive = False 
+        root = self.ui.treeWidget.invisibleRootItem()
+        self.recursive_traverse(root, "")  # Restore categories/codes hidden by branch filter
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, text_, case_sensitive)
         
@@ -4932,6 +4938,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         if not selected:
             return
         self.show_codes_branch_filter = ""
+        root = self.ui.treeWidget.invisibleRootItem()
+        self.recursive_traverse(root, "")  # Restore categories/codes hidden by branch filter
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.ui.pushButton_clear_filter_code.setVisible(True)
         self.ui.pushButton_clear_filter_code.setStyleSheet("background-color: #1e90ff; color: white;")
@@ -4940,8 +4948,12 @@ class DialogCodePdf(QtWidgets.QWidget):
     def clear_code_filter(self):
         """ Clears the filter and shows the entire tree. """
 
+        self.show_codes_like_filter = ""
+        self.show_codes_colour_filter = ""
         self.show_codes_branch_filter = ""
+        self.ui.lineEdit_code_filter.blockSignals(True)
         self.ui.lineEdit_code_filter.setText("")
+        self.ui.lineEdit_code_filter.blockSignals(False)
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")
         self.ui.pushButton_clear_filter_code.setVisible(False)
@@ -5160,8 +5172,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             # Recurse first so we know whether any descendant matches.
             descendant_match = self.recursive_traverse(child, text_, case_sensitive)
             if text_ == "":
-                if is_code:
-                    child.setHidden(False)
+                child.setHidden(False)
                 any_visible_descendant = True
                 continue
             self_match = False

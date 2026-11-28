@@ -2703,7 +2703,11 @@ class DialogCodeText(QtWidgets.QWidget):
         """  Show categoreis and codes of selected branch. """
 
         target_item = self.ui.treeWidget.currentItem()
-        codename= target_item.text(0)
+        if target_item is None:
+            return
+        codename = target_item.text(0)
+        self.show_codes_like_filter = ""
+        self.show_codes_colour_filter = ""
         self.show_codes_branch_filter = target_item.text(1)
 
         # Hide all items initially
@@ -2838,13 +2842,16 @@ class DialogCodeText(QtWidgets.QWidget):
         self.show_codes_like_filter = ""
         self.show_codes_colour_filter = ""
         self.show_codes_branch_filter = ""
+        self.ui.lineEdit_code_filter.blockSignals(True)
         self.ui.lineEdit_code_filter.setText("")
+        self.ui.lineEdit_code_filter.blockSignals(False)
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, "")  # Show all codes
+        self.recursive_traverse(root, "")  # Show all codes and categories
         self.ui.label_code.setPixmap(QtGui.QPixmap())
         self.ui.label_code.setToolTip("")
         self.ui.pushButton_clear_filter_code.setVisible(False)
         self.ui.pushButton_clear_filter_code.setStyleSheet("")  # Reset style
+        self.fill_code_label_with_selected_code()
 
     def clear_file_filter(self):
         """ Clear any active file filter (show files like, case files, attributes)
@@ -2876,8 +2883,7 @@ class DialogCodeText(QtWidgets.QWidget):
             # Recurse first so we know whether any descendant matches. <- L
             descendant_match = self.recursive_traverse(child, text_, case_sensitive)
             if text_ == "":
-                if is_code:
-                    child.setHidden(False)
+                child.setHidden(False)
                 any_visible_descendant = True
                 continue
             self_match = False

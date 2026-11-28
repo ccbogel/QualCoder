@@ -67,7 +67,7 @@ def descstats_odt(stats: dict, variable: str = None):
 
     doc = OpenDocumentText()
     doc.text.addElement(H(outlinelevel=1, text=_("Text statistics")))
-    doc.text.addElement(H(outlinelevel=2, text=_("Descending statistics")))
+    doc.text.addElement(H(outlinelevel=2, text=_("Totals")))
     summary = [
         [_("Total occurrences"), stats["total_occurrences"]],
         [_("Distinct forms"), stats["distinct_forms"]],

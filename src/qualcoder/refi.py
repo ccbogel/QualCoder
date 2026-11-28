@@ -890,7 +890,13 @@ class RefiImport:
         return name, creating_user, create_date, source_path, path_type, rich_text_path
 
     def unique_source_name(self, name):
-        """ Add _2, _3 etc before file extension, if source name is already taken. """
+        """ Add _2, _3 etc before file extension, if source name is already taken.
+        Replace WindowsOS illegal filename characters.
+        Illegal characters in Windows (Not Linux, macOS) filenames:
+                backslash, forwardslash, pipe, quote, asterix, colon, question mark
+        """        
+
+        # Add extensions if source taken.
         stem, dot, ext = name.rpartition(".")
         if not dot:
             stem, ext = name, ""
@@ -899,6 +905,18 @@ class RefiImport:
         while cur.execute("select 1 from source where name=?", [candidate]).fetchone():
             n += 1
             candidate = f"{stem}_{n}{dot}{ext}"
+
+        # Replace illegal characters " ? / * : |  for Windows
+        name_Length = len(candidate)
+        candidate = candidate.replace('"', '_QT_')
+        candidate = candidate.replace('?', '_QM_')
+        candidate = candidate.replace('/', '_SL_')
+        candidate = candidate.replace('\\', '_BS_')
+        candidate = candidate.replace('*', '_AS_')
+        candidate = candidate.replace(':', '_CN_')
+        candidate = candidate.replace('|', '_PP_')
+        if len(candidate) != name_Length:
+            self.parent_textedit.append(_("Replaced filename characters that are illegal on Windows: ") + candidate)
         return candidate
 
     def load_picture_source(self, element):
@@ -1358,7 +1376,7 @@ class RefiImport:
     def load_pdf_source(self, element):
         """ Load the pdf and text representation into sqlite.
         Can manage internal and absolute source paths.
-        Relative path sources are imported into the project folder
+        Relative path sources are imported into the project folder.
 
         Args:
             element: PDFSource element object
@@ -1377,10 +1395,10 @@ class RefiImport:
             destination = Path(self.app.project_path) / "documents" / name
             try:
                 shutil.copyfile(source_path, destination)
-                # print("PDF IMPORT", source_path, destination)
             except Exception as err:
                 self.parent_textedit.append(
                     _('Cannot copy PDF file from: ') + f"{source_path}\nto: {destination}\n{err}")
+                #print("\nERROR PDF IMPORT", source_path, destination)
         if path_type == "absolute":
             media_path = f"docs:{source_path}"
         if path_type == "relative":
@@ -1519,6 +1537,15 @@ class RefiImport:
                 name = f"{self.source_name_prefix}_{name}"
                 self.parent_textedit.append(f"source name duplicated. Adding prefix: {name}")
                 break
+        # Replace illegal filename characters for Windows
+        name = name.replace('"', '_QT_')
+        name = name.replace('?', '_QM_')
+        name = name.replace('/', '_SL_')
+        name = name.replace('\\', '_BS_')
+        name = name.replace('*', '_AS_')
+        name = name.replace(':', '_CN_')
+        name = name.replace('|', '_PP_')
+
         if pdf_rep_name != "":
             # contains .pdf
             name = pdf_rep_name
@@ -1527,7 +1554,7 @@ class RefiImport:
         cur = self.app.conn.cursor()
         # Find Description to complete memo
         memo = ""
-        for el in list(element):  # element.getchildren():
+        for el in list(element): 
             if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                 memo = el.text
         source = {'name': name, 'id': -1, 'fulltext': "", 'mediapath': mediapath, 'memo': memo,
@@ -1542,11 +1569,8 @@ class RefiImport:
                     break
                 if c == b'\r':
                     if f.read(1) == b'\n':
-                        # print('rn')
                         add_ending = True
-                    # print('r')
                     pass
-            # print('n')
 
         """Atlas stored correct positions in the project.qde xml
         as though it is \n  - one character
@@ -1599,14 +1623,14 @@ class RefiImport:
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
             destination = f"{self.app.project_path}/documents/{name}.{source_path.split('.')[-1]}"
-            # print("source", source_path)
-            # print("dest", destination)
             try:
                 shutil.copyfile(source_path, destination)
             except Exception as err:
                 logger.warning(str(err))
                 self.parent_textedit.append(
                     _('Cannot copy TextSource file from: ') + f"{source_path}\nto: {destination}\n{err}")
+                print("Source: ", source_path, "Destination:", destination)
+
             # If present, copy rich text file into .qda documents folder and rename into original name
             if rich_text_path != "":
                 rtf_destination = f"{self.app.project_path}/documents/{name}.{rich_text_path.split('.')[-1]}"

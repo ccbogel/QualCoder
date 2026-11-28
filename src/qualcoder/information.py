@@ -487,6 +487,28 @@ coding_shortcuts_display = coding_text_shortcuts + coding_pdf_shortcuts
 coding_shortcuts_display += coding_image_shortcuts + coding_av_shortcuts + code_tree_shortcuts
 coding_shortcuts_display += database_queries_shortcuts
 
+lexicometry_information = f'<h2>{_("Lexicometry. Text analysis.")}</h2>\
+{_("Apply statistical methods to the lexicon.")}<br />\
+<h3>{_("Definitions")}:</h3>\
+{_("Active forms: Nouns, main verbs, adjectives, adverbs. Occuring two ro more times in the corpus. Active forms contain meaning.")}<br />\
+{_("Corpus: Structures machine-readable collection of texts.")}<br />\
+{_("Forms: Nouns, main verbs, adjectives, adverbs.")}<br />\
+{_("Hapax: A form occuring only once.")}<br />\
+{_("Partition variable: Scores the tokens (words). Makes the tokens compete against each other numerically for statistical comparisons.")}<br />\
+{_("Stemming: Removes word endings to group word variants. e.g. runs, running = run")}<br />\
+{_("Supplementary forms: Functional or grammatical words such as pronouns, prepositions, conjunctions articles and auxillary words. Excluded from clustering math.")}<br />\
+{_("Tokenization: Breaks text into units (words) called tokens.")}<br />\
+<h3>{_("Graphs tab")}</h3>\
+{_("TODO: ")}<br />\
+<h3>{_("Reinert classification tab")}</h3>\
+{_("An unsupervised clustering technique used to group text segments into distinct classes based on word co-occurrence.")}<br />\
+{_("Reinert CHD: Descending Hierarchical Classification. Based on word co-occurence.")}<br />\
+<h3>{_("Topics tab")}</h3>\
+{_("BERT: Bidirectional Encoder Representations from Transformers. Reads text before and after a word to get context.")}<br />\
+{_("c-TF-IDF: Modified TF-IDF formula. TF = term frequency. IDF - Inverse document frequency.")}<br />\
+{_("infloat/mulitlingual-e5 large : Open source text embedding model from Microsoft.")}<br />\
+{_("paraphrase-multilingual-MiniLM-L12-v2 : Lightweight rembedding model.")}<br />'
+
 def project_tab_info():
     """Return translated Markdown for the Project tab placeholder."""
 

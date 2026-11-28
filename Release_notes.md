@@ -180,6 +180,17 @@ Added option to select multiple coded text segments and resize them, providing t
 
 Added Code Branch Filter to reduce tree clutter by showing only the select branch.
 
+## Text Analysis - Lexicometry
+
+New options for lexicometric analyses:
+
+* Corpus creation for export to IRaMuTeQ.
+* Text statistics report - summary, frequency table, hapax table. If selected, partition variable breakdown.
+* Similarity graph with communities.
+* Correspondence analysis.
+* Reinert CHD (Classification Hiérarchique Descendante / Descending Hierarchical Classification). Dendrogram.
+* BERTopic - topic modelling with BERT embeddings (sentence transformers).
+  
 ## Graph (Mind map)
 
 Radial option, now displays multiple radial graphs where there are multiple root nodes (root categories or codes).

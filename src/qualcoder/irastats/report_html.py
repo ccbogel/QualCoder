@@ -72,11 +72,11 @@ def table_html(headers: list, rows: list, row_classes: list = None) -> str:
 
 
 def descstats_body(stats: dict, variable: str = None) -> str:
-    """Body fragment of the descending statistics report (IRaMuTeQ "rapport descendant"). """
+    """Body fragment of the Totals report (IRaMuTeQ "rapport descendant"). """
 
     from .descstats import frequency_rows, hapax_rows, variable_rows
 
-    parts = [f"<h1>{escape(_('Text statistics'))}</h1>", f"<h2>{escape(_('Descending statistics'))}</h2>"]
+    parts = [f"<h1>{escape(_('Text statistics'))}</h1>", f"<h2>{escape(_('Totals'))}</h2>"]
     summary = [
         [_("Total occurrences"), stats["total_occurrences"]],
         [_("Distinct forms"), stats["distinct_forms"]],

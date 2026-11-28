@@ -30,6 +30,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .GUI.ui_dialog_text_stats import Ui_DialogTextStats
 from .helpers import ExportDirectoryPathDialog, Message
+from .information import DialogInformation, lexicometry_information
 from .irastats import (
     available_variables,
     build_document_segments,
@@ -131,7 +132,7 @@ class DialogTextStats(QtWidgets.QDialog):
         self.resize(1100, 750)
 
     def _setup_icons(self):
-        """qtawesome icons for the buttons (icons cannot be stored in the .ui file). """
+        """qtawesome icons for the buttons. """
 
         icons = {
             "pushButton_select_files": "mdi6.file-outline",
@@ -141,10 +142,10 @@ class DialogTextStats(QtWidgets.QDialog):
             "pushButton_export_iramuteq": "mdi6.export",
             "pushButton_descstats_run": "mdi6.play",
             "pushButton_descstats_csv": "mdi6.file-export-outline",
-            "pushButton_descstats_html": "mdi6.script-text-outline",
+            "pushButton_descstats_html": "mdi6.export",
             "pushButton_descstats_odt": "mdi6.file-document-outline",
             "pushButton_spec_csv": "mdi6.file-export-outline",
-            "pushButton_spec_html": "mdi6.script-text-outline",
+            "pushButton_spec_html": "mdi6.export",
             "pushButton_sim_run": "mdi6.play",
             "pushButton_sim_png": "mdi6.image-outline",
             "pushButton_ca_run": "mdi6.play",
@@ -164,9 +165,14 @@ class DialogTextStats(QtWidgets.QDialog):
             "pushButton_reinert_ca_popout": "mdi6.open-in-new",
             "pushButton_bertopic_chart_popout": "mdi6.open-in-new",
             "pushButton_bertopic_dist_popout": "mdi6.open-in-new",
+            "pushButton_info": "mdi6.help",
+            "pushButton_info_2": "mdi6.help",
+            "pushButton_info_3": "mdi6.help",
+            "pushButton_info_4": "mdi6.help"
         }
         for name, icon in icons.items():
-            getattr(self, name).setIcon(qta.icon(icon))
+            getattr(self, name).setIcon(qta.icon(icon, options=[{'scale_factor': 1.4}]))
+        self.ui.label_sim_halo.setPixmap(qta.icon('mdi6.circle-outline').pixmap(26, 26))
 
     def _init_combos(self):
         """Static combo contents; the partition variable combos are filled from the
@@ -176,7 +182,7 @@ class DialogTextStats(QtWidgets.QDialog):
         lang = self.app.settings.get("language", "fr")
         if lang in LANGUAGES:
             self.comboBox_language.setCurrentText(lang)
-        self.comboBox_sim_method.addItem(_("Jaccard index (default)"), "jaccard")
+        self.comboBox_sim_method.addItem(_("Jaccard index"), "jaccard")
         self.comboBox_sim_method.addItem("chi2 (phi-squared)", "chi2")
         self.comboBox_sim_halo.addItem("")
         self.comboBox_bertopic_unit.addItem(_("Coded segments"), "segments")
@@ -222,6 +228,15 @@ class DialogTextStats(QtWidgets.QDialog):
         self.pushButton_reinert_ca_popout.clicked.connect(self.popout_reinert_ca)
         self.pushButton_bertopic_chart_popout.clicked.connect(self.popout_topics_chart)
         self.pushButton_bertopic_dist_popout.clicked.connect(self.popout_topics_distribution)
+        self.pushButton_info.clicked.connect(self.analysis_information)
+        self.pushButton_info_2.clicked.connect(self.analysis_information)
+        self.pushButton_info_3.clicked.connect(self.analysis_information)
+        self.pushButton_info_4.clicked.connect(self.analysis_information)
+
+    def analysis_information(self):
+        ui = DialogInformation(self.app, _("Text analysis"), lexicometry_information)
+        ui.exec()
+
 
     def _fit_table(self, table, max_col_width: int = 500):
         """ Resize the columns to their contents but cap them at max_col_width,
