@@ -179,11 +179,11 @@ class DialogTextStats(QtWidgets.QDialog):
         project database by _fill_variable_combo / _refresh_variable_combos. """
 
         self.comboBox_language.addItems(LANGUAGES)
-        lang = self.app.settings.get("language", "fr")
+        lang = self.app.settings.get("language", "en")
         if lang in LANGUAGES:
             self.comboBox_language.setCurrentText(lang)
         self.comboBox_sim_method.addItem(_("Jaccard index"), "jaccard")
-        self.comboBox_sim_method.addItem("chi2 (phi-squared)", "chi2")
+        self.comboBox_sim_method.addItem("chi2", "chi2")
         self.comboBox_sim_halo.addItem("")
         self.comboBox_bertopic_unit.addItem(_("Coded segments"), "segments")
         self.comboBox_bertopic_unit.addItem(_("Whole documents"), "documents")
