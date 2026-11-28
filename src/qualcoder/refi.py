@@ -210,22 +210,20 @@ class RefiImport:
             name = parent.get("name")
             if name is not None:
                 cur = self.app.conn.cursor()
-                try:
-                    cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,'',?,?)",
-                                [name, description, now_date, cat_id])
-                    self.app.conn.commit()
-                    cur.execute("select last_insert_rowid()")
-                    last_insert_id = cur.fetchone()[0]
-                    counter += 1
-                except sqlite3.IntegrityError:
-                    # Category name already exists - reuse its catid so children still nest
-                    try:
-                        cur.execute("select catid from code_cat where name=?", [name])
-                        row = cur.fetchone()
-                        if row is not None:
-                            last_insert_id = row[0]
-                    except sqlite3.Error:
-                        pass
+                # Check for duplicate name and add suffix _n
+                candidate, n = name, 1
+                while cur.execute("select 1 from code_name where name=?", [candidate]).fetchone():
+                    n += 1
+                    candidate = f"{name}_{n}"
+                if candidate != name:
+                    self.parent_textedit.append(_("Duplicate category name, suffix added: ") + candidate)
+
+                cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,'',?,?)",
+                            [candidate, description, now_date, cat_id])
+                self.app.conn.commit()
+                cur.execute("select last_insert_rowid()")
+                last_insert_id = cur.fetchone()[0]
+                counter += 1
             # Children of a category attach to the category (cat_id), never to a code
             for el in child_code_elements:
                 counter += self.sub_codes(el, last_insert_id, None)
@@ -249,24 +247,20 @@ class RefiImport:
         code_insert_id = None
         if name is not None:
             cur = self.app.conn.cursor()
-            try:
-                cur.execute("insert into code_name (name,memo,owner,date,catid,color,supercid) values(?,?,'',?,?,?,?)",
-                            [name, description, now_date, link_catid, color, link_supercid])
-                self.app.conn.commit()
-                cur.execute("select last_insert_rowid()")
-                code_insert_id = cur.fetchone()[0]
-                self.codes.append({'guid': parent.get('guid'), 'cid': code_insert_id})
-                counter += 1
-            except sqlite3.IntegrityError:
-                # Code name already exists - reuse its cid so children can still nest under it
-                try:
-                    cur.execute("select cid from code_name where name=?", [name])
-                    row = cur.fetchone()
-                    if row is not None:
-                        code_insert_id = row[0]
-                        self.codes.append({'guid': parent.get('guid'), 'cid': code_insert_id})
-                except sqlite3.Error:
-                    pass
+            # Check for duplicate name and add suffix _n
+            candidate, n = name, 1
+            while cur.execute("select 1 from code_name where name=?", [candidate]).fetchone():
+                n += 1
+                candidate = f"{name}_{n}"
+            if candidate != name:
+                self.parent_textedit.append(_("Duplicate code name, suffix added: ") + candidate)
+            cur.execute("insert into code_name (name,memo,owner,date,catid,color,supercid) values(?,?,'',?,?,?,?)",
+                        [candidate, description, now_date, link_catid, color, link_supercid])
+            self.app.conn.commit()
+            cur.execute("select last_insert_rowid()")
+            code_insert_id = cur.fetchone()[0]
+            self.codes.append({'guid': parent.get('guid'), 'cid': code_insert_id})
+            counter += 1
         # Child Codes of a codable code become its sub-codes (supercid)
         for el in child_code_elements:
             counter += self.sub_codes(el, None, code_insert_id)
@@ -333,7 +327,7 @@ class RefiImport:
         self.pd_value = 0
 
         contents = os.listdir(self.folder_name)
-        # Not all proejcts has a project.qde, it may have another name.qde
+        # Not all projects has a project.qde, it may have another name.qde
         projectqde = "project.qde"
         for c in contents:
             if Path(c).suffix == ".qde":
@@ -374,6 +368,7 @@ class RefiImport:
                     # Recursive search through each Code in Codes
                     count += self.sub_codes(code, None)
                 self.parent_textedit.append(_("Parse codes and categories. Loaded: ") + str(count))
+
             if c.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Variables":
                 count = self.parse_variables(c)
                 self.parent_textedit.append(_("Parse variables. Loaded: ") + str(count))
@@ -446,6 +441,7 @@ class RefiImport:
         
         self.pd.close()
         msg = _("REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n")
+        msg += _("Duplicate category or code names will have a suffix added during import.\n")
         msg += _("Audio/video transcripts: transcript codings and synchpoints not tested.\n")
         msg += _("Set components may be imported as file attributes.\n")
         msg += _("Graphs not imported as QualCoder does not have this functionality.\n")
@@ -588,7 +584,7 @@ class RefiImport:
 
         typeOfVariable: Text, Boolean, Integer, Float, Date, Datetime
 
-        param: element
+        Args: element
 
         return: count of variables
         """
@@ -1808,8 +1804,7 @@ class RefiImport:
 
         called by: import_project
 
-        param: element Notes
-
+        Args: element Notes
         return: count of journals, count of annotations
         """
 
@@ -2011,7 +2006,7 @@ class RefiImport:
     def parse_project_tag(self, element):
         """ Parse the Project tag.
         basePath used for relative linked sources.
-        Ifthe is not basePath element - create  on relative to the QPDX folder - at least - for ATLAS.ti
+        If the is not basePath element - create  on relative to the QPDX folder - at least - for ATLAS.ti
         Software name for ATLAS.ti for line endings issue where txt source is \r\n but within ATLAS it is just \n """
         self.base_path = element.get("basePath")
         # print("BASEPATH ", self.base_path)
